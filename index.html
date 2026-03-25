@@ -2,17 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Harmonic Atlas">
-<meta name="theme-color" content="#12101c">
-<meta name="description" content="Scale & Chord Explorer — interactive music theory reference with guitar diagrams, Circle of Fifths and progression builder">
-<title>Harmonic Atlas</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harmonic Atlas - Scale Chord Explorer</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,7 +15,7 @@
     --accent:#7c6fa0; --accent2:#a08bc8;
   }
   html { font-size:16px; scroll-behavior:smooth; }
-  body { background:var(--bg); color:var(--text); font-family:'IBM Plex Mono',monospace; min-height:100vh; overflow-x:hidden; transition: background .25s, color .25s; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right); }
+  body { background:var(--bg); color:var(--text); font-family:'IBM Plex Mono',monospace; min-height:100vh; overflow-x:hidden; transition: background .25s, color .25s; }
   body::before {
     content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
     background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(201,168,76,.06) 0%,transparent 60%),
@@ -882,6 +873,37 @@
   body.light-theme .collapsible-hdr { color: var(--dim); }
   body.light-theme .collapsible-hdr:hover { color: var(--gold2); }
   body.light-theme .rel-chip { border-color: var(--border); color: var(--dim); background: var(--surface2); }
+
+  /* ── Compact mode ── */
+  #compact-toggle {
+    position: fixed;
+    top: 16px; right: 62px;
+    z-index: 600;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+    box-shadow: 0 2px 10px rgba(0,0,0,.35);
+  }
+  #compact-toggle:hover { border-color: var(--accent2); color: var(--accent2); }
+  #compact-toggle.active { border-color: var(--accent2); color: var(--accent2); background: rgba(124,111,160,.12); }
+  body.compact-mode .scale-hero-desc { display: none; }
+  body.compact-mode .chord-quality { display: none; }
+  body.compact-mode .chord-notes-row { display: none; }
+  body.compact-mode .degree-name-label { display: none; }
+  body.compact-mode .section-divider { margin: 4px 0; }
+  body.compact-mode .degree-section { padding-bottom: 4px; }
+  body.compact-mode .chord-card { padding: 6px 8px 5px; }
+  body.compact-mode .degree-header { margin-bottom: 4px; }
+  body.compact-mode .chords-grid { gap: 4px; }
+  body.compact-mode .cof-section { display: none; }
+  body.compact-mode .diag-quality { display: none; }
+  body.compact-mode .diag-notes { display: none; }
+  body.light-theme #compact-toggle { background: var(--surface2); border-color: var(--border); color: var(--muted); }
   body.light-theme .cad-row { border-color: var(--border); }
   body.light-theme .cad-name { color: var(--dim); }
   body.light-theme .cad-chord { color: var(--gold2); border-color: var(--border); background: var(--surface2); }
@@ -919,7 +941,7 @@
   #guide-btn {
     position: fixed;
     top: 16px;
-    right: 108px;
+    right: 154px;
     z-index: 300;
     width: 40px; height: 40px;
     border-radius: 50%;
@@ -935,7 +957,7 @@
 
   #tech-btn {
     position: fixed;
-    top: 16px; right: 62px;
+    top: 16px; right: 108px;
     z-index: 300;
     width: 40px; height: 40px;
     border-radius: 50%;
@@ -1104,7 +1126,7 @@
   .rel-chip {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
-    padding: 4px 10px;
+    padding: 5px 10px;
     border-radius: 2px;
     cursor: pointer;
     border: 1px solid var(--border2);
@@ -1112,9 +1134,16 @@
     color: var(--text);
     transition: all .15s;
     letter-spacing: .03em;
-    white-space: nowrap;
+    display: flex; flex-direction: column; gap: 2px;
+    min-width: 0;
+  }
+  .rel-chip-why {
+    font-size: 8.5px; opacity: .6; font-weight: 400;
+    letter-spacing: .02em; white-space: normal; line-height: 1.3;
   }
   .rel-chip:hover { border-color: var(--gold); color: var(--gold2); }
+  .rel-chip:hover .rel-chip-why { opacity: .8; }
+  .rel-chips { display: flex; flex-direction: column; gap: 5px; }
   .rel-chip.rel-relative {
     border-color: rgba(124,111,160,.4);
     color: var(--accent2);
@@ -1521,6 +1550,13 @@
   <!-- Moon icon: shown in light mode, click → go dark -->
   <svg id="theme-icon-light" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display:none">
     <path d="M12.5 10.5A6 6 0 016 4a6 6 0 000 9 6 6 0 006.5-2.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+  </svg>
+</button>
+<button id="compact-toggle" title="Toggle compact mode" aria-label="Compact mode">
+  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+    <rect x="1" y="2" width="13" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
+    <rect x="1" y="6.25" width="13" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
+    <rect x="1" y="10.5" width="13" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
   </svg>
 </button>
 <button id="guide-btn" title="User Guide" aria-label="Open user guide">
@@ -1950,11 +1986,9 @@ function spellScale(rootPc, intervals) {
   let rootName = rootCandidates[0];
   if(PREFER_FLAT_PC.has(rootPc%12) && rootCandidates.length > 1) rootName = rootCandidates[1];
 
-  // For pentatonic / short scales: skip sequential-letter rule.
-  // The "each degree gets the next letter" logic only works for heptatonic scales.
-  // For 5-note scales, just pick the simplest spelling for each pitch class
-  // (prefer naturals, then flats for flat-preferred PCs, then sharps).
-  if (n < 7) {
+  // For pentatonic / short scales AND octatonic scales: use simple enharmonic spelling
+  // The "each degree gets the next letter" logic only reliably works for heptatonic scales.
+  if (n !== 7) {
     return intervals.map(iv => {
       const pc = (rootPc + iv) % 12;
       const cands = PITCH_CANDIDATES[pc];
@@ -2042,38 +2076,89 @@ const SCALES = {
     desc:`Like harmonic minor but with a ♯4. The double augmented-second flavour (both between ♭3→♯4 and ♭6→♮7) gives it a hauntingly exotic, Eastern European character - the signature of Romani and Hungarian folk music.`},
   'Byzantine':                   {intervals:[0,1,4,5,7,8,11],  family:'Exotic Scales',  formula:'H A2 H W H A2 H',
     desc:`Also called Double Harmonic Major or Arabic scale. Two augmented 2nds (♭2→♮3 and ♭6→♮7) create a symmetrical, intensely exotic tension. The I chord is a major 7th but sits above a Phrygian ♭2, creating maximum contrast.`},
-  'Hirajoshi (Mode 4)':          {intervals:[0,1,5,7,8],       family:'Exotic Scales',  formula:'H M3 H H', pentatonic:true,
+  'Hirajoshi (Mode 4)':          {intervals:[0,1,5,7,8],       family:'Pentatonic',     formula:'H M3 H H', pentatonic:true,
+    degreeMap:[0,1,3,4,5],
     desc:`A Japanese pentatonic with a ♭2 and ♭6. The wide minor-third gap after the ♭2 is the defining leap that gives it its stark, meditative, koto-like character. Perfect for sparse, contemplative music.`},
+
+  'Hirajoshi':                   {intervals:[0,4,6,7,11],      family:'Pentatonic',     formula:'M3 H H M3 H', pentatonic:true,
+    degreeMap:[0,2,3,4,6],
+    desc:`The original Japanese Hirajoshi scale (mode 1). Built on a major third, two half-steps and another major third, it has a floating, ethereal quality central to koto music and Japanese folk melodies.`},
+
+  'Pentatonic Minor':            {intervals:[0,3,5,7,10],      family:'Pentatonic',     formula:'m3 W W m3 W', pentatonic:true,
+    degreeMap:[0,1,3,4,5],
+    desc:`The foundation of blues, rock, and folk music worldwide. Five notes — root, ♭3, 4th, 5th, ♭7th — that sit comfortably over minor and dominant chords alike. The most universally recognised scale in popular music.`},
+
+  'Pentatonic Major':            {intervals:[0,2,4,7,9],       family:'Pentatonic',     formula:'W W m3 W m3', pentatonic:true,
+    degreeMap:[0,1,2,4,5],
+    desc:`The bright counterpart to the minor pentatonic. Root, 2nd, 3rd, 5th, 6th — the scale of American country, Celtic folk, and East Asian folk melodies. Works over major chords and creates an open, optimistic sound.`},
+
+  'Blues Minor':                 {intervals:[0,3,5,6,7,10],    family:'Pentatonic',     formula:'m3 W H H m3 W',
+    degreeMap:[0,1,3,4,4,5],
+    desc:`The minor pentatonic with an added ♭5 (the "blue note"). That chromatic passing tone between the 4th and 5th creates the characteristic tension-and-release of blues soloing. Six notes, but feels like five with a secret weapon.`},
+
+  'Blues Major':                 {intervals:[0,2,3,4,7,9],     family:'Pentatonic',     formula:'W H H m3 W m3',
+    degreeMap:[0,1,2,2,4,5],
+    desc:`The major pentatonic with an added ♭3 — a chromatic approach note to the 3rd. Gives a country-blues flavour, sitting between major brightness and blues grittiness. Beloved in country guitar and soul music.`},
+
+  'Whole Tone':                  {intervals:[0,2,4,6,8,10],    family:'Exotic Scales',  formula:'W W W W W W',
+    degreeMap:[0,1,2,3,4,5],
+    desc:`Six equal whole steps with no half-step resolution — every triad built on it is augmented. The scale has no tonal gravity or leading tone, creating a dreamy, suspended ambiguity favoured by Debussy and jazz impressionists.`},
+
+  'Phrygian Bebop':              {intervals:[0,1,3,4,5,7,8,10],family:'Exotic Scales',  formula:'H W H H W H W W',
+    desc:`Phrygian Dominant with an added ♮3 passing tone (the bebop note). The clash between the ♭2 and natural 3rd creates chromatic tension ideal for bebop lines over altered dominant chords in a flamenco-jazz context.`},
+
+  'Spanish Gypsy':               {intervals:[0,1,4,5,7,8,10],  family:'Exotic Scales',  formula:'H A2 H W H W W',
+    desc:`Also known as the Phrygian Dominant scale. The augmented second between ♭2 and major 3rd is its signature — the sound of flamenco guitar, Middle-Eastern maqam, and Jewish klezmer. Creates intense modal tension with a I major chord.`},
+
+  'Arabian':                     {intervals:[0,2,4,5,6,8,10],  family:'Exotic Scales',  formula:'W W H H W W W',
+    desc:`A symmetrical scale combining a Lydian tetrachord (♯4) with a Phrygian upper tetrachord (♭6, ♭7). The ♯4 and ♭5 in close proximity give it an exotic, unstable, Middle-Eastern flavour unlike any European mode.`},
 };
 
-const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Exotic Scales'];
+const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Pentatonic','Exotic Scales'];
 
 const DEGREE_NAMES_7 = ['Tonic','Supertonic','Mediant','Subdominant','Dominant','Submediant','Leading Tone'];
 const DEGREE_NAMES_5 = ['Tonic','II','III','IV','V'];
+const DEGREE_NAMES_6 = ['Tonic','II','III','IV','V','VI'];
 const ROMAN_BASE_7   = ['I','II','III','IV','V','VI','VII'];
 const ROMAN_BASE_5   = ['I','II','III','IV','V'];
 
 // Major scale intervals used as reference for computing degree accidentals
 const MAJOR_REF = [0,2,4,5,7,9,11];
 
-// For pentatonic, map scale degrees to closest major scale degree index
-// Hirajoshi [0,1,5,7,8] → degrees map to major degrees 1,2,4,5,6 (indices 0,1,3,4,5)
-const PENTA_MAJOR_DEGREE_MAP = [0,1,3,4,5]; // which major-scale degree each pentatonic degree corresponds to
+// Get degree map for a pentatonic scale — use scale's own degreeMap if present,
+// otherwise fall back to the classic [0,1,3,4,5] mapping
+function getPentaDegreeMap(scaleData) {
+  return scaleData.degreeMap || [0,1,3,4,5];
+}
 
 // Compute the full Roman numeral symbol for a scale degree
 // scaleIntervals: full scale interval array
 // degIdx: degree index (0-based)
 // iv3, iv5: triad intervals in semitones above root
-function romanNumeral(scaleIntervals, degIdx, iv3, iv5) {
+function romanNumeral(scaleIntervals, degIdx, iv3, iv5, scaleData) {
   const n = scaleIntervals.length;
 
-  // Pentatonic: show actual major-scale degree number + accidental (no quality suffix)
+  // Short scales (≤6 notes): use degreeMap to reference major scale degrees
   if (n < 7) {
-    const refIdx = PENTA_MAJOR_DEGREE_MAP[degIdx] !== undefined ? PENTA_MAJOR_DEGREE_MAP[degIdx] : degIdx;
+    const degMap = getPentaDegreeMap(scaleData || {});
+    const refIdx = degMap[degIdx] !== undefined ? degMap[degIdx] : degIdx;
     const refInterval = MAJOR_REF[Math.min(refIdx, 6)];
     const diff = scaleIntervals[degIdx] - refInterval;
     const acc = diff===-1?'♭':diff===-2?'♭♭':diff===1?'♯':'';
-    return acc + ROMAN_BASE_7[refIdx]; // IV not III, V not IV, ♭VI not ♭V
+    return acc + ROMAN_BASE_7[refIdx];
+  }
+
+  // Octatonic (8 notes): map to nearest 7-degree reference
+  if (n > 7) {
+    const refIdx = Math.min(degIdx, 6);
+    const diff = scaleIntervals[degIdx] - MAJOR_REF[refIdx];
+    const acc = diff===-1?'♭':diff===-2?'♭♭':diff===1?'♯':'';
+    const base = ROMAN_BASE_7[refIdx];
+    if      (iv3===4 && iv5===7) return acc + base;
+    else if (iv3===3 && iv5===7) return acc + base.toLowerCase();
+    else if (iv3===3 && iv5===6) return acc + base.toLowerCase() + '°';
+    else if (iv3===4 && iv5===8) return acc + base + '+';
+    else                         return acc + base;
   }
 
   // Heptatonic: accidental vs. major scale reference
@@ -2359,14 +2444,38 @@ function buildOtherChords(scaleNotes, scaleIntervals, degree){
   const add9iv=(iv2>=1&&iv2<=2)?iv2+12:null;
   const add11iv=(iv4>=5&&iv4<=6)?iv4+12:null;
   const chords=[];
-  if(iv2===2&&iv5===7)                      chords.push({sym:'sus2', qual:'Sus 2nd',  notes:[root,step2,fifth],     iv:[0,iv2,iv5]});
-  if(iv4===5&&iv5===7)                      chords.push({sym:'sus4', qual:'Sus 4th',  notes:[root,fourth,fifth],    iv:[0,iv4,iv5]});
-  if(add9iv&&(iv3===3||iv3===4)&&iv5===7)   chords.push({sym:(iv3===3?'m':'')+'add9', qual:(iv3===3?'Minor ':'Maj ')+'add9', notes:[root,third,fifth,step2],  iv:[0,iv3,iv5,add9iv]});
-  if(add11iv&&(iv3===3||iv3===4)&&iv5===7)  chords.push({sym:(iv3===3?'m':'')+'add11',qual:(iv3===3?'Minor ':'Maj ')+'add11',notes:[root,third,fifth,fourth], iv:[0,iv3,iv5,add11iv]});
-  if(sixth&&(iv3===3||iv3===4)&&iv5===7&&iv6===9) chords.push({sym:(iv3===3?'m':'')+'6',qual:(iv3===3?'Minor ':'Maj ')+'6th',notes:[root,third,fifth,sixth],iv:[0,iv3,iv5,iv6]});
-  if(sixth&&add9iv&&(iv3===3||iv3===4)&&iv5===7&&iv6===9) chords.push({sym:(iv3===3?'m':'')+'6/9',qual:(iv3===3?'Minor ':'Maj ')+'6/9',notes:[root,third,fifth,sixth,step2],iv:[0,iv3,iv5,iv6,add9iv]});
-  if(iv3===4&&iv5===8)                      chords.push({sym:'aug',  qual:'Augmented',notes:[root,third,fifth],     iv:[0,iv3,iv5]});
-  if(iv4===5&&iv5===7&&iv7!==null)          chords.push({sym:iv7===11?'Maj7sus4':'7sus4',qual:iv7===11?'Maj7 sus4':'Dom 7 sus4',notes:[root,fourth,fifth,seventh||root],iv:[0,iv4,iv5,iv7]});
+
+  // sus2, sus4
+  if(iv2===2&&iv5===7)                      chords.push({sym:'sus2',   qual:'Sus 2nd',    notes:[root,step2,fifth],          iv:[0,iv2,iv5]});
+  if(iv4===5&&iv5===7)                      chords.push({sym:'sus4',   qual:'Sus 4th',    notes:[root,fourth,fifth],          iv:[0,iv4,iv5]});
+
+  // add9, add11
+  if(add9iv&&(iv3===3||iv3===4)&&iv5===7)   chords.push({sym:(iv3===3?'m':'')+'add9',  qual:(iv3===3?'Minor ':'')+'add9',   notes:[root,third,fifth,step2],    iv:[0,iv3,iv5,add9iv]});
+  if(add11iv&&(iv3===3||iv3===4)&&iv5===7)  chords.push({sym:(iv3===3?'m':'')+'add11', qual:(iv3===3?'Minor ':'')+'add11',  notes:[root,third,fifth,fourth],    iv:[0,iv3,iv5,add11iv]});
+
+  // M6, m6
+  if(sixth&&iv3===4&&iv5===7&&iv6===9)      chords.push({sym:'6',     qual:'Major 6th',  notes:[root,third,fifth,sixth],     iv:[0,iv3,iv5,iv6]});
+  if(sixth&&iv3===3&&iv5===7&&iv6===9)      chords.push({sym:'m6',    qual:'Minor 6th',  notes:[root,third,fifth,sixth],     iv:[0,iv3,iv5,iv6]});
+
+  // 6/9, m6/9
+  if(sixth&&add9iv&&iv3===4&&iv5===7&&iv6===9) chords.push({sym:'6/9',   qual:'Major 6/9',  notes:[root,third,fifth,sixth,step2], iv:[0,iv3,iv5,iv6,add9iv]});
+  if(sixth&&add9iv&&iv3===3&&iv5===7&&iv6===9) chords.push({sym:'m6/9',  qual:'Minor 6/9',  notes:[root,third,fifth,sixth,step2], iv:[0,iv3,iv5,iv6,add9iv]});
+
+  // Augmented
+  if(iv3===4&&iv5===8)                      chords.push({sym:'aug',   qual:'Augmented',  notes:[root,third,fifth],            iv:[0,iv3,iv5]});
+
+  // Diminished triad (if not already the diatonic chord)
+  if(iv3===3&&iv5===6)                      chords.push({sym:'dim',   qual:'Diminished', notes:[root,third,fifth],            iv:[0,iv3,iv5]});
+
+  // Power chord (root + fifth, no third)
+  if(iv5===7)                               chords.push({sym:'5',     qual:'Power chord', notes:[root,fifth],                  iv:[0,iv5]});
+
+  // 7sus4, Maj7sus4
+  if(iv4===5&&iv5===7&&iv7!==null)          chords.push({sym:iv7===11?'Maj7sus4':'7sus4', qual:iv7===11?'Maj7 sus4':'Dom 7 sus4', notes:[root,fourth,fifth,seventh||root], iv:[0,iv4,iv5,iv7]});
+
+  // sus2 with 7th
+  if(iv2===2&&iv5===7&&iv7!==null&&iv7===10) chords.push({sym:'7sus2', qual:'Dom 7 sus2', notes:[root,step2,fifth,seventh], iv:[0,iv2,iv5,iv7]});
+
   return chords;
 }
 
@@ -2626,10 +2735,9 @@ function buildSelectors(){
 }
 
 // Compute all degree Roman numerals for a scale (returns array of strings)
-function computeAllRomans(scaleIntervals) {
+function computeAllRomans(scaleIntervals, scaleData) {
   const n = scaleIntervals.length;
   return scaleIntervals.map((_, di) => {
-    // Get the triad intervals for this degree
     const rootNote = scaleIntervals[di];
     const thirdInterval = scaleIntervals[(di+2)%n];
     const fifthInterval = scaleIntervals[(di+4)%n];
@@ -2637,24 +2745,25 @@ function computeAllRomans(scaleIntervals) {
     const iv5raw = ((fifthInterval - rootNote)+12)%12;
     const iv3 = iv3raw;
     const iv5 = iv5raw <= iv3raw ? iv5raw+12 : iv5raw;
-    return romanNumeral(scaleIntervals, di, iv3, iv5);
+    return romanNumeral(scaleIntervals, di, iv3, iv5, scaleData);
   });
 }
 
 // Compute scale identity string: 1, 2, b3, 4, 5, b6, b7 etc.
-function scaleIdentity(intervals) {
+function scaleIdentity(intervals, scaleData) {
   const DEG_NAMES = ['1','2','3','4','5','6','7'];
   return intervals.map((semitones, di) => {
     if (intervals.length < 7) {
-      // Pentatonic: use major-scale reference
-      const refIdx = PENTA_MAJOR_DEGREE_MAP[di] !== undefined ? PENTA_MAJOR_DEGREE_MAP[di] : di;
+      const degMap = getPentaDegreeMap(scaleData || {});
+      const refIdx = degMap[di] !== undefined ? degMap[di] : di;
       const diff = semitones - MAJOR_REF[refIdx];
       const acc = diff === -1 ? '♭' : diff === -2 ? '♭♭' : diff === 1 ? '♯' : '';
       return acc + DEG_NAMES[refIdx];
     }
-    const diff = semitones - MAJOR_REF[di];
+    const refIdx = Math.min(di, 6);
+    const diff = semitones - MAJOR_REF[refIdx];
     const acc = diff === -1 ? '♭' : diff === -2 ? '♭♭' : diff === 1 ? '♯' : '';
-    return acc + DEG_NAMES[di];
+    return acc + DEG_NAMES[refIdx];
   }).join('  ');
 }
 
@@ -2664,8 +2773,8 @@ function renderScaleInfo(scaleNotes, scaleData){
   if(old) old.innerHTML='';
 
   const hero = document.getElementById('scale-hero');
-  const romans = computeAllRomans(scaleData.intervals);
-  const identity = scaleIdentity(scaleData.intervals);
+  const romans = computeAllRomans(scaleData.intervals, scaleData);
+  const identity = scaleIdentity(scaleData.intervals, scaleData);
 
   // Split scale name into root and mode for styling
   const rootNote = scaleNotes[0];
@@ -2971,8 +3080,8 @@ function renderChords(scaleNotes, scaleData){
   const container=document.getElementById('all-degrees');
   container.innerHTML='';
   const scaleLen=scaleNotes.length;
-  const DNAMES=scaleLen===5?DEGREE_NAMES_5:DEGREE_NAMES_7;
-  const romans=computeAllRomans(scaleData.intervals);
+  const DNAMES=scaleLen===5?DEGREE_NAMES_5:scaleLen===6?DEGREE_NAMES_6:DEGREE_NAMES_7;
+  const romans=computeAllRomans(scaleData.intervals, scaleData);
   const rootPc=parseInt(state.key);
   const mode=state.mode;
 
@@ -3026,6 +3135,40 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-quality">${chord.qual}</div>
           <div class="chord-notes-row">${makeNotePills(chord.notes)}</div>
           <div class="chord-intervals">Intervals: 1 · ${chord.iv.slice(1).map(iName).join(' · ')}</div>`;
+
+        // V7 alterations and tritone substitution (secdom only)
+        if (isSecDom) {
+          const domRootPc = noteNameToPc(chord.root);
+          if (domRootPc >= 0) {
+            const tritPc   = (domRootPc + 6) % 12;
+            const tritName = chromaticPcName(tritPc, PREFER_FLAT_PC.has(tritPc));
+            // Common alterations: b9, #9, #11, b13
+            const altDiv = document.createElement('div');
+            altDiv.style.cssText = 'margin-top:6px;display:flex;flex-wrap:wrap;gap:3px;';
+            const alts = [
+              { sym: '7♭9',   label: '♭9',  color: '#e07070' },
+              { sym: '7♯9',   label: '♯9',  color: '#e09050' },
+              { sym: '7♯11',  label: '♯11', color: '#70a0e0' },
+              { sym: '7♭13',  label: '♭13', color: '#9070c0' },
+              { sym: '7alt',  label: 'alt',  color: '#c06070' },
+            ];
+            alts.forEach(alt => {
+              const pill = document.createElement('span');
+              pill.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 5px;border-radius:2px;border:1px solid ${alt.color}40;background:${alt.color}12;color:${alt.color};letter-spacing:.05em;cursor:default;`;
+              pill.title = `${chord.root}${alt.sym}`;
+              pill.textContent = `${chord.root}${alt.sym}`;
+              altDiv.appendChild(pill);
+            });
+            // Tritone substitution badge
+            const tritPill = document.createElement('span');
+            tritPill.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 5px;border-radius:2px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.1);color:var(--gold2);letter-spacing:.05em;cursor:default;margin-left:2px;`;
+            tritPill.title = `Tritone sub: ${tritName}7 shares guide tones with ${chord.root}7`;
+            tritPill.textContent = `♭II ${tritName}7`;
+            altDiv.appendChild(tritPill);
+            card.appendChild(altDiv);
+          }
+        }
+
         addCardStaff(card, chord.notes);
         grid.appendChild(card);
       });
@@ -3151,38 +3294,42 @@ function renderChords(scaleNotes, scaleData){
   });
 }
 
+// ── Debounced render with fade transition for smooth UX ──
+let _renderTimer = null;
 function render(){
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
+  if (!scaleData) return;
   const scaleNotes=spellScale(rootPc,scaleData.intervals);
+
+  // Immediate lightweight updates (no DOM rebuild)
   renderScaleInfo(scaleNotes,scaleData);
   drawCoF(rootPc, scaleData.intervals);
   syncNegToggle();
   drawNegAxis(document.getElementById('cof-svg'), rootPc, scaleData.intervals);
 
   const isDiatonic7ths = state.mode==='4';
-  const isChromatic = ['secdom','secdim','secsub','chromed'].includes(state.mode);
-
-  // Drop2/Drop3 available for 7ths mode AND secondary dominants (all dom7 chords)
   const has7thChords = isDiatonic7ths || state.mode==='secdom';
   document.getElementById('tab-drop2').classList.toggle('disabled', !has7thChords);
   document.getElementById('tab-drop3').classList.toggle('disabled', !has7thChords);
-  // Guitar diagrams available for all modes
   document.getElementById('tab-diagrams').classList.toggle('disabled', false);
-
-  if ((state.view==='drop2'||state.view==='drop3') && !has7thChords) {
-    state.view='list';
-  }
-  // (No fallback needed for diagrams - it works for all modes now)
-  // Sync tab active state
+  if ((state.view==='drop2'||state.view==='drop3') && !has7thChords) state.view='list';
   document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
 
-  renderView(scaleNotes,scaleData);
-  renderScaleRelationships();
-  renderCadenceSuggester(scaleNotes,scaleData);
-  renderSubstitutions(scaleNotes,scaleData);
-  renderPivotChords();
-  renderStrumSelector();
+  // Debounce the heavy DOM rebuild with a fade
+  if (_renderTimer) clearTimeout(_renderTimer);
+  const container = document.getElementById('all-degrees');
+  container.style.opacity = '0.4';
+  container.style.transition = 'opacity 0.1s';
+  _renderTimer = setTimeout(() => {
+    renderView(scaleNotes,scaleData);
+    renderScaleRelationships();
+    renderCadenceSuggester(scaleNotes,scaleData);
+    renderSubstitutions(scaleNotes,scaleData);
+    renderPivotChords();
+    renderStrumSelector();
+    container.style.opacity = '1';
+  }, 60);
 }
 
 function renderView(scaleNotes,scaleData){
@@ -3191,7 +3338,6 @@ function renderView(scaleNotes,scaleData){
   else if(state.view==='drop2')     renderDropVoicings(scaleNotes,scaleData,2);
   else if(state.view==='drop3')     renderDropVoicings(scaleNotes,scaleData,3);
   else if(state.view==='mandolin')  renderMandolin(scaleNotes,scaleData);
-
 }
 
 // ══════════════════════════════════════════════
@@ -3201,59 +3347,55 @@ function renderView(scaleNotes,scaleData){
 const GUITAR_MIDI = [40,45,50,55,59,64]; // E2 A2 D3 G3 B3 E4
 
 // Low-level: find fret positions for a fixed pc-per-string assignment.
-// ascendingPitch=true for basic voicings, false for drop voicings.
+// Pitches ALWAYS ascend from lowest string to highest (physical guitar constraint).
+// For drop voicings the PC order on strings is non-sequential but pitches still rise.
 function computeGuitarVoicing(pcs, stringIndices, ascendingPitch=true) {
   const n = pcs.length;
   const PC = pcs.map(p=>((p%12)+12)%12);
+  // Build candidate frets for each string (avoid open strings for drop voicings)
   const candidates = PC.map((pc,i)=>{
-    const strPc = GUITAR_MIDI[stringIndices[i]]%12;
-    const base  = (pc-strPc+12)%12;
-    const opts  = [];
-    for(let f=base; f<=17; f+=12) opts.push(f);
+    const strMidi = GUITAR_MIDI[stringIndices[i]];
+    const strPc   = strMidi % 12;
+    const base    = (pc - strPc + 12) % 12;
+    const opts    = [];
+    // For drop voicings: start at fret 1 minimum (no open strings)
+    const startF  = (!ascendingPitch && base === 0) ? 12 : base;
+    for (let f = startF; f <= 19; f += 12) opts.push(f);
     return opts;
   });
-  let best=null, bestScore=Infinity;
-  function search(idx,cur){
-    if(idx===n){
-      if(ascendingPitch){
-        const pitches=cur.map((f,i)=>GUITAR_MIDI[stringIndices[i]]+f);
-        for(let i=1;i<n;i++) if(pitches[i]<=pitches[i-1]) return;
-      }
-      const span=Math.max(...cur)-Math.min(...cur);
-      if(span>6) return;
-      const minF=Math.min(...cur);
-      // Strongly prefer low fret positions; span is secondary
-      const score=span*10+(minF<=3 ? minF : minF*4);
-      if(score<bestScore){bestScore=score;best=[...cur];}
+  let best = null, bestScore = Infinity;
+  function search(idx, cur) {
+    if (idx === n) {
+      // Pitches must always ascend (or stay equal is rejected) — guitar strings go low to high
+      const pitches = cur.map((f,i) => GUITAR_MIDI[stringIndices[i]] + f);
+      for (let i = 1; i < n; i++) if (pitches[i] <= pitches[i-1]) return;
+      const span = Math.max(...cur) - Math.min(...cur);
+      if (span > 6) return;
+      const minF = Math.min(...cur);
+      const score = span * 10 + (minF <= 3 ? minF : minF * 4);
+      if (score < bestScore) { bestScore = score; best = [...cur]; }
       return;
     }
-    for(const fret of candidates[idx]){ cur.push(fret); search(idx+1,cur); cur.pop(); }
+    for (const fret of candidates[idx]) { cur.push(fret); search(idx+1, cur); cur.pop(); }
   }
-  search(0,[]);
+  search(0, []);
   return best;
 }
 
 // Jazz-context guitar voicing engine
-// Priority: [root, 3rd, 7th, extension] - 5th is dropped when chord has 4+ tones
+// Enforces root as the lowest sounding pitch (bass register) when possible
 // Uses 4-string closed voicings across strings [1-4], [2-5], [3-6]
 // Returns {frets6, pcs6} with unused strings = -1.
 function getBasicVoicing(rootPc, ivArray) {
   const allPcs = ivArray.map(iv=>((rootPc+iv)%12+12)%12);
+  const rootPcNorm = ((rootPc%12)+12)%12;
 
-  // Jazz voicing priority: keep root, 3rd, 7th, then highest extension
-  // Drop 5th for chords with 4+ tones (standard jazz practice)
   function jazzVoicingPcs(ivArr, root) {
-    if(ivArr.length <= 4) return allPcs; // triads & 7ths: keep all
-    // Identify which interval index is the 5th (index 2 in stacked-thirds array)
-    // iv[0]=root iv[1]=3rd iv[2]=5th iv[3]=7th iv[4]=9th iv[5]=11th iv[6]=13th
-    const keep = [0,1,3]; // root, 3rd, 7th always
-    // Add highest extension (9th, 11th, or 13th)
-    if(ivArr.length >= 5) keep.push(4); // 9th
-    if(ivArr.length >= 6) keep.push(5); // 11th (replaces 9th in voiced chord)
-    if(ivArr.length >= 7) keep.push(6); // 13th
-    // For 9th: keep root+3+7+9 (4 tones)
-    // For 11th: keep root+3+7+11 (4 tones, drop 9th for playability)
-    // For 13th: keep root+3+7+13 (4 tones, standard jazz shell)
+    if(ivArr.length <= 4) return allPcs;
+    const keep = [0,1,3];
+    if(ivArr.length >= 5) keep.push(4);
+    if(ivArr.length >= 6) keep.push(5);
+    if(ivArr.length >= 7) keep.push(6);
     const topIdx = keep[keep.length-1];
     const pcsOut = [0,1,3,topIdx].map(i=> ((root+ivArr[Math.min(i,ivArr.length-1)])%12+12)%12 );
     return [...new Set(pcsOut)];
@@ -3268,8 +3410,8 @@ function getBasicVoicing(rootPc, ivArray) {
 
   function tryStringSet(ss) {
     const n = ss.length;
-    const perms = allPerms(pcs.slice(0,Math.min(n,pcs.length)));
-    // Pad if fewer tones than strings (repeat root or 3rd)
+    const pcsN = pcs.slice(0, Math.min(n, pcs.length));
+    const perms = allPerms(pcsN);
     const extra = [];
     if(pcs.length < n) {
       const pad=[...pcs]; while(pad.length<n) pad.push(pcs[pad.length%pcs.length]);
@@ -3281,17 +3423,20 @@ function getBasicVoicing(rootPc, ivArray) {
       if(!v) continue;
       const span=Math.max(...v)-Math.min(...v);
       const minF=Math.min(...v);
-      // Prefer low-fret compact shapes; penalise high positions harder
-      const score=span*8+(minF===0?0:minF<=4?minF*2:minF*5);
-      if(score<bestScore){ bestScore=score; best={frets:v,pcs:assign}; }
+      // Bass register: root must be on lowest string AND lowest pitch
+      const bassIsRoot = ((assign[0]%12)+12)%12 === rootPcNorm;
+      const bassLowest = v.every((f,i) => i===0 || (GUITAR_MIDI[ss[i]]+f) >= (GUITAR_MIDI[ss[0]]+v[0]));
+      // Large penalty when root is not the bass — prefer root-position strongly
+      const bassPenalty = (!bassIsRoot || !bassLowest) ? 50 : 0;
+      const score = bassPenalty + span*8 + (minF===0?0:minF<=4?minF*2:minF*5);
+      if(score<bestScore){ bestScore=score; best={frets:v,pcs:assign,score}; }
     }
     return best ? {ss,frets:best.frets,pcs:best.pcs,score:bestScore} : null;
   }
 
-  // For extended chords prefer 4-string mid sets; for triads allow 5-string
   const stringSets = allPcs.length <= 3
     ? [[1,2,3,4],[2,3,4,5],[0,1,2,3],[1,2,3,4,5],[0,1,2,3,4]]
-    : [[1,2,3,4],[2,3,4,5],[0,1,2,3]]; // 4-string jazz voicings for extended
+    : [[1,2,3,4],[2,3,4,5],[0,1,2,3]];
   let globalBest=null, globalScore=Infinity;
   for(const ss of stringSets) {
     const v=tryStringSet(ss);
@@ -3333,13 +3478,26 @@ function noteNameToPc(name){
  * @param {number}   rootPc   root pitch class → gold dot
  * @param {number}   [w=140]  total SVG width in px
  */
+function detectBarre(frets6) {
+  // A barre occurs when ≥3 strings share the same fret and it's the minimum fret played
+  const played = frets6.filter(f => f > 0);
+  if (played.length < 3) return null;
+  const minF = Math.min(...played);
+  const barreStrings = frets6.map((f, i) => f === minF ? i : -1).filter(i => i >= 0);
+  if (barreStrings.length >= 3) {
+    // Barre: from lowest barred string to highest
+    return { fret: minF, fromStr: barreStrings[0], toStr: barreStrings[barreStrings.length - 1] };
+  }
+  return null;
+}
+
 function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
   const NUM_STR  = 6;
   const NUM_FRET = 4;
 
   const padL = 22, padR = 12, padT = 22, padB = 20;
   const strGap = (w - padL - padR) / (NUM_STR - 1);
-  const fretH  = Math.round((w - padL - padR) * 0.38); // proportional height
+  const fretH  = Math.round((w - padL - padR) * 0.38);
   const gridH  = NUM_FRET * fretH;
   const h      = padT + gridH + padB;
 
@@ -3348,7 +3506,10 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
   const minPlayed = played.length ? Math.min(...played) : 0;
   const startFret = minPlayed <= 1 ? 0 : minPlayed - 1;
 
-  const g = []; // SVG element strings
+  // Detect barre
+  const barre = detectBarre(frets6);
+
+  const g = [];
   g.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">`);
 
   // Nut or fret position marker
@@ -3378,6 +3539,18 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
     g.push(`<text x="${x}" y="${padT+gridH+13}" font-family="IBM Plex Mono,monospace" font-size="7" fill="${muted?'#333b48':'#5a6475'}" text-anchor="middle">${STR_NAMES[s]}</text>`);
   }
 
+  // Draw barre bar (before individual dots so dots render on top)
+  if (barre) {
+    const dispFr = barre.fret - startFret;
+    if (dispFr >= 1 && dispFr <= NUM_FRET) {
+      const by = padT + (dispFr - 0.5) * fretH;
+      const bx1 = padL + barre.fromStr * strGap;
+      const bx2 = padL + barre.toStr   * strGap;
+      const barreR = Math.max(6.5, fretH * 0.34);
+      g.push(`<rect x="${bx1}" y="${by - barreR}" width="${bx2-bx1}" height="${barreR*2}" rx="${barreR}" fill="#4a4060"/>`);
+    }
+  }
+
   // Dots / mute markers
   for (let s = 0; s < NUM_STR; s++) {
     const x   = padL + s * strGap;
@@ -3385,28 +3558,32 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
     const pc  = pcs6[s];
 
     if (fr === -1) {
-      // Muted: ✕ above nut
       const cx = x, cy = padT - 10;
       const d = 3.5;
       g.push(`<line x1="${cx-d}" y1="${cy-d}" x2="${cx+d}" y2="${cy+d}" stroke="#3a4252" stroke-width="1.4" stroke-linecap="round"/>`);
       g.push(`<line x1="${cx+d}" y1="${cy-d}" x2="${cx-d}" y2="${cy+d}" stroke="#3a4252" stroke-width="1.4" stroke-linecap="round"/>`);
     } else if (fr === 0) {
-      // Open: circle above nut
       const isRoot = pc !== -1 && ((pc%12+12)%12) === ((rootPc%12+12)%12);
       g.push(`<circle cx="${x}" cy="${padT-10}" r="4.5" fill="none" stroke="${isRoot?'#c9a84c':'#4a5878'}" stroke-width="1.5"/>`);
     } else {
-      // Fretted dot
       const dispFr = fr - startFret;
       if (dispFr >= 1 && dispFr <= NUM_FRET) {
         const y = padT + (dispFr - 0.5) * fretH;
         const isRoot = pc !== -1 && ((pc%12+12)%12) === ((rootPc%12+12)%12);
-        const fill = isRoot ? '#c9a84c' : '#6a5f90';
+        const isBarreNote = barre && fr === barre.fret && s >= barre.fromStr && s <= barre.toStr;
+        const fill = isRoot ? '#c9a84c' : isBarreNote ? '#5c5075' : '#6a5f90';
         const dotR = Math.max(6.5, fretH * 0.34);
         const lbl  = pc !== -1 ? pcToName(((pc%12)+12)%12) : '';
         g.push(`<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}"/>`);
         if (lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dotR*0.88}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
       }
     }
+  }
+
+  // Barre label if detected
+  if (barre && barre.fret - startFret >= 1 && barre.fret - startFret <= NUM_FRET) {
+    const by = padT + (barre.fret - startFret - 0.5) * fretH;
+    g.push(`<text x="${padL + barre.fromStr * strGap - 6}" y="${by}" font-family="IBM Plex Mono,monospace" font-size="6" fill="#7a6fa0" text-anchor="end" dominant-baseline="middle">B</text>`);
   }
 
   g.push(`</svg>`);
@@ -3469,8 +3646,8 @@ function renderDiagrams(scaleNotes, scaleData) {
   if (isChromatic) {
     // Chromatic modes: show diagram cards grouped by source degree
     const scaleLen = scaleNotes.length;
-    const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : DEGREE_NAMES_7;
-    const romans   = computeAllRomans(scaleData.intervals);
+    const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+    const romans   = computeAllRomans(scaleData.intervals, scaleData);
     const items =
       state.mode==='secdom'  ? buildSecondaryDominants(rootPc,scaleData.intervals,romans)  :
       state.mode==='secdim'  ? buildSecondaryDiminished(rootPc,scaleData.intervals,romans) :
@@ -3508,8 +3685,8 @@ function renderDiagrams(scaleNotes, scaleData) {
 
   // Diatonic modes
   const scaleLen = scaleNotes.length;
-  const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : DEGREE_NAMES_7;
-  const romans   = computeAllRomans(scaleData.intervals);
+  const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const romans   = computeAllRomans(scaleData.intervals, scaleData);
   const isOthers = state.mode === 'others';
   const n        = Math.min(isOthers ? 3 : (parseInt(state.mode)||3), scaleLen);
 
@@ -3565,7 +3742,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
   let chordEntries = [];
 
   if (isSecDom) {
-    const romans = computeAllRomans(scaleData.intervals);
+    const romans = computeAllRomans(scaleData.intervals, scaleData);
     const items  = buildSecondaryDominants(rootPc, scaleData.intervals, romans);
     items.forEach(({degIdx, label, chord}) => {
       const chRootPc = noteNameToPc(chord.root);
@@ -3581,8 +3758,8 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
     });
   } else {
     const scaleLen = scaleNotes.length;
-    const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : DEGREE_NAMES_7;
-    const romans   = computeAllRomans(scaleData.intervals);
+    const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+    const romans   = computeAllRomans(scaleData.intervals, scaleData);
     scaleNotes.forEach((_, di) => {
       const chordNotes = buildChord(scaleNotes, di, 4);
       const iv4        = chordIntervals(scaleData.intervals, di, 4);
@@ -3613,15 +3790,16 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
     sec.appendChild(chordLbl);
 
     const voicingFn = dropNum===2 ? getDrop2Voicings : getDrop3Voicings;
-    const voicings  = voicingFn(chord4pcs);
+    const voicings  = voicingFn(chord4pcs, chordNotes);
     let totalCards  = 0;
 
     const groups = [];
-    voicings.forEach(({inv, bass, notes, strSets}, invIdx) => {
+    voicings.forEach(({inv, bass, slashName, notes, strSets}, invIdx) => {
       const shapes = [];
       strSets.forEach(ss => {
         const frets = computeGuitarVoicing(notes, ss, false);
         if (!frets) return;
+        if (frets.some(f => f === 0)) return; // no open strings
         if (Math.max(...frets) - Math.min(...frets) > 5) return;
         shapes.push({ss, frets});
       });
@@ -3634,8 +3812,8 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
       const groupHdr = document.createElement('div');
       groupHdr.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap;';
       groupHdr.innerHTML = `
-        <span style="font-family:'EB Garamond',serif;font-size:14px;font-weight:600;color:${col.label}">${col.name}</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:${col.label};opacity:.85;background:${col.border};padding:2px 6px;border-radius:2px">${bass} IN BASS · ${bassNoteName}</span>`;
+        <span style="font-family:'EB Garamond',serif;font-size:14px;font-weight:600;color:${col.label}">${inv}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:${col.label};opacity:.85;background:${col.border};padding:2px 6px;border-radius:2px">${slashName || ''} · ${bassNoteName} IN BASS</span>`;
       group.appendChild(groupHdr);
 
       if (shapes.length === 0) {
@@ -3649,7 +3827,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
         shapes.forEach(({ss, frets}) => {
           const {frets6, pcs6} = voicingTo6Strings(ss, frets, notes);
           const strLabel = ss.map(i=>STR_NAMES[i]).join('-');
-          const title    = `${chordNotes[0]}${sym} - ${col.name} (${bass} in bass)`;
+          const title = `${slashName || chordNotes[0]+sym} (Drop ${dropNum} · ${inv})`;
 
           const card = document.createElement('div');
           card.className = `drop-card d${dropNum}-card`;
@@ -3668,7 +3846,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
     });
 
     const outerGrid = document.createElement('div');
-    outerGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;';
+    outerGrid.style.cssText = 'display:flex;flex-direction:column;gap:10px;';
     groups.forEach(g => outerGrid.appendChild(g));
     sec.appendChild(outerGrid);
 
@@ -4137,8 +4315,8 @@ function renderMandolin(scaleNotes, scaleData) {
   const rootPc  = parseInt(state.key);
   const isChromatic = ['secdom','secdim','secsub','chromed'].includes(state.mode);
   const scaleLen = scaleNotes.length;
-  const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : DEGREE_NAMES_7;
-  const romans   = computeAllRomans(scaleData.intervals);
+  const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const romans   = computeAllRomans(scaleData.intervals, scaleData);
   const isOthers = state.mode === 'others';
   const n        = Math.min(isOthers ? 3 : (parseInt(state.mode)||3), scaleLen);
 
@@ -4213,30 +4391,44 @@ function renderMandolin(scaleNotes, scaleData) {
   });
 }
 
-function getDrop2Voicings(chord4pcs) {
-  const [p1,p3,p5,p7]=chord4pcs;
+// ══════════════════════════════════════════════════════
+// DROP 2 — jazzguitar.be standard
+// Close position low→high: 1-3-5-7 (root), 3-5-7-1 (1st), 5-7-1-3 (2nd), 7-1-3-5 (3rd)
+// Drop 2nd from top one octave below → becomes bass voice
+//   Root:  1-3-5-7  → drop 5 → [1,5,7,3]
+//   1st:   3-5-7-1  → drop 7 → [3,7,1,5]
+//   2nd:   5-7-1-3  → drop 1 → [5,1,3,7]
+//   3rd:   7-1-3-5  → drop 3 → [7,3,5,1]
+// 3 string sets, no open strings
+function getDrop2Voicings(chord4pcs, chordNotes) {
+  const [p1,p3,p5,p7] = chord4pcs;
+  const [n1,n3,n5,n7] = chordNotes || [];
+  const r = n1 || '';
   return [
-    {inv:'Root', bass:'1', notes:[p1,p5,p7,p3], strSets:[[0,1,2,3],[1,2,3,4]]},
-    {inv:'1st',  bass:'3', notes:[p3,p7,p1,p5], strSets:[[0,1,2,3],[1,2,3,4]]},
-    {inv:'2nd',  bass:'5', notes:[p5,p1,p3,p7], strSets:[[0,1,2,3],[1,2,3,4]]},
-    {inv:'3rd',  bass:'7', notes:[p7,p3,p5,p1], strSets:[[0,1,2,3],[1,2,3,4]]},
+    { inv:'Root pos', bass:'1', slashName: r,                       notes:[p1,p5,p7,p3], strSets:[[0,1,2,3],[1,2,3,4],[2,3,4,5]] },
+    { inv:'1st inv',  bass:'3', slashName: n3 ? r+'/'+n3 : r,       notes:[p3,p7,p1,p5], strSets:[[0,1,2,3],[1,2,3,4],[2,3,4,5]] },
+    { inv:'2nd inv',  bass:'5', slashName: n5 ? r+'/'+n5 : r,       notes:[p5,p1,p3,p7], strSets:[[0,1,2,3],[1,2,3,4],[2,3,4,5]] },
+    { inv:'3rd inv',  bass:'7', slashName: n7 ? r+'/'+n7 : r,       notes:[p7,p3,p5,p1], strSets:[[0,1,2,3],[1,2,3,4],[2,3,4,5]] },
   ];
 }
 
-// Drop 3: close position = 1-3-5-7, drop 3rd-from-top (3) one octave
-// Resulting low→high order per inversion:
-//   Root pos  (1 in bass): [1, 7, 3, 5]   - skip string between bass and 7th
-//   1st inv   (3 in bass): [3, 1, 5, 7]
-//   2nd inv   (5 in bass): [5, 3, 7, 1]
-//   3rd inv   (7 in bass): [7, 5, 1, 3]
-// String sets: skip one string in the middle (6-4-3-2 or 5-3-2-1)
-function getDrop3Voicings(chord4pcs) {
-  const [p1,p3,p5,p7]=chord4pcs;
+// ══════════════════════════════════════════════════════
+// DROP 3 — jazzguitar.be standard
+// Drop 3rd from top one octave below → becomes bass voice
+//   Root:  1-3-5-7  → drop 3 → [1,7,3,5]  (skip 1 string)
+//   1st:   3-5-7-1  → drop 5 → [3,1,5,7]
+//   2nd:   5-7-1-3  → drop 7 → [5,3,7,1]
+//   3rd:   7-1-3-5  → drop 1 → [7,5,1,3]
+// String sets: skip 1 string → [0,2,3,4] [1,3,4,5] [0,1,3,4]
+function getDrop3Voicings(chord4pcs, chordNotes) {
+  const [p1,p3,p5,p7] = chord4pcs;
+  const [n1,n3,n5,n7] = chordNotes || [];
+  const r = n1 || '';
   return [
-    {inv:'Root', bass:'1', notes:[p1,p7,p3,p5], strSets:[[0,2,3,4],[1,3,4,5]]},
-    {inv:'1st',  bass:'3', notes:[p3,p1,p5,p7], strSets:[[0,2,3,4],[1,3,4,5]]},
-    {inv:'2nd',  bass:'5', notes:[p5,p3,p7,p1], strSets:[[0,2,3,4],[1,3,4,5]]},
-    {inv:'3rd',  bass:'7', notes:[p7,p5,p1,p3], strSets:[[0,2,3,4],[1,3,4,5]]},
+    { inv:'Root pos', bass:'1', slashName: r,                       notes:[p1,p7,p3,p5], strSets:[[0,2,3,4],[1,3,4,5],[0,1,3,4]] },
+    { inv:'1st inv',  bass:'3', slashName: n3 ? r+'/'+n3 : r,       notes:[p3,p1,p5,p7], strSets:[[0,2,3,4],[1,3,4,5],[0,1,3,4]] },
+    { inv:'2nd inv',  bass:'5', slashName: n5 ? r+'/'+n5 : r,       notes:[p5,p3,p7,p1], strSets:[[0,2,3,4],[1,3,4,5],[0,1,3,4]] },
+    { inv:'3rd inv',  bass:'7', slashName: n7 ? r+'/'+n7 : r,       notes:[p7,p5,p1,p3], strSets:[[0,2,3,4],[1,3,4,5],[0,1,3,4]] },
   ];
 }
 
@@ -4259,11 +4451,25 @@ function getAudioCtx() {
   if (!progAudioCtx || progAudioCtx.state === 'closed') {
     progAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  if (progAudioCtx.state === 'suspended') progAudioCtx.resume();
+  if (progAudioCtx.state === 'suspended') progAudioCtx.resume().catch(()=>{});
   return progAudioCtx;
 }
 
-// (no compressor - direct to destination)
+// PWA audio unlock — iOS/Android require a user gesture before AudioContext works.
+// We pre-create the context and play a silent buffer on first touch/click.
+function _unlockAudio() {
+  if (progAudioCtx && progAudioCtx.state !== 'suspended') return;
+  try {
+    if (!progAudioCtx) progAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (progAudioCtx.state === 'suspended') progAudioCtx.resume().catch(()=>{});
+    const buf = progAudioCtx.createBuffer(1, 1, 22050);
+    const src = progAudioCtx.createBufferSource();
+    src.buffer = buf; src.connect(progAudioCtx.destination); src.start(0);
+  } catch(e) {}
+}
+['touchstart','touchend','mousedown','keydown'].forEach(ev =>
+  document.addEventListener(ev, _unlockAudio, { once: true, passive: true })
+);
 
 // ── Note frequency ─────────────────────────────
 function pcToFreq(pc, octave) {
@@ -4787,7 +4993,6 @@ function renderProgSlots() {
   document.getElementById('prog-play').disabled = false;
 
   progression.forEach((ch, i) => {
-    // Ensure each slot has a beats value (backward compat)
     if (!ch.beats) ch.beats = progGetBeats();
 
     const slot = document.createElement('div');
@@ -4795,10 +5000,20 @@ function renderProgSlots() {
     slot.draggable = true;
     slot.dataset.idx = i;
     const noteList = (ch.notes || []).join(' · ');
+    const isFirst = i === 0, isLast = i === progression.length - 1;
     slot.innerHTML = `
       <div class="prog-slot-name">${ch.name}<sup>${ch.sym}</sup></div>
       <div class="prog-slot-roman">${ch.roman}</div>
       <div class="prog-slot-notes">${noteList}</div>
+      <div class="prog-slot-beats-ctrl">
+        <button class="slot-beat-btn slot-beat-dec" title="Fewer beats">−</button>
+        <span class="prog-slot-beats">${ch.beats}b</span>
+        <button class="slot-beat-btn slot-beat-inc" title="More beats">+</button>
+      </div>
+      <div style="display:flex;gap:3px;margin-top:3px">
+        <button class="slot-beat-btn slot-move-left" title="Move left" ${isFirst?'disabled':''} style="opacity:${isFirst?.3:1}">◀</button>
+        <button class="slot-beat-btn slot-move-right" title="Move right" ${isLast?'disabled':''} style="opacity:${isLast?.3:1}">▶</button>
+      </div>
       <div class="prog-slot-sub" title="Substitution ideas" data-idx="${i}">≈</div>
       <div class="prog-slot-del" title="Remove">×</div>`;
 
@@ -4812,6 +5027,34 @@ function renderProgSlots() {
     slot.querySelector('.prog-slot-sub').addEventListener('click', e => {
       e.stopPropagation();
       showSlotSubPopover(e.currentTarget, ch, i);
+    });
+
+    slot.querySelector('.slot-beat-dec').addEventListener('click', e => {
+      e.stopPropagation();
+      ch.beats = Math.max(1, (ch.beats || 4) - 1);
+      if (progPlaying) { progStop(); progPlay(); } else renderProgSlots();
+    });
+
+    slot.querySelector('.slot-beat-inc').addEventListener('click', e => {
+      e.stopPropagation();
+      ch.beats = Math.min(16, (ch.beats || 4) + 1);
+      if (progPlaying) { progStop(); progPlay(); } else renderProgSlots();
+    });
+
+    slot.querySelector('.slot-move-left').addEventListener('click', e => {
+      e.stopPropagation();
+      if (i === 0) return;
+      [progression[i-1], progression[i]] = [progression[i], progression[i-1]];
+      if (progPlaying) progStop();
+      renderProgSlots();
+    });
+
+    slot.querySelector('.slot-move-right').addEventListener('click', e => {
+      e.stopPropagation();
+      if (i === progression.length - 1) return;
+      [progression[i+1], progression[i]] = [progression[i], progression[i+1]];
+      if (progPlaying) progStop();
+      renderProgSlots();
     });
 
     // Drag-to-reorder
@@ -4932,7 +5175,7 @@ const PROG_PRESETS = [
 ];
 
 function buildPresets(scaleNotes, scaleData) {
-  const romans = computeAllRomans(scaleData.intervals);
+  const romans = computeAllRomans(scaleData.intervals, scaleData);
   const n      = scaleNotes.length;
   const wrap   = document.getElementById('prog-presets');
   // Remove old preset buttons (keep the label span)
@@ -5222,11 +5465,17 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
   document.body.classList.toggle('light-theme', isLightTheme);
   document.getElementById('theme-icon-dark').style.display = isLightTheme ? 'none' : '';
   document.getElementById('theme-icon-light').style.display = isLightTheme ? '' : 'none';
-  // Redraw CoF so SVG colors update with theme
   const rootPc = parseInt(state.key);
   const scaleData = SCALES[state.scale];
   drawCoF(rootPc, scaleData.intervals);
   drawNegAxis(document.getElementById('cof-svg'), rootPc, scaleData.intervals);
+});
+
+let isCompactMode = false;
+document.getElementById('compact-toggle').addEventListener('click', () => {
+  isCompactMode = !isCompactMode;
+  document.body.classList.toggle('compact-mode', isCompactMode);
+  document.getElementById('compact-toggle').classList.toggle('active', isCompactMode);
 });
 
 // ══════════════════════════════════════════════
@@ -5390,26 +5639,74 @@ function renderScaleRelationships() {
   if (!container) return;
   const rootPc = parseInt(state.key);
   const { relative, parallel, closely } = findScaleRelationships(rootPc, state.scale);
+  const currentData = SCALES[state.scale];
+  const currentLen  = currentData ? currentData.intervals.length : 7;
+
+  // Helper: explain why two scales are related
+  function whyRelated(item, type) {
+    if (type === 'relative') {
+      // Same pitch set, different root — find degree offset
+      const targetData = SCALES[item.scale];
+      if (!targetData || !currentData) return 'Same pitch set, different root';
+      // Find which mode of the current scale this is
+      const currPcs = new Set(currentData.intervals.map(iv=>(rootPc+iv)%12));
+      const degName = ['1st','2nd','3rd','4th','5th','6th','7th'];
+      for (let d = 0; d < currentData.intervals.length; d++) {
+        const modePc = (rootPc + currentData.intervals[d]) % 12;
+        if (modePc === item.key) {
+          return `${degName[d]||d+1} mode of ${state.scale.replace(' (Ionian)','')} — same ${currentLen} notes`;
+        }
+      }
+      return `Same ${currentLen} notes, different root`;
+    }
+    if (type === 'parallel') {
+      const targetData = SCALES[item.scale];
+      if (!targetData || !currentData) return 'Same root';
+      const currPcs = currentData.intervals.map(iv=>(rootPc+iv)%12);
+      const targPcs = targetData.intervals.map(iv=>(rootPc+iv)%12);
+      const shared = currPcs.filter(p => targPcs.includes(p)).length;
+      const diff = Math.max(currentLen, targetData.intervals.length) - shared;
+      const diffNotes = targPcs.filter(p => !currPcs.includes(p)).map(p => {
+        const cands = PITCH_CANDIDATES[p];
+        return cands ? cands[0] : '';
+      }).filter(Boolean);
+      if (diff === 0) return 'Same root, same notes';
+      const diffStr = diffNotes.length ? ` (${diffNotes.join(', ')} altered)` : '';
+      return `Same root, ${diff} note${diff>1?'s':''} different${diffStr}`;
+    }
+    if (type === 'closely') {
+      const targetData = SCALES[item.scale];
+      if (!targetData || !currentData) return 'Closely related';
+      const currPcs = currentData.intervals.map(iv=>(rootPc+iv)%12);
+      const targPcs = targetData.intervals.map(iv=>(item.key+iv)%12);
+      const shared  = currPcs.filter(p => targPcs.includes(p)).length;
+      const keyName = PITCH_CANDIDATES[item.key]?.[0] || '';
+      return `${shared}/${currentLen} shared notes · root a ${item.key > rootPc ? (item.key-rootPc) : (12+item.key-rootPc)} semitone${(item.key>rootPc?item.key-rootPc:12+item.key-rootPc)>1?'s':''} away`;
+    }
+    return '';
+  }
 
   let html = '';
-  const makeChips = (items, cls) => items.length
-    ? items.map(it => `<span class="rel-chip ${cls}" data-key="${it.key}" data-scale="${encodeURIComponent(it.scale)}">${it.label}</span>`).join('')
+  const makeChips = (items, cls, type) => items.length
+    ? items.map(it => {
+        const why = whyRelated(it, type);
+        return `<span class="rel-chip ${cls}" data-key="${it.key}" data-scale="${encodeURIComponent(it.scale)}" title="${why}">${it.label}<span class="rel-chip-why">${why}</span></span>`;
+      }).join('')
     : '<span class="rel-empty">None found</span>';
 
   if (relative.length) {
-    html += `<div class="rel-group"><div class="rel-group-label">Relative (same notes)</div><div class="rel-chips">${makeChips(relative,'rel-relative')}</div></div>`;
+    html += `<div class="rel-group"><div class="rel-group-label">Relative <span style="font-size:9px;opacity:.6;font-weight:400">(same notes)</span></div><div class="rel-chips">${makeChips(relative,'rel-relative','relative')}</div></div>`;
   }
   if (parallel.length) {
-    html += `<div class="rel-group"><div class="rel-group-label">Parallel (same root)</div><div class="rel-chips">${makeChips(parallel,'rel-parallel')}</div></div>`;
+    html += `<div class="rel-group"><div class="rel-group-label">Parallel <span style="font-size:9px;opacity:.6;font-weight:400">(same root)</span></div><div class="rel-chips">${makeChips(parallel,'rel-parallel','parallel')}</div></div>`;
   }
   if (closely.length) {
-    html += `<div class="rel-group"><div class="rel-group-label">Closely related</div><div class="rel-chips">${makeChips(closely,'rel-closely')}</div></div>`;
+    html += `<div class="rel-group"><div class="rel-group-label">Closely related</div><div class="rel-chips">${makeChips(closely,'rel-closely','closely')}</div></div>`;
   }
   if (!html) html = '<span class="rel-empty">No close relationships found for this scale.</span>';
 
   container.innerHTML = html;
 
-  // Click to navigate
   container.querySelectorAll('.rel-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       state.key = chip.dataset.key;
@@ -6200,7 +6497,7 @@ body.light-theme #tech-panel { background: #faf7f2; }
 
     <div class="tech-section">
       <div class="tech-section-title">Chord Theory Engine</div>
-      <div class="tech-row"><span class="tech-key">Scale data</span><span class="tech-val">24 scales encoded as interval arrays (semitone offsets from root). Families: Major modes, Harmonic Minor, Melodic Minor, Exotic.</span></div>
+      <div class="tech-row"><span class="tech-key">Scale data</span><span class="tech-val">35 scales encoded as interval arrays. Families: Major modes (7), Harmonic Minor (7), Melodic Minor (7), Pentatonic (6 inc. Blues), Exotic (8 inc. Whole Tone, Arabian, Spanish Gypsy, Phrygian Bebop). 5–8 note scales supported.</span></div>
       <div class="tech-row"><span class="tech-key">Chord stacking</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">chordIntervals()</code> - iterative stacking of thirds by scale degree; handles wrap-around octave context</span></div>
       <div class="tech-row"><span class="tech-key">Chord naming</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> - recursive classifier; N=3 triads → N=7 full 13th chords. Lead-sheet standard: maj7/m7/7/ø7/dim7; cumulative extensions; alterations suffix.</span></div>
       <div class="tech-row"><span class="tech-key">Enharmonic spelling</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spellScale()</code> - sequential letter assignment for heptatonic; PREFER_FLAT_PC set for pentatonic</span></div>
@@ -6213,7 +6510,7 @@ body.light-theme #tech-panel { background: #faf7f2; }
       <div class="tech-row"><span class="tech-key">Tuning</span><span class="tech-val">E2-A2-D3-G3-B3-E4 (MIDI 40-45-50-55-59-64)</span></div>
       <div class="tech-row"><span class="tech-key">Jazz shell voicing</span><span class="tech-val">Extended chords (9th+) reduce to [root, 3rd, 7th, highest extension] - 5th dropped. Standard jazz practice for playable shapes.</span></div>
       <div class="tech-row"><span class="tech-key">Shape search</span><span class="tech-val">Exhaustive permutation search over 4-string sets [1-4, 2-5, 3-6]; span ≤6 frets; scored by span × 8 + fret position penalty</span></div>
-      <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val">Drop 2: 2nd-from-top voice lowered an octave. Drop 3: 3rd-from-top lowered. Both computed algorithmically across all 4 inversions × 2 string sets.</span></div>
+      <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val">Drop 2: 2nd-from-top voice lowered an octave. Drop 3: 3rd-from-top lowered. Both follow jazzguitar.be standard across all 4 inversions × 3 string sets. No open strings. Inversion shown in slash notation (e.g. Gmaj7/B).</span></div>
       <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Generated inline via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordDiagram()</code>; click-to-zoom modal at 280px width; pitch-class labels on fret dots</span></div>
     </div>
 
@@ -6501,7 +6798,8 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         </div>
       </div>
       <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar voicings, a circle of fifths, scale relationships, a cadence suggester, and a playable chord progression builder.</p>
-      <p class="guide-p">The tool covers <strong>24 scales</strong> across four families: Major Modes, Harmonic Minor, Melodic Minor, and Exotic Scales. Every scale is presented in all 12 keys. Chord tones are always spelled with correct enharmonic names (e.g. B♭ not A♯ in F major).</p>
+      <p class="guide-p">The tool covers <strong>35 scales</strong> across five families: Major Modes, Harmonic Minor, Melodic Minor, Pentatonic (including Blues scales), and Exotic Scales. Every scale is presented in all 12 keys. Chord tones are always spelled with correct enharmonic names (e.g. B♭ not A♯ in F major).</p>
+      <p class="guide-p">The <strong>☰ compact mode</strong> button (top-right) hides chord quality labels, note names and the Circle of Fifths for a denser view — useful on small screens or when you just want the chord symbols and diagrams.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">💡</span>
         <span class="guide-tip-text">The left column holds reference tools (CoF, scale relationships, cadences, progression builder). The right column always shows the chord view. Both scroll independently.</span>
@@ -6524,7 +6822,7 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         <span class="guide-kv-key">Root Key</span>
         <span class="guide-kv-val">Sets the tonic of the scale. All note names and chord roots adjust automatically with correct spelling.</span>
         <span class="guide-kv-key">Scale / Mode</span>
-        <span class="guide-kv-val">Selects from 24 scales. Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
+        <span class="guide-kv-val">Selects from 35 scales across 5 families (Major Modes, Harmonic Minor, Melodic Minor, Pentatonic, Exotic). Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
@@ -6558,13 +6856,13 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         <span class="guide-kv-key">13ths</span>
         <span class="guide-kv-val">Full seven-note chord stacks. Every scale degree voiced simultaneously - the richest harmonic texture.</span>
         <span class="guide-kv-key">Others</span>
-        <span class="guide-kv-val">Sus2, Sus4, add9, add11, 6th, 6/9, augmented triads, 7sus4, Maj7sus4 - all built from scale tones.</span>
+        <span class="guide-kv-val">Sus2, Sus4, add9, add11, M6, m6, 6/9, m6/9, augmented, diminished, power chord (5), 7sus4, Maj7sus4, 7sus2 — all built from scale tones where available.</span>
       </div>
 
       <p class="guide-p" style="margin-bottom:6px"><strong>Chromatic modes:</strong></p>
       <div class="guide-kv">
         <span class="guide-kv-key">Secondary Dom.</span>
-        <span class="guide-kv-val">V7 chords targeting each diatonic degree - e.g. V/ii, V/IV. Classic way to tonicise non-tonic chords.</span>
+        <span class="guide-kv-val">V7 chords targeting each diatonic degree (V/ii, V/IV, etc.). Each card shows common alterations — <strong>7♭9, 7♯9, 7♯11, 7♭13, 7alt</strong> — and a <strong>♭II tritone substitution</strong> (the dominant a tritone away, which shares the guide tones).</span>
         <span class="guide-kv-key">Secondary Dim.</span>
         <span class="guide-kv-val">vii° chords a semitone below each diatonic root. Tighter chromatic pull than secondary dominants.</span>
         <span class="guide-kv-key">Secondary Sub.</span>
@@ -6633,15 +6931,15 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         <span class="guide-kv-key">Chord List</span>
         <span class="guide-kv-val">Default view. Each degree shows one card with the chord symbol, quality, note names, and interval stack (e.g. 1 · ♭3 · 5 · ♭7).</span>
         <span class="guide-kv-key">Guitar Diagrams</span>
-        <span class="guide-kv-val">SVG fretboard diagrams for each chord. Shows optimal fingering across frets 0–12, with dots colour-coded by chord tone function.</span>
+        <span class="guide-kv-val">SVG fretboard diagrams for each chord. The algorithm prioritises the <strong>root as bass note</strong> (lowest sounding pitch). Shapes requiring a barre are shown with a purple bar across the relevant strings and a small <strong>B</strong> marker. Gold dot = root, purple = other chord tones.</span>
         <span class="guide-kv-key">Drop 2</span>
-        <span class="guide-kv-val">Jazz voicing technique: the second-highest note of a closed chord is dropped an octave. Shows all four string sets (strings 1–4, 2–5, 3–6). Click any diagram to zoom.</span>
+        <span class="guide-kv-val">Jazz voicing: the 2nd-highest note of a close-position chord dropped one octave. Shows all 4 inversions × 3 string sets (E-A-D-G, A-D-G-B, D-G-B-e). No open strings. Inversion label shown as slash notation, e.g. <strong>Gmaj7/B</strong> for 1st inversion.</span>
         <span class="guide-kv-key">Drop 3</span>
-        <span class="guide-kv-val">The third-highest note dropped an octave. Wider, more open voicings used in big-band arranging. Two string sets shown. Click to zoom.</span>
+        <span class="guide-kv-val">Jazz voicing: the 3rd-highest note dropped one octave. Wider, more open voicings on non-adjacent string sets. Same 4 inversions × 3 sets. Used in big-band arranging. Click any diagram to zoom.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
-        <span class="guide-tip-text">Drop 2 and Drop 3 tabs are only active in 7th-chord mode or Secondary Dominants mode - they require four-note chords to work correctly.</span>
+        <span class="guide-tip-text">Drop 2 and Drop 3 voicings follow the jazzguitar.be standard — verified against the most widely used jazz guitar reference. Shapes are only shown when a playable position (span ≤ 5 frets, no open strings) is found.</span>
       </div>
     </section>
 
@@ -6656,14 +6954,14 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
           <div class="guide-section-title">Scale Relationships</div>
         </div>
       </div>
-      <p class="guide-p">This collapsible panel (left column) shows three groups of related scales. Click any chip to instantly navigate to that scale - handy for modal interchange and modulation planning.</p>
+      <p class="guide-p">This collapsible panel (left column) shows three groups of related scales. Each chip now shows a brief explanation of <em>why</em> the two scales are related. Click any chip to instantly navigate to that scale — handy for modal interchange and modulation planning.</p>
       <div class="guide-kv">
         <span class="guide-kv-key" style="background:rgba(124,111,160,.15);border-color:rgba(124,111,160,.4);color:#a08bc8">Relative</span>
-        <span class="guide-kv-val">Scales that share every note but start on a different root. E.g. C Major and A Aeolian.</span>
+        <span class="guide-kv-val">Scales that share every note but start on a different root. The chip shows which mode of the current scale it corresponds to — e.g. "3rd mode of Major (Ionian) — same 7 notes."</span>
         <span class="guide-kv-key" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.35);color:#e8c96a">Parallel</span>
-        <span class="guide-kv-val">Scales with the same root but different note sets. E.g. C Major and C Dorian - same root, different flavour.</span>
+        <span class="guide-kv-val">Scales with the same root but different note sets. The chip shows how many notes differ and which ones — e.g. "Same root, 1 note different (Bb altered)".</span>
         <span class="guide-kv-key" style="background:rgba(80,160,120,.1);border-color:rgba(80,160,120,.35);color:#6bb89a">Closely Related</span>
-        <span class="guide-kv-val">Scales differing by only one or two notes - the most subtle modulation targets.</span>
+        <span class="guide-kv-val">Scales differing by only one note with a root a semitone or two away — the subtlest modulation targets. Shows shared note count and root distance.</span>
       </div>
     </section>
 
@@ -6706,19 +7004,19 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         <span class="guide-kv-key">Adding chords</span>
         <span class="guide-kv-val">Click any chord card in the right panel, or any chord chip in the Cadence Suggester. Chords are added as slots to the strip.</span>
         <span class="guide-kv-key">Reordering</span>
-        <span class="guide-kv-val">Drag slots left or right to reorder the sequence.</span>
-        <span class="guide-kv-key">Beat count</span>
-        <span class="guide-kv-val">Each slot has independent − / + controls to set how many beats that chord lasts. The global Beats/chord sets the default for new additions.</span>
+        <span class="guide-kv-val">Drag slots left or right to reorder, or use the <strong>◀ ▶</strong> arrow buttons on each slot for one-step moves — useful on mobile where drag-and-drop is tricky.</span>
+        <span class="guide-kv-key">Per-chord duration</span>
+        <span class="guide-kv-val">Each slot has independent <strong>− / +</strong> controls to set how many beats that chord lasts (1–16). The global Beats/chord sets the default for new additions but you can override any slot independently.</span>
         <span class="guide-kv-key">BPM</span>
         <span class="guide-kv-val">Tempo from 40 to 240 BPM. Changes take effect at the next playback.</span>
         <span class="guide-kv-key">Rhythm</span>
         <span class="guide-kv-val">Six strum patterns (Straight, Folk, Rock, Ballad, Bossa, Waltz) shape the rhythmic feel within each chord — from simple block chords to syncopated arpeggiation. The pattern applies to all chords in the progression.</span>
         <span class="guide-kv-key">Substitutions</span>
-        <span class="guide-kv-val">Each chord slot shows a <strong>≈</strong> button in the top-right corner on hover. Clicking it opens a context-aware substitution menu — sus chords, relative major/minor, tritone sub (for dom7), augmented and diminished alternatives, and half-step approach chords. The chosen sub is inserted as a new slot after the current one.</span>
+        <span class="guide-kv-val">Each chord slot shows a <strong>≈</strong> button on hover. Clicking it opens a context-aware menu — sus chords, relative major/minor, tritone sub (for dom7), augmented and diminished alternatives, and half-step approach chords.</span>
         <span class="guide-kv-key">Metronome</span>
         <span class="guide-kv-val">Toggle a click track or kick+snare drum pattern alongside playback.</span>
         <span class="guide-kv-key">Loop</span>
-        <span class="guide-kv-val">Cycle the progression indefinitely until you press Stop. The Loop button lights up gold when active. Works the same in the expanded fullscreen view.</span>
+        <span class="guide-kv-val">Cycle the progression indefinitely until you press Stop. The Loop button lights up gold when active.</span>
         <span class="guide-kv-key">Presets</span>
         <span class="guide-kv-val">Load classic progressions (I–IV–V–I, ii–V–I, etc.) instantly transposed to your current key.</span>
         <span class="guide-kv-key">Expand</span>
@@ -7035,16 +7333,6 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
   });
 
 })();
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(r => console.log('SW registered:', r.scope))
-      .catch(e => console.warn('SW failed:', e));
-  });
-}
 </script>
 </body>
 </html>
