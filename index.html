@@ -890,20 +890,37 @@
     box-shadow: 0 2px 10px rgba(0,0,0,.35);
   }
   #compact-toggle:hover { border-color: var(--accent2); color: var(--accent2); }
-  #compact-toggle.active { border-color: var(--accent2); color: var(--accent2); background: rgba(124,111,160,.12); }
+  #compact-toggle.active { border-color: var(--accent2); color: var(--accent2); background: rgba(124,111,160,.15); }
+  body.light-theme #compact-toggle { background: var(--surface2); border-color: var(--border); color: var(--muted); }
+
+  /* Compact mode: hide verbose elements, tighten spacing */
   body.compact-mode .scale-hero-desc { display: none; }
+  body.compact-mode .scale-hero-formula { display: none; }
   body.compact-mode .chord-quality { display: none; }
   body.compact-mode .chord-notes-row { display: none; }
+  body.compact-mode .chord-intervals { display: none; }
+  body.compact-mode .chord-staff-btn { display: none; }
   body.compact-mode .degree-name-label { display: none; }
-  body.compact-mode .section-divider { margin: 4px 0; }
-  body.compact-mode .degree-section { padding-bottom: 4px; }
-  body.compact-mode .chord-card { padding: 6px 8px 5px; }
-  body.compact-mode .degree-header { margin-bottom: 4px; }
-  body.compact-mode .chords-grid { gap: 4px; }
+  body.compact-mode .section-divider { margin: 2px 0; min-height: 1px; }
+  body.compact-mode .degree-section { padding-bottom: 2px; }
+  body.compact-mode .chord-card { padding: 5px 7px 4px; min-height: 0; }
+  body.compact-mode .chord-root { font-size: 14px; }
+  body.compact-mode .chord-root sup { font-size: 9px; }
+  body.compact-mode .degree-header { margin-bottom: 2px; padding: 2px 0; }
+  body.compact-mode .chords-grid { gap: 3px; }
+  body.compact-mode .degree-num { font-size: 13px; }
   body.compact-mode .cof-section { display: none; }
   body.compact-mode .diag-quality { display: none; }
   body.compact-mode .diag-notes { display: none; }
-  body.light-theme #compact-toggle { background: var(--surface2); border-color: var(--border); color: var(--muted); }
+  body.compact-mode .scale-hero { padding: 10px 14px; }
+  body.compact-mode .scale-hero-eyebrow { display: none; }
+  body.compact-mode .scale-hero-identity { font-size: 9px; }
+  body.compact-mode #neg-btn { display: none; }
+  body.compact-mode .tip-badge { display: none; }
+  body.compact-mode .drop-str-label { font-size: 7px; }
+  body.compact-mode .diag-chord-name { font-size: 12px; }
+  body.compact-mode .diag-card { padding: 5px 5px 4px; }
+  body.compact-mode .drop-card { padding: 5px 5px 4px; }
   body.light-theme .cad-row { border-color: var(--border); }
   body.light-theme .cad-name { color: var(--dim); }
   body.light-theme .cad-chord { color: var(--gold2); border-color: var(--border); background: var(--surface2); }
@@ -1978,21 +1995,23 @@ function letterIndex(name) { return LETTERS.indexOf(name[0]); }
 
 // Spell a scale starting from rootPc (0-11) with given interval array.
 // Returns array of note name strings with correct enharmonic spelling.
-function spellScale(rootPc, intervals) {
+// scaleData: optional — if provided, uses .preferSharps to override flat preference.
+function spellScale(rootPc, intervals, scaleData) {
   const n = intervals.length;
+  const preferSharps = scaleData && scaleData.preferSharps;
 
-  // Canonical root name (prefer natural/flat over weird enharmonics)
+  // Canonical root name
   const rootCandidates = PITCH_CANDIDATES[rootPc % 12];
   let rootName = rootCandidates[0];
-  if(PREFER_FLAT_PC.has(rootPc%12) && rootCandidates.length > 1) rootName = rootCandidates[1];
+  if(!preferSharps && PREFER_FLAT_PC.has(rootPc%12) && rootCandidates.length > 1) rootName = rootCandidates[1];
 
   // For pentatonic / short scales AND octatonic scales: use simple enharmonic spelling
-  // The "each degree gets the next letter" logic only reliably works for heptatonic scales.
   if (n !== 7) {
     return intervals.map(iv => {
       const pc = (rootPc + iv) % 12;
       const cands = PITCH_CANDIDATES[pc];
       if (cands.length === 1) return cands[0];
+      if (preferSharps) return cands[0]; // always sharp
       return PREFER_FLAT_PC.has(pc) ? cands[1] : cands[0];
     });
   }
@@ -2076,45 +2095,28 @@ const SCALES = {
     desc:`Like harmonic minor but with a ♯4. The double augmented-second flavour (both between ♭3→♯4 and ♭6→♮7) gives it a hauntingly exotic, Eastern European character - the signature of Romani and Hungarian folk music.`},
   'Byzantine':                   {intervals:[0,1,4,5,7,8,11],  family:'Exotic Scales',  formula:'H A2 H W H A2 H',
     desc:`Also called Double Harmonic Major or Arabic scale. Two augmented 2nds (♭2→♮3 and ♭6→♮7) create a symmetrical, intensely exotic tension. The I chord is a major 7th but sits above a Phrygian ♭2, creating maximum contrast.`},
-  'Hirajoshi (Mode 4)':          {intervals:[0,1,5,7,8],       family:'Pentatonic',     formula:'H M3 H H', pentatonic:true,
+  'Hirajoshi (Mode 4)':          {intervals:[0,1,5,7,8],       family:'Exotic Scales',     formula:'H M3 H H', pentatonic:true,
     degreeMap:[0,1,3,4,5],
     desc:`A Japanese pentatonic with a ♭2 and ♭6. The wide minor-third gap after the ♭2 is the defining leap that gives it its stark, meditative, koto-like character. Perfect for sparse, contemplative music.`},
 
-  'Hirajoshi':                   {intervals:[0,4,6,7,11],      family:'Pentatonic',     formula:'M3 H H M3 H', pentatonic:true,
+  'Hirajoshi':                   {intervals:[0,4,6,7,11],      family:'Exotic Scales',     formula:'M3 H H M3 H', pentatonic:true,
+    preferSharps:true,
     degreeMap:[0,2,3,4,6],
     desc:`The original Japanese Hirajoshi scale (mode 1). Built on a major third, two half-steps and another major third, it has a floating, ethereal quality central to koto music and Japanese folk melodies.`},
 
-  'Pentatonic Minor':            {intervals:[0,3,5,7,10],      family:'Pentatonic',     formula:'m3 W W m3 W', pentatonic:true,
-    degreeMap:[0,1,3,4,5],
-    desc:`The foundation of blues, rock, and folk music worldwide. Five notes — root, ♭3, 4th, 5th, ♭7th — that sit comfortably over minor and dominant chords alike. The most universally recognised scale in popular music.`},
-
-  'Pentatonic Major':            {intervals:[0,2,4,7,9],       family:'Pentatonic',     formula:'W W m3 W m3', pentatonic:true,
-    degreeMap:[0,1,2,4,5],
-    desc:`The bright counterpart to the minor pentatonic. Root, 2nd, 3rd, 5th, 6th — the scale of American country, Celtic folk, and East Asian folk melodies. Works over major chords and creates an open, optimistic sound.`},
-
-  'Blues Minor':                 {intervals:[0,3,5,6,7,10],    family:'Pentatonic',     formula:'m3 W H H m3 W',
-    degreeMap:[0,1,3,4,4,5],
-    desc:`The minor pentatonic with an added ♭5 (the "blue note"). That chromatic passing tone between the 4th and 5th creates the characteristic tension-and-release of blues soloing. Six notes, but feels like five with a secret weapon.`},
-
-  'Blues Major':                 {intervals:[0,2,3,4,7,9],     family:'Pentatonic',     formula:'W H H m3 W m3',
-    degreeMap:[0,1,2,2,4,5],
-    desc:`The major pentatonic with an added ♭3 — a chromatic approach note to the 3rd. Gives a country-blues flavour, sitting between major brightness and blues grittiness. Beloved in country guitar and soul music.`},
-
   'Whole Tone':                  {intervals:[0,2,4,6,8,10],    family:'Exotic Scales',  formula:'W W W W W W',
+    preferSharps:true,
     degreeMap:[0,1,2,3,4,5],
     desc:`Six equal whole steps with no half-step resolution — every triad built on it is augmented. The scale has no tonal gravity or leading tone, creating a dreamy, suspended ambiguity favoured by Debussy and jazz impressionists.`},
 
   'Phrygian Bebop':              {intervals:[0,1,3,4,5,7,8,10],family:'Exotic Scales',  formula:'H W H H W H W W',
     desc:`Phrygian Dominant with an added ♮3 passing tone (the bebop note). The clash between the ♭2 and natural 3rd creates chromatic tension ideal for bebop lines over altered dominant chords in a flamenco-jazz context.`},
 
-  'Spanish Gypsy':               {intervals:[0,1,4,5,7,8,10],  family:'Exotic Scales',  formula:'H A2 H W H W W',
-    desc:`Also known as the Phrygian Dominant scale. The augmented second between ♭2 and major 3rd is its signature — the sound of flamenco guitar, Middle-Eastern maqam, and Jewish klezmer. Creates intense modal tension with a I major chord.`},
-
   'Arabian':                     {intervals:[0,2,4,5,6,8,10],  family:'Exotic Scales',  formula:'W W H H W W W',
     desc:`A symmetrical scale combining a Lydian tetrachord (♯4) with a Phrygian upper tetrachord (♭6, ♭7). The ♯4 and ♭5 in close proximity give it an exotic, unstable, Middle-Eastern flavour unlike any European mode.`},
 };
 
-const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Pentatonic','Exotic Scales'];
+const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Exotic Scales'];
 
 const DEGREE_NAMES_7 = ['Tonic','Supertonic','Mediant','Subdominant','Dominant','Submediant','Leading Tone'];
 const DEGREE_NAMES_5 = ['Tonic','II','III','IV','V'];
@@ -3008,7 +3010,8 @@ function findSharedTone(r1, q1, r2, q2) {
   return shared !== undefined ? chromaticPcName(shared, PREFER_FLAT_PC.has(shared)) : '?';
 }
 
-// Build secondary diminished chords: vii° of X = dim triad a semitone below X's root
+// Build secondary diminished chords: vii°7 of X = fully-diminished 7th a semitone below X's root
+// This is the standard jazz practice — use dim7 (4 notes), not just a triad
 function buildSecondaryDiminished(rootPc, scaleIntervals, romans){
   const n=scaleIntervals.length;
   const scalePcs=new Set(scaleIntervals.map(i=>(rootPc+i)%12));
@@ -3018,19 +3021,25 @@ function buildSecondaryDiminished(rootPc, scaleIntervals, romans){
     if(q==='dim'||q==='aug'||q==='other') continue;
     const targetPc=(rootPc+scaleIntervals[di])%12;
     const dimRootPc=(targetPc-1+12)%12;
-    const dimPcs=[dimRootPc,(dimRootPc+3)%12,(dimRootPc+6)%12];
-    if(dimPcs.every(p=>scalePcs.has(p))) continue; // fully diatonic - skip
-    const r=chromaticPcName(dimRootPc, PREFER_FLAT_PC.has(dimRootPc));
-    const notes=[r,
-      chromaticPcName((dimRootPc+3)%12, PREFER_FLAT_PC.has((dimRootPc+3)%12)),
-      chromaticPcName((dimRootPc+6)%12, PREFER_FLAT_PC.has((dimRootPc+6)%12))];
-    const chord={root:r, notes, sym:'dim', qual:'Diminished', iv:[0,3,6]};
-    result.push({degIdx:di, roman:romans[di], label:`vii° / ${romans[di]}`, chord});
+    // Use fully diminished 7th (dim7): root, m3, dim5, dim7
+    const p1pc = dimRootPc;
+    const p3pc = (dimRootPc+3)%12;
+    const p5pc = (dimRootPc+6)%12;
+    const p7pc = (dimRootPc+9)%12;  // dim7 = bb7 = enharmonic major 6th
+    const dim7Pcs=[p1pc,p3pc,p5pc,p7pc];
+    if(dim7Pcs.every(p=>scalePcs.has(p))) continue; // fully diatonic - skip
+    const r  = chromaticPcName(p1pc, PREFER_FLAT_PC.has(p1pc));
+    const n3 = chromaticPcName(p3pc, PREFER_FLAT_PC.has(p3pc));
+    const n5 = chromaticPcName(p5pc, PREFER_FLAT_PC.has(p5pc));
+    const n7 = chromaticPcName(p7pc, PREFER_FLAT_PC.has(p7pc));
+    const chord={root:r, notes:[r,n3,n5,n7], sym:'dim7', qual:'Diminished 7th', iv:[0,3,6,9]};
+    result.push({degIdx:di, roman:romans[di], label:`vii°7 / ${romans[di]}`, chord});
   }
   return result;
 }
 
-// Build secondary subdominants: IV of X = major triad a P4 above X's root (+5 semitones)
+// Build secondary subdominants: IV7 of X = Maj7 a P4 above X's root (+5 semitones)
+// Using Maj7 (4-note) as it's more musically useful and consistent with secdom approach
 function buildSecondarySubdominants(rootPc, scaleIntervals, romans){
   const n=scaleIntervals.length;
   const scalePcs=new Set(scaleIntervals.map(i=>(rootPc+i)%12));
@@ -3040,10 +3049,19 @@ function buildSecondarySubdominants(rootPc, scaleIntervals, romans){
     if(q==='dim'||q==='aug'||q==='other') continue;
     const targetPc=(rootPc+scaleIntervals[di])%12;
     const ivRootPc=(targetPc+5)%12;
-    const ivPcs=[ivRootPc,(ivRootPc+4)%12,(ivRootPc+7)%12];
+    // IV Maj7: root, maj3, p5, maj7
+    const p1pc = ivRootPc;
+    const p3pc = (ivRootPc+4)%12;
+    const p5pc = (ivRootPc+7)%12;
+    const p7pc = (ivRootPc+11)%12;
+    const ivPcs=[p1pc,p3pc,p5pc,p7pc];
     if(ivPcs.every(p=>scalePcs.has(p))) continue; // fully diatonic - skip
-    const chord=spellTriad(ivRootPc,'major');
-    result.push({degIdx:di, roman:romans[di], label:`IV / ${romans[di]}`, chord});
+    const r  = chromaticPcName(p1pc, PREFER_FLAT_PC.has(p1pc));
+    const n3 = chromaticPcName(p3pc, PREFER_FLAT_PC.has(p3pc));
+    const n5 = chromaticPcName(p5pc, PREFER_FLAT_PC.has(p5pc));
+    const n7 = chromaticPcName(p7pc, PREFER_FLAT_PC.has(p7pc));
+    const chord={root:r, notes:[r,n3,n5,n7], sym:'Δ7', qual:'Major 7th', iv:[0,4,7,11]};
+    result.push({degIdx:di, roman:romans[di], label:`IVΔ7 / ${romans[di]}`, chord});
   }
   return result;
 }
@@ -3300,7 +3318,7 @@ function render(){
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   if (!scaleData) return;
-  const scaleNotes=spellScale(rootPc,scaleData.intervals);
+  const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
 
   // Immediate lightweight updates (no DOM rebuild)
   renderScaleInfo(scaleNotes,scaleData);
@@ -3347,32 +3365,47 @@ function renderView(scaleNotes,scaleData){
 const GUITAR_MIDI = [40,45,50,55,59,64]; // E2 A2 D3 G3 B3 E4
 
 // Low-level: find fret positions for a fixed pc-per-string assignment.
-// Pitches ALWAYS ascend from lowest string to highest (physical guitar constraint).
-// For drop voicings the PC order on strings is non-sequential but pitches still rise.
+// Pitches ALWAYS ascend from lowest to highest string (physical guitar constraint).
+// dropVoicing=true: no open strings; span is measured relative to lowest fret window.
 function computeGuitarVoicing(pcs, stringIndices, ascendingPitch=true) {
   const n = pcs.length;
   const PC = pcs.map(p=>((p%12)+12)%12);
-  // Build candidate frets for each string (avoid open strings for drop voicings)
+  const isDropVoicing = !ascendingPitch;
+
+  // Build candidate frets per string
   const candidates = PC.map((pc,i)=>{
     const strMidi = GUITAR_MIDI[stringIndices[i]];
     const strPc   = strMidi % 12;
     const base    = (pc - strPc + 12) % 12;
     const opts    = [];
-    // For drop voicings: start at fret 1 minimum (no open strings)
-    const startF  = (!ascendingPitch && base === 0) ? 12 : base;
-    for (let f = startF; f <= 19; f += 12) opts.push(f);
+    // For drop voicings: generate options starting from fret 1 (no open)
+    // but also try fret 12/13+ range for high-position shapes
+    if (isDropVoicing) {
+      const start = base === 0 ? 12 : base;
+      for (let f = start; f <= 20; f += 12) opts.push(f);
+    } else {
+      for (let f = base; f <= 17; f += 12) opts.push(f);
+    }
     return opts;
   });
+
   let best = null, bestScore = Infinity;
+
   function search(idx, cur) {
     if (idx === n) {
-      // Pitches must always ascend (or stay equal is rejected) — guitar strings go low to high
+      // Pitches must always ascend across strings
       const pitches = cur.map((f,i) => GUITAR_MIDI[stringIndices[i]] + f);
       for (let i = 1; i < n; i++) if (pitches[i] <= pitches[i-1]) return;
-      const span = Math.max(...cur) - Math.min(...cur);
-      if (span > 6) return;
+
+      // For drop voicings: span measured relative (max-min of frets within the shape)
+      // A shape at frets 9-10-11-12 is perfectly fine (span=3)
       const minF = Math.min(...cur);
-      const score = span * 10 + (minF <= 3 ? minF : minF * 4);
+      const maxF = Math.max(...cur);
+      const span = maxF - minF;
+      if (span > 5) return;
+
+      // Score: prefer lower positions, tighter span
+      const score = span * 10 + (minF <= 4 ? minF : minF <= 9 ? minF * 2 : minF * 3);
       if (score < bestScore) { bestScore = score; best = [...cur]; }
       return;
     }
@@ -4850,32 +4883,34 @@ function progPlay() {
   if (!progression.length) return;
   progStop();
 
-  const ctx     = getAudioCtx();
-  const bpm     = progGetBpm();
-  const sound   = progGetSound();
-  const beatDur = 60 / bpm;
+  // On mobile the AudioContext may still be suspended even after _unlockAudio.
+  // We must resume it and wait before scheduling any nodes.
+  const ctx = getAudioCtx();
+  const doPlay = () => {
+    const bpm     = progGetBpm();
+    const sound   = progGetSound();
+    const beatDur = 60 / bpm;
 
-  // Build schedule (relative times within one loop iteration)
-  const schedule = [];
-  let t = 0;
-  progression.forEach(ch => {
-    const beats    = ch.beats || progGetBeats();
-    const duration = beats * beatDur;
-    schedule.push({ t, duration });
-    t += duration;
-  });
-  const totalDur = t;
+    const schedule = [];
+    let t = 0;
+    progression.forEach(ch => {
+      const beats    = ch.beats || progGetBeats();
+      const duration = beats * beatDur;
+      schedule.push({ t, duration });
+      t += duration;
+    });
+    const totalDur = t;
 
-  progStartTime  = ctx.currentTime + 0.05;
-  progPlaying    = true;
-  progCurrentIdx = 0;
+    progStartTime  = ctx.currentTime + 0.1; // slightly larger offset for mobile
+    progPlaying    = true;
+    progCurrentIdx = 0;
 
-  document.getElementById('prog-play').classList.add('playing');
-  document.getElementById('prog-stop').disabled = false;
+    document.getElementById('prog-play').classList.add('playing');
+    document.getElementById('prog-stop').disabled = false;
 
   // ── scheduleIteration: schedule one full pass starting at audioT ──
   // Collects all created nodes into progNodes/progGainNodes for stop().
-  // Returns the audio time at which this iteration ends (= start of next).
+  // ── scheduleIteration ──
   function scheduleIteration(audioT) {
     const _origOsc  = ctx.createOscillator.bind(ctx);
     const _origBuf  = ctx.createBufferSource.bind(ctx);
@@ -4899,9 +4934,8 @@ function progPlay() {
     return audioT + totalDur;
   }
 
-  // Schedule first iteration
   let iterationEnd = scheduleIteration(progStartTime);
-  let nextLoopScheduled = false; // have we pre-scheduled the next loop pass?
+  let nextLoopScheduled = false;
 
   const playhead = document.getElementById('prog-playhead');
 
@@ -4909,28 +4943,20 @@ function progPlay() {
     if (!progPlaying) return;
     const now     = ctx.currentTime;
     const elapsed = now - progStartTime;
-    // elapsed within current loop cycle (wraps on loop)
     const cycleElapsed = totalDur > 0 ? elapsed % totalDur : 0;
 
-    // Pre-schedule next loop iteration ~200ms before current ends
-    // This is the key: we schedule the NEXT pass while the CURRENT is still playing,
-    // so there's zero gap at the seam — the AudioContext clock is continuous.
     if (progLoop && !nextLoopScheduled && (iterationEnd - now) < 0.25) {
       iterationEnd = scheduleIteration(iterationEnd);
       nextLoopScheduled = true;
-      // Reset flag shortly after so we can schedule the pass after that
       setTimeout(() => { if (progPlaying) nextLoopScheduled = false; }, 150);
     }
 
-    // Check for non-loop end
     if (!progLoop && elapsed >= totalDur) {
       progStop(); return;
     }
 
-    // Progress bar (always 0→100% per cycle)
     playhead.style.width = (Math.min(cycleElapsed / totalDur, 1) * 100) + '%';
 
-    // Slot highlight
     let curIdx = schedule.length - 1;
     for (let i = 0; i < schedule.length; i++) {
       if (cycleElapsed < schedule[i].t + schedule[i].duration) { curIdx = i; break; }
@@ -4945,6 +4971,14 @@ function progPlay() {
   }
 
   progScheduler = requestAnimationFrame(tick);
+  }; // end doPlay
+
+  // Resume AudioContext first (critical for iOS/Android PWA)
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(doPlay).catch(() => doPlay());
+  } else {
+    doPlay();
+  }
 }
 
 function progStop() {
@@ -6004,7 +6038,7 @@ function renderComparison() {
   const sB = document.getElementById('compare-scale-b')?.value || 'Aeolian (Natural Minor)';
 
   const dA = SCALES[sA], dB = SCALES[sB];
-  const nA = spellScale(kA, dA.intervals), nB = spellScale(kB, dB.intervals);
+  const nA = spellScale(kA, dA.intervals, dA), nB = spellScale(kB, dB.intervals, dB);
   const pcsA = new Set(dA.intervals.map(iv=>(kA+iv)%12));
   const pcsB = new Set(dB.intervals.map(iv=>(kB+iv)%12));
 
@@ -6344,7 +6378,7 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   state.view = tab.dataset.view;
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
-  const scaleNotes=spellScale(rootPc,scaleData.intervals);
+  const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   renderView(scaleNotes,scaleData);
   wireChordCards();
 });
@@ -6497,7 +6531,7 @@ body.light-theme #tech-panel { background: #faf7f2; }
 
     <div class="tech-section">
       <div class="tech-section-title">Chord Theory Engine</div>
-      <div class="tech-row"><span class="tech-key">Scale data</span><span class="tech-val">35 scales encoded as interval arrays. Families: Major modes (7), Harmonic Minor (7), Melodic Minor (7), Pentatonic (6 inc. Blues), Exotic (8 inc. Whole Tone, Arabian, Spanish Gypsy, Phrygian Bebop). 5–8 note scales supported.</span></div>
+      <div class="tech-row"><span class="tech-key">Scale data</span><span class="tech-val">29 scales encoded as interval arrays. Families: Major modes (7), Harmonic Minor (7), Melodic Minor (7), Exotic (8 inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop). 5–8 note scales supported.</span></div>
       <div class="tech-row"><span class="tech-key">Chord stacking</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">chordIntervals()</code> - iterative stacking of thirds by scale degree; handles wrap-around octave context</span></div>
       <div class="tech-row"><span class="tech-key">Chord naming</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> - recursive classifier; N=3 triads → N=7 full 13th chords. Lead-sheet standard: maj7/m7/7/ø7/dim7; cumulative extensions; alterations suffix.</span></div>
       <div class="tech-row"><span class="tech-key">Enharmonic spelling</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spellScale()</code> - sequential letter assignment for heptatonic; PREFER_FLAT_PC set for pentatonic</span></div>
@@ -6798,7 +6832,7 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         </div>
       </div>
       <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar voicings, a circle of fifths, scale relationships, a cadence suggester, and a playable chord progression builder.</p>
-      <p class="guide-p">The tool covers <strong>35 scales</strong> across five families: Major Modes, Harmonic Minor, Melodic Minor, Pentatonic (including Blues scales), and Exotic Scales. Every scale is presented in all 12 keys. Chord tones are always spelled with correct enharmonic names (e.g. B♭ not A♯ in F major).</p>
+      <p class="guide-p">The tool covers <strong>29 scales</strong> across four families: Major Modes, Harmonic Minor, Melodic Minor, and Exotic Scales (inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop). Every scale is presented in all 12 keys. Chord tones are always spelled with correct enharmonic names (e.g. B♭ not A♯ in F major).</p>
       <p class="guide-p">The <strong>☰ compact mode</strong> button (top-right) hides chord quality labels, note names and the Circle of Fifths for a denser view — useful on small screens or when you just want the chord symbols and diagrams.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">💡</span>
@@ -6822,7 +6856,7 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         <span class="guide-kv-key">Root Key</span>
         <span class="guide-kv-val">Sets the tonic of the scale. All note names and chord roots adjust automatically with correct spelling.</span>
         <span class="guide-kv-key">Scale / Mode</span>
-        <span class="guide-kv-val">Selects from 35 scales across 5 families (Major Modes, Harmonic Minor, Melodic Minor, Pentatonic, Exotic). Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
+        <span class="guide-kv-val">Selects from 29 scales across 4 families. Each scale is described in the Scale Hero banner with its characteristic colours and degrees. Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
