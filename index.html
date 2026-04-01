@@ -69,6 +69,58 @@
     position: relative;
     overflow: visible;
   }
+
+  /* History breadcrumb strip */
+  #history-strip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px 5px;
+    margin-bottom: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: nowrap;
+  }
+  #history-strip::-webkit-scrollbar { display: none; }
+  .hist-chip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .14s;
+    flex-shrink: 0;
+    letter-spacing: .02em;
+  }
+  .hist-chip:hover { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.07); }
+  .hist-chip.hist-current { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.1); cursor: default; }
+  .hist-sep { color: var(--border2); font-size: 9px; flex-shrink: 0; user-select: none; }
+  .hist-share-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid var(--border2);
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+    white-space: nowrap;
+    transition: all .14s;
+    letter-spacing: .04em;
+  }
+  .hist-share-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .hist-share-btn.copied { border-color: #50c87a; color: #50c87a; }
+  body.light-theme .hist-chip { background: var(--surface2); border-color: var(--border); color: var(--dim); }
+  body.light-theme .hist-chip:hover { border-color: var(--gold); color: var(--gold2); }
+  body.light-theme .hist-chip.hist-current { border-color: var(--gold); color: var(--gold2); }
   .scale-hero::before {
     content: '';
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -874,53 +926,6 @@
   body.light-theme .collapsible-hdr:hover { color: var(--gold2); }
   body.light-theme .rel-chip { border-color: var(--border); color: var(--dim); background: var(--surface2); }
 
-  /* ── Compact mode ── */
-  #compact-toggle {
-    position: fixed;
-    top: 16px; right: 62px;
-    z-index: 600;
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    color: var(--muted);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all .2s;
-    box-shadow: 0 2px 10px rgba(0,0,0,.35);
-  }
-  #compact-toggle:hover { border-color: var(--accent2); color: var(--accent2); }
-  #compact-toggle.active { border-color: var(--accent2); color: var(--accent2); background: rgba(124,111,160,.15); }
-  body.light-theme #compact-toggle { background: var(--surface2); border-color: var(--border); color: var(--muted); }
-
-  /* Compact mode: hide verbose elements, tighten spacing */
-  body.compact-mode .scale-hero-desc { display: none; }
-  body.compact-mode .scale-hero-formula { display: none; }
-  body.compact-mode .chord-quality { display: none; }
-  body.compact-mode .chord-notes-row { display: none; }
-  body.compact-mode .chord-intervals { display: none; }
-  body.compact-mode .chord-staff-btn { display: none; }
-  body.compact-mode .degree-name-label { display: none; }
-  body.compact-mode .section-divider { margin: 2px 0; min-height: 1px; }
-  body.compact-mode .degree-section { padding-bottom: 2px; }
-  body.compact-mode .chord-card { padding: 5px 7px 4px; min-height: 0; }
-  body.compact-mode .chord-root { font-size: 14px; }
-  body.compact-mode .chord-root sup { font-size: 9px; }
-  body.compact-mode .degree-header { margin-bottom: 2px; padding: 2px 0; }
-  body.compact-mode .chords-grid { gap: 3px; }
-  body.compact-mode .degree-num { font-size: 13px; }
-  body.compact-mode .cof-section { display: none; }
-  body.compact-mode .diag-quality { display: none; }
-  body.compact-mode .diag-notes { display: none; }
-  body.compact-mode .scale-hero { padding: 10px 14px; }
-  body.compact-mode .scale-hero-eyebrow { display: none; }
-  body.compact-mode .scale-hero-identity { font-size: 9px; }
-  body.compact-mode #neg-btn { display: none; }
-  body.compact-mode .tip-badge { display: none; }
-  body.compact-mode .drop-str-label { font-size: 7px; }
-  body.compact-mode .diag-chord-name { font-size: 12px; }
-  body.compact-mode .diag-card { padding: 5px 5px 4px; }
-  body.compact-mode .drop-card { padding: 5px 5px 4px; }
   body.light-theme .cad-row { border-color: var(--border); }
   body.light-theme .cad-name { color: var(--dim); }
   body.light-theme .cad-chord { color: var(--gold2); border-color: var(--border); background: var(--surface2); }
@@ -958,7 +963,7 @@
   #guide-btn {
     position: fixed;
     top: 16px;
-    right: 154px;
+    right: 108px;
     z-index: 300;
     width: 40px; height: 40px;
     border-radius: 50%;
@@ -974,7 +979,7 @@
 
   #tech-btn {
     position: fixed;
-    top: 16px; right: 108px;
+    top: 16px; right: 62px;
     z-index: 300;
     width: 40px; height: 40px;
     border-radius: 50%;
@@ -1569,13 +1574,6 @@
     <path d="M12.5 10.5A6 6 0 016 4a6 6 0 000 9 6 6 0 006.5-2.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
   </svg>
 </button>
-<button id="compact-toggle" title="Toggle compact mode" aria-label="Compact mode">
-  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-    <rect x="1" y="2" width="13" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
-    <rect x="1" y="6.25" width="13" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
-    <rect x="1" y="10.5" width="13" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
-  </svg>
-</button>
 <button id="guide-btn" title="User Guide" aria-label="Open user guide">
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
@@ -1652,9 +1650,9 @@
       <select id="compare-scale-b"></select>
     </div>
   </div>
+  <!-- History breadcrumb strip -->
+  <div id="history-strip" style="display:none"></div>
   <div class="scale-hero" id="scale-hero" style="position:relative">
-    <!-- Populated by renderScaleHero() -->
-  </div>
 
   <div class="main-layout">
   <div class="left-panel">
@@ -1971,12 +1969,18 @@ function playScale(noteNames, btnEl) {
   const stepSecs = noteMs / 1000;
   const noteDur  = stepSecs * 1.8;  // overlap into next note
 
-  // Pre-schedule ALL notes at exact AudioContext times — eliminates setTimeout jitter
-  const t0 = ctx.currentTime + 0.02;
-  midis.forEach((midi, i) => {
-    const freq = 440 * Math.pow(2, (midi - 69) / 12);
-    makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
-  });
+  const scheduleScale = () => {
+    const t0 = ctx.currentTime + 0.05;
+    midis.forEach((midi, i) => {
+      const freq = 440 * Math.pow(2, (midi - 69) / 12);
+      makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
+    });
+  };
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => setTimeout(scheduleScale, 30)).catch(scheduleScale);
+  } else {
+    scheduleScale();
+  }
 
   // setTimeout only for UI cleanup — jitter here is harmless
   const totalMs = midis.length * noteMs + 300;
@@ -3364,27 +3368,24 @@ function renderView(scaleNotes,scaleData){
 
 const GUITAR_MIDI = [40,45,50,55,59,64]; // E2 A2 D3 G3 B3 E4
 
-// Low-level: find fret positions for a fixed pc-per-string assignment.
-// Pitches ALWAYS ascend from lowest to highest string (physical guitar constraint).
-// dropVoicing=true: no open strings; span is measured relative to lowest fret window.
 function computeGuitarVoicing(pcs, stringIndices, ascendingPitch=true) {
   const n = pcs.length;
   const PC = pcs.map(p=>((p%12)+12)%12);
-  const isDropVoicing = !ascendingPitch;
 
-  // Build candidate frets per string
+  // Build candidate frets per string.
+  // Drop voicings (ascendingPitch=false): no open strings (fret 0 forbidden),
+  // max fret 14, span ≤ 4 frets.
+  // Basic voicings: open strings allowed, max fret 15, span ≤ 5 frets.
+  const isDropVoicing = !ascendingPitch;
   const candidates = PC.map((pc,i)=>{
-    const strMidi = GUITAR_MIDI[stringIndices[i]];
-    const strPc   = strMidi % 12;
-    const base    = (pc - strPc + 12) % 12;
-    const opts    = [];
-    // For drop voicings: generate options starting from fret 1 (no open)
-    // but also try fret 12/13+ range for high-position shapes
+    const strPc = GUITAR_MIDI[stringIndices[i]] % 12;
+    const base  = (pc - strPc + 12) % 12;
+    const opts  = [];
     if (isDropVoicing) {
-      const start = base === 0 ? 12 : base;
-      for (let f = start; f <= 20; f += 12) opts.push(f);
+      const start = base === 0 ? 12 : base; // no open strings for drop voicings
+      for (let f = start; f <= 14; f += 12) opts.push(f);
     } else {
-      for (let f = base; f <= 17; f += 12) opts.push(f);
+      for (let f = base; f <= 15; f += 12) opts.push(f);
     }
     return opts;
   });
@@ -3393,19 +3394,21 @@ function computeGuitarVoicing(pcs, stringIndices, ascendingPitch=true) {
 
   function search(idx, cur) {
     if (idx === n) {
-      // Pitches must always ascend across strings
+      // Pitches must always ascend from low to high string
       const pitches = cur.map((f,i) => GUITAR_MIDI[stringIndices[i]] + f);
       for (let i = 1; i < n; i++) if (pitches[i] <= pitches[i-1]) return;
 
-      // For drop voicings: span measured relative (max-min of frets within the shape)
-      // A shape at frets 9-10-11-12 is perfectly fine (span=3)
-      const minF = Math.min(...cur);
-      const maxF = Math.max(...cur);
+      // Span: for drop voicings all frets are ≥1, use all of cur
+      // For basic voicings exclude open strings from span calculation
+      const active = isDropVoicing ? cur : cur.filter(f => f > 0);
+      if (!active.length) return;
+      const minF = Math.min(...active);
+      const maxF = Math.max(...active);
       const span = maxF - minF;
-      if (span > 5) return;
+      if (span > (isDropVoicing ? 4 : 5)) return;
 
-      // Score: prefer lower positions, tighter span
-      const score = span * 10 + (minF <= 4 ? minF : minF <= 9 ? minF * 2 : minF * 3);
+      // Score: prefer low position first, then tight span
+      const score = minF * 3 + span * 8;
       if (score < bestScore) { bestScore = score; best = [...cur]; }
       return;
     }
@@ -4973,11 +4976,13 @@ function progPlay() {
   progScheduler = requestAnimationFrame(tick);
   }; // end doPlay
 
-  // Resume AudioContext first (critical for iOS/Android PWA)
+  // Resume AudioContext first (critical for iOS/Android PWA).
+  // ctx.currentTime is frozen while suspended — must read it AFTER resume completes.
+  const startPlayback = () => setTimeout(doPlay, 50);
   if (ctx.state === 'suspended') {
-    ctx.resume().then(doPlay).catch(() => doPlay());
+    ctx.resume().then(startPlayback).catch(startPlayback);
   } else {
-    doPlay();
+    startPlayback();
   }
 }
 
@@ -5503,13 +5508,6 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
   const scaleData = SCALES[state.scale];
   drawCoF(rootPc, scaleData.intervals);
   drawNegAxis(document.getElementById('cof-svg'), rootPc, scaleData.intervals);
-});
-
-let isCompactMode = false;
-document.getElementById('compact-toggle').addEventListener('click', () => {
-  isCompactMode = !isCompactMode;
-  document.body.classList.toggle('compact-mode', isCompactMode);
-  document.getElementById('compact-toggle').classList.toggle('active', isCompactMode);
 });
 
 // ══════════════════════════════════════════════
@@ -6423,6 +6421,133 @@ renderView = function(scaleNotes, scaleData) {
 
 // ── Init ──
 buildSelectors();
+
+// ── URL Hash: encode/decode state so the page is shareable ──
+// Format: #k=0&s=Major+(Ionian)&m=4&v=list
+function encodeHash(st) {
+  return '#k=' + st.key +
+    '&s=' + encodeURIComponent(st.scale) +
+    '&m=' + encodeURIComponent(st.mode) +
+    '&v=' + encodeURIComponent(st.view);
+}
+function decodeHash(hash) {
+  if (!hash || hash.length < 3) return null;
+  const p = new URLSearchParams(hash.replace(/^#/, ''));
+  const s = p.get('s') ? decodeURIComponent(p.get('s')) : null;
+  const k = p.get('k');
+  const m = p.get('m') ? decodeURIComponent(p.get('m')) : null;
+  const v = p.get('v') ? decodeURIComponent(p.get('v')) : null;
+  if (k === null || !s || !SCALES[s]) return null;
+  return {
+    key:   parseInt(k),
+    scale: s,
+    mode:  m || '4',
+    view:  v || 'list',
+  };
+}
+
+// Apply hash state on load (shared link support)
+(function() {
+  const fromHash = decodeHash(location.hash);
+  if (fromHash) {
+    state.key   = fromHash.key;
+    state.scale = fromHash.scale;
+    state.mode  = fromHash.mode;
+    state.view  = fromHash.view;
+    // Sync selectors
+    const keyEl = document.getElementById('sel-key');
+    const scaleEl = document.getElementById('sel-scale');
+    if (keyEl) keyEl.value = state.key;
+    if (scaleEl) scaleEl.value = state.scale;
+    // Sync mode buttons
+    document.querySelectorAll('.ct-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.n === state.mode);
+    });
+  }
+})();
+
+// ── History: remember last 15 unique key+scale combos ──
+let _history = []; // [{key, scale}] most recent first
+const _HISTORY_MAX = 15;
+
+const KEY_SHORT = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
+
+function historyPush(key, scale) {
+  const k = parseInt(key);
+  // Remove existing entry if same key+scale
+  _history = _history.filter(h => !(h.key === k && h.scale === scale));
+  // Add to front
+  _history.unshift({ key: k, scale });
+  // Trim
+  if (_history.length > _HISTORY_MAX) _history = _history.slice(0, _HISTORY_MAX);
+  renderHistory();
+}
+
+function renderHistory() {
+  const strip = document.getElementById('history-strip');
+  if (!strip) return;
+  strip.innerHTML = '';
+
+  // Need at least 2 entries to be useful
+  if (_history.length < 2) { strip.style.display = 'none'; return; }
+  strip.style.display = 'flex';
+
+  _history.forEach((h, i) => {
+    if (i > 0) {
+      const sep = document.createElement('span');
+      sep.className = 'hist-sep';
+      sep.textContent = '›';
+      strip.insertBefore(sep, strip.firstChild); // newest on right, oldest on left
+    }
+    const chip = document.createElement('button');
+    chip.className = 'hist-chip' + (i === 0 ? ' hist-current' : '');
+    const shortScale = h.scale.replace(' (Ionian)','').replace('Aeolian (Natural Minor)','Aeolian');
+    chip.textContent = KEY_SHORT[h.key] + ' ' + shortScale;
+    chip.title = KEY_SHORT[h.key] + ' ' + h.scale;
+    if (i > 0) {
+      chip.addEventListener('click', () => {
+        state.key   = h.key;
+        state.scale = h.scale;
+        document.getElementById('sel-key').value   = h.key;
+        document.getElementById('sel-scale').value = h.scale;
+        render();
+      });
+    }
+    strip.insertBefore(chip, strip.firstChild); // insert so newest ends up on right
+  });
+
+  // Share button — always at far right
+  const shareBtn = document.createElement('button');
+  shareBtn.className = 'hist-share-btn';
+  shareBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="9" cy="2" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="9" cy="9" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="2" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="7.6" y1="2.7" x2="3.4" y2="4.8" stroke="currentColor" stroke-width="1.1"/><line x1="3.4" y1="6.2" x2="7.6" y2="8.3" stroke="currentColor" stroke-width="1.1"/></svg>Share';
+  shareBtn.title = 'Copy shareable link to clipboard';
+  shareBtn.addEventListener('click', () => {
+    const url = location.href.split('#')[0] + encodeHash(state);
+    navigator.clipboard.writeText(url).then(() => {
+      shareBtn.textContent = '✓ Copied!';
+      shareBtn.classList.add('copied');
+      setTimeout(() => {
+        shareBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="9" cy="2" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="9" cy="9" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="2" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="7.6" y1="2.7" x2="3.4" y2="4.8" stroke="currentColor" stroke-width="1.1"/><line x1="3.4" y1="6.2" x2="7.6" y2="8.3" stroke="currentColor" stroke-width="1.1"/></svg>Share';
+        shareBtn.classList.remove('copied');
+      }, 2000);
+    }).catch(() => {
+      // Fallback: show URL in prompt
+      prompt('Copy this link:', url);
+    });
+  });
+  strip.appendChild(shareBtn);
+}
+
+// Patch render() to update hash + history on every navigation
+const _origRender = render;
+render = function() {
+  _origRender();
+  // Update URL hash (no page reload, no history entry)
+  history.replaceState(null, '', encodeHash(state));
+  // Push to breadcrumb history
+  historyPush(state.key, state.scale);
+};
+
 render();
 renderProgSlots();
 initCollapsibles();
@@ -6833,7 +6958,6 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
       </div>
       <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar voicings, a circle of fifths, scale relationships, a cadence suggester, and a playable chord progression builder.</p>
       <p class="guide-p">The tool covers <strong>29 scales</strong> across four families: Major Modes, Harmonic Minor, Melodic Minor, and Exotic Scales (inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop). Every scale is presented in all 12 keys. Chord tones are always spelled with correct enharmonic names (e.g. B♭ not A♯ in F major).</p>
-      <p class="guide-p">The <strong>☰ compact mode</strong> button (top-right) hides chord quality labels, note names and the Circle of Fifths for a denser view — useful on small screens or when you just want the chord symbols and diagrams.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">💡</span>
         <span class="guide-tip-text">The left column holds reference tools (CoF, scale relationships, cadences, progression builder). The right column always shows the chord view. Both scroll independently.</span>
