@@ -20,7 +20,7 @@
     --z-back:0; --z-content:1; --z-tooltip:100; --z-popover:300; --z-sticky:600;
     --z-dropdown:1000; --z-diagram:4000; --z-overlay:8000; --z-modal:9000; --z-top:9999;
   }
-  html { font-size:16px; scroll-behavior:smooth; }
+  html { font-size:16px; scroll-behavior:smooth; zoom:1.25; }
   body { background:var(--bg); color:var(--text); font-family:'IBM Plex Mono',monospace; min-height:100vh; overflow-x:hidden; transition: background .25s, color .25s; }
   body::before {
     content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
@@ -29,7 +29,7 @@
   }
   .grain { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
     background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E"); }
-  .wrap { position:relative; z-index:1; max-width:1400px; margin:0 auto; padding:0 24px 100px; }
+  .wrap { position:relative; z-index:1; max-width:1600px; margin:0 auto; padding:0 32px 100px; }
 
   header { padding:44px 0 32px; border-bottom:1px solid var(--border); margin-bottom:32px; }
   .logo-eyebrow { font-size:10px; letter-spacing:.22em; color:var(--gold); text-transform:uppercase; margin-bottom:8px; }
@@ -38,7 +38,7 @@
   .logo-sub { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px; color:var(--muted); margin-top:8px; }
 
   /* Controls */
-  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:28px; padding:24px; background:var(--surface); border:1px solid var(--border); border-radius:2px; position:relative; }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:28px; padding:26px; background:var(--surface); border:1px solid var(--border); border-radius:2px; position:relative; }
   .controls::before { content:''; position:absolute; top:0; left:24px; right:24px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
   .ctrl-group { display:flex; flex-direction:column; gap:8px; }
   .ctrl-label { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); font-weight:500; }
@@ -198,10 +198,11 @@
   /* Big note pills row */
   .scale-hero-notes {
     display: flex;
-    gap: 10px;
+    gap: 0;
     flex-wrap: wrap;
     align-items: flex-end;
     margin-bottom: 0;
+    row-gap: 6px;
   }
   .hero-note-item {
     display: flex;
@@ -211,6 +212,54 @@
     cursor: pointer;
     margin-bottom: 0;
   }
+  /* Interval arcs — hidden by default, shown when .show-intervals is on parent */
+  .scale-hero-notes .hero-interval { display: none; }
+  .scale-hero-notes.show-intervals .hero-interval { display: flex; }
+
+  /* Toggle button */
+  #intervals-toggle {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--muted); letter-spacing: .08em;
+    background: none; border: 1px solid var(--border2);
+    border-radius: 3px; padding: 3px 8px; cursor: pointer;
+    transition: color .15s, border-color .15s;
+    margin-left: 4px; vertical-align: middle;
+  }
+  #intervals-toggle:hover { color: var(--gold); border-color: var(--gold); }
+  #intervals-toggle.active { color: var(--gold2); border-color: rgba(201,168,76,.5); }
+  #intervals-toggle svg { flex-shrink: 0; }
+  body.light-theme #intervals-toggle { border-color: var(--border); }
+  body.light-theme #intervals-toggle.active { color: var(--gold2); border-color: var(--gold); }
+
+  /* Interval arc between note pills */
+  .hero-interval {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 2px;
+    min-width: 28px;
+    flex-shrink: 0;
+  }
+  .hero-interval svg { display: block; overflow: visible; }
+  .hero-interval-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    letter-spacing: .03em;
+    text-align: center;
+    margin-top: 2px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .hero-interval-label.iv-half   { color: #c06878; }
+  .hero-interval-label.iv-aug    { color: #c08848; }
+  .hero-interval-label.iv-whole  { color: var(--dim); }
+  .hero-interval-label.iv-double { color: var(--accent2); }
+  body.light-theme .hero-interval-label { color: var(--muted); }
+  body.light-theme .hero-interval-label.iv-half  { color: #b04050; }
+  body.light-theme .hero-interval-label.iv-whole { color: #888; }
   .hero-note-pill {
     padding: 10px 20px;
     background: rgba(201,168,76,.08);
@@ -265,8 +314,8 @@
   /* ── TWO-COLUMN MAIN LAYOUT ── */
   .main-layout {
     display:grid;
-    grid-template-columns: 420px 1fr;
-    gap: 28px;
+    grid-template-columns: clamp(420px, 30vw, 520px) 1fr;
+    gap: 32px;
     align-items: start;
   }
 
@@ -2828,12 +2877,54 @@ function renderScaleInfo(scaleNotes, scaleData){
         </div>
         <div class="scale-hero-formula">${scaleData.formula}</div>
         <div class="scale-hero-identity">${identity}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Notes</span>
+          <button id="intervals-toggle" title="Show/hide interval steps between notes">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M1 9 Q3 2 5.5 9 Q8 2 10 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+            </svg>
+            Steps
+          </button>
+        </div>
         <div class="scale-hero-notes" id="note-pills">
-          ${scaleNotes.map((n,i)=>`
-            <div class="hero-note-item" data-deg="${i}" title="Scroll to ${romans[i]}">
-              <span class="hero-note-pill">${n}</span>
-              <span class="hero-note-degree">${romans[i]}</span>
-            </div>`).join('')}
+          ${(()=>{
+            const ivs = scaleData.intervals;
+            const steps = ivs.map((iv,i) => i < ivs.length-1 ? ivs[i+1]-iv : 12-iv);
+            function ivLabel(st) {
+              if (st===1) return '½';
+              if (st===2) return '1';
+              if (st===3) return '1½';
+              if (st===4) return '2';
+              return st+'st';
+            }
+            function ivClass(st) {
+              if (st===1) return 'iv-half';
+              if (st===3) return 'iv-aug';
+              if (st>=4)  return 'iv-double';
+              return 'iv-whole';
+            }
+            function arcSvg(st) {
+              const w = 10 + st*10, h = 14;
+              const col = st===1 ? '#c06878' : st===3 ? '#c08848' : st>=4 ? '#a08bc8' : 'rgba(180,170,155,.45)';
+              const sw  = st===1 ? 1.2 : 1;
+              return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="M2 ${h} Q${w/2} 2 ${w-2} ${h}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"/></svg>`;
+            }
+            return scaleNotes.map((n,i) => {
+              const noteHtml = `<div class="hero-note-item" data-deg="${i}" title="Scroll to ${romans[i]}">
+                <span class="hero-note-pill">${n}</span>
+                <span class="hero-note-degree">${romans[i]}</span>
+              </div>`;
+              if (i < scaleNotes.length) {
+                const st = steps[i];
+                const arcHtml = `<div class="hero-interval">
+                  ${arcSvg(st)}
+                  <span class="hero-interval-label ${ivClass(st)}">${ivLabel(st)}</span>
+                </div>`;
+                return noteHtml + arcHtml;
+              }
+              return noteHtml;
+            }).join('');
+          })()}
         </div>
         ${staffPlaceholder}
       </div>
@@ -2923,6 +3014,12 @@ function renderScaleInfo(scaleNotes, scaleData){
       if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'});
     });
   });
+
+  // Re-apply interval visibility after every render (DOM is replaced)
+  const pills = document.getElementById('note-pills');
+  if (pills && localStorage.getItem('harmonic-show-intervals') === '1') {
+    pills.classList.add('show-intervals');
+  }
 }
 
 function makeNotePills(notes){
@@ -6607,6 +6704,25 @@ render = function() {
 render();
 renderProgSlots();
 initCollapsibles();
+
+// ── Intervals toggle (wired once, survives re-renders) ──
+(function() {
+  const btn = document.getElementById('intervals-toggle');
+  if (!btn) return;
+  const getPills = () => document.getElementById('note-pills');
+  const updateBtn = (on) => btn.classList.toggle('active', on);
+  // Default is OFF — only activate if user explicitly turned it on
+  const stored = localStorage.getItem('harmonic-show-intervals');
+  if (stored === null) localStorage.setItem('harmonic-show-intervals', '0');
+  updateBtn(localStorage.getItem('harmonic-show-intervals') === '1');
+  btn.addEventListener('click', () => {
+    const pills = getPills();
+    if (!pills) return;
+    const on = pills.classList.toggle('show-intervals');
+    localStorage.setItem('harmonic-show-intervals', on ? '1' : '0');
+    updateBtn(on);
+  });
+})();
 
 // ── Populate pivot selects ──
 (function(){
