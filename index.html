@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Harmonic Atlas - Scale Chord Explorer</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" id="meta-theme-color" content="#12101c">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2887,20 +2891,27 @@ function renderScaleInfo(scaleNotes, scaleData){
 
         // Pause icon
         playIcon.setAttribute('d',`M${px} ${py-5}v10M${px+4} ${py-5}v10`);
-        // Pre-schedule ALL notes at precise AudioContext times — no setTimeout jitter
-        const t0       = ctx.currentTime + 0.02;
-        const stepSecs = noteMs / 1000;
-        const noteDur  = stepSecs * 1.8;  // overlap into next note
-        midis.forEach((midi, i) => {
-          const freq = 440 * Math.pow(2, (midi - 69) / 12);
-          makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
-        });
-        // Use setTimeout only for UI reset — timing doesn't need to be exact
-        const totalMs = midis.length * noteMs + 300;
-        _timer = setTimeout(() => {
-          _timer = null;
-          playIcon.setAttribute('d','M' + playG.dataset.px + ' ' + playG.dataset.py1 + 'l6 3.5-6 3.5z');
-        }, totalMs);
+
+        const schedule = () => {
+          const t0       = ctx.currentTime + 0.05;
+          const stepSecs = noteMs / 1000;
+          const noteDur  = stepSecs * 1.8;
+          midis.forEach((midi, i) => {
+            const freq = 440 * Math.pow(2, (midi - 69) / 12);
+            makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
+          });
+          const totalMs = midis.length * noteMs + 300;
+          _timer = setTimeout(() => {
+            _timer = null;
+            playIcon.setAttribute('d','M' + playG.dataset.px + ' ' + playG.dataset.py1 + 'l6 3.5-6 3.5z');
+          }, totalMs);
+        };
+        // Resume AudioContext first — critical for mobile/PWA where it starts suspended
+        if (ctx.state !== 'running') {
+          ctx.resume().then(() => setTimeout(schedule, 100)).catch(schedule);
+        } else {
+          schedule();
+        }
       });
     }
 
@@ -5523,18 +5534,27 @@ function progAddChord({root, sym, qual, notes}) {
 // ══════════════════════════════════════════════
 // THEME TOGGLE
 // ══════════════════════════════════════════════
+const _THEME_DARK  = '#12101c';
+const _THEME_LIGHT = '#f5f0e8';
+function _applyThemeColor(light) {
+  document.getElementById('meta-theme-color').content = light ? _THEME_LIGHT : _THEME_DARK;
+}
+
 let isLightTheme = localStorage.getItem('harmonic-theme') === 'light';
 if (isLightTheme) {
   document.body.classList.add('light-theme');
   document.getElementById('theme-icon-dark').style.display = 'none';
   document.getElementById('theme-icon-light').style.display = '';
 }
+_applyThemeColor(isLightTheme);
+
 document.getElementById('theme-toggle').addEventListener('click', () => {
   isLightTheme = !isLightTheme;
   localStorage.setItem('harmonic-theme', isLightTheme ? 'light' : 'dark');
   document.body.classList.toggle('light-theme', isLightTheme);
   document.getElementById('theme-icon-dark').style.display = isLightTheme ? 'none' : '';
   document.getElementById('theme-icon-light').style.display = isLightTheme ? '' : 'none';
+  _applyThemeColor(isLightTheme);
   const rootPc = parseInt(state.key);
   const scaleData = SCALES[state.scale];
   drawCoF(rootPc, scaleData.intervals);
@@ -6497,11 +6517,15 @@ function decodeHash(hash) {
   }
 })();
 
-// ── History: remember last 15 unique key+scale combos ──
-let _history = []; // [{key, scale}] most recent first
+// ── History: remember last 15 unique key+scale combos (persisted to localStorage) ──
 const _HISTORY_MAX = 15;
+const _HISTORY_KEY = 'harmonic-history';
 
 const KEY_SHORT = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
+
+let _history = (() => {
+  try { return JSON.parse(localStorage.getItem(_HISTORY_KEY)) || []; } catch(e) { return []; }
+})();
 
 function historyPush(key, scale) {
   const k = parseInt(key);
@@ -6511,6 +6535,7 @@ function historyPush(key, scale) {
   _history.unshift({ key: k, scale });
   // Trim
   if (_history.length > _HISTORY_MAX) _history = _history.slice(0, _HISTORY_MAX);
+  try { localStorage.setItem(_HISTORY_KEY, JSON.stringify(_history)); } catch(e) {}
   renderHistory();
 }
 
