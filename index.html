@@ -13,6 +13,8 @@
     --gold:#c9a84c; --gold2:#e8c96a;
     --cream:#f0e8d8; --muted:#6b7280; --text:#d8d0c4; --dim:#9089a0;
     --accent:#7c6fa0; --accent2:#a08bc8;
+    --z-back:0; --z-content:1; --z-tooltip:100; --z-popover:300; --z-sticky:600;
+    --z-dropdown:1000; --z-diagram:4000; --z-overlay:8000; --z-modal:9000; --z-top:9999;
   }
   html { font-size:16px; scroll-behavior:smooth; }
   body { background:var(--bg); color:var(--text); font-family:'IBM Plex Mono',monospace; min-height:100vh; overflow-x:hidden; transition: background .25s, color .25s; }
@@ -275,7 +277,7 @@
 
   /* CoF tooltip */
   #cof-tooltip {
-    position: fixed; z-index: 200;
+    position: fixed; z-index: var(--z-tooltip);
     background: var(--surface); border: 1px solid var(--gold);
     color: var(--text); font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; padding: 6px 12px; border-radius: 3px;
@@ -370,7 +372,7 @@
   .empty-msg { color:var(--muted); font-size:12px; padding:14px 0; font-style:italic; }
   .section-divider { height:1px; background:linear-gradient(90deg,var(--border),transparent); margin:4px 0 16px; }
 
-  #back-top { position:fixed; bottom:28px; right:28px; z-index:100; width:42px; height:42px; background:var(--surface); border:1px solid var(--gold); border-radius:2px; color:var(--gold); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; opacity:0; pointer-events:none; box-shadow:0 4px 16px rgba(0,0,0,.5); }
+  #back-top { position:fixed; bottom:28px; right:28px; z-index:var(--z-tooltip); width:42px; height:42px; background:var(--surface); border:1px solid var(--gold); border-radius:2px; color:var(--gold); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; opacity:0; pointer-events:none; box-shadow:0 4px 16px rgba(0,0,0,.5); }
   #back-top.visible { opacity:1; pointer-events:all; }
   #back-top:hover { background:rgba(201,168,76,.15); transform:translateY(-2px); }
 
@@ -558,10 +560,13 @@
 
   /* ── PROGRESSION ZOOM OVERLAY ── */
   #prog-zoom-overlay {
-    display: none; position: fixed; inset: 0; z-index: 8000;
-    background: rgba(0,0,0,.78); backdrop-filter: blur(8px);
+    display: none; position: fixed; inset: 0; z-index: var(--z-overlay);
+    background: rgba(0,0,0,.86);
     align-items: center; justify-content: center;
     padding: 24px 16px;
+  }
+  @supports (backdrop-filter: blur(8px)) {
+    #prog-zoom-overlay { background: rgba(0,0,0,.78); backdrop-filter: blur(8px); }
   }
   #prog-zoom-overlay.open { display: flex; }
   #prog-zoom-panel {
@@ -711,7 +716,7 @@
   }
   .tip-badge:hover { border-color: var(--gold); color: var(--gold2); }
   .tip-popup {
-    display: none; position: absolute; z-index: 300;
+    display: none; position: absolute; z-index: var(--z-popover);
     bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
     background: #1a1f27; border: 1px solid rgba(201,168,76,.4);
     color: var(--cream); font-family: 'IBM Plex Mono', monospace;
@@ -964,7 +969,7 @@
     position: fixed;
     top: 16px;
     right: 108px;
-    z-index: 300;
+    z-index: var(--z-popover);
     width: 40px; height: 40px;
     border-radius: 50%;
     border: 1px solid var(--border2);
@@ -980,7 +985,7 @@
   #tech-btn {
     position: fixed;
     top: 16px; right: 62px;
-    z-index: 300;
+    z-index: var(--z-popover);
     width: 40px; height: 40px;
     border-radius: 50%;
     border: 1px solid var(--border2);
@@ -996,7 +1001,7 @@
   #theme-toggle {
     position: fixed;
     top: 16px; right: 20px;
-    z-index: 600;
+    z-index: var(--z-sticky);
     width: 34px; height: 34px;
     border-radius: 50%;
     background: var(--surface2);
@@ -1448,7 +1453,7 @@
 
   /* ── Slot substitution popover ── */
   .slot-sub-popover {
-    position:absolute; z-index:4000;
+    position:absolute; z-index:var(--z-diagram);
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:4px;
@@ -2008,6 +2013,23 @@ function spellScale(rootPc, intervals, scaleData) {
   const rootCandidates = PITCH_CANDIDATES[rootPc % 12];
   let rootName = rootCandidates[0];
   if(!preferSharps && PREFER_FLAT_PC.has(rootPc%12) && rootCandidates.length > 1) rootName = rootCandidates[1];
+
+  // Hexatonic (6-note, e.g. whole-tone): use ascending-letter spelling like heptatonic
+  // so C whole-tone = C D E F# G# A# (not C D E Gb Ab Bb)
+  if (n === 6) {
+    const result6 = [rootName];
+    const rootLi = letterIndex(rootName);
+    for (let i = 1; i < 6; i++) {
+      const targetLetter = LETTERS[(rootLi + i) % 7];
+      const pc = (rootPc + intervals[i]) % 12;
+      const match = PITCH_CANDIDATES[pc].find(c => c[0] === targetLetter);
+      if (match) { result6.push(match); continue; }
+      const naturalPc = PITCH_CANDIDATES.findIndex(a => a.includes(targetLetter));
+      const diff = ((pc - naturalPc) + 12) % 12;
+      result6.push(targetLetter + (diff===1?'#':diff===2?'##':diff===11?'b':diff===10?'bb':''));
+    }
+    return result6;
+  }
 
   // For pentatonic / short scales AND octatonic scales: use simple enharmonic spelling
   if (n !== 7) {
@@ -3035,7 +3057,7 @@ function buildSecondaryDiminished(rootPc, scaleIntervals, romans){
     const r  = chromaticPcName(p1pc, PREFER_FLAT_PC.has(p1pc));
     const n3 = chromaticPcName(p3pc, PREFER_FLAT_PC.has(p3pc));
     const n5 = chromaticPcName(p5pc, PREFER_FLAT_PC.has(p5pc));
-    const n7 = chromaticPcName(p7pc, PREFER_FLAT_PC.has(p7pc));
+    const n7 = chromaticPcName(p7pc, true); // dim7 always spelled flat (bb7, not enharmonic m6)
     const chord={root:r, notes:[r,n3,n5,n7], sym:'dim7', qual:'Diminished 7th', iv:[0,3,6,9]};
     result.push({degIdx:di, roman:romans[di], label:`vii°7 / ${romans[di]}`, chord});
   }
@@ -3631,7 +3653,7 @@ function showDiagramModal(frets6, pcs6, rootPc, title) {
   document.getElementById('diag-modal')?.remove();
   const modal = document.createElement('div');
   modal.id = 'diag-modal';
-  modal.style.cssText = `position:fixed;inset:0;z-index:9999;background:rgba(8,10,12,.88);
+  modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.88);
     display:flex;align-items:center;justify-content:center;cursor:pointer;
     animation:fadeIn .15s ease`;
   const inner = document.createElement('div');
@@ -4322,7 +4344,7 @@ function showMandoDiagramModal(frets4, pcs4, rootPc, title) {
   document.getElementById('diag-modal')?.remove();
   const modal = document.createElement('div');
   modal.id = 'diag-modal';
-  modal.style.cssText = `position:fixed;inset:0;z-index:9999;background:rgba(8,10,12,.88);
+  modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.88);
     display:flex;align-items:center;justify-content:center;cursor:pointer;animation:fadeIn .15s ease`;
   const inner = document.createElement('div');
   inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
@@ -4591,8 +4613,8 @@ function makePianoNote(ctx, freq, startTime, duration, gain = 0.13) {
   const silentT  = releaseT + 0.05;
   master.gain.linearRampToValueAtTime(0, silentT);
 
-  // Oscillators stop 20ms after silence — by then gain is 0, so osc.stop() is silent
-  const oscStop = silentT + 0.02;
+  // Oscillators stop 50ms after silence — wider buffer prevents clicks if scheduling jitter occurs
+  const oscStop = silentT + 0.05;
 
   // ── Per-partial oscillators — amplitude baked into a static gain node ──
   // Each partial's TIME-VARYING amplitude = master_gain × partial_static_gain.
@@ -4756,8 +4778,7 @@ function makeClickBeat(ctx, t, isDownbeat) {
   const g   = ctx.createGain();
   osc.type  = 'triangle';
   osc.frequency.setValueAtTime(isDownbeat ? 1400 : 900, t);
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.5, t + 0.002);
+  g.gain.setValueAtTime(0.5, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
   osc.connect(g); g.connect(ctx.destination);
   osc.start(t); osc.stop(t + 0.07);
@@ -4793,7 +4814,7 @@ function makeHiHat(ctx, t, isOpen=false) {
   const buf = ctx.createBuffer(1, ctx.sampleRate * (isOpen?0.18:0.06), ctx.sampleRate);
   const d   = buf.getChannelData(0);
   for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-  const src = ctx.createBufferSource(); src.buffer=buf;
+  const src = ctx.createBufferSource(); src.buffer=buf; src.loop=false;
   const hp  = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=7000;
   const g   = ctx.createGain();
   g.gain.setValueAtTime(0.22, t);
@@ -4978,8 +4999,9 @@ function progPlay() {
 
   // Resume AudioContext first (critical for iOS/Android PWA).
   // ctx.currentTime is frozen while suspended — must read it AFTER resume completes.
-  const startPlayback = () => setTimeout(doPlay, 50);
-  if (ctx.state === 'suspended') {
+  // Use 100ms buffer (not 50) to ensure ctx.currentTime is non-zero on slow devices.
+  const startPlayback = () => setTimeout(doPlay, 100);
+  if (ctx.state !== 'running') {
     ctx.resume().then(startPlayback).catch(startPlayback);
   } else {
     startPlayback();
@@ -5002,9 +5024,12 @@ function progStop() {
     try { g.gain.cancelScheduledValues(now); g.gain.setTargetAtTime(0, now, 0.015); } catch(e){}
   });
   const stopAt = now + 0.06;
-  progNodes.forEach(n => { try { n.stop(stopAt); } catch(e){} });
+  const staleNodes = progNodes;
+  const staleGains = progGainNodes;
   progNodes = [];
   progGainNodes = [];
+  staleNodes.forEach(n => { try { n.stop(stopAt); } catch(e){} });
+  setTimeout(() => { staleNodes.length = 0; staleGains.length = 0; }, 70);
 }
 
 // ── Slots rendering ─────────────────────────────
@@ -5498,9 +5523,15 @@ function progAddChord({root, sym, qual, notes}) {
 // ══════════════════════════════════════════════
 // THEME TOGGLE
 // ══════════════════════════════════════════════
-let isLightTheme = false;
+let isLightTheme = localStorage.getItem('harmonic-theme') === 'light';
+if (isLightTheme) {
+  document.body.classList.add('light-theme');
+  document.getElementById('theme-icon-dark').style.display = 'none';
+  document.getElementById('theme-icon-light').style.display = '';
+}
 document.getElementById('theme-toggle').addEventListener('click', () => {
   isLightTheme = !isLightTheme;
+  localStorage.setItem('harmonic-theme', isLightTheme ? 'light' : 'dark');
   document.body.classList.toggle('light-theme', isLightTheme);
   document.getElementById('theme-icon-dark').style.display = isLightTheme ? 'none' : '';
   document.getElementById('theme-icon-light').style.display = isLightTheme ? '' : 'none';
@@ -6579,7 +6610,7 @@ initCollapsibles();
 <!-- ══════ TECH INFO MODAL ══════ -->
 <style>
 #tech-modal {
-  display: none; position: fixed; inset: 0; z-index: 9100;
+  display: none; position: fixed; inset: 0; z-index: var(--z-top);
   background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
   align-items: flex-start; justify-content: center;
   padding: 40px 16px;
@@ -6777,7 +6808,7 @@ body.light-theme #tech-panel { background: #faf7f2; }
 <style>
 #guide-modal {
   display: none;
-  position: fixed; inset: 0; z-index: 9000;
+  position: fixed; inset: 0; z-index: var(--z-modal);
   background: rgba(0,0,0,.72);
   backdrop-filter: blur(6px);
   overflow-y: auto;
@@ -7282,15 +7313,26 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
   </div>
 </div>
 <script>
+// ── Scroll-lock helpers (compensate for scrollbar width to prevent layout shift) ──
+function lockScroll() {
+  const sb = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.paddingRight = sb > 0 ? sb + 'px' : '';
+  document.body.style.overflow = 'hidden';
+}
+function unlockScroll() {
+  document.body.style.paddingRight = '';
+  document.body.style.overflow = '';
+}
+
 // ── User Guide wiring (after modal DOM exists) ──
 (function() {
   function closeGuide() {
     document.getElementById('guide-modal').classList.remove('open');
-    document.body.style.overflow = '';
+    unlockScroll();
   }
   document.getElementById('guide-btn').addEventListener('click', () => {
     document.getElementById('guide-modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    lockScroll();
   });
   document.getElementById('guide-close').addEventListener('click', closeGuide);
   document.getElementById('guide-modal').addEventListener('click', e => {
@@ -7301,13 +7343,13 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
   const techModal = document.getElementById('tech-modal');
   document.getElementById('tech-btn').addEventListener('click', () => {
     techModal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    lockScroll();
   });
   document.getElementById('tech-close').addEventListener('click', () => {
-    techModal.classList.remove('open'); document.body.style.overflow = '';
+    techModal.classList.remove('open'); unlockScroll();
   });
   techModal.addEventListener('click', e => {
-    if (e.target === techModal) { techModal.classList.remove('open'); document.body.style.overflow = ''; }
+    if (e.target === techModal) { techModal.classList.remove('open'); unlockScroll(); }
   });
 
   document.addEventListener('keydown', e => {
@@ -7315,7 +7357,7 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
       closeGuide();
       techModal.classList.remove('open');
       document.getElementById('prog-zoom-overlay').classList.remove('open');
-      document.body.style.overflow = '';
+      unlockScroll();
     }
   });
   document.querySelectorAll('.guide-toc-link').forEach(link => {
@@ -7368,14 +7410,14 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
 
   function closeZoom() {
     overlay.classList.remove('open');
-    document.body.style.overflow = '';
+    unlockScroll();
   }
 
   openBtn.addEventListener('click', () => {
     syncZoomFromMain();
     renderProgZoom();
     overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    lockScroll();
     updateZoomPlayState();
   });
   closeBtn.addEventListener('click', closeZoom);
