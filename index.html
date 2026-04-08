@@ -3015,11 +3015,11 @@ function renderScaleInfo(scaleNotes, scaleData){
     });
   });
 
-  // Re-apply interval visibility after every render (DOM is replaced)
+  // Re-apply interval visibility + button state after every render (DOM is replaced)
   const pills = document.getElementById('note-pills');
-  if (pills && localStorage.getItem('harmonic-show-intervals') === '1') {
-    pills.classList.add('show-intervals');
-  }
+  const intervalsOn = localStorage.getItem('harmonic-show-intervals') === '1';
+  if (pills) pills.classList.toggle('show-intervals', intervalsOn);
+  document.getElementById('intervals-toggle')?.classList.toggle('active', intervalsOn);
 }
 
 function makeNotePills(notes){
@@ -3513,7 +3513,7 @@ function computeGuitarVoicing(pcs, stringIndices, ascendingPitch=true) {
     const opts  = [];
     if (isDropVoicing) {
       const start = base === 0 ? 12 : base; // no open strings for drop voicings
-      for (let f = start; f <= 14; f += 12) opts.push(f);
+      for (let f = start; f <= 15; f += 12) opts.push(f);
     } else {
       for (let f = base; f <= 15; f += 12) opts.push(f);
     }
@@ -3659,18 +3659,20 @@ function detectBarre(frets6) {
 
 function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
   const NUM_STR  = 6;
-  const NUM_FRET = 4;
+
+  // Determine fret window first so NUM_FRET can adapt to the actual span
+  const played = frets6.filter(f => f > 0);
+  const minPlayed = played.length ? Math.min(...played) : 0;
+  const maxPlayed = played.length ? Math.max(...played) : 0;
+  const startFret = minPlayed <= 1 ? 0 : minPlayed - 1;
+  // Need enough fret slots so the highest note fits: dispFr = maxPlayed - startFret
+  const NUM_FRET = played.length ? Math.max(4, maxPlayed - startFret) : 4;
 
   const padL = 22, padR = 12, padT = 22, padB = 20;
   const strGap = (w - padL - padR) / (NUM_STR - 1);
   const fretH  = Math.round((w - padL - padR) * 0.38);
   const gridH  = NUM_FRET * fretH;
   const h      = padT + gridH + padB;
-
-  // Determine fret window
-  const played = frets6.filter(f => f > 0);
-  const minPlayed = played.length ? Math.min(...played) : 0;
-  const startFret = minPlayed <= 1 ? 0 : minPlayed - 1;
 
   // Detect barre
   const barre = detectBarre(frets6);
@@ -4585,16 +4587,16 @@ function getDrop2Voicings(chord4pcs, chordNotes) {
 //   1st:   3-5-7-1  → drop 5 → [3,1,5,7]
 //   2nd:   5-7-1-3  → drop 7 → [5,3,7,1]
 //   3rd:   7-1-3-5  → drop 1 → [7,5,1,3]
-// String sets: skip 1 string → [0,2,3,4] [1,3,4,5] [0,1,3,4]
+// String sets: skip 1 string between bass and rest → [0,2,3,4] (6432) [1,3,4,5] (5321)
 function getDrop3Voicings(chord4pcs, chordNotes) {
   const [p1,p3,p5,p7] = chord4pcs;
   const [n1,n3,n5,n7] = chordNotes || [];
   const r = n1 || '';
   return [
-    { inv:'Root pos', bass:'1', slashName: r,                       notes:[p1,p7,p3,p5], strSets:[[0,2,3,4],[1,3,4,5],[0,1,3,4]] },
-    { inv:'1st inv',  bass:'3', slashName: n3 ? r+'/'+n3 : r,       notes:[p3,p1,p5,p7], strSets:[[0,2,3,4],[1,3,4,5],[0,1,3,4]] },
-    { inv:'2nd inv',  bass:'5', slashName: n5 ? r+'/'+n5 : r,       notes:[p5,p3,p7,p1], strSets:[[0,2,3,4],[1,3,4,5],[0,1,3,4]] },
-    { inv:'3rd inv',  bass:'7', slashName: n7 ? r+'/'+n7 : r,       notes:[p7,p5,p1,p3], strSets:[[0,2,3,4],[1,3,4,5],[0,1,3,4]] },
+    { inv:'Root pos', bass:'1', slashName: r,                       notes:[p1,p7,p3,p5], strSets:[[0,2,3,4],[1,3,4,5]] },
+    { inv:'1st inv',  bass:'3', slashName: n3 ? r+'/'+n3 : r,       notes:[p3,p1,p5,p7], strSets:[[0,2,3,4],[1,3,4,5]] },
+    { inv:'2nd inv',  bass:'5', slashName: n5 ? r+'/'+n5 : r,       notes:[p5,p3,p7,p1], strSets:[[0,2,3,4],[1,3,4,5]] },
+    { inv:'3rd inv',  bass:'7', slashName: n7 ? r+'/'+n7 : r,       notes:[p7,p5,p1,p3], strSets:[[0,2,3,4],[1,3,4,5]] },
   ];
 }
 
@@ -6705,22 +6707,19 @@ render();
 renderProgSlots();
 initCollapsibles();
 
-// ── Intervals toggle (wired once, survives re-renders) ──
+// ── Intervals toggle (event delegation — survives hero re-renders) ──
 (function() {
-  const btn = document.getElementById('intervals-toggle');
-  if (!btn) return;
   const getPills = () => document.getElementById('note-pills');
-  const updateBtn = (on) => btn.classList.toggle('active', on);
   // Default is OFF — only activate if user explicitly turned it on
-  const stored = localStorage.getItem('harmonic-show-intervals');
-  if (stored === null) localStorage.setItem('harmonic-show-intervals', '0');
-  updateBtn(localStorage.getItem('harmonic-show-intervals') === '1');
-  btn.addEventListener('click', () => {
+  if (localStorage.getItem('harmonic-show-intervals') === null)
+    localStorage.setItem('harmonic-show-intervals', '0');
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#intervals-toggle')) return;
     const pills = getPills();
     if (!pills) return;
     const on = pills.classList.toggle('show-intervals');
     localStorage.setItem('harmonic-show-intervals', on ? '1' : '0');
-    updateBtn(on);
+    document.getElementById('intervals-toggle')?.classList.toggle('active', on);
   });
 })();
 
