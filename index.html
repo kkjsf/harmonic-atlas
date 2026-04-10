@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Harmonic Atlas - Scale Chord Explorer</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" id="meta-theme-color" content="#12101c">
@@ -89,6 +89,37 @@
     flex-wrap: nowrap;
   }
   #history-strip::-webkit-scrollbar { display: none; }
+  .hist-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: .6;
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+  .transpose-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .transpose-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    border-radius: 2px;
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .12s, border-color .12s;
+  }
+  .transpose-btn:hover { background: var(--surface3); border-color: var(--accent); }
   .hist-chip {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 9.5px;
@@ -321,12 +352,16 @@
 
   /* CoF interactive hover */
   .cof-slice { cursor: pointer; }
+  .cof-slice:hover { fill: rgba(255,255,255,.13) !important; }
   .cof-slice-hover { pointer-events: none; }
   /* Chord card highlight when CoF is hovered */
   .chord-card.cof-dim   { opacity:.35; transition: opacity .2s, border-color .2s, box-shadow .2s; }
   .chord-card.cof-hi    { border-color: var(--gold) !important; box-shadow: 0 0 0 1px var(--gold), 0 4px 24px rgba(201,168,76,.35) !important; opacity:1 !important; transform: translateY(-2px); }
   .diag-card.cof-dim, .drop-card.cof-dim  { opacity:.35; transition: opacity .2s; }
   .diag-card.cof-hi, .drop-card.cof-hi   { border-color: var(--gold) !important; box-shadow: 0 0 0 1px var(--gold), 0 4px 24px rgba(201,168,76,.3) !important; opacity:1 !important; }
+
+  /* CoF slice highlight when chord card is hovered */
+  .cof-slice.cof-chord-hi { fill: rgba(255,255,255,.18) !important; stroke: rgba(255,255,255,.55) !important; stroke-width: 1.5px !important; }
 
   /* CoF tooltip */
   #cof-tooltip {
@@ -422,6 +457,10 @@
   .cn.root-note { background:rgba(201,168,76,.12); border-color:rgba(201,168,76,.4); color:var(--gold2); }
   .cn.ext-note { background:rgba(124,111,160,.12); border-color:rgba(124,111,160,.4); color:var(--accent2); }
   .chord-intervals { font-size:9px; color:var(--muted); letter-spacing:.1em; }
+  .chord-impro { display:flex; flex-wrap:wrap; align-items:center; gap:3px; margin-top:7px; padding-top:6px; border-top:1px solid var(--border2); }
+  .impro-label { font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); opacity:.7; margin-right:2px; font-family:'IBM Plex Mono',monospace; }
+  .impro-pill { font-size:8px; padding:1px 6px; border-radius:2px; border:1px solid rgba(124,111,160,.35); background:rgba(124,111,160,.08); color:var(--accent2); font-family:'IBM Plex Mono',monospace; cursor:pointer; transition:all .12s; white-space:nowrap; }
+  .impro-pill:hover { background:rgba(124,111,160,.22); border-color:rgba(124,111,160,.7); }
   .empty-msg { color:var(--muted); font-size:12px; padding:14px 0; font-style:italic; }
   .section-divider { height:1px; background:linear-gradient(90deg,var(--border),transparent); margin:4px 0 16px; }
 
@@ -1419,6 +1458,8 @@
     .compare-cols { grid-template-columns: 1fr; }
   }
   @media(max-width:560px){
+    html { zoom: 1; }
+    .wrap { padding: 0 14px 80px; }
     header{padding:28px 0 20px}
     .controls{padding:14px}
     .chords-grid{grid-template-columns:1fr}
@@ -1658,7 +1699,11 @@
   <div class="controls">
     <div class="ctrl-group">
       <div class="ctrl-label has-tip" style="display:flex;align-items:center">Root Key<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Root Key</span>The tonic - the home pitch class of your scale. All scale degrees and chord names are computed relative to this note.</div></div>
-      <select id="sel-key"></select>
+      <div class="transpose-row">
+        <button class="transpose-btn" id="transpose-dn" title="Transpose down 1 semitone">▼</button>
+        <select id="sel-key" style="flex:1;min-width:0"></select>
+        <button class="transpose-btn" id="transpose-up" title="Transpose up 1 semitone">▲</button>
+      </div>
     </div>
     <div class="ctrl-group">
       <div class="ctrl-label has-tip" style="display:flex;align-items:center">Scale / Mode<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Scale / Mode</span>Choose from 26 scales across Major modes, Harmonic Minor, Melodic Minor, and Exotic families. Type to filter the list.</div></div>
@@ -2182,14 +2227,13 @@ const SCALES = {
     desc:`Like harmonic minor but with a ♯4. The double augmented-second flavour (both between ♭3→♯4 and ♭6→♮7) gives it a hauntingly exotic, Eastern European character - the signature of Romani and Hungarian folk music.`},
   'Byzantine':                   {intervals:[0,1,4,5,7,8,11],  family:'Exotic Scales',  formula:'H A2 H W H A2 H',
     desc:`Also called Double Harmonic Major or Arabic scale. Two augmented 2nds (♭2→♮3 and ♭6→♮7) create a symmetrical, intensely exotic tension. The I chord is a major 7th but sits above a Phrygian ♭2, creating maximum contrast.`},
-  'Hirajoshi (Mode 4)':          {intervals:[0,1,5,7,8],       family:'Exotic Scales',     formula:'H M3 H H', pentatonic:true,
+  'Hirajoshi (Mode 4)':          {intervals:[0,1,5,7,8],       family:'Exotic Scales',     formula:'H M3 W H', pentatonic:true,
     degreeMap:[0,1,3,4,5],
-    desc:`A Japanese pentatonic with a ♭2 and ♭6. The wide minor-third gap after the ♭2 is the defining leap that gives it its stark, meditative, koto-like character. Perfect for sparse, contemplative music.`},
+    desc:`The 4th mode of Hirajoshi (Sakura pentatonic). Starting on the 5th degree of Hirajoshi gives ♭2, 4, 5 and ♭6 — the stark half-step opening followed by a wide leap is the signature of Japanese koto and shamisen music.`},
 
-  'Hirajoshi':                   {intervals:[0,4,6,7,11],      family:'Exotic Scales',     formula:'M3 H H M3 H', pentatonic:true,
-    preferSharps:true,
-    degreeMap:[0,2,3,4,6],
-    desc:`The original Japanese Hirajoshi scale (mode 1). Built on a major third, two half-steps and another major third, it has a floating, ethereal quality central to koto music and Japanese folk melodies.`},
+  'Hirajoshi':                   {intervals:[0,2,3,7,8],       family:'Exotic Scales',     formula:'W H M3 H', pentatonic:true,
+    degreeMap:[0,1,2,4,5],
+    desc:`The original Japanese Hirajoshi scale (mode 1): root, 2nd, ♭3rd, 5th and ♭6th (e.g. A B C E F). The ♭3 and ♭6 give it a melancholic, introspective quality — a natural minor scale with the 4th and 7th removed.`},
 
   'Whole Tone':                  {intervals:[0,2,4,6,8,10],    family:'Exotic Scales',  formula:'W W W W W W',
     preferSharps:true,
@@ -2733,11 +2777,10 @@ function drawCoF(rootPc, scaleIntervals){
     dt.textContent=COF_DIM[i];
     svg.appendChild(dt);
 
-    // ── Hover highlight overlay (invisible until hover) for each highlighted ring ──
-    // We draw transparent overlay slices to capture pointer events cleanly
+    // ── Hover overlay for ALL 12 positions × 3 rings (highlighted or not) ──
+    // Transparent fill captures pointer events; CSS :hover gives visual feedback
     ['maj','min','dim'].forEach(ring=>{
       const hl = ring==='maj'?hlMaj:ring==='min'?hlMin:hlDim;
-      if(!hl) return;
       const deg = ring==='maj'?majDeg:ring==='min'?minDeg:dimDeg;
       const rOut2 = ring==='maj'?R_OUT:ring==='min'?R_MID:R_INN;
       const rIn2  = ring==='maj'?R_MID+1:ring==='min'?R_INN+1:2;
@@ -2746,9 +2789,10 @@ function drawCoF(rootPc, scaleIntervals){
       ov.setAttribute('fill','transparent');
       ov.setAttribute('stroke','none');
       ov.setAttribute('class','cof-slice');
-      ov.dataset.deg=deg; ov.dataset.ring=ring;
+      ov.dataset.ring=ring;
       const lbl = ring==='maj'?COF_MAJ[i]:ring==='min'?COF_MIN[i]:COF_DIM[i];
       ov.dataset.label=lbl;
+      if(hl) ov.dataset.deg=deg; // only set for diatonic slices (links to chord cards)
       svg.appendChild(ov);
     });
   }
@@ -2768,19 +2812,21 @@ function drawCoF(rootPc, scaleIntervals){
     const deg = parseInt(sl.dataset.deg);
     const ring = sl.dataset.ring;
     const lbl  = sl.dataset.label;
-    if(isNaN(deg)||deg<0) return;
 
-    // Dim all chord cards, highlight matching degree
+    // Dim/highlight chord cards only for diatonic slices (those with data-deg)
     const allCards = document.querySelectorAll('.chord-card, .diag-card, .drop-card');
-    allCards.forEach(c=>{
-      c.classList.remove('cof-hi','cof-dim');
-      // Each section has id="deg-N"; cards are children of that section
-      const sec = c.closest('[id^="deg-"]');
-      if(sec && sec.id===`deg-${deg}`) c.classList.add('cof-hi');
-      else c.classList.add('cof-dim');
-    });
+    if(!isNaN(deg) && deg >= 0) {
+      allCards.forEach(c=>{
+        c.classList.remove('cof-hi','cof-dim');
+        const sec = c.closest('[id^="deg-"]');
+        if(sec && sec.id===`deg-${deg}`) c.classList.add('cof-hi');
+        else c.classList.add('cof-dim');
+      });
+    } else {
+      allCards.forEach(c=>c.classList.remove('cof-hi','cof-dim'));
+    }
 
-    // Show tooltip
+    // Show tooltip for all slices
     const ringLabel = ring==='maj'?'Major':ring==='min'?'Minor':'Diminished';
     tooltip.textContent = `${lbl} - ${ringLabel}`;
     tooltip.classList.add('visible');
@@ -2883,7 +2929,6 @@ function renderScaleInfo(scaleNotes, scaleData){
         <div class="scale-hero-top">
           <div class="scale-hero-name"><em>${rootNote}</em> ${modeName}</div>
         </div>
-        <div class="scale-hero-formula">${scaleData.formula}</div>
         <div class="scale-hero-identity">${identity}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
           <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Notes</span>
@@ -2947,9 +2992,16 @@ function renderScaleInfo(scaleNotes, scaleData){
     // Cap width so notes don't spread too far — staff should be compact
     const n = scaleNotes.length;
     const PLAY_W = 32, CLEF_W = 24, STAFF_X0 = 28 + PLAY_W;
-    const minNeeded = STAFF_X0 + CLEF_W + n * 22 + 20;
-    const w = Math.min(rawW, Math.max(minNeeded, n * 22 + STAFF_X0 + CLEF_W + 40));
+    const minNeeded = STAFF_X0 + CLEF_W + n * 26 + 20;
+    const w = Math.min(rawW, Math.max(minNeeded, n * 26 + STAFF_X0 + CLEF_W + 40));
     wrap.innerHTML = makeScaleStaffSVG(scaleNotes, w, true, true);
+
+    // Restore intervals toggle state after hero re-render
+    const showIv = localStorage.getItem('harmonic-show-intervals') === '1';
+    const pillsEl = document.getElementById('note-pills');
+    if (pillsEl && showIv) pillsEl.classList.add('show-intervals');
+    const togBtn = document.getElementById('intervals-toggle');
+    if (togBtn) togBtn.classList.toggle('active', showIv);
 
     // Wire SVG play button group
     const playG = wrap.querySelector('.staff-play-circle');
@@ -3242,6 +3294,46 @@ function addCardStaff(card, notes) {
   card.appendChild(panel);
 }
 
+// ── Jazz impro scale suggestions ──
+const IMPRO_MAP = [
+  { match: q => q.includes('Aug Dominant') || (q.includes('7') && q.includes('♯5') && !q.includes('Δ')), scales: ['Whole Tone', 'Lydian Augmented'] },
+  { match: q => q.includes('Dom') && q.includes('♭9') && q.includes('♯11'), scales: ['Altered (Super Locrian)'] },
+  { match: q => q.includes('Dom') && q.includes('♭9'),  scales: ['Phrygian Dominant', 'Altered (Super Locrian)'] },
+  { match: q => q.includes('Dom') && q.includes('♯9'),  scales: ['Altered (Super Locrian)', 'Lydian Dominant'] },
+  { match: q => q.includes('Dom') && q.includes('♯11'), scales: ['Lydian Dominant', 'Whole Tone'] },
+  { match: q => (q.includes('Dom') || q.includes('Dominant')) && !q.includes('sus'), scales: ['Mixolydian', 'Lydian Dominant'] },
+  { match: q => q.includes('Minor-Major') || q.includes('mΔ'), scales: ['Harmonic Minor', 'Melodic Minor (Ascending)'] },
+  { match: q => q.includes('Half-Dim') || q.includes('ø'),    scales: ['Locrian ♮2 (Half-Diminished)', 'Locrian'] },
+  { match: q => q.includes('Diminished 7th'),                 scales: ['Altered (Super Locrian)'] },
+  { match: q => q.includes('Augmented Δ'),                    scales: ['Lydian Augmented'] },
+  { match: q => q.includes('Major 7') || q.includes('Δ'),     scales: ['Lydian', 'Major (Ionian)'] },
+  { match: q => q.includes('Minor'),                          scales: ['Dorian', 'Aeolian (Natural Minor)'] },
+  { match: q => q.includes('Major'),                          scales: ['Major (Ionian)', 'Lydian'] },
+];
+
+function makeImproDiv(quality, chordRootPc) {
+  const entry = IMPRO_MAP.find(e => e.match(quality));
+  if (!entry) return null;
+  const scales = entry.scales.filter(s => SCALES[s]);
+  if (!scales.length) return null;
+  const div = document.createElement('div');
+  div.className = 'chord-impro';
+  const lbl = document.createElement('span');
+  lbl.className = 'impro-label';
+  lbl.textContent = 'Impro:';
+  div.appendChild(lbl);
+  scales.forEach(scaleName => {
+    const pill = document.createElement('span');
+    pill.className = 'impro-pill';
+    pill.textContent = scaleName.replace(' (Ionian)', '').replace('Aeolian (Natural Minor)', 'Aeolian');
+    pill.dataset.scale = scaleName;
+    pill.dataset.rootPc = chordRootPc;
+    pill.title = `Navigate to ${scaleName} at this chord root`;
+    div.appendChild(pill);
+  });
+  return div;
+}
+
 // Build the alteration pills div for any dominant chord root.
 // Shows ♭9/♯9/♯11/♭13/alt with actual note names + tritone sub with notes.
 function makeAltPillsDiv(domRootPc, rootName) {
@@ -3287,6 +3379,7 @@ function renderChords(scaleNotes, scaleData){
   const romans=computeAllRomans(scaleData.intervals, scaleData);
   const rootPc=parseInt(state.key);
   const mode=state.mode;
+  const showDegreeNames = state.scale==='Major (Ionian)' || state.scale==='Aeolian (Natural Minor)';
 
   // ── Chromatic modes: flat list grouped by source degree ──
   if(mode==='secdom'||mode==='chromed'||mode==='secdim'||mode==='secsub'){
@@ -3323,7 +3416,7 @@ function renderChords(scaleNotes, scaleData){
       sec.id=`deg-${di}`;
       const hdr=document.createElement('div');
       hdr.className='degree-header';
-      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`;
+      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span>${showDegreeNames?`<span class="degree-name-label">${DNAMES[di]}</span>`:''}`;
       sec.appendChild(hdr);
       const grid=document.createElement('div');
       grid.className='chords-grid';
@@ -3343,6 +3436,14 @@ function renderChords(scaleNotes, scaleData){
         if (isSecDom) {
           const domRootPc = noteNameToPc(chord.root);
           if (domRootPc >= 0) card.appendChild(makeAltPillsDiv(domRootPc, chord.root));
+        }
+        // Jazz impro suggestions for 7th+ chords
+        if (chord.iv.length >= 4) {
+          const rPc = noteNameToPc(chord.root);
+          if (rPc >= 0) {
+            const improDiv = makeImproDiv(chord.quality, rPc);
+            if (improDiv) card.appendChild(improDiv);
+          }
         }
 
         addCardStaff(card, chord.notes);
@@ -3395,9 +3496,13 @@ function renderChords(scaleNotes, scaleData){
         <div class="chord-notes-row">${makeNotePills(chordNotes)}</div>
         <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
       addCardStaff(card, chordNotes);
-      if (quality.includes('Dominant')) {
+      if (quality.includes('Dom') && !quality.includes('sus')) {
         const rPc = noteNameToPc(chordNotes[0]);
         if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
+      }
+      if (n >= 4) {
+        const rPc = noteNameToPc(chordNotes[0]);
+        if (rPc >= 0) { const improDiv = makeImproDiv(quality, rPc); if (improDiv) card.appendChild(improDiv); }
       }
 
       // Middle arrow
@@ -3421,6 +3526,10 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-notes-row">${makeNotePills(negCh.notes)}</div>
           <div class="chord-intervals">Intervals: 1 · ${negCh.iv.slice(1).map(iName).join(' · ')}</div>`;
         addCardStaff(negCard, negCh.notes || []);
+        if (n >= 4) {
+          const negRootPc = noteNameToPc(negCh.root);
+          if (negRootPc >= 0) { const improDiv = makeImproDiv(negCh.qual, negRootPc); if (improDiv) negCard.appendChild(improDiv); }
+        }
       } else {
         negCard.className = 'neg-card';
         negCard.innerHTML = '<div class="empty-msg" style="font-size:10px;color:var(--muted)">-</div>';
@@ -3465,9 +3574,13 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-notes-row">${makeNotePills(chordNotes)}</div>
           <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
         addCardStaff(card, chordNotes);
-        if (quality.includes('Dominant')) {
-          const rPc = noteNameToPc(chordNotes[0]);
+        const rPc = noteNameToPc(chordNotes[0]);
+        if (quality.includes('Dom') && !quality.includes('sus')) {
           if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
+        }
+        if (n >= 4 && rPc >= 0) {
+          const improDiv = makeImproDiv(quality, rPc);
+          if (improDiv) card.appendChild(improDiv);
         }
         grid.appendChild(card);
       }
@@ -3867,7 +3980,7 @@ function renderDiagrams(scaleNotes, scaleData) {
     byDeg.forEach((degItems, di) => {
       const sec=document.createElement('div'); sec.className='degree-section'; sec.id=`deg-${di}`;
       const hdr=document.createElement('div'); hdr.className='degree-header';
-      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`;
+      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span>${showDegreeNames?`<span class="degree-name-label">${DNAMES[di]}</span>`:''}`;
       sec.appendChild(hdr);
       const grid=document.createElement('div'); grid.className='chords-grid';
       degItems.forEach((item, ci) => {
@@ -4135,16 +4248,16 @@ function _stepsAboveE4(diaStep, oct) { return (oct - 4) * 7 + (diaStep - 2); }
 // playBtn: if true, leaves PLAY_W px on the left for a play button placeholder
 // ─────────────────────────────────────────────
 function makeScaleStaffSVG(noteNames, w, bright, playBtn) {
-  const LINE_GAP  = 9;
+  const LINE_GAP  = 12;
   const STEP_PX   = LINE_GAP / 2;
-  const NOTE_R_X  = 4.8;
-  const NOTE_R_Y  = 3.6;
+  const NOTE_R_X  = 6;
+  const NOTE_R_Y  = 4.5;
   const PLAY_W    = playBtn ? 32 : 0;  // space on left for play button
   const STAFF_X0  = 28 + PLAY_W;       // left edge of staff lines
   const CLEF_W    = 24;
   const STEM_LEN  = LINE_GAP * 3.5;
-  const PAD_TOP   = 6;
-  const PAD_BOT   = 8;
+  const PAD_TOP   = 10;
+  const PAD_BOT   = 14;
 
   // We pick a reference Y for the bottom staff line (E4) and compute everything relative to it.
   // After collecting all Y values we'll normalise.
@@ -4667,6 +4780,7 @@ let progPlaying  = false;
 let progLoop     = false;
 let progScheduler = null;
 let progAudioCtx  = null;
+let progMasterOut = null; // DynamicsCompressor → destination
 let progCurrentIdx = -1;
 let progDragIdx    = null;
 
@@ -4674,6 +4788,16 @@ let progDragIdx    = null;
 function getAudioCtx() {
   if (!progAudioCtx || progAudioCtx.state === 'closed') {
     progAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    progMasterOut = null; // rebuild compressor on new context
+  }
+  if (!progMasterOut) {
+    progMasterOut = progAudioCtx.createDynamicsCompressor();
+    progMasterOut.threshold.value = -20;
+    progMasterOut.knee.value      = 6;
+    progMasterOut.ratio.value     = 4;
+    progMasterOut.attack.value    = 0.003;
+    progMasterOut.release.value   = 0.25;
+    progMasterOut.connect(progAudioCtx.destination);
   }
   if (progAudioCtx.state === 'suspended') progAudioCtx.resume().catch(()=>{});
   return progAudioCtx;
@@ -4843,7 +4967,7 @@ function makePianoNote(ctx, freq, startTime, duration, gain = 0.13) {
   shelf.gain.value = isTreble ? -3 : -5;
 
   master.connect(shaper); shaper.connect(hp); hp.connect(warm); warm.connect(shelf);
-  shelf.connect(ctx.destination);
+  shelf.connect(progMasterOut);
   if (progReverbNode) shelf.connect(progReverbNode);
 }
 
@@ -4878,7 +5002,7 @@ function makeOrganNote(ctx, freq, startTime, duration, gain=0.10) {
   });
 
   mix.connect(tremolo);
-  tremolo.connect(ctx.destination);
+  tremolo.connect(progMasterOut);
   if (progReverbNode) tremolo.connect(progReverbNode);
 }
 
@@ -4905,14 +5029,15 @@ function makeGuitarNote(ctx, freq, startTime, duration, gain=0.28) {
   const src = ctx.createBufferSource();
   src.buffer = buf;
   const g = ctx.createGain();
-  g.gain.setValueAtTime(gain, startTime);
+  g.gain.setValueAtTime(0.0001, startTime);
+  g.gain.linearRampToValueAtTime(gain, startTime + 0.002);
   // No long decay needed - Karplus-Strong already decays naturally
   const lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=4800;
   // Body resonance: +5dB peak at ~300 Hz (guitar body warmth)
   const body = ctx.createBiquadFilter(); body.type='peaking';
   body.frequency.value=300; body.Q.value=1.2; body.gain.value=5;
   src.connect(lp); lp.connect(body); body.connect(g);
-  g.connect(ctx.destination);
+  g.connect(progMasterOut);
   if (progReverbNode) g.connect(progReverbNode);
   src.start(startTime); src.stop(startTime + duration + 1.5);
 }
@@ -4940,7 +5065,7 @@ function makePadNote(ctx, freq, startTime, duration, gain=0.07) {
     osc.start(startTime); osc.stop(relEnd + rel + 0.1);
   });
   filter.connect(envG);
-  envG.connect(ctx.destination);
+  envG.connect(progMasterOut);
   if (progReverbNode) envG.connect(progReverbNode);
 }
 
@@ -4955,7 +5080,7 @@ function makeClickBeat(ctx, t, isDownbeat) {
   osc.frequency.setValueAtTime(isDownbeat ? 1400 : 900, t);
   g.gain.setValueAtTime(0.5, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-  osc.connect(g); g.connect(ctx.destination);
+  osc.connect(g); g.connect(progMasterOut);
   osc.start(t); osc.stop(t + 0.07);
 }
 
@@ -4967,7 +5092,7 @@ function makeKickBeat(ctx, t) {
   osc.frequency.exponentialRampToValueAtTime(50, t + 0.08);
   g.gain.setValueAtTime(0.9, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-  osc.connect(g); g.connect(ctx.destination);
+  osc.connect(g); g.connect(progMasterOut);
   osc.start(t); osc.stop(t + 0.2);
 }
 
@@ -4981,7 +5106,7 @@ function makeSnareBeat(ctx, t) {
   const g   = ctx.createGain();
   g.gain.setValueAtTime(0.35, t);
   g.gain.exponentialRampToValueAtTime(0.001, t+0.14);
-  src.connect(hp); hp.connect(g); g.connect(ctx.destination);
+  src.connect(hp); hp.connect(g); g.connect(progMasterOut);
   src.start(t); src.stop(t+0.16);
 }
 
@@ -5105,7 +5230,7 @@ function createProgReverb(ctx) {
   const wet = ctx.createGain();
   wet.gain.value = 0.18;
   conv.connect(wet);
-  wet.connect(ctx.destination);
+  wet.connect(progMasterOut);
   return conv;
 }
 
@@ -5926,7 +6051,7 @@ function findScaleRelationships(rootPc, scaleName) {
       if (r === rootPc) continue;
       const shared = countSharedNotes(ivA, data.intervals, rootPc, r);
       if (shared === totalNotes) {
-        const noteName = PITCH_CANDIDATES[r][0];
+        const noteName = PREFER_FLAT_PC.has(r) && PITCH_CANDIDATES[r].length > 1 ? PITCH_CANDIDATES[r][1] : PITCH_CANDIDATES[r][0];
         const label = noteName + ' ' + name;
         if (!relative.find(x => x.label === label)) {
           relative.push({ label, key: r, scale: name, rootPc: r });
@@ -5948,7 +6073,7 @@ function findScaleRelationships(rootPc, scaleName) {
       const r2 = (rootPc + delta + 12) % 12;
       const sh = countSharedNotes(ivA, data.intervals, rootPc, r2);
       if (sh >= totalNotes - 1) {
-        const nn = PITCH_CANDIDATES[r2][0];
+        const nn = PREFER_FLAT_PC.has(r2) && PITCH_CANDIDATES[r2].length > 1 ? PITCH_CANDIDATES[r2][1] : PITCH_CANDIDATES[r2][0];
         const lbl = nn + ' ' + name;
         if (!closely.find(x => x.label === lbl)) {
           closely.push({ label: lbl, key: r2, scale: name, shared: sh });
@@ -6626,6 +6751,17 @@ const KEY_NAMES = ['C','C♯/D♭','D','D♯/E♭','E','F','F♯/G♭','G','G♯
 document.getElementById('sel-key').addEventListener('change',e=>{state.key=e.target.value;render();});
 document.getElementById('sel-scale').addEventListener('change',e=>{state.scale=e.target.value;render();});
 
+document.getElementById('transpose-dn').addEventListener('click',()=>{
+  state.key = ((parseInt(state.key) - 1 + 12) % 12).toString();
+  document.getElementById('sel-key').value = state.key;
+  render();
+});
+document.getElementById('transpose-up').addEventListener('click',()=>{
+  state.key = ((parseInt(state.key) + 1) % 12).toString();
+  document.getElementById('sel-key').value = state.key;
+  render();
+});
+
 // ── Scale search filter ──
 (function(){
   const searchEl = document.getElementById('scale-search');
@@ -6796,19 +6932,27 @@ function renderHistory() {
   if (_history.length < 2) { strip.style.display = 'none'; return; }
   strip.style.display = 'flex';
 
-  _history.forEach((h, i) => {
-    if (i > 0) {
+  const histLbl = document.createElement('span');
+  histLbl.className = 'hist-label';
+  histLbl.textContent = 'History:';
+  strip.appendChild(histLbl);
+
+  // _history is newest-first; render oldest→newest (left→right)
+  const ordered = _history.slice().reverse();
+  ordered.forEach((h, idx) => {
+    if (idx > 0) {
       const sep = document.createElement('span');
       sep.className = 'hist-sep';
       sep.textContent = '›';
-      strip.insertBefore(sep, strip.firstChild); // newest on right, oldest on left
+      strip.appendChild(sep);
     }
+    const histIdx = _history.length - 1 - idx; // 0 = newest (current)
     const chip = document.createElement('button');
-    chip.className = 'hist-chip' + (i === 0 ? ' hist-current' : '');
+    chip.className = 'hist-chip' + (histIdx === 0 ? ' hist-current' : '');
     const shortScale = h.scale.replace(' (Ionian)','').replace('Aeolian (Natural Minor)','Aeolian');
     chip.textContent = KEY_SHORT[h.key] + ' ' + shortScale;
     chip.title = KEY_SHORT[h.key] + ' ' + h.scale;
-    if (i > 0) {
+    if (histIdx > 0) {
       chip.addEventListener('click', () => {
         state.key   = h.key;
         state.scale = h.scale;
@@ -6817,29 +6961,8 @@ function renderHistory() {
         render();
       });
     }
-    strip.insertBefore(chip, strip.firstChild); // insert so newest ends up on right
+    strip.appendChild(chip);
   });
-
-  // Share button — always at far right
-  const shareBtn = document.createElement('button');
-  shareBtn.className = 'hist-share-btn';
-  shareBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="9" cy="2" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="9" cy="9" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="2" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="7.6" y1="2.7" x2="3.4" y2="4.8" stroke="currentColor" stroke-width="1.1"/><line x1="3.4" y1="6.2" x2="7.6" y2="8.3" stroke="currentColor" stroke-width="1.1"/></svg>Share';
-  shareBtn.title = 'Copy shareable link to clipboard';
-  shareBtn.addEventListener('click', () => {
-    const url = location.href.split('#')[0] + encodeHash(state);
-    navigator.clipboard.writeText(url).then(() => {
-      shareBtn.textContent = '✓ Copied!';
-      shareBtn.classList.add('copied');
-      setTimeout(() => {
-        shareBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="9" cy="2" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="9" cy="9" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="2" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="7.6" y1="2.7" x2="3.4" y2="4.8" stroke="currentColor" stroke-width="1.1"/><line x1="3.4" y1="6.2" x2="7.6" y2="8.3" stroke="currentColor" stroke-width="1.1"/></svg>Share';
-        shareBtn.classList.remove('copied');
-      }, 2000);
-    }).catch(() => {
-      // Fallback: show URL in prompt
-      prompt('Copy this link:', url);
-    });
-  });
-  strip.appendChild(shareBtn);
 }
 
 // Patch render() to update hash + history on every navigation
@@ -6893,6 +7016,47 @@ initCollapsibles();
 })();
 // Auto-open prog builder only when chords are added
 
+// ── Impro pill click → navigate to scale at chord root ──
+document.getElementById('all-degrees').addEventListener('click', e => {
+  const pill = e.target.closest('.impro-pill');
+  if (!pill) return;
+  const scaleName = pill.dataset.scale;
+  const rootPc = parseInt(pill.dataset.rootPc);
+  if (!SCALES[scaleName] || isNaN(rootPc)) return;
+  state.key = rootPc;
+  state.scale = scaleName;
+  document.getElementById('sel-key').value = rootPc;
+  document.getElementById('sel-scale').value = scaleName;
+  render();
+});
+
+// ── Chord hover → CoF highlight (event delegation, survives re-renders) ──
+(function() {
+  const allDeg = document.getElementById('all-degrees');
+  if (!allDeg) return;
+  allDeg.addEventListener('mouseover', e => {
+    const card = e.target.closest('.chord-card');
+    if (!card) return;
+    const sec = card.closest('[id^="deg-"]');
+    if (!sec) return;
+    const di = parseInt(sec.id.replace('deg-', ''));
+    document.querySelectorAll('.cof-slice').forEach(sl => {
+      sl.classList.toggle('cof-chord-hi', parseInt(sl.dataset.deg) === di);
+    });
+  });
+  allDeg.addEventListener('mouseleave', () => {
+    document.querySelectorAll('.cof-slice.cof-chord-hi').forEach(sl =>
+      sl.classList.remove('cof-chord-hi'));
+  });
+  // Also clear when moving between cards without crossing the container boundary
+  allDeg.addEventListener('mouseout', e => {
+    const toCard = e.relatedTarget && e.relatedTarget.closest('.chord-card');
+    if (!toCard) {
+      document.querySelectorAll('.cof-slice.cof-chord-hi').forEach(sl =>
+        sl.classList.remove('cof-chord-hi'));
+    }
+  });
+})();
 
 </script>
 
@@ -7015,11 +7179,12 @@ body.light-theme #tech-panel { background: #faf7f2; }
     <div class="tech-section">
       <div class="tech-section-title">Visual &amp; UI</div>
       <div class="tech-row"><span class="tech-key">Staff notation</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeScaleStaffSVG()</code> / <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordStaffSVG()</code> — pure SVG; auto-fitting viewBox from actual note Y-bounds; treble clef uses overflow:visible; accidentals, ledger lines, stems</span></div>
-      <div class="tech-row"><span class="tech-key">Circle of Fifths</span><span class="tech-val">Inline SVG, 380×380 px; three concentric rings (major/minor/dim); interactive hover; negative harmony axis overlay</span></div>
+      <div class="tech-row"><span class="tech-key">Circle of Fifths</span><span class="tech-val">Inline SVG, 380×380 px; three concentric rings (major/minor/dim); bidirectional hover (CoF↔chord cards); transparent overlay slices cover all 12 positions × 3 rings with CSS :hover fill; negative harmony axis overlay</span></div>
       <div class="tech-row"><span class="tech-key">Negative harmony</span><span class="tech-val">CoF fold method (Ernst Levy / Jacob Collier): <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">mirror = (2×tonicSlot + 1 - pcSlot + 12) % 12</code></span></div>
-      <div class="tech-row"><span class="tech-key">Scale relationships</span><span class="tech-val">Relative (shared pitch set, different root); Parallel (same root, ≥4 shared notes); Closely related (adjacent root, ≥n-1 shared)</span></div>
+      <div class="tech-row"><span class="tech-key">Scale relationships</span><span class="tech-val">Relative (shared pitch set, different root); Parallel (same root, ≥4 shared notes); Closely related (adjacent root, ≥n-1 shared); enharmonic names use PREFER_FLAT_PC set (Db/Eb/Ab/Bb)</span></div>
+      <div class="tech-row"><span class="tech-key">Jazz impro hints</span><span class="tech-val">IMPRO_MAP quality→scale lookup on each 7th-chord card; clicking a scale pill navigates to that scale at the chord root via state update + render()</span></div>
       <div class="tech-row"><span class="tech-key">Theme system</span><span class="tech-val">CSS custom properties; 20+ overrides for light mode; CoF SVG redrawn on toggle via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getThemeColor()</code></span></div>
-      <div class="tech-row"><span class="tech-key">Responsive</span><span class="tech-val">Breakpoints at 1400 px / 900 px / 560 px; landscape-mobile at max-height: 500 px</span></div>
+      <div class="tech-row"><span class="tech-key">Responsive</span><span class="tech-val">Breakpoints at 1400 px / 900 px / 560 px; landscape-mobile at max-height: 500 px; zoom reset to 1 on ≤560 px; user-scalable=no viewport</span></div>
     </div>
 
     <div class="tech-section">
@@ -7370,12 +7535,12 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
           <div class="guide-section-title">Scale Hero Banner</div>
         </div>
       </div>
-      <p class="guide-p">The full-width banner directly below the chord mode buttons shows the current scale at a glance: its family, step formula (W = whole tone, H = half tone, A2 = augmented 2nd), the degree identity line (e.g. <em>1 2 ♭3 4 5 ♭6 ♭7</em>), and large note pills in scale order.</p>
-      <p class="guide-p">Below the note pills, a live <strong>treble-clef staff</strong> shows the ascending scale in standard notation - noteheads, stems, accidentals, and ledger lines are all rendered in real time. A small <strong>▶ play button</strong> sits to the left of the staff; clicking it plays the scale up one octave using the piano synth, and clicking again stops it mid-playback.</p>
+      <p class="guide-p">The full-width banner directly below the chord mode buttons shows the current scale at a glance: its family, the degree identity line (e.g. <em>1 2 ♭3 4 5 ♭6 ♭7</em>), and large note pills in scale order. A <strong>Steps</strong> toggle reveals interval arcs between each note pill showing the semitone distance (½ = half step, 1 = whole step, 1½ = minor 3rd, 2 = major 3rd).</p>
+      <p class="guide-p">Below the note pills, a live <strong>treble-clef staff</strong> shows the ascending scale in standard notation — noteheads, stems, accidentals, and ledger lines rendered in real time. A small <strong>▶ play button</strong> sits to the left of the staff; clicking it plays the scale up one octave, clicking again stops it.</p>
       <p class="guide-p">The <strong>right panel</strong> shows a concise description of the scale's characteristic colour and harmonic applications.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">👆</span>
-        <span class="guide-tip-text">Clicking any note pill scrolls the chord panel to that scale degree's chord cards. The ♩ icon on each chord card opens an inline stacked-chord staff notation for that chord.</span>
+        <span class="guide-tip-text">Clicking any note pill scrolls the chord panel to that scale degree's chord cards. The ♩ icon on each chord card opens an inline stacked-chord staff notation for that chord. The search history strip above the banner shows your recent key+scale navigations.</span>
       </div>
     </section>
 
@@ -7391,10 +7556,10 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         </div>
       </div>
       <p class="guide-p">The Circle of Fifths arranges all 12 keys clockwise by ascending perfect fifths. The <strong>outer ring</strong> shows major keys, the <strong>middle ring</strong> their relative minors, the <strong>inner ring</strong> diminished chords.</p>
-      <p class="guide-p">Segments highlighted in <strong style="color:#c9a84c">gold</strong> are major chords of your scale; <strong style="color:#a08bc8">purple</strong> are minor chords; <strong style="color:#d4813a">orange</strong> are diminished chords. Keys adjacent on the circle share the most common notes - useful for modulation.</p>
+      <p class="guide-p">Segments highlighted in <strong style="color:#c9a84c">gold</strong> are major chords of your scale; <strong style="color:#a08bc8">purple</strong> are minor chords; <strong style="color:#d4813a">orange</strong> are diminished chords. Keys adjacent on the circle share the most common notes — useful for modulation planning.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">🖱️</span>
-        <span class="guide-tip-text">Hover any CoF segment to highlight the matching chord card in the right panel. Tooltips show the chord name and quality.</span>
+        <span class="guide-tip-text">Hover works in both directions: hover any CoF segment to highlight the matching chord card (and see a tooltip with name + quality) — including non-diatonic positions. Conversely, hover any chord card to highlight its slice on the circle.</span>
       </div>
     </section>
 
@@ -7852,6 +8017,7 @@ document.addEventListener('visibilitychange', () => {
 // ── Service worker registration + update notification ──────────────────────
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').then(reg => {
+    reg.update(); // check for SW updates on every page load
     reg.addEventListener('updatefound', () => {
       const nw = reg.installing;
       nw && nw.addEventListener('statechange', () => {
