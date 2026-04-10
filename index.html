@@ -5234,7 +5234,7 @@ function progPlay() {
   // On mobile the AudioContext may still be suspended even after _unlockAudio.
   // We must resume it and wait before scheduling any nodes.
   const ctx = getAudioCtx();
-  const doPlay = () => {
+  const doPlay = () => { try {
     const bpm     = progGetBpm();
     const sound   = progGetSound();
     const beatDur = 60 / bpm;
@@ -5323,6 +5323,7 @@ function progPlay() {
   }
 
   progScheduler = requestAnimationFrame(tick);
+  } catch(err) { alert('Audio error: ' + err.message); progStop(); }
   }; // end doPlay
 
   // Resume AudioContext first (critical for iOS/Android PWA).
