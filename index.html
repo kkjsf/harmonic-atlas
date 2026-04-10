@@ -4780,7 +4780,6 @@ let progPlaying  = false;
 let progLoop     = false;
 let progScheduler = null;
 let progAudioCtx  = null;
-let progMasterOut = null; // DynamicsCompressor → destination
 let progCurrentIdx = -1;
 let progDragIdx    = null;
 
@@ -4788,16 +4787,6 @@ let progDragIdx    = null;
 function getAudioCtx() {
   if (!progAudioCtx || progAudioCtx.state === 'closed') {
     progAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    progMasterOut = null; // rebuild compressor on new context
-  }
-  if (!progMasterOut) {
-    progMasterOut = progAudioCtx.createDynamicsCompressor();
-    progMasterOut.threshold.value = -20;
-    progMasterOut.knee.value      = 6;
-    progMasterOut.ratio.value     = 4;
-    progMasterOut.attack.value    = 0.003;
-    progMasterOut.release.value   = 0.25;
-    progMasterOut.connect(progAudioCtx.destination);
   }
   if (progAudioCtx.state === 'suspended') progAudioCtx.resume().catch(()=>{});
   return progAudioCtx;
@@ -4967,7 +4956,7 @@ function makePianoNote(ctx, freq, startTime, duration, gain = 0.13) {
   shelf.gain.value = isTreble ? -3 : -5;
 
   master.connect(shaper); shaper.connect(hp); hp.connect(warm); warm.connect(shelf);
-  shelf.connect(progMasterOut || ctx.destination);
+  shelf.connect(ctx.destination);
   if (progReverbNode) shelf.connect(progReverbNode);
 }
 
@@ -5002,7 +4991,7 @@ function makeOrganNote(ctx, freq, startTime, duration, gain=0.10) {
   });
 
   mix.connect(tremolo);
-  tremolo.connect(progMasterOut || ctx.destination);
+  tremolo.connect(ctx.destination);
   if (progReverbNode) tremolo.connect(progReverbNode);
 }
 
@@ -5037,7 +5026,7 @@ function makeGuitarNote(ctx, freq, startTime, duration, gain=0.28) {
   const body = ctx.createBiquadFilter(); body.type='peaking';
   body.frequency.value=300; body.Q.value=1.2; body.gain.value=5;
   src.connect(lp); lp.connect(body); body.connect(g);
-  g.connect(progMasterOut || ctx.destination);
+  g.connect(ctx.destination);
   if (progReverbNode) g.connect(progReverbNode);
   src.start(startTime); src.stop(startTime + duration + 1.5);
 }
@@ -5065,7 +5054,7 @@ function makePadNote(ctx, freq, startTime, duration, gain=0.07) {
     osc.start(startTime); osc.stop(relEnd + rel + 0.1);
   });
   filter.connect(envG);
-  envG.connect(progMasterOut || ctx.destination);
+  envG.connect(ctx.destination);
   if (progReverbNode) envG.connect(progReverbNode);
 }
 
@@ -5080,7 +5069,7 @@ function makeClickBeat(ctx, t, isDownbeat) {
   osc.frequency.setValueAtTime(isDownbeat ? 1400 : 900, t);
   g.gain.setValueAtTime(0.5, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-  osc.connect(g); g.connect(progMasterOut || ctx.destination);
+  osc.connect(g); g.connect(ctx.destination);
   osc.start(t); osc.stop(t + 0.07);
 }
 
@@ -5090,9 +5079,9 @@ function makeKickBeat(ctx, t) {
   osc.type  = 'sine';
   osc.frequency.setValueAtTime(180, t);
   osc.frequency.exponentialRampToValueAtTime(50, t + 0.08);
-  g.gain.setValueAtTime(0.9, t);
+  g.gain.setValueAtTime(0.5, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-  osc.connect(g); g.connect(progMasterOut || ctx.destination);
+  osc.connect(g); g.connect(ctx.destination);
   osc.start(t); osc.stop(t + 0.2);
 }
 
@@ -5106,7 +5095,7 @@ function makeSnareBeat(ctx, t) {
   const g   = ctx.createGain();
   g.gain.setValueAtTime(0.35, t);
   g.gain.exponentialRampToValueAtTime(0.001, t+0.14);
-  src.connect(hp); hp.connect(g); g.connect(progMasterOut || ctx.destination);
+  src.connect(hp); hp.connect(g); g.connect(ctx.destination);
   src.start(t); src.stop(t+0.16);
 }
 
@@ -5175,7 +5164,7 @@ function playChordAt(ctx, pcs, startTime, duration, sound) {
     'piano':  makePianoNote
   }[sound] || makePianoNote;
 
-  const baseGains = { piano: 0.13, organ: 0.10, guitar: 0.28, pad: 0.07 };
+  const baseGains = { piano: 0.08, organ: 0.07, guitar: 0.18, pad: 0.05 };
   const baseGain  = baseGains[sound] || 0.13;
 
   // All sounds use the strum pattern for rhythmic re-attacks
@@ -5230,7 +5219,7 @@ function createProgReverb(ctx) {
   const wet = ctx.createGain();
   wet.gain.value = 0.18;
   conv.connect(wet);
-  wet.connect(progMasterOut || ctx.destination);
+  wet.connect(ctx.destination);
   return conv;
 }
 
