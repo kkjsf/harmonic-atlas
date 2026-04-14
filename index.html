@@ -99,6 +99,15 @@
     flex-shrink: 0;
     margin-right: 2px;
   }
+  .ctrl-scale-key-row { display:flex; flex-direction:row; align-items:flex-start; gap:14px; grid-column:1/-1; }
+  .ctrl-scale-block { flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; }
+  .ctrl-key-block { flex:0 0 auto; display:flex; flex-direction:column; gap:8px; }
+  .key-big-display {
+    font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--cream);
+    text-align:center; padding:6px 12px; background:var(--surface2);
+    border:1px solid var(--border2); border-radius:2px; white-space:nowrap;
+    min-width:68px; letter-spacing:-.01em; line-height:1.2; flex:1;
+  }
   .transpose-row {
     display: flex;
     align-items: center;
@@ -483,6 +492,23 @@
   .view-tab:hover { color:var(--cream); }
   .view-tab.active { color:var(--gold2); border-bottom-color:var(--gold); }
   .view-tab.disabled { opacity:.3; cursor:not-allowed; }
+
+  /* ── Guitar sub-tabs ── */
+  .guitar-sub-tabs {
+    display:flex; gap:2px;
+    margin-top:-16px; margin-bottom:16px;
+    padding-left:12px;
+    border-bottom:1px solid var(--border);
+  }
+  .guitar-sub-tab {
+    padding:5px 12px; background:transparent; border:none;
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+    color:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:9px;
+    letter-spacing:.1em; text-transform:uppercase; cursor:pointer; transition:all .18s;
+  }
+  .guitar-sub-tab:hover { color:var(--cream); }
+  .guitar-sub-tab.active { color:var(--gold2); border-bottom-color:var(--gold); }
+  .guitar-sub-tab.disabled { opacity:.3; cursor:not-allowed; }
 
   /* ── Guitar diagram card ── */
   .diag-card {
@@ -1697,20 +1723,23 @@
   </header>
 
   <div class="controls">
-    <div class="ctrl-group">
-      <div class="ctrl-label has-tip" style="display:flex;align-items:center">Root Key<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Root Key</span>The tonic - the home pitch class of your scale. All scale degrees and chord names are computed relative to this note.</div></div>
-      <div class="transpose-row">
-        <button class="transpose-btn" id="transpose-dn" title="Transpose down 1 semitone">▼</button>
-        <select id="sel-key" style="flex:1;min-width:0"></select>
-        <button class="transpose-btn" id="transpose-up" title="Transpose up 1 semitone">▲</button>
+    <div class="ctrl-group ctrl-scale-key-row">
+      <div class="ctrl-key-block">
+        <div class="ctrl-label has-tip" style="display:flex;align-items:center;white-space:nowrap">Root Key<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Root Key</span>The tonic - the home pitch class of your scale. All scale degrees and chord names are computed relative to this note.</div></div>
+        <div class="transpose-row">
+          <button class="transpose-btn" id="transpose-dn" title="Transpose down 1 semitone">▼</button>
+          <div class="key-big-display" id="key-display">C</div>
+          <select id="sel-key" style="display:none"></select>
+          <button class="transpose-btn" id="transpose-up" title="Transpose up 1 semitone">▲</button>
+        </div>
       </div>
-    </div>
-    <div class="ctrl-group">
-      <div class="ctrl-label has-tip" style="display:flex;align-items:center">Scale / Mode<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Scale / Mode</span>Choose from 26 scales across Major modes, Harmonic Minor, Melodic Minor, and Exotic families. Type to filter the list.</div></div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        <input id="scale-search" type="text" placeholder="Filter scales…" autocomplete="off"
-          style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:2px;padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;outline:none;transition:border-color .15s">
-        <select id="sel-scale" size="1"></select>
+      <div class="ctrl-scale-block">
+        <div class="ctrl-label has-tip" style="display:flex;align-items:center">Scale / Mode<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Scale / Mode</span>Choose from 26 scales across Major modes, Harmonic Minor, Melodic Minor, and Exotic families. Type to filter the list.</div></div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <input id="scale-search" type="text" placeholder="Filter scales…" autocomplete="off"
+            style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:2px;padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;outline:none;transition:border-color .15s">
+          <select id="sel-scale" size="1"></select>
+        </div>
       </div>
     </div>
     <div class="ctrl-group ctrl-group-wide">
@@ -1974,10 +2003,14 @@
   </div>
   <div class="view-tabs" id="view-tabs" style="align-items:center">
     <button class="view-tab active" data-view="list"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="5.6" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="9.2" width="7" height="1.8" rx=".5" fill="currentColor" opacity=".5"/></svg>Chord List</button>
-    <button class="view-tab" data-view="diagrams" id="tab-diagrams"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="9" r="1.2" fill="currentColor"/></svg>Guitar</button>
+    <button class="view-tab" data-view="guitar" id="tab-guitar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="9" r="1.2" fill="currentColor"/></svg>Guitar</button>
     <button class="view-tab" data-view="mandolin" id="tab-mandolin"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><ellipse cx="6.5" cy="8" rx="3.5" ry="4.5" stroke="currentColor" stroke-width="1.1" fill="none"/><line x1="6.5" y1="1" x2="6.5" y2="3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.5" y1="4" x2="8.5" y2="4" stroke="currentColor" stroke-width="1" opacity=".6"/><circle cx="6.5" cy="8" r="1" fill="currentColor" opacity=".4"/></svg>Mandolin</button>
-    <button class="view-tab" data-view="drop2" id="tab-drop2"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 3 L2 10 M11 3 L11 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M2 5 L11 5 M2 8 L11 8" stroke="currentColor" stroke-width="1" opacity=".6"/><path d="M5.5 10 L8 13 L10.5 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Drop 2</button>
-<button class="view-tab" data-view="drop3" id="tab-drop3"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 3 L2 10 M11 3 L11 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M2 5 L11 5 M2 7 L11 7 M2 9 L11 9" stroke="currentColor" stroke-width="1" opacity=".5"/><path d="M5.5 10 L8 13 L10.5 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Drop 3</button>
+  </div>
+  <div class="guitar-sub-tabs" id="guitar-sub-tabs" style="display:none">
+    <button class="guitar-sub-tab active" data-view="diagrams" id="tab-diagrams">Basic</button>
+    <button class="guitar-sub-tab" data-view="arpeggio" id="tab-arpeggio">Arpeggios</button>
+    <button class="guitar-sub-tab" data-view="drop2" id="tab-drop2">Drop 2</button>
+    <button class="guitar-sub-tab" data-view="drop3" id="tab-drop3">Drop 3</button>
   </div>
   <div id="compare-panel" style="display:none">
     <div class="compare-cols" id="compare-cols">
@@ -2849,7 +2882,7 @@ function drawCoF(rootPc, scaleIntervals){
 // STATE & RENDERING
 // ══════════════════════════════════════════════
 
-let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list'};
+let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastGuitarView:'diagrams'};
 
 function buildSelectors(){
   // Key selector: show both enharmonic names for ambiguous keys
@@ -2867,6 +2900,7 @@ function buildSelectors(){
     });
     scaleEl.appendChild(g);
   });
+  syncKeyDisplay();
 }
 
 // Compute all degree Roman numerals for a scale (returns array of strings)
@@ -3593,10 +3627,18 @@ function renderChords(scaleNotes, scaleData){
 
 // ── Debounced render with fade transition for smooth UX ──
 let _renderTimer = null;
+function syncKeyDisplay() {
+  const el = document.getElementById('key-display');
+  if (!el) return;
+  const KEY_SHORT = ['C','C♯/D♭','D','D♯/E♭','E','F','F♯/G♭','G','G♯/A♭','A','A♯/B♭','B'];
+  el.textContent = KEY_SHORT[((parseInt(state.key)%12)+12)%12] || 'C';
+}
+
 function render(){
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   if (!scaleData) return;
+  syncKeyDisplay();
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
 
   // Immediate lightweight updates (no DOM rebuild)
@@ -3609,9 +3651,20 @@ function render(){
   const has7thChords = isDiatonic7ths || state.mode==='secdom' || state.mode==='secdim' || state.mode==='secsub';
   document.getElementById('tab-drop2').classList.toggle('disabled', !has7thChords);
   document.getElementById('tab-drop3').classList.toggle('disabled', !has7thChords);
-  document.getElementById('tab-diagrams').classList.toggle('disabled', false);
-  if ((state.view==='drop2'||state.view==='drop3') && !has7thChords) state.view='list';
-  document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
+  if ((state.view==='drop2'||state.view==='drop3') && !has7thChords) {
+    state.view='diagrams'; state.lastGuitarView='diagrams';
+  }
+  document.getElementById('tab-arpeggio').classList.toggle('disabled', !has7thChords);
+  if (state.view==='arpeggio' && !has7thChords) {
+    state.view='diagrams'; state.lastGuitarView='diagrams';
+  }
+  const isGuitar = ['diagrams','arpeggio','drop2','drop3'].includes(state.view);
+  document.querySelectorAll('.view-tab').forEach(t => {
+    const isActive = t.dataset.view==='guitar' ? isGuitar : t.dataset.view===state.view;
+    t.classList.toggle('active', isActive);
+  });
+  document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
+  document.getElementById('guitar-sub-tabs').style.display = isGuitar ? 'flex' : 'none';
 
   // Debounce the heavy DOM rebuild with a fade
   if (_renderTimer) clearTimeout(_renderTimer);
@@ -3633,6 +3686,7 @@ function render(){
 function renderView(scaleNotes,scaleData){
   if(state.view==='list')           renderChords(scaleNotes,scaleData);
   else if(state.view==='diagrams')  renderDiagrams(scaleNotes,scaleData);
+  else if(state.view==='arpeggio')  renderArpeggios(scaleNotes,scaleData);
   else if(state.view==='drop2')     renderDropVoicings(scaleNotes,scaleData,2);
   else if(state.view==='drop3')     renderDropVoicings(scaleNotes,scaleData,3);
   else if(state.view==='mandolin')  renderMandolin(scaleNotes,scaleData);
@@ -3681,7 +3735,7 @@ function computeGuitarVoicing(pcs, stringIndices, ascendingPitch=true) {
       const minF = Math.min(...active);
       const maxF = Math.max(...active);
       const span = maxF - minF;
-      if (span > (isDropVoicing ? 4 : 5)) return;
+      if (span > (isDropVoicing ? 4 : 6)) return;
 
       // Score: prefer low position first, then tight span
       const score = minF * 3 + span * 8;
@@ -3747,7 +3801,7 @@ function getBasicVoicing(rootPc, ivArray) {
   }
 
   const stringSets = allPcs.length <= 3
-    ? [[1,2,3,4],[2,3,4,5],[0,1,2,3],[1,2,3,4,5],[0,1,2,3,4]]
+    ? [[1,2,3,4],[2,3,4,5],[0,1,2,3],[1,2,3,4,5],[0,1,2,3,4],[3,4,5]]
     : [[1,2,3,4],[2,3,4,5],[0,1,2,3]];
   let globalBest=null, globalScore=Infinity;
   for(const ss of stringSets) {
@@ -3957,7 +4011,7 @@ function makeDiagCard(chRootPc, notes, sym, qual, iv, animDelay) {
 function renderDiagrams(scaleNotes, scaleData) {
   const container = document.getElementById('all-degrees');
   container.innerHTML = '';
-
+  const showDegreeNames = state.scale==='Major (Ionian)' || state.scale==='Aeolian (Natural Minor)';
   const rootPc   = parseInt(state.key);
   const isChromatic = ['secdom','secdim','secsub','chromed'].includes(state.mode);
 
@@ -4195,6 +4249,215 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
   });
 }
 
+
+// ══════════════════════════════════════════════
+// ARPEGGIO SHAPES ENGINE (7th chords only)
+// 5 CAGED positions, root anchored on strings E→A→D→G→B.
+// Notes ascend in proper arpeggio order: R-3-5-7-R-3-5-7…
+// 1–2 notes per string, horizontal fretboard diagrams.
+// ══════════════════════════════════════════════
+
+const ARP_TUNING_ST = [0, 5, 10, 15, 19, 24]; // semitones above low E open
+const ARP_OPEN_PC   = [4, 9, 2, 7, 11, 4];     // open string pitch classes
+
+function buildArpeggioShape(chordPcs, rootPc, anchorStr) {
+  const rootPcN = ((rootPc%12)+12)%12;
+  const pcsNorm = chordPcs.map(pc => ((pc%12)+12)%12);
+
+  // Find lowest root fret on anchor string
+  let anchorFret = -1;
+  for (let f = 0; f <= 12; f++) {
+    if ((ARP_OPEN_PC[anchorStr] + f) % 12 === rootPcN) { anchorFret = f; break; }
+  }
+  if (anchorFret < 0) return null;
+
+  const startPitch = ARP_TUNING_ST[anchorStr] + anchorFret;
+  const fretLo = Math.max(0, anchorFret - 2);
+  const fretHi = anchorFret + 2; // max 5-fret span
+
+  // Collect all chord tones on ALL strings within the compact fret window
+  const candidates = [];
+  for (let s = 0; s < 6; s++) {
+    for (let f = fretLo; f <= Math.min(17, fretHi); f++) {
+      const pc = (ARP_OPEN_PC[s] + f) % 12;
+      if (!pcsNorm.includes(pc)) continue;
+      const pitch = ARP_TUNING_ST[s] + f;
+      if (pitch >= startPitch) candidates.push({ str: s, fret: f, pc, pitch });
+    }
+  }
+  candidates.sort((a, b) => a.pitch - b.pitch || a.str - b.str);
+
+  // Select notes: ascending pitch, max 2 per string
+  const notes = [];
+  const strCount = {};
+  let prevPitch = -1;
+  for (const c of candidates) {
+    if (c.pitch <= prevPitch) continue;
+    const cnt = strCount[c.str] || 0;
+    if (cnt >= 2) continue;
+    notes.push(c);
+    strCount[c.str] = cnt + 1;
+    prevPitch = c.pitch;
+  }
+
+  if (notes.length < 4) return null;
+  return { notes, anchorFret };
+}
+
+function computeArpeggioPositions(chordPcs, rootPc) {
+  const CAGED_LABELS = ['E form','A form','D form','G form','C form'];
+  const positions = [];
+  for (let str = 0; str < 5; str++) {
+    const shape = buildArpeggioShape(chordPcs, rootPc, str);
+    if (!shape) continue;
+    positions.push({ ...shape, label: CAGED_LABELS[str] });
+  }
+  return positions;
+}
+
+// Horizontal fretboard arpeggio diagram. Strings horizontal (E bottom, e top).
+// notes: array of { str, fret, pc }
+function makeArpeggioDiagram(notes, rootPc, w=440) {
+  const rootPcN = ((rootPc%12)+12)%12;
+  const allFrets = notes.map(n => n.fret).filter(f => f > 0);
+  if (!allFrets.length) return '';
+  const minFret = Math.min(...allFrets);
+  const maxFret = Math.max(...allFrets);
+  const hasOpen = notes.some(n => n.fret === 0);
+  const startFret = hasOpen ? 0 : Math.max(1, minFret - 1);
+  const endFret = Math.max(startFret + 4, maxFret + 1);
+  const numFrets = endFret - startFret;
+
+  const padL = 20, padR = 10, padT = 16, padB = 18;
+  const fretW = (w - padL - padR) / numFrets;
+  const strGap = 16;
+  const h = padT + strGap * 5 + padB;
+  const DOT_R = 7.5;
+  const gc = '#c9a84c', dc = '#6a5f90';
+  const lc = 'rgba(255,255,255,0.18)';
+  const STR_NAMES = ['e','B','G','D','A','E'];
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;flex-shrink:0">`;
+
+  // Fret lines (vertical)
+  for (let i = 0; i <= numFrets; i++) {
+    const x = padL + i * fretW;
+    const isNut = (startFret === 0 && i === 0);
+    svg += `<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${padT}" y2="${padT+strGap*5}" stroke="${isNut?'rgba(180,170,155,0.7)':lc}" stroke-width="${isNut?3:0.8}"/>`;
+  }
+
+  // String lines + labels
+  for (let s = 0; s < 6; s++) {
+    const y = padT + s * strGap;
+    svg += `<line x1="${padL}" x2="${padL+numFrets*fretW}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${lc}" stroke-width="1"/>`;
+    svg += `<text x="${padL-3}" y="${(y+1).toFixed(1)}" text-anchor="end" font-size="9" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.35)">${STR_NAMES[s]}</text>`;
+  }
+
+  // Fret number label — placed below the diagram, left-aligned
+  if (startFret > 0) {
+    svg += `<text x="${padL}" y="${padT+strGap*5+12}" text-anchor="start" font-size="9.5" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.45)">${startFret}fr</text>`;
+  }
+
+  // Dots (1-2 per string)
+  for (const { str, fret, pc } of notes) {
+    const svgRow = 5 - str;
+    const y = padT + svgRow * strGap;
+    const isRoot = pc === rootPcN;
+    const col = isRoot ? gc : dc;
+
+    if (fret === 0) {
+      svg += `<circle cx="${(padL-1).toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="none" stroke="${col}" stroke-width="1.5"/>`;
+    } else {
+      const cx = padL + (fret - startFret - 0.5) * fretW;
+      svg += `<circle cx="${cx.toFixed(1)}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}"/>`;
+      svg += `<text x="${cx.toFixed(1)}" y="${(y+0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="8" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${pcToName(pc)}</text>`;
+    }
+  }
+
+  svg += '</svg>';
+  return svg;
+}
+
+function renderArpeggios(scaleNotes, scaleData) {
+  const container = document.getElementById('all-degrees');
+  container.innerHTML = '';
+  const rootPc  = parseInt(state.key);
+  const isSecDom = state.mode === 'secdom';
+  const isSecDim = state.mode === 'secdim';
+  const scaleLen = scaleNotes.length;
+  const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const showDegreeNames = state.scale==='Major (Ionian)' || state.scale==='Aeolian (Natural Minor)';
+  const romans   = computeAllRomans(scaleData.intervals, scaleData);
+
+  let chordEntries = [];
+
+  if (isSecDom) {
+    const items = buildSecondaryDominants(rootPc, scaleData.intervals, romans);
+    items.forEach(({degIdx, label, chord}) => {
+      const chRootPc  = noteNameToPc(chord.root);
+      const pcs       = chord.notes.map(n => noteNameToPc(n));
+      chordEntries.push({ degIdx, headerHtml: `<span class="degree-num" style="font-size:18px;color:#e07070">${label}</span>`,
+        chordNotes: chord.notes, sym: chord.sym, chRootPc, pcs });
+    });
+  } else if (isSecDim) {
+    const items = buildSecondaryDiminished(rootPc, scaleData.intervals, romans, scaleNotes);
+    items.forEach(({degIdx, label, chord}) => {
+      const chRootPc  = noteNameToPc(chord.root);
+      const pcs       = chord.notes.map(n => noteNameToPc(n));
+      chordEntries.push({ degIdx, headerHtml: `<span class="degree-num" style="font-size:18px;color:#7090c0">${label}</span>`,
+        chordNotes: chord.notes, sym: chord.sym, chRootPc, pcs });
+    });
+  } else {
+    scaleNotes.forEach((_, di) => {
+      const chordNotes = buildChord(scaleNotes, di, 4);
+      const iv         = chordIntervals(scaleData.intervals, di, 4);
+      const {sym}      = getChordSymbol(chordNotes[0], iv);
+      const chRootPc   = noteNameToPc(chordNotes[0]);
+      const pcs        = chordNotes.map(n => noteNameToPc(n));
+      const degName    = DNAMES[di] || '';
+      chordEntries.push({
+        degIdx: di,
+        headerHtml: `<span class="degree-num">${romans[di]}</span>${showDegreeNames && degName ? `<span class="degree-name-label">${degName}</span>` : ''}`,
+        chordNotes, sym, chRootPc, pcs
+      });
+    });
+  }
+
+  let delay = 0;
+  chordEntries.forEach(({ degIdx, headerHtml, chordNotes, sym, chRootPc, pcs }) => {
+    const sec = document.createElement('div');
+    sec.className = 'degree-section'; sec.id = `deg-${degIdx}`;
+
+    const hdr = document.createElement('div'); hdr.className = 'degree-header';
+    hdr.innerHTML = headerHtml;
+    sec.appendChild(hdr);
+
+    const chordLbl = document.createElement('div');
+    chordLbl.style.cssText = 'font-family:Playfair Display,serif;font-size:16px;font-weight:700;color:var(--cream);margin-bottom:10px;';
+    chordLbl.innerHTML = `${chordNotes[0]}<sup style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--gold2);vertical-align:super">${sym}</sup>`;
+    sec.appendChild(chordLbl);
+
+    const positions = computeArpeggioPositions(pcs, chRootPc);
+    if (positions.length === 0) {
+      const msg = document.createElement('div'); msg.className = 'empty-msg';
+      msg.textContent = 'No arpeggio positions found.'; sec.appendChild(msg);
+    } else {
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px';
+      positions.forEach(pos => {
+        const card = document.createElement('div');
+        card.style.cssText = `padding:5px 6px 3px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:3px;animation-delay:${delay}s`;
+        delay += 0.03;
+        card.innerHTML = `<div style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px">${pos.label}</div>${makeArpeggioDiagram(pos.notes, chRootPc)}`;
+        grid.appendChild(card);
+      });
+      sec.appendChild(grid);
+    }
+
+    const dv = document.createElement('div'); dv.className = 'section-divider'; sec.appendChild(dv);
+    container.appendChild(sec);
+  });
+}
 
 // Drop 2: close position = 1-3-5-7, drop 2nd-from-top (5) one octave
 // Resulting low→high order per inversion:
@@ -4956,7 +5219,7 @@ function makePianoNote(ctx, freq, startTime, duration, gain = 0.13) {
   shelf.gain.value = isTreble ? -3 : -5;
 
   master.connect(shaper); shaper.connect(hp); hp.connect(warm); warm.connect(shelf);
-  shelf.connect(ctx.destination);
+  shelf.connect(progMasterBus || ctx.destination);
   if (progReverbNode) shelf.connect(progReverbNode);
 }
 
@@ -4991,7 +5254,7 @@ function makeOrganNote(ctx, freq, startTime, duration, gain=0.10) {
   });
 
   mix.connect(tremolo);
-  tremolo.connect(ctx.destination);
+  tremolo.connect(progMasterBus || ctx.destination);
   if (progReverbNode) tremolo.connect(progReverbNode);
 }
 
@@ -5026,7 +5289,7 @@ function makeGuitarNote(ctx, freq, startTime, duration, gain=0.28) {
   const body = ctx.createBiquadFilter(); body.type='peaking';
   body.frequency.value=300; body.Q.value=1.2; body.gain.value=5;
   src.connect(lp); lp.connect(body); body.connect(g);
-  g.connect(ctx.destination);
+  g.connect(progMasterBus || ctx.destination);
   if (progReverbNode) g.connect(progReverbNode);
   src.start(startTime); src.stop(startTime + duration + 1.5);
 }
@@ -5054,7 +5317,7 @@ function makePadNote(ctx, freq, startTime, duration, gain=0.07) {
     osc.start(startTime); osc.stop(relEnd + rel + 0.1);
   });
   filter.connect(envG);
-  envG.connect(ctx.destination);
+  envG.connect(progMasterBus || ctx.destination);
   if (progReverbNode) envG.connect(progReverbNode);
 }
 
@@ -5069,7 +5332,7 @@ function makeClickBeat(ctx, t, isDownbeat) {
   osc.frequency.setValueAtTime(isDownbeat ? 1400 : 900, t);
   g.gain.setValueAtTime(0.5, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-  osc.connect(g); g.connect(ctx.destination);
+  osc.connect(g); g.connect(progMasterBus || ctx.destination);
   osc.start(t); osc.stop(t + 0.07);
 }
 
@@ -5081,7 +5344,7 @@ function makeKickBeat(ctx, t) {
   osc.frequency.exponentialRampToValueAtTime(50, t + 0.08);
   g.gain.setValueAtTime(0.5, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-  osc.connect(g); g.connect(ctx.destination);
+  osc.connect(g); g.connect(progMasterBus || ctx.destination);
   osc.start(t); osc.stop(t + 0.2);
 }
 
@@ -5095,7 +5358,7 @@ function makeSnareBeat(ctx, t) {
   const g   = ctx.createGain();
   g.gain.setValueAtTime(0.35, t);
   g.gain.exponentialRampToValueAtTime(0.001, t+0.14);
-  src.connect(hp); hp.connect(g); g.connect(ctx.destination);
+  src.connect(hp); hp.connect(g); g.connect(progMasterBus || ctx.destination);
   src.start(t); src.stop(t+0.16);
 }
 
@@ -5108,7 +5371,7 @@ function makeHiHat(ctx, t, isOpen=false) {
   const g   = ctx.createGain();
   g.gain.setValueAtTime(0.22, t);
   g.gain.exponentialRampToValueAtTime(0.001, t+(isOpen?0.17:0.05));
-  src.connect(hp); hp.connect(g); g.connect(ctx.destination);
+  src.connect(hp); hp.connect(g); g.connect(progMasterBus || ctx.destination);
   src.start(t); src.stop(t+(isOpen?0.19:0.07));
 }
 
@@ -5201,6 +5464,7 @@ let progTotalBeats = 0;
 let progReverbNode = null; // shared ConvolverNode for current play session
 let progSwing = 0;         // swing offset in %, 0 = straight, 50 = full swing
 let _wakeLock = null;
+let progMasterBus = null; // DynamicsCompressor — master limiter to prevent clipping
 
 // Build algorithmic reverb IR and return the ConvolverNode (the send point).
 // Wet gain is tracked so progStop() silences it immediately via gain fade.
@@ -5219,7 +5483,7 @@ function createProgReverb(ctx) {
   const wet = ctx.createGain();
   wet.gain.value = 0.18;
   conv.connect(wet);
-  wet.connect(ctx.destination);
+  wet.connect(progMasterBus || ctx.destination);
   return conv;
 }
 
@@ -5249,6 +5513,12 @@ function progPlay() {
     });
     const totalDur = t;
 
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -18; comp.knee.value = 10;
+    comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.18;
+    comp.connect(ctx.destination);
+    progMasterBus = comp;
+
     progReverbNode = createProgReverb(ctx);
     _acquireWakeLock();
     progStartTime  = ctx.currentTime + 0.1; // slightly larger offset for mobile
@@ -5269,17 +5539,19 @@ function progPlay() {
     ctx.createBufferSource= () => { const n=_origBuf();  progNodes.push(n);     return n; };
     ctx.createGain        = () => { const n=_origGain(); progGainNodes.push(n); return n; };
 
-    progression.forEach((ch, i) => {
-      playChordAt(ctx, ch.pcs, audioT + schedule[i].t, schedule[i].duration, sound);
-      if (metronomeEnabled) {
-        const beats = ch.beats || progGetBeats();
-        playDrumMeasure(ctx, audioT + schedule[i].t, beats, beatDur);
-      }
-    });
-
-    ctx.createOscillator   = _origOsc;
-    ctx.createBufferSource = _origBuf;
-    ctx.createGain         = _origGain;
+    try {
+      progression.forEach((ch, i) => {
+        playChordAt(ctx, ch.pcs, audioT + schedule[i].t, schedule[i].duration, sound);
+        if (metronomeEnabled) {
+          const beats = ch.beats || progGetBeats();
+          playDrumMeasure(ctx, audioT + schedule[i].t, beats, beatDur);
+        }
+      });
+    } finally {
+      ctx.createOscillator   = _origOsc;
+      ctx.createBufferSource = _origBuf;
+      ctx.createGain         = _origGain;
+    }
 
     return audioT + totalDur;
   }
@@ -5340,6 +5612,7 @@ function progPlay() {
 function progStop() {
   progPlaying = false;
   progReverbNode = null;
+  progMasterBus = null;
   _releaseWakeLock();
   if (progScheduler) { cancelAnimationFrame(progScheduler); progScheduler = null; }
   progCurrentIdx = -1;
@@ -6796,9 +7069,25 @@ document.querySelector('.controls').addEventListener('click',e=>{
 document.getElementById('view-tabs').addEventListener('click',e=>{
   const tab = e.target.closest('.view-tab');
   if(!tab || tab.classList.contains('disabled')) return;
-  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
-  tab.classList.add('active');
+  const tv = tab.dataset.view;
+  state.view = tv==='guitar' ? (state.lastGuitarView||'diagrams') : tv;
+  const rootPc=parseInt(state.key);
+  const scaleData=SCALES[state.scale];
+  const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
+  const isGuitar=['diagrams','arpeggio','drop2','drop3'].includes(state.view);
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active', t.dataset.view==='guitar'?isGuitar:t.dataset.view===state.view));
+  document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
+  document.getElementById('guitar-sub-tabs').style.display=isGuitar?'flex':'none';
+  renderView(scaleNotes,scaleData);
+  wireChordCards();
+});
+
+document.getElementById('guitar-sub-tabs').addEventListener('click',e=>{
+  const tab = e.target.closest('.guitar-sub-tab');
+  if(!tab || tab.classList.contains('disabled')) return;
   state.view = tab.dataset.view;
+  state.lastGuitarView = tab.dataset.view;
+  document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
@@ -7123,7 +7412,7 @@ body.light-theme #tech-panel { background: #faf7f2; }
     <div class="tech-section">
       <div class="tech-section-title">Stack &amp; Platform</div>
       <div class="tech-row"><span class="tech-key">Language</span><span class="tech-val">Vanilla HTML5 / CSS3 / ES2022 JavaScript - zero build tools, zero frameworks</span></div>
-      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~5 500 lines); no server, no network requests at runtime</span></div>
+      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~8 300 lines); no server, no network requests at runtime</span></div>
       <div class="tech-row"><span class="tech-key">Fonts (CDN)</span><span class="tech-val"><span class="tech-chip">Playfair Display</span><span class="tech-chip">IBM Plex Mono</span><span class="tech-chip">Cormorant Garamond</span><span class="tech-chip">EB Garamond</span> via Google Fonts</span></div>
       <div class="tech-row"><span class="tech-key">No libraries</span><span class="tech-val">No React, Vue, jQuery, D3, Tone.js - all audio, SVG, and UI written from scratch</span></div>
     </div>
@@ -7145,6 +7434,15 @@ body.light-theme #tech-panel { background: #faf7f2; }
       <div class="tech-row"><span class="tech-key">Shape search</span><span class="tech-val">Exhaustive permutation search over 4-string sets [1-4, 2-5, 3-6]; span ≤6 frets; scored by span × 8 + fret position penalty</span></div>
       <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val">Drop 2: 2nd-from-top voice lowered an octave. Drop 3: 3rd-from-top lowered. Both follow jazzguitar.be standard across all 4 inversions × 3 string sets. No open strings. Inversion shown in slash notation (e.g. Gmaj7/B).</span></div>
       <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Generated inline via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordDiagram()</code>; click-to-zoom modal at 280px width; pitch-class labels on fret dots</span></div>
+    </div>
+
+    <div class="tech-section">
+      <div class="tech-section-title">Arpeggio Engine</div>
+      <div class="tech-row"><span class="tech-key">System</span><span class="tech-val">CAGED-based: 5 positions anchored by root on each string (E, A, D, G, B). Each shape labelled E form, A form, D form, G form, C form.</span></div>
+      <div class="tech-row"><span class="tech-key">Fret window</span><span class="tech-val">Compact 5-fret span: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">anchorFret ± 2</code>. All chord tones on all 6 strings within the window are candidates.</span></div>
+      <div class="tech-row"><span class="tech-key">Note selection</span><span class="tech-val">Ascending pitch order (R–3–5–7 cycle); strictly increasing pitch; max 2 notes per string. Minimum 4 notes per shape.</span></div>
+      <div class="tech-row"><span class="tech-key">Scope</span><span class="tech-val">7th chords only (4 pitch classes). Disabled for triads. Works with diatonic, secondary dominant, and secondary diminished chord modes.</span></div>
+      <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Horizontal fretboard: strings horizontal (E bottom → e top), frets as vertical lines. Gold dots = root, purple = other chord tones, note names inside dots. 440 px wide.</span></div>
     </div>
 
     <div class="tech-section">
@@ -7184,6 +7482,7 @@ body.light-theme #tech-panel { background: #faf7f2; }
       <div class="tech-row"><span class="tech-key">Guitar chord shapes</span><span class="tech-val"><a href="https://www.chordie.com" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">chordie.com</a>; <a href="https://www.all-guitar-chords.com" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">all-guitar-chords.com</a> - Extended chord fingerings</span></div>
       <div class="tech-row"><span class="tech-key">Mandolin chords</span><span class="tech-val"><a href="https://www.mandolincafe.com/chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">mandolincafe.com</a> - Chord shapes &amp; chop technique; <a href="https://mandolessons.com/chord-shapes" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">mandolessons.com</a></span></div>
       <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val"><a href="https://www.jazzguitar.be/blog/drop-2-chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Drop 2</a>; <a href="https://www.jazzguitar.be/blog/drop-3-chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Drop 3</a></span></div>
+      <div class="tech-row"><span class="tech-key">Arpeggio shapes</span><span class="tech-val"><a href="https://www.jazzguitar.be/blog/guitar-arpeggios/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Guitar Arpeggios</a> - CAGED arpeggio positions for 7th chords</span></div>
       <div class="tech-row"><span class="tech-key">Negative harmony</span><span class="tech-val">Ernst Levy, <em>A Theory of Harmony</em> (1985); Jacob Collier interviews; <a href="https://www.youtube.com/watch?v=9-EHgH4LZEQ" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">Adam Neely's Negative Harmony explanation</a></span></div>
       <div class="tech-row"><span class="tech-key">Karplus-Strong</span><span class="tech-val">Karplus &amp; Strong (1983) "Digital Synthesis of Plucked String and Drum Timbres" - Computer Music Journal</span></div>
       <div class="tech-row"><span class="tech-key">Scale modes</span><span class="tech-val"><a href="https://www.musictheory.net/lessons/mode" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">musictheory.net modes</a>; Mark Levine, <em>The Jazz Theory Book</em>; Jerry Bergonzi, <em>Inside Improvisation</em></span></div>
@@ -7564,20 +7863,30 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
           <div class="guide-section-title">Chord Views</div>
         </div>
       </div>
-      <p class="guide-p">Four tabs above the right panel switch the display mode for all chords:</p>
+      <p class="guide-p">Three tabs above the right panel switch the display mode for all chords:</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Chord List</span>
         <span class="guide-kv-val">Default view. Each degree shows one card with the chord symbol, quality, note names, and interval stack (e.g. 1 · ♭3 · 5 · ♭7).</span>
-        <span class="guide-kv-key">Guitar Diagrams</span>
+        <span class="guide-kv-key">Guitar</span>
+        <span class="guide-kv-val">Four sub-tabs for guitar-specific views:</span>
+      </div>
+      <div class="guide-kv" style="margin-left:18px">
+        <span class="guide-kv-key">Basic</span>
         <span class="guide-kv-val">SVG fretboard diagrams for each chord. The algorithm prioritises the <strong>root as bass note</strong> (lowest sounding pitch). Shapes requiring a barre are shown with a purple bar across the relevant strings and a small <strong>B</strong> marker. Gold dot = root, purple = other chord tones.</span>
+        <span class="guide-kv-key">Arpeggios</span>
+        <span class="guide-kv-val">Horizontal fretboard diagrams showing ascending arpeggio shapes for 7th chords across the CAGED system (E, A, D, G, C forms). Each shape covers a compact 5-fret window with the root on a specific string. Notes ascend in R–3–5–7 order. Only available in 7th chord modes.</span>
         <span class="guide-kv-key">Drop 2</span>
         <span class="guide-kv-val">Jazz voicing: the 2nd-highest note of a close-position chord dropped one octave. Shows all 4 inversions × 3 string sets (E-A-D-G, A-D-G-B, D-G-B-e). No open strings. Inversion label shown as slash notation, e.g. <strong>Gmaj7/B</strong> for 1st inversion.</span>
         <span class="guide-kv-key">Drop 3</span>
         <span class="guide-kv-val">Jazz voicing: the 3rd-highest note dropped one octave. Wider, more open voicings on non-adjacent string sets. Same 4 inversions × 3 sets. Used in big-band arranging. Click any diagram to zoom.</span>
       </div>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Mandolin</span>
+        <span class="guide-kv-val">Chord diagrams for mandolin (G-D-A-E tuning). Supports triads through extended chords with chop chord voicings.</span>
+      </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
-        <span class="guide-tip-text">Drop 2 and Drop 3 voicings follow the jazzguitar.be standard — verified against the most widely used jazz guitar reference. Shapes are only shown when a playable position (span ≤ 5 frets, no open strings) is found.</span>
+        <span class="guide-tip-text">Drop 2 and Drop 3 voicings follow the jazzguitar.be standard. Arpeggio shapes use the CAGED system to map 5 positions across the fretboard for each 7th chord.</span>
       </div>
     </section>
 
