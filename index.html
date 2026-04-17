@@ -510,6 +510,20 @@
   .guitar-sub-tab.active { color:var(--gold2); border-bottom-color:var(--gold); }
   .guitar-sub-tab.disabled { opacity:.3; cursor:not-allowed; }
 
+  /* ── Scale tab ── */
+  .scale-legend { display:flex; gap:14px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  .scale-legend-item { display:flex; align-items:center; gap:5px; font-size:9px; font-family:'IBM Plex Mono',monospace; color:var(--muted); letter-spacing:.08em; }
+  .scale-legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+  .scale-pos-card {
+    padding:10px 12px 8px; background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.07); border-radius:3px;
+    cursor:pointer; transition:border-color .15s, box-shadow .15s;
+  }
+  .scale-pos-card:hover { border-color:rgba(201,168,76,.5); box-shadow:0 2px 12px rgba(0,0,0,.5); }
+  .scale-pos-label { font-size:9px; font-family:'IBM Plex Mono',monospace; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:5px; }
+  .scale-full-board { overflow-x:auto; cursor:pointer; padding:4px 0 2px; }
+  .scale-full-board:hover svg { opacity:.85; }
+
   /* ── Guitar diagram card ── */
   .diag-card {
     background:var(--surface); border:1px solid var(--border);
@@ -1995,10 +2009,10 @@
 
 <div class="right-panel">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-    <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Chord Views</span>
+    <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Scale &amp; Chord Views</span>
     <span class="has-tip" style="display:inline-flex;align-items:center">
       <span class="tip-badge" tabindex="0">?</span>
-      <div class="tip-popup" style="left:auto;right:0;transform:none"><span class="tip-title">Chord Views</span>Switch between different ways to display the harmonised chords. Chord List shows all notes and intervals. Guitar Diagrams shows playable fretboard shapes. Drop 2 and Drop 3 are jazz voicing techniques that redistribute chord tones across strings for smoother voice-leading.</div>
+      <div class="tip-popup" style="left:auto;right:0;transform:none"><span class="tip-title">Scale &amp; Chord Views</span>Switch between different ways to display the harmonised chords. Chord List shows all notes and intervals. Guitar and Mandolin tabs include a Scale view showing the full fretboard and CAGED positions. Drop 2 and Drop 3 are jazz voicing techniques that redistribute chord tones across strings for smoother voice-leading.</div>
     </span>
   </div>
   <div class="view-tabs" id="view-tabs" style="align-items:center">
@@ -2009,8 +2023,13 @@
   <div class="guitar-sub-tabs" id="guitar-sub-tabs" style="display:none">
     <button class="guitar-sub-tab active" data-view="diagrams" id="tab-diagrams">Basic</button>
     <button class="guitar-sub-tab" data-view="arpeggio" id="tab-arpeggio">Arpeggios</button>
+    <button class="guitar-sub-tab" data-view="scale" id="tab-scale">Scale</button>
     <button class="guitar-sub-tab" data-view="drop2" id="tab-drop2">Drop 2</button>
     <button class="guitar-sub-tab" data-view="drop3" id="tab-drop3">Drop 3</button>
+  </div>
+  <div class="guitar-sub-tabs" id="mandolin-sub-tabs" style="display:none">
+    <button class="guitar-sub-tab active" data-view="mandolin" id="tab-mando-chords">Chords</button>
+    <button class="guitar-sub-tab" data-view="mandolin-scale" id="tab-mando-scale">Scale</button>
   </div>
   <div id="compare-panel" style="display:none">
     <div class="compare-cols" id="compare-cols">
@@ -2882,7 +2901,7 @@ function drawCoF(rootPc, scaleIntervals){
 // STATE & RENDERING
 // ══════════════════════════════════════════════
 
-let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastGuitarView:'diagrams'};
+let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastGuitarView:'diagrams',lastMandolinView:'mandolin',scaleLabelMode:'notes'};
 
 function buildSelectors(){
   // Key selector: show both enharmonic names for ambiguous keys
@@ -3658,13 +3677,16 @@ function render(){
   if (state.view==='arpeggio' && !has7thChords) {
     state.view='diagrams'; state.lastGuitarView='diagrams';
   }
-  const isGuitar = ['diagrams','arpeggio','drop2','drop3'].includes(state.view);
+  const isGuitar   = ['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
+  const isMandolin = ['mandolin','mandolin-scale'].includes(state.view);
   document.querySelectorAll('.view-tab').forEach(t => {
-    const isActive = t.dataset.view==='guitar' ? isGuitar : t.dataset.view===state.view;
+    const tv = t.dataset.view;
+    const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv===state.view;
     t.classList.toggle('active', isActive);
   });
   document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
-  document.getElementById('guitar-sub-tabs').style.display = isGuitar ? 'flex' : 'none';
+  document.getElementById('guitar-sub-tabs').style.display   = isGuitar   ? 'flex' : 'none';
+  document.getElementById('mandolin-sub-tabs').style.display = isMandolin ? 'flex' : 'none';
 
   // Debounce the heavy DOM rebuild with a fade
   if (_renderTimer) clearTimeout(_renderTimer);
@@ -3687,9 +3709,11 @@ function renderView(scaleNotes,scaleData){
   if(state.view==='list')           renderChords(scaleNotes,scaleData);
   else if(state.view==='diagrams')  renderDiagrams(scaleNotes,scaleData);
   else if(state.view==='arpeggio')  renderArpeggios(scaleNotes,scaleData);
+  else if(state.view==='scale')     renderScaleTab(scaleNotes,scaleData);
   else if(state.view==='drop2')     renderDropVoicings(scaleNotes,scaleData,2);
   else if(state.view==='drop3')     renderDropVoicings(scaleNotes,scaleData,3);
-  else if(state.view==='mandolin')  renderMandolin(scaleNotes,scaleData);
+  else if(state.view==='mandolin')        renderMandolin(scaleNotes,scaleData);
+  else if(state.view==='mandolin-scale') renderMandolinScale(scaleNotes,scaleData);
 }
 
 // ══════════════════════════════════════════════
@@ -4446,9 +4470,14 @@ function renderArpeggios(scaleNotes, scaleData) {
       grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px';
       positions.forEach(pos => {
         const card = document.createElement('div');
-        card.style.cssText = `padding:5px 6px 3px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:3px;animation-delay:${delay}s`;
+        card.style.cssText = `padding:5px 6px 3px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:3px;animation-delay:${delay}s;cursor:pointer;transition:border-color .15s,box-shadow .15s`;
         delay += 0.03;
-        card.innerHTML = `<div style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px">${pos.label}</div>${makeArpeggioDiagram(pos.notes, chRootPc)}`;
+        card.innerHTML = `<div style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px">${pos.label} · click to zoom</div>${makeArpeggioDiagram(pos.notes, chRootPc)}`;
+        card.addEventListener('mouseenter', () => { card.style.borderColor='rgba(201,168,76,.45)'; card.style.boxShadow='0 2px 12px rgba(0,0,0,.5)'; });
+        card.addEventListener('mouseleave', () => { card.style.borderColor='rgba(255,255,255,0.06)'; card.style.boxShadow=''; });
+        card.addEventListener('click', () =>
+          showSvgModal(makeArpeggioDiagram(pos.notes, chRootPc, 680), `${chordNotes[0]}<sup>${sym}</sup> — ${pos.label}`)
+        );
         grid.appendChild(card);
       });
       sec.appendChild(grid);
@@ -4457,6 +4486,321 @@ function renderArpeggios(scaleNotes, scaleData) {
     const dv = document.createElement('div'); dv.className = 'section-divider'; sec.appendChild(dv);
     container.appendChild(sec);
   });
+}
+
+// ══════════════════════════════════════════════
+// SCALE TAB ENGINE — full fretboard + CAGED positions
+// ══════════════════════════════════════════════
+
+// Characteristic (modal colour) semitone offsets per scale
+const SCALE_CHAR = {
+  'Major (Ionian)':                   [11],
+  'Dorian':                           [9],
+  'Phrygian':                         [1],
+  'Lydian':                           [6],
+  'Mixolydian':                       [10],
+  'Aeolian (Natural Minor)':          [8],
+  'Locrian':                          [1, 6],
+  'Harmonic Minor':                   [11],
+  'Locrian ♮6':                      [9],
+  'Ionian ♯5':                       [8],
+  'Dorian ♯4':                       [6],
+  'Phrygian Dominant':                [1, 4],
+  'Lydian ♯2':                       [3, 6],
+  'Super Locrian ♭♭7':               [9],
+  'Melodic Minor':                    [9, 11],
+  'Dorian ♭2':                       [1],
+  'Lydian Augmented':                 [6, 8],
+  'Lydian Dominant':                  [6, 10],
+  'Mixolydian ♭6':                   [8],
+  'Half-Diminished (Locrian ♮2)':   [2, 6],
+  'Altered (Super Locrian)':          [1, 3, 6, 8],
+  'Neapolitan Minor':                 [1, 11],
+  'Hungarian Minor':                  [6, 11],
+  'Byzantine':                        [1, 4, 11],
+  'Hirajoshi (Mode 4)':              [1, 8],
+  'Hirajoshi':                        [3, 8],
+  'Whole Tone':                       [],
+  'Phrygian Bebop':                   [1, 4],
+  'Arabian':                          [6, 10],
+};
+
+const INTERVAL_LABEL = ['R','♭2','2','♭3','3','4','♯4','5','♭6','6','♭7','7'];
+const SC_OPEN_PC = [4, 9, 2, 7, 11, 4]; // E A D G B e open pitch classes
+const SC_ROOT_COL = '#e05555';
+const SC_CHAR_COL = '#55aa70';
+const SC_NOTE_COL = '#6a5f90';
+
+// Draws a horizontal fretboard SVG (strings horizontal, frets as columns).
+// startFret = fret number of the leftmost fret LINE (0 = nut).
+// endFret   = fret number of the rightmost fret line.
+// Slots: frets [startFret+1 .. endFret]. Open strings shown when startFret===0.
+// showNotes: true = note names (C, D#…), false = interval labels (R, ♭3…)
+// openPCs / strNamesTop: override for non-guitar instruments (e.g. mandolin)
+function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endFret, w,
+                                showNotes=false, openPCs=null, strNamesTop=null) {
+  openPCs     = openPCs     || SC_OPEN_PC;
+  strNamesTop = strNamesTop || ['e','B','G','D','A','E'];
+  const numStr   = openPCs.length;
+  const rootPcN  = ((rootPc % 12) + 12) % 12;
+  const intNorm  = intervals.map(i => ((i % 12) + 12) % 12);
+  const charSet  = new Set(charSemitones.map(s => ((s % 12) + 12) % 12));
+  const numFrets = endFret - startFret;
+  const padL = 24, padR = 12, padT = 18, padB = 22;
+  const fretW = (w - padL - padR) / numFrets;
+  const strGap = 16;
+  const h = padT + strGap * (numStr - 1) + padB;
+  const DOT_R = 7;
+  const lc = 'rgba(255,255,255,0.14)';
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;max-width:100%">`;
+
+  // Fret-marker dots (3,5,7,9,12,15)
+  const strBottom = padT + strGap * (numStr - 1);
+  for (const mf of [3,5,7,9,12,15]) {
+    if (mf <= startFret || mf > endFret) continue;
+    const slot = mf - startFret;
+    const cx   = padL + (slot - 0.5) * fretW;
+    const dotY = strBottom + 10;
+    const numY = strBottom + 6;
+    svg += `<text x="${cx.toFixed(1)}" y="${numY}" text-anchor="middle" font-size="7" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.2)">${mf}</text>`;
+    if (mf === 12) {
+      svg += `<circle cx="${(cx-4).toFixed(1)}" cy="${dotY}" r="2.5" fill="rgba(255,255,255,0.15)"/>`;
+      svg += `<circle cx="${(cx+4).toFixed(1)}" cy="${dotY}" r="2.5" fill="rgba(255,255,255,0.15)"/>`;
+    } else {
+      svg += `<circle cx="${cx.toFixed(1)}" cy="${dotY}" r="2.5" fill="rgba(255,255,255,0.15)"/>`;
+    }
+  }
+
+  // Fret lines
+  for (let i = 0; i <= numFrets; i++) {
+    const x = padL + i * fretW;
+    const isNut = (startFret === 0 && i === 0);
+    svg += `<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${padT}" y2="${strBottom}" stroke="${isNut ? 'rgba(200,185,160,0.7)' : lc}" stroke-width="${isNut ? 3 : 0.8}"/>`;
+  }
+
+  // String lines + labels
+  for (let svgRow = 0; svgRow < numStr; svgRow++) {
+    const y = padT + svgRow * strGap;
+    const thickness = 1 + (numStr - 1 - svgRow) * 0.18;
+    svg += `<line x1="${padL}" x2="${(padL + numFrets * fretW).toFixed(1)}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${lc}" stroke-width="${thickness.toFixed(2)}"/>`;
+    svg += `<text x="${padL - 4}" y="${(y + 1).toFixed(1)}" text-anchor="end" font-size="9" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.28)">${strNamesTop[svgRow]}</text>`;
+  }
+
+  // Start-fret label
+  if (startFret > 0) {
+    svg += `<text x="${padL}" y="${(strBottom + 13).toFixed(1)}" text-anchor="start" font-size="9" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.38)">${startFret}fr</text>`;
+  }
+
+  // Scale note dots — str 0 = lowest string (svgRow = numStr-1 = bottom)
+  for (let s = 0; s < numStr; s++) {
+    const svgRow = (numStr - 1) - s;
+    const y = padT + svgRow * strGap;
+
+    // Open string (only when startFret === 0)
+    if (startFret === 0) {
+      const openPc = openPCs[s];
+      const sem = (openPc - rootPcN + 12) % 12;
+      if (intNorm.includes(sem)) {
+        const isRoot = sem === 0;
+        const isChar = !isRoot && charSet.has(sem);
+        const col    = isRoot ? SC_ROOT_COL : isChar ? SC_CHAR_COL : SC_NOTE_COL;
+        const lbl    = showNotes ? pcToName((openPc + 12) % 12) : (INTERVAL_LABEL[sem] || '?');
+        const cx     = padL - DOT_R - 2;
+        svg += `<circle cx="${cx}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="0.85"/>`;
+        svg += `<text x="${cx}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? 6 : 8}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${lbl}</text>`;
+      }
+    }
+
+    // Fretted notes
+    for (let f = startFret + 1; f <= endFret; f++) {
+      const pc  = (openPCs[s] + f) % 12;
+      const sem = (pc - rootPcN + 12) % 12;
+      if (!intNorm.includes(sem)) continue;
+      const isRoot = sem === 0;
+      const isChar = !isRoot && charSet.has(sem);
+      const col    = isRoot ? SC_ROOT_COL : isChar ? SC_CHAR_COL : SC_NOTE_COL;
+      const lbl    = showNotes ? pcToName(pc) : (INTERVAL_LABEL[sem] || '?');
+      const slot   = f - startFret;
+      const cx     = padL + (slot - 0.5) * fretW;
+      svg += `<circle cx="${cx.toFixed(1)}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="0.85"/>`;
+      svg += `<text x="${cx.toFixed(1)}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? 6 : 8}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${lbl}</text>`;
+    }
+  }
+
+  svg += '</svg>';
+  return svg;
+}
+
+// Returns up to 5 CAGED-style positions, sorted ascending by fret window.
+function computeScalePositions(intervals, rootPc) {
+  const rootPcN  = ((rootPc % 12) + 12) % 12;
+  const intNorm  = intervals.map(i => ((i % 12) + 12) % 12);
+  const LABELS   = ['E shape','A shape','D shape','G shape','C shape'];
+  const positions = [];
+
+  for (let anchorStr = 0; anchorStr < 5; anchorStr++) {
+    // Find lowest root fret on this string
+    let rootFret = -1;
+    for (let f = 0; f <= 12; f++) {
+      if ((SC_OPEN_PC[anchorStr] + f) % 12 === rootPcN) { rootFret = f; break; }
+    }
+    if (rootFret < 0) continue;
+
+    // Window: startFret (left fret line) and endFret (right fret line)
+    // We want the root in ~the second slot, so startFret = rootFret - 1 (clamped to 0)
+    const startFret = Math.max(0, rootFret - 1);
+    const endFret   = startFret + 4;  // 4 fret slots
+
+    // Skip duplicate windows
+    if (positions.some(p => p.startFret === startFret)) continue;
+
+    // Count scale notes in window (sanity check)
+    let count = 0;
+    for (let s = 0; s < 6; s++) {
+      for (let f = (startFret === 0 ? 0 : startFret + 1); f <= Math.min(15, endFret); f++) {
+        const pc  = (SC_OPEN_PC[s] + f) % 12;
+        const sem = (pc - rootPcN + 12) % 12;
+        if (intNorm.includes(sem)) count++;
+      }
+    }
+    if (count < 3) continue;
+
+    positions.push({ startFret, endFret, label: LABELS[anchorStr] });
+  }
+
+  positions.sort((a, b) => a.startFret - b.startFret);
+  return positions;
+}
+
+// Generic SVG zoom modal (reuses #diag-modal id)
+function showSvgModal(svgHtml, title) {
+  document.getElementById('diag-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.id = 'diag-modal';
+  modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.9);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    animation:fadeIn .15s ease;padding:20px;box-sizing:border-box`;
+  const inner = document.createElement('div');
+  inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
+    padding:24px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;
+    cursor:default;max-width:min(96vw,960px);overflow-x:auto;`;
+  inner.innerHTML = `
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">${title}</div>
+    <div style="overflow-x:auto;max-width:100%">${svgHtml}</div>
+    <div style="font-size:10px;color:#3a4556;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">CLICK ANYWHERE TO CLOSE</div>`;
+  modal.appendChild(inner);
+  inner.addEventListener('click', e => e.stopPropagation());
+  modal.addEventListener('click', () => modal.remove());
+  document.body.appendChild(modal);
+}
+
+function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs, strNamesTop, maxFret, showCAGED) {
+  const rootPc    = parseInt(state.key);
+  const rootPcN   = ((rootPc % 12) + 12) % 12;
+  const intervals = scaleData.intervals;
+  const charSems  = SCALE_CHAR[state.scale] || [];
+  const scaleName = `${scaleNotes[0]} ${state.scale}`;
+  const showNotes = state.scaleLabelMode === 'notes';
+
+  // ── Characteristic note descriptions ─────────────────
+  const charDesc = charSems.map(s => {
+    const pc = (rootPcN + s + 12) % 12;
+    return `${INTERVAL_LABEL[s]} (${pcToName(pc)})`;
+  }).join(', ');
+
+  // ── Header row (title + toggle) ───────────────────────
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap';
+
+  const titleBlock = document.createElement('div');
+  titleBlock.innerHTML = `
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">${instrument} Scale — ${scaleName}</div>
+    <div class="scale-legend">
+      <div class="scale-legend-item"><div class="scale-legend-dot" style="background:${SC_ROOT_COL}"></div>Root</div>
+      ${charDesc ? `<div class="scale-legend-item"><div class="scale-legend-dot" style="background:${SC_CHAR_COL}"></div>Characteristic: ${charDesc}</div>` : ''}
+      <div class="scale-legend-item"><div class="scale-legend-dot" style="background:${SC_NOTE_COL}"></div>Scale tone</div>
+    </div>`;
+
+  // Toggle button: Notes / Degrees
+  const toggle = document.createElement('button');
+  toggle.style.cssText = `padding:4px 10px;background:transparent;border:1px solid var(--border);border-radius:2px;
+    color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;
+    text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .15s,border-color .15s`;
+  toggle.textContent = showNotes ? 'Show Degrees' : 'Show Notes';
+  toggle.addEventListener('click', () => {
+    state.scaleLabelMode = showNotes ? 'degrees' : 'notes';
+    const rootPc2 = parseInt(state.key);
+    const scaleData2 = SCALES[state.scale];
+    const scaleNotes2 = spellScale(rootPc2, scaleData2.intervals, scaleData2);
+    renderView(scaleNotes2, scaleData2);
+  });
+
+  hdr.appendChild(titleBlock);
+  hdr.appendChild(toggle);
+  container.appendChild(hdr);
+
+  // ── Full fretboard ────────────────────────────────────
+  const fullSec = document.createElement('div');
+  fullSec.style.cssText = 'margin-bottom:26px';
+  const fullLabel = document.createElement('div');
+  fullLabel.style.cssText = 'font-size:9px;font-family:IBM Plex Mono,monospace;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px';
+  fullLabel.textContent = `Full Fretboard — Frets 0–${maxFret} · Click to zoom`;
+  fullSec.appendChild(fullLabel);
+
+  const fullBoard = document.createElement('div');
+  fullBoard.className = 'scale-full-board';
+  fullBoard.title = 'Click to zoom';
+  fullBoard.innerHTML = makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 820, showNotes, openPCs, strNamesTop);
+  fullBoard.addEventListener('click', () =>
+    showSvgModal(makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 900, showNotes, openPCs, strNamesTop),
+      `${scaleName} — Full Fretboard`)
+  );
+  fullSec.appendChild(fullBoard);
+  container.appendChild(fullSec);
+
+  if (!showCAGED) return;
+
+  // ── CAGED positions ───────────────────────────────────
+  const posLabel = document.createElement('div');
+  posLabel.style.cssText = 'font-size:9px;font-family:IBM Plex Mono,monospace;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px';
+  posLabel.textContent = 'CAGED Positions — Click to Zoom';
+  container.appendChild(posLabel);
+
+  const positions = computeScalePositions(intervals, rootPcN);
+  const posGrid = document.createElement('div');
+  posGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;';
+
+  positions.forEach(pos => {
+    const card = document.createElement('div');
+    card.className = 'scale-pos-card';
+    const svgSmall = makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 260, showNotes, openPCs, strNamesTop);
+    card.innerHTML = `<div class="scale-pos-label">${pos.label}</div>${svgSmall}`;
+    card.addEventListener('click', () =>
+      showSvgModal(makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 560, showNotes, openPCs, strNamesTop),
+        `${scaleName} — ${pos.label}`)
+    );
+    posGrid.appendChild(card);
+  });
+
+  container.appendChild(posGrid);
+  const div = document.createElement('div'); div.className = 'section-divider'; container.appendChild(div);
+}
+
+function renderScaleTab(scaleNotes, scaleData) {
+  const container = document.getElementById('all-degrees');
+  container.innerHTML = '';
+  renderScaleTabFor(container, scaleNotes, scaleData, 'Guitar',
+    null, null, 15, true);
+}
+
+function renderMandolinScale(scaleNotes, scaleData) {
+  const container = document.getElementById('all-degrees');
+  container.innerHTML = '';
+  const MANDO_OPEN_PC   = [7, 2, 9, 4];              // G D A E (low→high)
+  const MANDO_STR_TOP   = ['e','A','D','G'];          // top→bottom in SVG
+  renderScaleTabFor(container, scaleNotes, scaleData, 'Mandolin',
+    MANDO_OPEN_PC, MANDO_STR_TOP, 12, false);
 }
 
 // Drop 2: close position = 1-3-5-7, drop 2nd-from-top (5) one octave
@@ -7070,14 +7414,21 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   const tab = e.target.closest('.view-tab');
   if(!tab || tab.classList.contains('disabled')) return;
   const tv = tab.dataset.view;
-  state.view = tv==='guitar' ? (state.lastGuitarView||'diagrams') : tv;
+  if (tv==='guitar')   state.view = state.lastGuitarView   || 'diagrams';
+  else if (tv==='mandolin') state.view = state.lastMandolinView || 'mandolin';
+  else state.view = tv;
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
-  const isGuitar=['diagrams','arpeggio','drop2','drop3'].includes(state.view);
-  document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active', t.dataset.view==='guitar'?isGuitar:t.dataset.view===state.view));
+  const isGuitar2  =['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
+  const isMandolin2=['mandolin','mandolin-scale'].includes(state.view);
+  document.querySelectorAll('.view-tab').forEach(t=>{
+    const v=t.dataset.view;
+    t.classList.toggle('active', v==='guitar'?isGuitar2:v==='mandolin'?isMandolin2:v===state.view);
+  });
   document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
-  document.getElementById('guitar-sub-tabs').style.display=isGuitar?'flex':'none';
+  document.getElementById('guitar-sub-tabs').style.display  =isGuitar2  ?'flex':'none';
+  document.getElementById('mandolin-sub-tabs').style.display=isMandolin2?'flex':'none';
   renderView(scaleNotes,scaleData);
   wireChordCards();
 });
@@ -7088,6 +7439,19 @@ document.getElementById('guitar-sub-tabs').addEventListener('click',e=>{
   state.view = tab.dataset.view;
   state.lastGuitarView = tab.dataset.view;
   document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
+  const rootPc=parseInt(state.key);
+  const scaleData=SCALES[state.scale];
+  const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
+  renderView(scaleNotes,scaleData);
+  wireChordCards();
+});
+
+document.getElementById('mandolin-sub-tabs').addEventListener('click',e=>{
+  const tab = e.target.closest('.guitar-sub-tab');
+  if(!tab || tab.classList.contains('disabled')) return;
+  state.view = tab.dataset.view;
+  state.lastMandolinView = tab.dataset.view;
+  document.querySelectorAll('#mandolin-sub-tabs .guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
