@@ -3405,9 +3405,9 @@ function addCardPlayBtn(card, notes) {
     e.stopPropagation();
     const ctx = getAudioCtx();
     const sound = document.getElementById('prog-sound')?.value || 'piano';
-    playChordAt(ctx, pcs, ctx.currentTime + 0.01, 2.0, sound);
+    playChordAt(ctx, pcs, ctx.currentTime + 0.01, 4.0, sound);
     btn.classList.add('playing');
-    setTimeout(() => btn.classList.remove('playing'), 2000);
+    setTimeout(() => btn.classList.remove('playing'), 4000);
   });
   card.appendChild(btn);
 }
@@ -4198,7 +4198,7 @@ function renderDiagrams(scaleNotes, scaleData) {
       const chRootPc = noteNameToPc(ch.notes[0]);
       const mainCard = makeDiagCard(chRootPc, ch.notes, ch.sym, ch.qual, ch.iv, ci*.05);
 
-      if (negHarmonyActive && n >= 4) {
+      if (negHarmonyActive) {
         // Wrap original + neg in a paired container
         const wrap = document.createElement('div');
         wrap.style.cssText = 'display:flex;align-items:flex-start;gap:6px;grid-column:1/-1;';
@@ -4931,13 +4931,13 @@ function renderMandolinScale(scaleNotes, scaleData) {
     MANDO_OPEN_PC, MANDO_STR_TOP, 12, false);
 }
 
-// ── Closed (moveable) mandolin voicings for chop chords ──────────
+// ── Mandolin voicings for chop chords (open strings allowed) ─────
 function computeClosedMandoVoicing(pcs, stringIndices) {
   const PC = pcs.map(p => ((p%12)+12)%12);
   const candidates = PC.map((pc, i) => {
     const strPc = MANDO_MIDI[stringIndices[i]] % 12;
     const base  = (pc - strPc + 12) % 12;
-    const start = base === 0 ? 12 : base;  // skip open string
+    const start = base;  // open strings allowed
     const opts  = [];
     for (let f = start; f <= 16; f += 12) opts.push(f);
     return opts;
@@ -4996,7 +4996,7 @@ function renderMandolinChop(scaleNotes, scaleData) {
 
   const desc = document.createElement('div');
   desc.style.cssText = 'font-size:9px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:560px;font-family:"IBM Plex Mono",monospace;letter-spacing:.03em;border-left:2px solid var(--border2);padding-left:10px';
-  desc.textContent = 'Chop chords use closed (moveable) shapes — no open strings. Strike and immediately release finger pressure for the classic backbeat chop on beats 2 & 4.';
+  desc.textContent = 'Chop chords use compact low-position shapes. Strike and immediately release finger pressure for the classic backbeat chop on beats 2 & 4.';
   container.appendChild(desc);
 
   const rootPc  = parseInt(state.key);
