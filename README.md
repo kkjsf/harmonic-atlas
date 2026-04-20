@@ -112,7 +112,7 @@ git push
 ### Architecture
 
 - **Single-file app** — all CSS, JS, and HTML live in `index.html`. Intentional: easier to share and edit.
-- **No JS framework** — vanilla JS only. Google Fonts is the only external CSS resource.
+- **No JS framework** — vanilla JS only. External resources: Google Fonts (CSS) and Tone.js (audio, loaded from CDN).
 - **Audio:** Tone.js 14.8.49 (CDN) + Salamander Grand Piano samples (CDN, streamed on load)
 - **PWA:** `manifest.json` + `sw.js`. Service worker uses network-first for HTML navigation and cache-first for static assets.
 
@@ -126,7 +126,7 @@ git push
 | Scale staff playback | `schedule()` inside the staff SVG click handler |
 | Progression player | `playChordAt` → strum hits via `getStrumDurations` |
 
-`Tone.start()` is called on first user interaction (touchstart/mousedown/keydown) to satisfy the browser autoplay policy. `Tone.getContext().rawContext` is exposed as `progAudioCtx` so existing Web Audio scheduling code (timing, `ctx.currentTime`) continues to work alongside Tone.
+`Tone.start()` is called on first user interaction (touchstart/mousedown/keydown) to satisfy the browser autoplay policy. `Tone.getContext().rawContext` is aliased as `progAudioCtx` solely to read `ctx.currentTime` for scheduling offsets — all actual audio is routed through Tone.
 
 `progStop()` calls `sampler.releaseAll()` to immediately silence all playing notes.
 
