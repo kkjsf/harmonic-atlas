@@ -3649,7 +3649,7 @@ function renderChords(scaleNotes, scaleData){
         <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
       addCardStaff(card, chordNotes);
       addCardPlayBtn(card, chordNotes);
-      addCardAddBtn(card, chordNotes[0], sym, roman, chordNotes, quality);
+      addCardAddBtn(card, chordNotes[0], sym, romans[di], chordNotes, quality);
       if (quality.includes('Dom') && !quality.includes('sus')) {
         const rPc = noteNameToPc(chordNotes[0]);
         if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
@@ -3752,7 +3752,7 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
         addCardStaff(card, chordNotes);
         addCardPlayBtn(card, chordNotes);
-        addCardAddBtn(card, chordNotes[0], sym, roman, chordNotes, quality);
+        addCardAddBtn(card, chordNotes[0], sym, romans[di], chordNotes, quality);
         const rPc = noteNameToPc(chordNotes[0]);
         if (quality.includes('Dom') && !quality.includes('sus')) {
           if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
