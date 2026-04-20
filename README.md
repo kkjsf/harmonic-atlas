@@ -1,101 +1,151 @@
-# 🎵 Harmonic Atlas — Developer Setup
+# 🎵 Harmonic Atlas
 
-## What's in this folder
+Interactive music theory reference — scales, chords, guitar/mandolin voicings, chord progression builder. Runs as an installable PWA (Progressive Web App) directly in the browser.
+
+**Live app:** https://kkjsf.github.io/harmonic-atlas
+
+---
+
+## Feature overview
+
+### Scale & chord panel
+
+- Pick any **root note** and **scale** (major, minor, modes, jazz scales, etc.) from the top controls
+- The **Circle of Fifths** highlights related keys and borrowed chords
+- **Scale staff** — click the ♪ button to play the scale ascending; notes are rendered on a music staff
+- **Interval arcs** — toggle "Steps" to see interval distances between notes
+- **Negative harmony** — toggle to mirror all chords through the tonal axis (CoF highlighting is suppressed while active; hover chord cards to see per-note transformation arrows)
+
+### Chord cards
+
+Each scale degree shows a chord card with:
+- Chord name, quality, and note names
+- **▶ play button** (top-right corner, appears on hover) — plays the chord as a strummed hit, then an ascending arpeggio so you can hear both the harmony and the individual notes
+- Staff notation toggle
+- Improv scale suggestions (e.g. Dorian over a minor 7th)
+
+### Guitar tab
+
+- Chord diagrams for all scale-degree chords
+- **Full fretboard** — shows scale positions across all 6 strings; swipe/scroll horizontally
+- CAGED-position voicings
+
+### Mandolin tab
+
+- **Scale voicings** tab — scale positions on 4 strings
+- **Chop Chords** tab — closed-position triads and 7th chords for the chop technique; open strings allowed where they fit the voicing
+
+### Progression builder
+
+- Click any chord card to add it to the progression
+- Drag to reorder; set per-chord beat count
+- **Play / Stop** — plays the progression in loop using the Salamander Grand Piano sound
+- BPM, time signature, and swing controls
+- **Zoom view** — full-screen progression view with playhead
+- Export as text chord chart
+
+---
+
+## Audio
+
+All audio uses **Tone.js** with the **Salamander Grand Piano** sample library — real recorded piano samples, not synthesized tones. Samples load once on page open (a small "⟳ loading samples…" indicator shows during loading).
+
+- Chord play button: strummed chord → ascending arpeggio
+- Scale staff: ascending scale playback
+- Progression player: strummed chords with bass note emphasis and slight humanization
+
+---
+
+## Developer setup
+
+### What's in this folder
 
 ```
 harmonic-atlas/
-├── index.html          ← The entire app (one file)
+├── index.html          ← The entire app (HTML + CSS + JS, ~9000 lines)
 ├── manifest.json       ← PWA config (name, icon, theme)
-├── sw.js               ← Service worker (offline caching)
+├── sw.js               ← Service worker (network-first for HTML, cache-first for assets)
 ├── dev-server.js       ← Local dev server with live-reload
 ├── start.bat           ← Windows launcher (double-click)
 ├── start.sh            ← Mac/Linux launcher
 └── icons/
-    ├── icon-192.png    ← Android launcher icon
-    ├── icon-512.png    ← Android splash / store icon
+    ├── icon-192.png
+    ├── icon-512.png
     ├── apple-touch-icon.png
     └── favicon-32.png
 ```
 
----
+### One-time setup
 
-## One-time setup
+You only need **Node.js** installed — nothing else. Download it at https://nodejs.org (LTS).
 
-You only need **Node.js** installed — nothing else.
-Download it free at https://nodejs.org (pick "LTS").
-
----
-
-## Daily workflow
-
-### 1. Start the dev server
+### Daily workflow
 
 **Windows:** double-click `start.bat`
-**Mac/Linux:** double-click `start.sh` or run `node dev-server.js` in terminal
+**Mac/Linux:** run `node dev-server.js` in terminal
 
-You'll see:
 ```
 ╔══════════════════════════════════════════╗
 ║   🎵  Harmonic Atlas — Dev Server         ║
 ╠══════════════════════════════════════════╣
 ║  PC:    http://localhost:3000             ║
-║  Phone: http://192.168.1.42:3000          ║   ← your actual IP
+║  Phone: http://192.168.1.42:3000          ║
 ╚══════════════════════════════════════════╝
 ```
 
-### 2. Open in browser (PC)
-
-Go to **http://localhost:3000**
-
 The page auto-reloads every time `index.html` is saved.
 
-### 3. Open on your Android phone
+### Deploying
 
-- Make sure phone is on the **same WiFi** as your PC
-- Open Chrome and go to **http://192.168.x.x:3000** (the IP shown in the terminal)
-- The page live-reloads on your phone too when you save on the PC
+Push to the `main` branch — GitHub Pages redeploys automatically in ~30 seconds.
 
----
-
-## Working with Claude
-
-When you want an evolution:
-
-1. Start the dev server so you can see changes live
-2. Ask Claude to make the change
-3. Claude edits `index.html` and gives you the updated file
-4. **Replace** the `index.html` in this folder with the new one
-5. The browser reloads automatically — you see the result instantly
-
-> **Tip:** Keep Claude's chat open in one window, the app in another.
-> You'll see changes appear in real time as you confirm each step.
+```bash
+git add index.html
+git commit -m "your message"
+git push
+```
 
 ---
 
-## Deploying to your phone (production)
+## Technical notes
 
-When you're happy with the changes:
+### Architecture
 
-1. Push the updated `index.html` to GitHub (see below)
-2. GitHub Pages redeploys automatically in ~30 seconds
-3. Open Chrome on Android → visit your GitHub Pages URL
-4. The installed PWA updates on next open
+- **Single-file app** — all CSS, JS, and HTML live in `index.html`. Intentional: easier to share and edit.
+- **No JS framework** — vanilla JS only. Google Fonts is the only external CSS resource.
+- **Audio:** Tone.js 14.8.49 (CDN) + Salamander Grand Piano samples (CDN, streamed on load)
+- **PWA:** `manifest.json` + `sw.js`. Service worker uses network-first for HTML navigation and cache-first for static assets.
 
-### GitHub Pages setup (one-time)
+### Audio subsystem
 
-1. Create account at https://github.com
-2. New repository → name: `harmonic-atlas` → Public
-3. Upload all files from this folder (drag & drop in the browser UI)
-4. Settings → Pages → Source: main branch → Save
-5. Your URL: `https://YOUR_USERNAME.github.io/harmonic-atlas`
-6. Open on Android Chrome → ⋮ menu → **"Add to Home screen"**
+`initSampler()` creates a `Tone.Sampler` backed by Salamander mp3 files and connects it to `Tone.getDestination()`. All three audio paths share the same sampler:
 
----
+| Path | Function |
+|---|---|
+| Chord card play button | `addCardPlayBtn` → `sampler.triggerAttackRelease` |
+| Scale staff playback | `schedule()` inside the staff SVG click handler |
+| Progression player | `playChordAt` → strum hits via `getStrumDurations` |
 
-## File structure notes
+`Tone.start()` is called on first user interaction (touchstart/mousedown/keydown) to satisfy the browser autoplay policy. `Tone.getContext().rawContext` is exposed as `progAudioCtx` so existing Web Audio scheduling code (timing, `ctx.currentTime`) continues to work alongside Tone.
 
-The entire app lives in **`index.html`** — all CSS, JS, and HTML in one file.
-This is intentional: easier to share, back up, and send to Claude for edits.
+`progStop()` calls `sampler.releaseAll()` to immediately silence all playing notes.
 
-`manifest.json` and `sw.js` are small and rarely need changing.
-The icons can be replaced if you want a different look.
+### Key functions
+
+| Function | Purpose |
+|---|---|
+| `initSampler()` | Creates Tone.Sampler, shows/hides loading indicator |
+| `midiToNoteName(midi)` | Converts MIDI int → Tone note string (e.g. 60 → "C4") |
+| `spreadChordOctaves(pcs)` | Voices a set of pitch classes across octaves for smooth ascending playback |
+| `playChordAt(ctx, pcs, startTime, duration, sound)` | Schedules a chord with strum pattern via sampler |
+| `getStrumDurations(duration, beats)` | Returns strum hit timing/velocity pattern |
+| `progPlay()` / `progStop()` | Progression playback start/stop |
+| `addCardPlayBtn(card, notes)` | Adds ▶ button to chord cards (chord + arpeggio) |
+| `addCardStaff(card, notes)` | Adds staff notation toggle to chord cards |
+| `wireChordCards()` | Binds click-to-add-progression on all chord cards |
+| `computeClosedMandoVoicing` / `getChopMandoVoicing` | Mandolin chop chord voicings |
+| `makeScaleFretboardSVG` | Full horizontal fretboard SVG |
+
+### Service worker cache
+
+Cache key: `harmonic-atlas-v10`. Bump the version in `sw.js` when adding new static assets that need to be cached offline. HTML is always fetched fresh (network-first).
