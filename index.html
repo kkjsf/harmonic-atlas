@@ -165,9 +165,6 @@
   }
   .hist-share-btn:hover { border-color: var(--accent2); color: var(--accent2); }
   .hist-share-btn.copied { border-color: #50c87a; color: #50c87a; }
-  body.light-theme .hist-chip { background: var(--surface2); border-color: var(--border); color: var(--dim); }
-  body.light-theme .hist-chip:hover { border-color: var(--gold); color: var(--gold2); }
-  body.light-theme .hist-chip.hist-current { border-color: var(--gold); color: var(--gold2); }
   .scale-hero::before {
     content: '';
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -270,9 +267,6 @@
   #intervals-toggle:hover { color: var(--gold); border-color: var(--gold); }
   #intervals-toggle.active { color: var(--gold2); border-color: rgba(201,168,76,.5); }
   #intervals-toggle svg { flex-shrink: 0; }
-  body.light-theme #intervals-toggle { border-color: var(--border); }
-  body.light-theme #intervals-toggle.active { color: var(--gold2); border-color: var(--gold); }
-
   /* Interval arc between note pills */
   .hero-interval {
     display: flex;
@@ -298,9 +292,6 @@
   .hero-interval-label.iv-aug    { color: #c08848; }
   .hero-interval-label.iv-whole  { color: var(--dim); }
   .hero-interval-label.iv-double { color: var(--accent2); }
-  body.light-theme .hero-interval-label { color: var(--muted); }
-  body.light-theme .hero-interval-label.iv-half  { color: #b04050; }
-  body.light-theme .hero-interval-label.iv-whole { color: #888; }
   .hero-note-pill {
     padding: 10px 20px;
     background: rgba(201,168,76,.08);
@@ -802,10 +793,6 @@
     color: var(--muted); font-size: 12px; letter-spacing: .08em;
     padding: 20px; text-align: center; width: 100%;
   }
-  body.light-theme #prog-zoom-panel { background: #faf7f2; }
-  body.light-theme .zoom-slot { background: #ede8de; border-color: #cec8ba; }
-  body.light-theme .zoom-slot-name { color: #302818; }
-  body.light-theme .zoom-slot-roman { color: #8a7a60; }
   @media (max-width: 600px) {
     #prog-zoom-panel { padding: 18px 14px 20px; }
     .zoom-slots-wrap { gap: 10px; }
@@ -1032,108 +1019,6 @@
   /* ══════════════════════════════════════
      LIGHT THEME
   ══════════════════════════════════════ */
-  body.light-theme {
-    --bg: #ede8dc;
-    --surface: #f7f3ec;
-    --surface2: #e6e0d4;
-    --border: #c4bcac;
-    --border2: #a89f8e;
-    --gold: #8a5c0a;
-    --gold2: #5e3d00;
-    --cream: #1a120a;
-    --muted: #5c5040;
-    --text: #241a0e;
-    --dim: #3e3020;
-    --accent: #3e3678;
-    --accent2: #5448a0;
-  }
-  body.light-theme { color: var(--text); background: var(--bg); }
-  body.light-theme::before { opacity: .15; }
-  body.light-theme .grain { opacity: .08; }
-  body.light-theme header { border-bottom-color: var(--border); background: transparent; }
-  body.light-theme .logo-title { color: var(--text); }
-  body.light-theme .logo-eyebrow, body.light-theme .logo-sub { color: var(--muted); }
-  body.light-theme .controls { background: var(--surface); border-bottom: 1px solid var(--border); }
-  body.light-theme .scale-hero { background: var(--surface); border: 1px solid var(--border); }
-  body.light-theme .tip-popup {
-    background: #f7f3ec;
-    border-color: rgba(140,90,10,.5);
-    color: var(--cream);
-    box-shadow: 0 4px 16px rgba(0,0,0,.18);
-  }
-  body.light-theme .rel-panel,
-  body.light-theme .cad-panel,
-  body.light-theme .prog-panel,
-  body.light-theme .cof-section { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; }
-  body.light-theme select { background-color: var(--surface2); color: var(--cream); border-color: var(--border); }
-  body.light-theme select option { background: #f0ebe2; color: #1a120a; }
-  body.light-theme .prog-select option { background: #f0ebe2; color: #1a120a; }
-  body.light-theme .prog-input { color: var(--cream); background: var(--surface2); border-color: var(--border); }
-  body.light-theme .prog-slot { background: var(--surface); border-color: var(--border); }
-  body.light-theme .prog-slot-del { background: var(--surface2); color: var(--muted); }
-  body.light-theme .prog-slots-wrap { background: var(--surface2); }
-  body.light-theme .chord-card { background: var(--surface); border-color: var(--border); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-  body.light-theme .chord-card:hover { border-color: var(--gold); box-shadow: 0 2px 12px rgba(138,92,10,.18); }
-  body.light-theme .chord-name { color: var(--gold2); }
-  body.light-theme .chord-quality { color: var(--muted); }
-  body.light-theme .chord-intervals { color: var(--dim); }
-  body.light-theme .chord-notes { color: var(--muted); }
-  body.light-theme .roman-num { color: var(--gold); }
-  body.light-theme .degree-header { border-color: var(--border); }
-  body.light-theme .degree-num { color: var(--gold2); }
-  body.light-theme .degree-name-label { color: var(--muted); }
-  body.light-theme .section-divider { border-color: var(--border); }
-  body.light-theme .compare-bar { background: var(--surface); border-color: var(--border); }
-  body.light-theme .hero-note-pill { background: rgba(138,92,10,.12) !important; color: var(--gold2) !important; border-color: rgba(138,92,10,.35) !important; }
-  body.light-theme .hero-note-pill.tonic-pill { background: rgba(138,92,10,.22) !important; border-color: var(--gold) !important; }
-  body.light-theme .hero-note-degree { color: var(--muted) !important; }
-  body.light-theme .scale-hero-identity { color: var(--gold); }
-  body.light-theme .scale-hero-formula { color: var(--muted); }
-  body.light-theme .scale-hero-family { color: var(--accent2); }
-  body.light-theme .scale-hero-desc { color: var(--muted); border-color: var(--border); background: rgba(138,92,10,.06); }
-  body.light-theme .scale-hero-right { border-color: var(--border); background: rgba(138,92,10,.04); }
-  body.light-theme .ct-btn { background: var(--surface2); color: var(--dim); border-color: var(--border); }
-  body.light-theme .ct-btn.active { background: rgba(138,92,10,.12); color: var(--gold2); border-color: var(--gold); }
-  body.light-theme .view-tab { background: var(--surface2); color: var(--dim); border-color: var(--border); }
-  body.light-theme .view-tab.active { background: rgba(138,92,10,.14); color: var(--gold2); border-color: var(--gold); }
-  body.light-theme .view-tab.disabled { color: var(--border2); }
-  body.light-theme .note-degree { color: var(--cream); }
-  body.light-theme .note-pill { background: rgba(138,92,10,.1); border-color: rgba(138,92,10,.25); color: var(--gold2); }
-  body.light-theme .collapsible-hdr { color: var(--dim); }
-  body.light-theme .collapsible-hdr:hover { color: var(--gold2); }
-  body.light-theme .rel-chip { border-color: var(--border); color: var(--dim); background: var(--surface2); }
-
-  body.light-theme .cad-row { border-color: var(--border); }
-  body.light-theme .cad-name { color: var(--dim); }
-  body.light-theme .cad-chord { color: var(--gold2); border-color: var(--border); background: var(--surface2); }
-  body.light-theme .cad-chord:hover { border-color: var(--gold); background: rgba(138,92,10,.1); }
-  body.light-theme .cad-target { border-color: var(--gold) !important; background: rgba(138,92,10,.14) !important; color: var(--gold2) !important; }
-  body.light-theme .cad-arrow { color: var(--border2); }
-  body.light-theme .prog-btn { background: var(--surface2); border-color: var(--border); color: var(--dim); }
-  body.light-theme .prog-btn:not(:disabled):hover { border-color: var(--gold); color: var(--gold2); }
-  body.light-theme .prog-btn.play-btn:not(:disabled) { background: rgba(138,92,10,.12); border-color: var(--gold); color: var(--gold2); }
-  body.light-theme .strum-btn { background: var(--surface2); border-color: var(--border); color: var(--muted); }
-  body.light-theme .strum-btn.active { background: rgba(138,92,10,.12); border-color: var(--gold); color: var(--gold2); }
-  body.light-theme #theme-toggle { background: var(--surface2); border-color: var(--border); color: var(--gold2); }
-  body.light-theme #guide-btn { background: var(--surface2); border-color: var(--border); color: var(--gold); }
-  body.light-theme #tech-btn { background: var(--surface2); border-color: var(--border); color: var(--muted); }
-  body.light-theme .diag-card { background: var(--surface); border-color: var(--border); }
-  body.light-theme .diag-chord-name { color: var(--gold2); }
-  body.light-theme .diag-quality { color: var(--muted); }
-  body.light-theme .diag-notes { color: var(--muted); }
-  body.light-theme .drop-card { background: var(--surface); border-color: var(--border); }
-  body.light-theme .prog-preset-btn { background: var(--surface2); border-color: var(--border); color: var(--dim); }
-  body.light-theme .prog-preset-btn:hover { border-color: var(--gold); color: var(--gold2); }
-  body.light-theme .mode-group-label { color: var(--muted); }
-  body.light-theme .ctrl-label { color: var(--dim); }
-  body.light-theme .tip-badge { background: rgba(138,92,10,.15); color: var(--gold); border-color: rgba(138,92,10,.3); }
-  body.light-theme .rel-panel-title, body.light-theme .cad-panel-title { color: var(--dim); }
-  body.light-theme .collapse-chevron { color: var(--border2); }
-  body.light-theme #back-to-top { background: var(--surface2); border-color: var(--border); color: var(--muted); }
-  body.light-theme .cof-eyebrow { color: var(--muted); }
-  body.light-theme .cof-leg-item { color: var(--muted); }
-  body.light-theme .scale-hero-root { color: var(--text); }
-
   /* ══════════════════════════════════════
      THEME TOGGLE BUTTON
   ══════════════════════════════════════ */
@@ -1169,27 +1054,6 @@
     box-shadow: 0 2px 12px rgba(0,0,0,.4);
   }
   #tech-btn:hover { border-color: var(--accent2); color: var(--accent2); background: var(--surface2); }
-
-  #theme-toggle {
-    position: fixed;
-    top: 16px; right: 20px;
-    z-index: var(--z-sticky);
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    color: var(--gold);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color .2s, transform .25s, background .2s;
-    box-shadow: 0 2px 10px rgba(0,0,0,.35);
-  }
-  #theme-toggle:hover {
-    border-color: var(--gold);
-    transform: rotate(18deg);
-  }
 
   /* ══════════════════════════════════════
      COMPARE BAR
@@ -1561,7 +1425,7 @@
   /* ── Scale search ── */
   #scale-search:focus { border-color: var(--gold); }
   #scale-search::placeholder { color: var(--muted); opacity:.7; }
-  body.light-theme #scale-search { background: var(--surface2); border-color: var(--border); color: var(--text); }
+
 
 
 
@@ -1618,13 +1482,6 @@
     border-color: rgba(201,168,76,.35);
   }
   .chord-staff-btn.active { background: rgba(201,168,76,.06); }
-  body.light-theme .chord-staff-btn { border-color: var(--border); color: var(--muted); }
-  body.light-theme .chord-staff-panel { border-top-color: var(--border); }
-  /* Staff SVG uses fixed rgba(255,255,255,...) — give it a dark bg in light mode */
-  body.light-theme .chord-staff-panel { background: #1e2530; border-radius: 3px; padding: 6px 8px 4px; margin-top: 8px; }
-  body.light-theme .hero-staff-wrap { background: #1e2530; border-radius: 3px; padding: 8px 10px 4px; margin-top: 14px; }
-  body.light-theme .chord-card:hover .chord-staff-btn { color: var(--gold); border-color: var(--gold); }
-
   /* ── Slot substitution popover ── */
   .slot-sub-popover {
     position:absolute; z-index:var(--z-diagram);
@@ -1658,8 +1515,6 @@
     font-size:14px; line-height:1; padding:2px 4px;
   }
   .slot-sub-close:hover { color:var(--text); }
-  body.light-theme .slot-sub-popover { background:var(--surface); border-color:var(--border); box-shadow:0 8px 32px rgba(0,0,0,.18); }
-
   /* ── Prog slot: sub button ── */
   .prog-slot-sub {
     position:absolute; top:-6px; right:12px;
@@ -1673,7 +1528,6 @@
   }
   .prog-slot:hover .prog-slot-sub { opacity:1; }
   .prog-slot-sub:hover { background:rgba(124,111,160,.2); }
-  body.light-theme .prog-slot-sub { background:var(--surface2); border-color:rgba(124,111,160,.4); }
   .prog-slot { position:relative; }
 
   /* ── Pivot panel ── */
@@ -1692,8 +1546,6 @@
   .pivot-arrow { font-size:9px; color:var(--dim); }
   .pivot-roman-b { font-size:9px; color:var(--accent2); }
   .pivot-none { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); font-style:italic; }
-  body.light-theme .pivot-chord-row { background:rgba(0,0,0,.025); border-left-color:var(--gold); }
-
   /* ══════════════════════════════════════
      MOBILE PORTRAIT (≤480px)
   ══════════════════════════════════════ */
@@ -1719,7 +1571,6 @@
     .chord-name { font-size:18px; }
     .view-tabs { gap:4px; flex-wrap:wrap; }
     .view-tab { padding: 5px 8px; font-size:9px; gap:3px; }
-    #theme-toggle { width:30px; height:30px; right:12px; top:12px; }
     #guide-btn { width:30px; height:30px; right:50px; top:12px; }
     #tech-btn { width:30px; height:30px; right:88px; top:12px; }
     .prog-slot { min-width: 70px; }
@@ -1735,24 +1586,6 @@
 </style>
 </head>
 <body>
-<button id="theme-toggle" title="Toggle light/dark theme" aria-label="Toggle theme">
-  <!-- Sun icon: shown in dark mode, click → go light -->
-  <svg id="theme-icon-dark" width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <circle cx="8" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/>
-    <line x1="8" y1="1.5" x2="8" y2="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="8" y1="13" x2="8" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="1.5" y1="8" x2="3" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="13" y1="8" x2="14.5" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="3.4" y1="3.4" x2="4.5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="11.5" y1="11.5" x2="12.6" y2="12.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="12.6" y1="3.4" x2="11.5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="4.5" y1="11.5" x2="3.4" y2="12.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-  </svg>
-  <!-- Moon icon: shown in light mode, click → go dark -->
-  <svg id="theme-icon-light" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display:none">
-    <path d="M12.5 10.5A6 6 0 016 4a6 6 0 000 9 6 6 0 006.5-2.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
-  </svg>
-</button>
 <button id="guide-btn" title="User Guide" aria-label="Open user guide">
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
@@ -1769,7 +1602,7 @@
 <div class="wrap">
   <header id="page-top">
     <div class="logo-eyebrow">Music Theory Reference</div>
-    <h1 class="logo-title">Harmonic <em>Atlas</em></h1>
+    <h1 class="logo-title"><img src="icons/icon-192.png" alt="" style="height:32px;width:32px;vertical-align:middle;margin-right:10px;border-radius:6px;">Harmonic <em>Atlas</em></h1>
     <p class="logo-sub">Scale harmonization &amp; chord explorer</p>
   </header>
 
@@ -1906,7 +1739,7 @@
       Cadence Suggester
       <span class="has-tip" style="display:inline-flex;align-items:center;margin-left:4px" onclick="event.stopPropagation()">
         <span class="tip-badge" tabindex="0">?</span>
-        <div class="tip-popup"><span class="tip-title">Cadences</span>A cadence is a chord sequence that creates a sense of resolution or pause. Perfect = V→I (strongest closure). Plagal = IV→I (church "amen"). Deceptive = V→vi (surprise). Half = ends on V (unresolved). Click any chord to add it to the progression.</div>
+        <div class="tip-popup"><span class="tip-title">Cadences</span>A cadence is a chord sequence that creates a sense of resolution or pause. Perfect = V→I (strongest closure). Plagal = IV→I (church "amen"). Deceptive = V→vi (surprise). Half = ends on V (unresolved). Click any chord chip to add it to the progression.</div>
       </span>
       <span class="collapse-chevron"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </div>
@@ -1965,7 +1798,7 @@
         Progression Builder
         <span class="has-tip" style="display:inline-flex;align-items:center;margin-left:4px" onclick="event.stopPropagation()">
           <span class="tip-badge" tabindex="0">?</span>
-          <div class="tip-popup"><span class="tip-title">Progression Builder</span>Click any chord card to add it to the sequence. Set BPM, beats/chord, and timbre then press Play. Use presets for instant progressions in the current key.</div>
+          <div class="tip-popup"><span class="tip-title">Progression Builder</span>Hover a chord card and click the <strong>+</strong> button to add it to the sequence. Set BPM, beats/chord, and timbre then press Play. Use presets for instant progressions in the current key.</div>
         </span>
         <button id="prog-zoom-btn" title="Expand progression view" onclick="event.stopPropagation()" style="margin-left:auto;margin-right:8px;background:none;border:1px solid var(--border2);color:var(--muted);cursor:pointer;border-radius:3px;padding:3px 8px;font-size:10px;display:inline-flex;align-items:center;gap:4px;transition:all .15s;font-family:inherit">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 3.5V1h2.5M6.5 1H9v2.5M9 6.5V9H6.5M3.5 9H1V6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2021,7 +1854,7 @@
 
       <div class="prog-slots-wrap" id="prog-slots">
         <div class="prog-playhead" id="prog-playhead"></div>
-        <div class="prog-empty-hint" id="prog-hint">← Click any chord card to add it here</div>
+        <div class="prog-empty-hint" id="prog-hint">← Hover a chord card and click + to add it here</div>
       </div>
 
       <div class="prog-controls-row" style="gap:8px">
@@ -2176,10 +2009,15 @@ function playScale(noteNames, btnEl) {
   const noteDur  = stepSecs * 1.8;  // overlap into next note
 
   const scheduleScale = () => {
-    const t0 = ctx.currentTime + 0.05;
+    const t0  = ctx.currentTime + 0.05;
+    const now = Tone.now();
     midis.forEach((midi, i) => {
-      const freq = 440 * Math.pow(2, (midi - 69) / 12);
-      makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
+      if (samplerReady) {
+        sampler.triggerAttackRelease(midiToNoteName(midi), noteDur, now + (t0 + i * stepSecs - ctx.currentTime));
+      } else {
+        const freq = 440 * Math.pow(2, (midi - 69) / 12);
+        makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
+      }
     });
   };
   if (ctx.state === 'suspended') {
@@ -2762,10 +2600,6 @@ function computeCofHighlights(rootPc, scaleIntervals){
   return{majSet,minSet,dimSet};
 }
 
-function getThemeColor(dark, light) {
-  return document.body.classList.contains('light-theme') ? light : dark;
-}
-
 function drawCoF(rootPc, scaleIntervals){
   const svg=document.getElementById('cof-svg');
   svg.innerHTML='';
@@ -2784,7 +2618,7 @@ function drawCoF(rootPc, scaleIntervals){
   // Background
   const bg=mk('circle');
   bg.setAttribute('cx',CX);bg.setAttribute('cy',CY);bg.setAttribute('r',R_OUT+4);
-  bg.setAttribute('fill',getThemeColor('#080b0e','#ddd8cc'));bg.setAttribute('stroke',getThemeColor('#1e2530','#a89f8e'));bg.setAttribute('stroke-width','1.5');
+  bg.setAttribute('fill','#080b0e');bg.setAttribute('stroke','#1e2530');bg.setAttribute('stroke-width','1.5');
   svg.appendChild(bg);
 
   for(let i=0;i<12;i++){
@@ -2812,10 +2646,10 @@ function drawCoF(rootPc, scaleIntervals){
     const outerFill = negColor === 'both'   ? 'rgba(240,210,60,0.55)'
                     : negColor === 'origin' ? 'rgba(60,140,240,0.55)'
                     : negColor === 'dest'   ? 'rgba(220,70,70,0.55)'
-                    : hlMaj                 ? getThemeColor('rgba(201,168,76,0.3)','rgba(138,92,10,0.55)')
-                                            : getThemeColor('#0e1318','#ccc7ba');
+                    : hlMaj                 ? 'rgba(201,168,76,0.3)'
+                                            : '#0e1318';
     sO.setAttribute('fill', outerFill);
-    sO.setAttribute('stroke',getThemeColor('#1e2530','#9a9180')); sO.setAttribute('stroke-width','1.5');
+    sO.setAttribute('stroke','#1e2530'); sO.setAttribute('stroke-width','1.5');
     if(hlMaj){
       sO.setAttribute('class','cof-slice');
       sO.dataset.deg = majDeg;
@@ -2827,8 +2661,8 @@ function drawCoF(rootPc, scaleIntervals){
     // ── Mid ring (minor) ──
     const sM=mk('path');
     sM.setAttribute('d',arcPath(R_MID,R_INN+1,aS,aE));
-    sM.setAttribute('fill', hlMin ? getThemeColor('rgba(124,111,160,0.35)','rgba(80,60,160,0.5)') : getThemeColor('#0b0f14','#c5c0b4'));
-    sM.setAttribute('stroke',getThemeColor('#1e2530','#9a9180')); sM.setAttribute('stroke-width','1.5');
+    sM.setAttribute('fill', hlMin ? 'rgba(124,111,160,0.35)' : '#0b0f14');
+    sM.setAttribute('stroke','#1e2530'); sM.setAttribute('stroke-width','1.5');
     if(hlMin){
       sM.setAttribute('class','cof-slice');
       sM.dataset.deg = minDeg;
@@ -2840,8 +2674,8 @@ function drawCoF(rootPc, scaleIntervals){
     // ── Inner ring (dim) ──
     const sI=mk('path');
     sI.setAttribute('d',arcPath(R_INN,2,aS,aE));
-    sI.setAttribute('fill', hlDim ? getThemeColor('rgba(212,129,58,0.30)','rgba(180,80,10,0.5)') : getThemeColor('#080c0f','#bab5a8'));
-    sI.setAttribute('stroke',getThemeColor('#1e2530','#9a9180')); sI.setAttribute('stroke-width','1.5');
+    sI.setAttribute('fill', hlDim ? 'rgba(212,129,58,0.30)' : '#080c0f');
+    sI.setAttribute('stroke','#1e2530'); sI.setAttribute('stroke-width','1.5');
     if(hlDim){
       sI.setAttribute('class','cof-slice');
       sI.dataset.deg = dimDeg;
@@ -2860,8 +2694,8 @@ function drawCoF(rootPc, scaleIntervals){
     lt.setAttribute('font-size', outerActive ? (COF_MAJ[i].includes('/')?'11':'17') : (COF_MAJ[i].includes('/')?'10':'14'));
     lt.setAttribute('font-weight', outerActive ? '700' : '400');
     const labelFill = negColor               ? '#ffffff'
-                    : hlMaj                 ? getThemeColor('#f0d878','#3a1e00')
-                                            : getThemeColor('#3a4250','#6a6050');
+                    : hlMaj                 ? '#f0d878'
+                                            : '#3a4250';
     lt.setAttribute('fill', labelFill);
     lt.setAttribute('stroke', 'none');
     lt.setAttribute('pointer-events','none');
@@ -2876,7 +2710,7 @@ function drawCoF(rootPc, scaleIntervals){
     mt.setAttribute('font-family','IBM Plex Mono,monospace');
     mt.setAttribute('font-size', hlMin ? '11' : '9');
     mt.setAttribute('font-weight', hlMin ? '600' : '400');
-    mt.setAttribute('fill', hlMin ? getThemeColor('#b89de0','#3a2a80') : getThemeColor('#2a3040','#7a7060'));
+    mt.setAttribute('fill', hlMin ? '#b89de0' : '#2a3040');
     mt.setAttribute('pointer-events','none');
     mt.textContent=COF_MIN[i];
     svg.appendChild(mt);
@@ -2889,7 +2723,7 @@ function drawCoF(rootPc, scaleIntervals){
     dt.setAttribute('font-family','IBM Plex Mono,monospace');
     dt.setAttribute('font-size', hlDim ? '9' : '7.5');
     dt.setAttribute('font-weight', hlDim ? '600' : '400');
-    dt.setAttribute('fill', hlDim ? getThemeColor('#e0924a','#7a2800') : getThemeColor('#212830','#7a7060'));
+    dt.setAttribute('fill', hlDim ? '#e0924a' : '#212830');
     dt.setAttribute('pointer-events','none');
     dt.textContent=COF_DIM[i];
     svg.appendChild(dt);
@@ -2917,7 +2751,7 @@ function drawCoF(rootPc, scaleIntervals){
   // Center dot
   const cd=mk('circle');
   cd.setAttribute('cx',CX);cd.setAttribute('cy',CY);cd.setAttribute('r','4');
-  cd.setAttribute('fill',getThemeColor('#1e2530','#9a9180'));
+  cd.setAttribute('fill','#1e2530');
   svg.appendChild(cd);
 
   // ── Attach hover events ──
@@ -6354,7 +6188,7 @@ function renderProgSlots() {
   if (!progression.length) {
     const h = document.createElement('div');
     h.className = 'prog-empty-hint'; h.id = 'prog-hint';
-    h.textContent = '← Click any chord card to add it here';
+    h.textContent = '← Hover a chord card and click + to add it here';
     wrap.appendChild(h);
     document.getElementById('prog-play').disabled = true;
     return;
@@ -6760,13 +6594,14 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
 
   });
 
-  // ── 3. Red highlight on mirrored CoF slots ────────────────
+  // ── 3. Red highlight on dest-only CoF slots (skip "both" — already yellow in drawCoF) ──
   const negPcs = new Set([...scalePcs].map(pc => negMirrorPcCoF(pc, tonic)));
+  const negDestOnly = new Set([...negPcs].filter(pc => !scalePcs.has(pc)));
 
   for (let i = 0; i < 12; i++) {
     const aS = i * 30 - 15, aE = i * 30 + 15;
     const slotPc = COF_PC[i];
-    if (!negPcs.has(slotPc)) continue;
+    if (!negDestOnly.has(slotPc)) continue;
 
     // Highlight outer ring slot in red
     const ov = mk('path');
@@ -6806,36 +6641,6 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
 function progAddChord({root, sym, qual, notes}) {
   addToProgression(root, sym, '', notes, qual);
 }
-
-// ══════════════════════════════════════════════
-// THEME TOGGLE
-// ══════════════════════════════════════════════
-const _THEME_DARK  = '#12101c';
-const _THEME_LIGHT = '#f5f0e8';
-function _applyThemeColor(light) {
-  document.getElementById('meta-theme-color').content = light ? _THEME_LIGHT : _THEME_DARK;
-}
-
-let isLightTheme = localStorage.getItem('harmonic-theme') === 'light';
-if (isLightTheme) {
-  document.body.classList.add('light-theme');
-  document.getElementById('theme-icon-dark').style.display = 'none';
-  document.getElementById('theme-icon-light').style.display = '';
-}
-_applyThemeColor(isLightTheme);
-
-document.getElementById('theme-toggle').addEventListener('click', () => {
-  isLightTheme = !isLightTheme;
-  localStorage.setItem('harmonic-theme', isLightTheme ? 'light' : 'dark');
-  document.body.classList.toggle('light-theme', isLightTheme);
-  document.getElementById('theme-icon-dark').style.display = isLightTheme ? 'none' : '';
-  document.getElementById('theme-icon-light').style.display = isLightTheme ? '' : 'none';
-  _applyThemeColor(isLightTheme);
-  const rootPc = parseInt(state.key);
-  const scaleData = SCALES[state.scale];
-  drawCoF(rootPc, scaleData.intervals);
-  drawNegAxis(document.getElementById('cof-svg'), rootPc, scaleData.intervals);
-});
 
 // ══════════════════════════════════════════════
 // STRUM PATTERNS
@@ -7983,7 +7788,7 @@ initCollapsibles();
 // ── Reset preferences ──
 document.getElementById('reset-prefs-btn')?.addEventListener('click', () => {
   if (!confirm('Clear all saved preferences (theme, history, toggles)?')) return;
-  ['harmonic-theme','harmonic-history','harmonic-show-intervals'].forEach(k => localStorage.removeItem(k));
+  ['harmonic-history','harmonic-show-intervals'].forEach(k => localStorage.removeItem(k));
   location.reload();
 });
 
@@ -8114,7 +7919,6 @@ document.getElementById('all-degrees').addEventListener('click', e => {
   padding: 2px 7px; font-size: 10px; font-family: 'IBM Plex Mono', monospace;
   color: var(--accent2); margin: 2px 3px 2px 0;
 }
-body.light-theme #tech-panel { background: #faf7f2; }
 </style>
 <div id="tech-modal" role="dialog" aria-modal="true" aria-label="Technical Details">
   <div id="tech-panel">
@@ -8125,9 +7929,9 @@ body.light-theme #tech-panel { background: #faf7f2; }
     <div class="tech-section">
       <div class="tech-section-title">Stack &amp; Platform</div>
       <div class="tech-row"><span class="tech-key">Language</span><span class="tech-val">Vanilla HTML5 / CSS3 / ES2022 JavaScript - zero build tools, zero frameworks</span></div>
-      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~8 300 lines); no server, no network requests at runtime</span></div>
+      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~9 100 lines); no server, no network requests at runtime beyond Tone.js CDN and piano samples</span></div>
       <div class="tech-row"><span class="tech-key">Fonts (CDN)</span><span class="tech-val"><span class="tech-chip">Playfair Display</span><span class="tech-chip">IBM Plex Mono</span><span class="tech-chip">Cormorant Garamond</span><span class="tech-chip">EB Garamond</span> via Google Fonts</span></div>
-      <div class="tech-row"><span class="tech-key">No libraries</span><span class="tech-val">No React, Vue, jQuery, D3, Tone.js - all audio, SVG, and UI written from scratch</span></div>
+      <div class="tech-row"><span class="tech-key">No frameworks</span><span class="tech-val">No React, Vue, jQuery, D3 — all UI and SVG written from scratch. <span class="tech-chip">Tone.js 14.8.49</span> used for Salamander Grand Piano sample playback only.</span></div>
     </div>
 
     <div class="tech-section">
@@ -8186,7 +7990,7 @@ body.light-theme #tech-panel { background: #faf7f2; }
       <div class="tech-row"><span class="tech-key">Negative harmony</span><span class="tech-val">CoF fold method (Ernst Levy / Jacob Collier): <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">mirror = (2×tonicSlot + 1 - pcSlot + 12) % 12</code></span></div>
       <div class="tech-row"><span class="tech-key">Scale relationships</span><span class="tech-val">Relative (shared pitch set, different root); Parallel (same root, ≥4 shared notes); Closely related (adjacent root, ≥n-1 shared); enharmonic names use PREFER_FLAT_PC set (Db/Eb/Ab/Bb)</span></div>
       <div class="tech-row"><span class="tech-key">Jazz impro hints</span><span class="tech-val">IMPRO_MAP quality→scale lookup on each 7th-chord card; clicking a scale pill navigates to that scale at the chord root via state update + render()</span></div>
-      <div class="tech-row"><span class="tech-key">Theme system</span><span class="tech-val">CSS custom properties; 20+ overrides for light mode; CoF SVG redrawn on toggle via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getThemeColor()</code></span></div>
+      <div class="tech-row"><span class="tech-key">Theme</span><span class="tech-val">Dark mode only; CSS custom properties on <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">:root</code>; CoF SVG uses hardcoded dark-palette colours</span></div>
       <div class="tech-row"><span class="tech-key">Responsive</span><span class="tech-val">Breakpoints at 1400 px / 900 px / 560 px; landscape-mobile at max-height: 500 px; zoom reset to 1 on ≤560 px; user-scalable=no viewport</span></div>
     </div>
 
@@ -8229,9 +8033,6 @@ body.light-theme #tech-panel { background: #faf7f2; }
           <label>Sound</label>
           <select class="prog-select" id="zoom-sound">
             <option value="piano">Piano</option>
-            <option value="organ">Organ</option>
-            <option value="guitar">Guitar</option>
-            <option value="pad">Pad</option>
           </select>
         </div>
         <button class="prog-btn play-btn" id="zoom-play">
@@ -8400,9 +8201,6 @@ body.light-theme #tech-panel { background: #faf7f2; }
   background: rgba(201,168,76,.08); border: 1px solid rgba(201,168,76,.25);
   border-radius: 3px; color: var(--gold2); letter-spacing: .04em;
 }
-body.light-theme #guide-panel { background: #faf7f2; border-color: #cec8ba; }
-body.light-theme .guide-toc { background: #ede8de; border-color: #cec8ba; }
-body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .guide-kv-val { color: #302818; opacity: 1; }
 @media(max-width:620px) {
   #guide-panel { padding: 32px 22px 48px; }
   .guide-toc ol { grid-template-columns: 1fr; }
@@ -8669,10 +8467,10 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
           <div class="guide-section-title">Progression Builder</div>
         </div>
       </div>
-      <p class="guide-p">Build and play chord progressions with the piano synth. The builder is collapsed by default and <strong>opens automatically</strong> the first time you click a chord card.</p>
+      <p class="guide-p">Build and play chord progressions with the Salamander Grand Piano sampler. The builder is collapsed by default and <strong>opens automatically</strong> the first time you add a chord.</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Adding chords</span>
-        <span class="guide-kv-val">Click any chord card in the right panel, or any chord chip in the Cadence Suggester. Chords are added as slots to the strip.</span>
+        <span class="guide-kv-val">Hover any chord card and click the <strong>+</strong> button, or click any chord chip in the Cadence Suggester. Chords are added as slots to the strip.</span>
         <span class="guide-kv-key">Reordering</span>
         <span class="guide-kv-val">Drag slots left or right to reorder, or use the <strong>◀ ▶</strong> arrow buttons on each slot for one-step moves — useful on mobile where drag-and-drop is tricky.</span>
         <span class="guide-kv-key">Per-chord duration</span>

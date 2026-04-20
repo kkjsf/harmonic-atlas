@@ -12,17 +12,18 @@ Interactive music theory reference — scales, chords, guitar/mandolin voicings,
 
 - Pick any **root note** and **scale** (major, minor, modes, jazz scales, etc.) from the top controls
 - The **Circle of Fifths** highlights related keys and borrowed chords
-- **Scale staff** — click the ♪ button to play the scale ascending; notes are rendered on a music staff
+- **Scale staff** — click the ♪ button to play the scale ascending; notes rendered on a music staff
 - **Interval arcs** — toggle "Steps" to see interval distances between notes
-- **Negative harmony** — toggle to mirror all chords through the tonal axis (CoF highlighting is suppressed while active; hover chord cards to see per-note transformation arrows)
+- **Negative harmony** — toggle to mirror all chords through the tonal axis; per-note transformation arrows shown on hover; chord cards use distinct colors to indicate mirrored relationships
 
 ### Chord cards
 
 Each scale degree shows a chord card with:
 - Chord name, quality, and note names
-- **▶ play button** (top-right corner, appears on hover) — plays the chord as a strummed hit, then an ascending arpeggio so you can hear both the harmony and the individual notes
+- **▶ play button** (top-right corner, appears on hover) — plays a strummed chord hit then an ascending arpeggio via Tone.js
 - Staff notation toggle
 - Improv scale suggestions (e.g. Dorian over a minor 7th)
+- **+ button** — adds the chord to the progression builder
 
 ### Guitar tab
 
@@ -33,14 +34,14 @@ Each scale degree shows a chord card with:
 ### Mandolin tab
 
 - **Scale voicings** tab — scale positions on 4 strings
-- **Chop Chords** tab — closed-position triads and 7th chords for the chop technique; open strings allowed where they fit the voicing
+- **Chop Chords** tab — closed-position triads and 7th chords for the chop technique
 
 ### Progression builder
 
-- Click any chord card to add it to the progression
+- Click the **+** button on any chord card to add it to the progression
 - Drag to reorder; set per-chord beat count
-- **Play / Stop** — plays the progression in loop using the Salamander Grand Piano sound
-- BPM, time signature, and swing controls
+- **Play / Stop** — plays the progression in loop using Tone.js + Salamander Grand Piano samples
+- BPM, time signature, swing, and strum-pattern controls
 - **Zoom view** — full-screen progression view with playhead
 - Export as text chord chart
 
@@ -114,6 +115,7 @@ git push
 - **Single-file app** — all CSS, JS, and HTML live in `index.html`. Intentional: easier to share and edit.
 - **No JS framework** — vanilla JS only. External resources: Google Fonts (CSS) and Tone.js (audio, loaded from CDN).
 - **Audio:** Tone.js 14.8.49 (CDN) + Salamander Grand Piano samples (CDN, streamed on load)
+- **Theme:** dark mode only
 - **PWA:** `manifest.json` + `sw.js`. Service worker uses network-first for HTML navigation and cache-first for static assets.
 
 ### Audio subsystem
@@ -142,7 +144,7 @@ git push
 | `progPlay()` / `progStop()` | Progression playback start/stop |
 | `addCardPlayBtn(card, notes)` | Adds ▶ button to chord cards (chord + arpeggio) |
 | `addCardStaff(card, notes)` | Adds staff notation toggle to chord cards |
-| `wireChordCards()` | Binds click-to-add-progression on all chord cards |
+| `wireChordCards()` | No-op (add-to-progression now handled by per-card `+` button via `addCardAddBtn`) |
 | `computeClosedMandoVoicing` / `getChopMandoVoicing` | Mandolin chop chord voicings |
 | `makeScaleFretboardSVG` | Full horizontal fretboard SVG |
 
