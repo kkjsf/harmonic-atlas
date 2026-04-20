@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -1988,10 +1989,8 @@
           <label>Sound</label>
           <select class="prog-select" id="prog-sound">
             <option value="piano">Piano</option>
-            <option value="organ">Organ</option>
-            <option value="guitar">Guitar</option>
-            <option value="pad">Pad</option>
           </select>
+          <span id="sampler-loading" style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;display:none">⟳ loading samples…</span>
         </div>
       </div>
       <div class="strum-row" style="margin-bottom:10px">
@@ -3145,9 +3144,14 @@ function renderScaleInfo(scaleNotes, scaleData){
           const t0       = ctx.currentTime + 0.05;
           const stepSecs = noteMs / 1000;
           const noteDur  = stepSecs * 1.8;
+          const now      = Tone.now();
           midis.forEach((midi, i) => {
-            const freq = 440 * Math.pow(2, (midi - 69) / 12);
-            makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
+            if (samplerReady) {
+              sampler.triggerAttackRelease(midiToNoteName(midi), noteDur, now + (t0 + i * stepSecs - ctx.currentTime));
+            } else {
+              const freq = 440 * Math.pow(2, (midi - 69) / 12);
+              makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
+            }
           });
           const totalMs = midis.length * noteMs + 300;
           _timer = setTimeout(() => {
@@ -3403,22 +3407,17 @@ function addCardPlayBtn(card, notes) {
   btn.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10"><polygon points="1,1 8,5 1,9" fill="currentColor"/></svg>';
   btn.addEventListener('click', e => {
     e.stopPropagation();
-    // Use progAudioCtx only if already running — never create or resume it here
-    // to avoid corrupting the context state before progPlay() can unlock it.
-    const ctx = (progAudioCtx && progAudioCtx.state === 'running') ? progAudioCtx
-      : new (window.AudioContext || window.webkitAudioContext)();
     const play = () => {
-      const t0 = ctx.currentTime + 0.02;
+      if (!samplerReady) return;
       const voiced = spreadChordOctaves(pcs);
+      const now = Tone.now() + 0.02;
       voiced.forEach((v, i) => {
-        const freq = 440 * Math.pow(2, (v.midi - 69) / 12);
-        makePianoNote(ctx, freq, t0 + i * 0.008, 3.5, 0.11);
+        sampler.triggerAttackRelease(midiToNoteName(v.midi), 3.5, now + i * 0.008);
       });
       btn.classList.add('playing');
       setTimeout(() => btn.classList.remove('playing'), 3500);
     };
-    if (ctx.state === 'running') play();
-    else ctx.resume().then(play).catch(() => {});
+    Tone.start().then(play).catch(() => {});
   });
   card.appendChild(btn);
 }
@@ -5658,29 +5657,50 @@ let progPlaying  = false;
 let progLoop     = false;
 let progScheduler = null;
 let progAudioCtx  = null;
+let sampler       = null;
+let samplerReady  = false;
 let progCurrentIdx = -1;
 let progDragIdx    = null;
 
-// ── Audio Context (lazy init) ───────────────────
-function getAudioCtx() {
-  if (!progAudioCtx || progAudioCtx.state === 'closed') {
-    progAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if (progAudioCtx.state === 'suspended') progAudioCtx.resume().catch(()=>{});
-  return progAudioCtx;
+// ── Tone.js Sampler (Salamander Grand Piano) ────
+function midiToNoteName(midi) {
+  const names = ['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+  return names[midi % 12] + Math.floor(midi / 12 - 1);
 }
 
-// PWA audio unlock — iOS/Android require a user gesture before AudioContext works.
-// We pre-create the context and play a silent buffer on first touch/click.
+function initSampler() {
+  const loading = document.getElementById('sampler-loading');
+  if (loading) loading.style.display = 'inline';
+  sampler = new Tone.Sampler({
+    urls: {
+      A0:'A0.mp3', C1:'C1.mp3', 'D#1':'Ds1.mp3', 'F#1':'Fs1.mp3', A1:'A1.mp3',
+      C2:'C2.mp3', 'D#2':'Ds2.mp3', 'F#2':'Fs2.mp3', A2:'A2.mp3',
+      C3:'C3.mp3', 'D#3':'Ds3.mp3', 'F#3':'Fs3.mp3', A3:'A3.mp3',
+      C4:'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3', A4:'A4.mp3',
+      C5:'C5.mp3', 'D#5':'Ds5.mp3', 'F#5':'Fs5.mp3', A5:'A5.mp3',
+      C6:'C6.mp3', 'D#6':'Ds6.mp3', 'F#6':'Fs6.mp3', A6:'A6.mp3',
+      C7:'C7.mp3', 'D#7':'Ds7.mp3', 'F#7':'Fs7.mp3', A7:'A7.mp3',
+      C8:'C8.mp3'
+    },
+    baseUrl: 'https://tonejs.github.io/audio/salamander/',
+    onload: () => {
+      samplerReady = true;
+      if (loading) loading.style.display = 'none';
+      progAudioCtx = Tone.getContext().rawContext;
+    }
+  }).toDestination();
+}
+
+// ── Audio Context ───────────────────────────────
+function getAudioCtx() {
+  return Tone.getContext().rawContext;
+}
+
+// PWA audio unlock — Tone.start() is required on iOS before any audio.
 function _unlockAudio() {
-  if (progAudioCtx && progAudioCtx.state !== 'suspended') return;
-  try {
-    if (!progAudioCtx) progAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (progAudioCtx.state === 'suspended') progAudioCtx.resume().catch(()=>{});
-    const buf = progAudioCtx.createBuffer(1, 1, 22050);
-    const src = progAudioCtx.createBufferSource();
-    src.buffer = buf; src.connect(progAudioCtx.destination); src.start(0);
-  } catch(e) {}
+  Tone.start().then(() => {
+    progAudioCtx = Tone.getContext().rawContext;
+  }).catch(() => {});
 }
 ['touchstart','touchend','mousedown','keydown'].forEach(ev =>
   document.addEventListener(ev, _unlockAudio, { passive: true })
@@ -6035,37 +6055,24 @@ function playChordAt(ctx, pcs, startTime, duration, sound) {
 
   const voiced = spreadChordOctaves(uniquePcs);
 
-  const noteFunc = {
-    'organ':  makeOrganNote,
-    'guitar': makeGuitarNote,
-    'pad':    makePadNote,
-    'piano':  makePianoNote
-  }[sound] || makePianoNote;
-
-  const baseGains = { piano: 0.08, organ: 0.07, guitar: 0.18, pad: 0.05 };
-  const baseGain  = baseGains[sound] || 0.13;
-
-  // All sounds use the strum pattern for rhythmic re-attacks
   const beatsForChord = Math.max(1, Math.round(duration * progGetBpm() / 60));
   const strumHits = getStrumDurations(duration, beatsForChord);
+  const now = Tone.now();
   strumHits.forEach(hit => {
-    const velGain  = hit.velocity !== undefined ? hit.velocity : 1.0;
-    const humGain  = 0.97 + Math.random() * 0.06;
-    const hitGain  = baseGain * velGain * humGain;
     const notesOrdered = hit.up ? [...voiced].reverse() : voiced;
     notesOrdered.forEach((v, i) => {
-      const freq    = 440 * Math.pow(2, (v.midi - 69) / 12);
-      const noteOff = i * 0.008;
-      const noteDur = (duration - hit.offset) + 0.15;
-      noteFunc(ctx, freq, startTime + hit.offset + noteOff, Math.max(0.15, noteDur), hitGain);
+      const noteOff  = i * 0.008;
+      const noteDur  = Math.max(0.15, (duration - hit.offset) + 0.15);
+      const toneTime = now + (startTime + hit.offset + noteOff - ctx.currentTime);
+      if (samplerReady) sampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, toneTime);
     });
     // Bass note emphasis on beat 1: root an octave lower
     if (hit.isFirst && voiced.length > 0) {
       const rootMidi = voiced[0].midi - 12;
-      if (rootMidi >= 28) { // don't go below E1
-        const bassFreq = 440 * Math.pow(2, (rootMidi - 69) / 12);
-        const bassDur  = duration + 0.15;
-        noteFunc(ctx, bassFreq, startTime + hit.offset, Math.max(0.15, bassDur), baseGain * 0.55);
+      if (rootMidi >= 28) {
+        const bassDur  = Math.max(0.15, duration + 0.15);
+        const toneTime = now + (startTime + hit.offset - ctx.currentTime);
+        if (samplerReady) sampler.triggerAttackRelease(midiToNoteName(rootMidi), bassDur, toneTime);
       }
     }
   });
@@ -6213,21 +6220,15 @@ function progPlay() {
   } catch(err) { alert('Audio error: ' + err.message); progStop(); }
   }; // end doPlay
 
-  // Resume AudioContext first (critical for iOS/Android PWA).
-  // ctx.currentTime is frozen while suspended — must read it AFTER resume completes.
-  // Use 100ms buffer (not 50) to ensure ctx.currentTime is non-zero on slow devices.
   const startPlayback = () => setTimeout(doPlay, 200);
-  if (ctx.state !== 'running') {
-    ctx.resume().then(startPlayback).catch(startPlayback);
-  } else {
-    startPlayback();
-  }
+  Tone.start().then(startPlayback).catch(startPlayback);
 }
 
 function progStop() {
   progPlaying = false;
   progReverbNode = null;
   progMasterBus = null;
+  if (sampler) sampler.releaseAll();
   _releaseWakeLock();
   if (progScheduler) { cancelAnimationFrame(progScheduler); progScheduler = null; }
   progCurrentIdx = -1;
@@ -9006,13 +9007,15 @@ function _releaseWakeLock() {
 // Re-acquire if page becomes visible while playing (lock is auto-released on hide)
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    if (progAudioCtx) progAudioCtx.resume().catch(()=>{});
+    Tone.start().catch(() => {});
     if (progPlaying) _acquireWakeLock();
   } else {
-    // Suspend audio context to save battery when backgrounded
-    if (progAudioCtx && progAudioCtx.state === 'running') progAudioCtx.suspend().catch(()=>{});
+    Tone.getContext().rawContext.suspend().catch(() => {});
   }
 });
+
+// ── Sampler init ───────────────────────────────────────────────────────────
+initSampler();
 
 // ── Service worker registration + update notification ──────────────────────
 if ('serviceWorker' in navigator) {
