@@ -1024,9 +1024,9 @@
     font-family: 'IBM Plex Mono', monospace; font-size: 10px;
     color: #c0b8a8; line-height: 1.7;
   }
-  .neg-transform-row .ntr-from { color: var(--gold2); min-width: 24px; text-align: right; }
-  .neg-transform-row .ntr-arrow { color: #e07070; opacity: .7; }
-  .neg-transform-row .ntr-to { color: #e07070; min-width: 24px; }
+  .neg-transform-row .ntr-from { color: #70b8f0; min-width: 24px; text-align: right; }
+  .neg-transform-row .ntr-arrow { color: rgba(255,255,255,.45); opacity: 1; }
+  .neg-transform-row .ntr-to { color: #f07070; min-width: 24px; }
 
 
   /* ══════════════════════════════════════
@@ -2859,12 +2859,11 @@ function drawCoF(rootPc, scaleIntervals){
     const outerActive = hlMaj || !!negColor;
     lt.setAttribute('font-size', outerActive ? (COF_MAJ[i].includes('/')?'11':'17') : (COF_MAJ[i].includes('/')?'10':'14'));
     lt.setAttribute('font-weight', outerActive ? '700' : '400');
-    const labelFill = negColor === 'both'   ? '#f0d840'
-                    : negColor === 'origin' ? '#70b8f0'
-                    : negColor === 'dest'   ? '#f07070'
+    const labelFill = negColor               ? '#ffffff'
                     : hlMaj                 ? getThemeColor('#f0d878','#3a1e00')
                                             : getThemeColor('#3a4250','#6a6050');
     lt.setAttribute('fill', labelFill);
+    lt.setAttribute('stroke', 'none');
     lt.setAttribute('pointer-events','none');
     lt.textContent=COF_MAJ[i];
     svg.appendChild(lt);
@@ -6710,18 +6709,16 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
   // ── 2. Directed green arrows: scale note → its mirror ────────
   if (!scaleIntervals) return;
 
-  // Arrowhead marker (green)
+  // Arrowhead markers: red (dest only) + yellow (both)
   const defs = mk('defs');
-  const marker = mk('marker');
-  marker.setAttribute('id', 'neg-arrow-head');
-  marker.setAttribute('markerWidth', '7'); marker.setAttribute('markerHeight', '7');
-  marker.setAttribute('refX', '6'); marker.setAttribute('refY', '3');
-  marker.setAttribute('orient', 'auto'); marker.setAttribute('class', 'neg-axis');
-  const arrowPath = mk('path');
-  arrowPath.setAttribute('d', 'M0,0 L0,6 L7,3 z');
-  arrowPath.setAttribute('fill', 'rgba(80,210,130,0.9)');
-  marker.appendChild(arrowPath);
-  defs.appendChild(marker);
+  [['neg-arrow-head-red','rgba(240,112,112,0.95)'],['neg-arrow-head-yellow','rgba(240,210,60,0.95)']].forEach(([id,col]) => {
+    const m = mk('marker');
+    m.setAttribute('id', id); m.setAttribute('markerWidth','7'); m.setAttribute('markerHeight','7');
+    m.setAttribute('refX','6'); m.setAttribute('refY','3');
+    m.setAttribute('orient','auto'); m.setAttribute('class','neg-axis');
+    const p = mk('path'); p.setAttribute('d','M0,0 L0,6 L7,3 z'); p.setAttribute('fill',col);
+    m.appendChild(p); defs.appendChild(m);
+  });
   svg.appendChild(defs);
 
   const scalePcs = new Set(scaleIntervals.map(iv => (tonic + iv) % 12));
@@ -6730,6 +6727,10 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
   scalePcs.forEach(pc => {
     const mirPc = negMirrorPcCoF(pc, tonic);
     if (pc === mirPc) return; // note maps to itself — no arrow needed
+
+    const isBoth = scalePcs.has(mirPc);
+    const arrowColor = isBoth ? 'rgba(240,210,60,0.85)' : 'rgba(240,112,112,0.85)';
+    const markerId   = isBoth ? 'neg-arrow-head-yellow' : 'neg-arrow-head-red';
 
     const origAng = COF_SLOT_OF[pc]  * 30;
     const mirAng  = COF_SLOT_OF[mirPc] * 30;
@@ -6751,30 +6752,12 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
     const arrow = mk('path');
     arrow.setAttribute('d', `M${sx.toFixed(1)},${sy.toFixed(1)} Q${cpx.toFixed(1)},${cpy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`);
     arrow.setAttribute('fill', 'none');
-    arrow.setAttribute('stroke', 'rgba(80,210,130,0.75)');
+    arrow.setAttribute('stroke', arrowColor);
     arrow.setAttribute('stroke-width', '1.6');
-    arrow.setAttribute('marker-end', 'url(#neg-arrow-head)');
+    arrow.setAttribute('marker-end', `url(#${markerId})`);
     arrow.setAttribute('class', 'neg-axis');
     svg.appendChild(arrow);
 
-    // Gold dot at source (scale note)
-    const srcDot = mk('circle');
-    srcDot.setAttribute('cx', x1.toFixed(1)); srcDot.setAttribute('cy', y1.toFixed(1));
-    srcDot.setAttribute('r', '3'); srcDot.setAttribute('fill', '#c9a84c');
-    srcDot.setAttribute('opacity', '0.85'); srcDot.setAttribute('class', 'neg-axis');
-    svg.appendChild(srcDot);
-
-    // Source note name (small, gold) just outside the inner ring
-    const srcName = PITCH_CANDIDATES[pc][0];
-    const [nlx, nly] = pxy(r - 10, origAng);
-    const nt = mk('text');
-    nt.setAttribute('x', nlx.toFixed(1)); nt.setAttribute('y', nly.toFixed(1));
-    nt.setAttribute('text-anchor', 'middle'); nt.setAttribute('dominant-baseline', 'central');
-    nt.setAttribute('font-family', 'IBM Plex Mono,monospace'); nt.setAttribute('font-size', '7.5');
-    nt.setAttribute('fill', '#c9a84c'); nt.setAttribute('opacity', '0.9');
-    nt.setAttribute('pointer-events', 'none'); nt.setAttribute('class', 'neg-axis');
-    nt.textContent = srcName;
-    svg.appendChild(nt);
   });
 
   // ── 3. Red highlight on mirrored CoF slots ────────────────
@@ -6794,7 +6777,7 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
     ov.setAttribute('class', 'neg-axis');
     svg.appendChild(ov);
 
-    // Red text label on top
+    // White text label on top (destination / both)
     const [lx, ly] = pxy((R_OUT + R_MID) / 2, i * 30);
     const lt = mk('text');
     lt.setAttribute('x', lx.toFixed(1)); lt.setAttribute('y', ly.toFixed(1));
@@ -6803,7 +6786,8 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
     const label = COF_MAJ[i];
     lt.setAttribute('font-size', label.includes('/') ? '11' : '17');
     lt.setAttribute('font-weight', '700');
-    lt.setAttribute('fill', '#f07878');
+    lt.setAttribute('fill', '#ffffff');
+    lt.setAttribute('stroke', 'none');
     lt.setAttribute('pointer-events', 'none');
     lt.setAttribute('class', 'neg-axis');
     lt.textContent = label;
