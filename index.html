@@ -442,6 +442,10 @@
   .chords-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
   .chord-card { background:var(--surface); border:1px solid var(--border); padding:16px 18px; border-radius:2px; position:relative; overflow:hidden; transition:all .2s; }
+  .chord-play-btn { position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.22); color:var(--gold2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; }
+  .chord-card:hover .chord-play-btn { opacity:1; }
+  .chord-play-btn:hover { background:rgba(201,168,76,.25); color:var(--cream); }
+  .chord-play-btn.playing { opacity:1; background:rgba(201,168,76,.35); color:var(--cream); }
   @keyframes fadeUp { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:none} }
   .chord-card { animation:fadeUp .24s ease both; }
   .chord-card::after { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--accent); transform:scaleY(0); transform-origin:bottom; transition:transform .2s; }
@@ -2076,7 +2080,9 @@
 
 </div><!-- end main-layout -->
 
-  <footer>Harmonic Atlas · All 12 keys · Major modes · Harmonic minor · Melodic minor · Exotic scales</footer>
+  <footer>Harmonic Atlas · All 12 keys · Major modes · Harmonic minor · Melodic minor · Exotic scales
+    <span style="display:block;margin-top:8px"><button id="reset-prefs-btn" style="background:none;border:none;color:var(--muted);font-family:inherit;font-size:9px;letter-spacing:.1em;cursor:pointer;text-decoration:underline dotted;padding:0" title="Clears theme, history and toggle preferences">Reset preferences</button></span>
+  </footer>
 </div><!-- end wrap -->
 
 <button id="back-top" title="Back to top" aria-label="Back to top">↑</button>
@@ -3386,6 +3392,26 @@ function addCardStaff(card, notes) {
   card.appendChild(panel);
 }
 
+function addCardPlayBtn(card, notes) {
+  if (!notes || !notes.length) return;
+  const pcs = notes.map(n => noteNameToPc(n)).filter(p => p >= 0);
+  if (!pcs.length) return;
+  const btn = document.createElement('button');
+  btn.className = 'chord-play-btn';
+  btn.title = 'Play chord';
+  btn.setAttribute('aria-label', 'Play chord');
+  btn.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10"><polygon points="1,1 8,5 1,9" fill="currentColor"/></svg>';
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const ctx = getAudioCtx();
+    const sound = document.getElementById('prog-sound')?.value || 'piano';
+    playChordAt(ctx, pcs, ctx.currentTime + 0.01, 2.0, sound);
+    btn.classList.add('playing');
+    setTimeout(() => btn.classList.remove('playing'), 2000);
+  });
+  card.appendChild(btn);
+}
+
 // ── Jazz impro scale suggestions ──
 const IMPRO_MAP = [
   { match: q => q.includes('Aug Dominant') || (q.includes('7') && q.includes('♯5') && !q.includes('Δ')), scales: ['Whole Tone', 'Lydian Augmented'] },
@@ -3539,6 +3565,7 @@ function renderChords(scaleNotes, scaleData){
         }
 
         addCardStaff(card, chord.notes);
+        addCardPlayBtn(card, chord.notes);
         grid.appendChild(card);
       });
       sec.appendChild(grid);
@@ -3588,6 +3615,7 @@ function renderChords(scaleNotes, scaleData){
         <div class="chord-notes-row">${makeNotePills(chordNotes)}</div>
         <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
       addCardStaff(card, chordNotes);
+      addCardPlayBtn(card, chordNotes);
       if (quality.includes('Dom') && !quality.includes('sus')) {
         const rPc = noteNameToPc(chordNotes[0]);
         if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
@@ -3670,6 +3698,7 @@ function renderChords(scaleNotes, scaleData){
               <div class="chord-notes-row">${makeNotePills(ch.notes)}</div>
               <div class="chord-intervals">Intervals: 1 · ${ch.iv.slice(1).map(iName).join(' · ')}</div>`;
             addCardStaff(card, ch.notes);
+            addCardPlayBtn(card, ch.notes);
             grid.appendChild(card);
           });
         }
@@ -3685,6 +3714,7 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-notes-row">${makeNotePills(chordNotes)}</div>
           <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
         addCardStaff(card, chordNotes);
+        addCardPlayBtn(card, chordNotes);
         const rPc = noteNameToPc(chordNotes[0]);
         if (quality.includes('Dom') && !quality.includes('sus')) {
           if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
@@ -7902,6 +7932,13 @@ initCollapsibles();
   });
 })();
 
+// ── Reset preferences ──
+document.getElementById('reset-prefs-btn')?.addEventListener('click', () => {
+  if (!confirm('Clear all saved preferences (theme, history, toggles)?')) return;
+  ['harmonic-theme','harmonic-history','harmonic-show-intervals'].forEach(k => localStorage.removeItem(k));
+  location.reload();
+});
+
 // ── Populate pivot selects ──
 (function(){
   const KEYS = ['C','C♯/D♭','D','E♭','E','F','F♯/G♭','G','A♭','A','B♭','B'];
@@ -8836,26 +8873,35 @@ function unlockScroll() {
   }
 
   // Intercept progPlay/progStop to also update zoom UI
+  let _zoomTickRunning = false;
+  function startZoomTick() {
+    if (_zoomTickRunning) return;
+    _zoomTickRunning = true;
+    (function tick() {
+      if (!overlay.classList.contains('open') || !progPlaying) {
+        _zoomTickRunning = false;
+        const bar = document.getElementById('zoom-playhead-bar');
+        if (bar && !progPlaying) bar.style.width = '0';
+        return;
+      }
+      const bar = document.getElementById('zoom-playhead-bar');
+      if (bar) {
+        const ctx = getAudioCtx();
+        const elapsed = ctx.currentTime - progStartTime;
+        const bpm = progGetBpm();
+        const beatDur = 60 / bpm;
+        const total = progression.reduce((s, ch) => s + (ch.beats || progGetBeats()) * beatDur, 0);
+        bar.style.width = (Math.min(elapsed / total, 1) * 100) + '%';
+      }
+      updateZoomPlayState();
+      requestAnimationFrame(tick);
+    })();
+  }
   const origPlay = window.progPlay;
   window.progPlay = function() {
     origPlay && origPlay();
     updateZoomPlayState();
-    // Animate playhead in zoom
-    (function tick() {
-      if (!document.getElementById('prog-zoom-overlay').classList.contains('open')) return;
-      const bar = document.getElementById('zoom-playhead-bar');
-      if (!bar) return;
-      if (!progPlaying) { bar.style.width = '0'; return; }
-      const ctx = getAudioCtx();
-      const elapsed = ctx.currentTime - progStartTime;
-      // Compute total duration
-      const bpm = progGetBpm();
-      const beatDur = 60 / bpm;
-      const total = progression.reduce((s, ch) => s + (ch.beats || progGetBeats()) * beatDur, 0);
-      bar.style.width = (Math.min(elapsed / total, 1) * 100) + '%';
-      updateZoomPlayState();
-      requestAnimationFrame(tick);
-    })();
+    startZoomTick();
   };
 
   zoomPlay.addEventListener('click', () => { progPlay(); updateZoomPlayState(); });
