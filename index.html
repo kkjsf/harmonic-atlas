@@ -3404,18 +3404,18 @@ function addCardPlayBtn(card, notes) {
   btn.addEventListener('click', e => {
     e.stopPropagation();
     const ctx = getAudioCtx();
-    if (ctx.state !== 'running') ctx.resume().catch(()=>{});
-    const sound = document.getElementById('prog-sound')?.value || 'piano';
-    const noteFunc = { organ: makeOrganNote, guitar: makeGuitarNote, pad: makePadNote, piano: makePianoNote }[sound] || makePianoNote;
-    const gain = { piano: 0.10, organ: 0.08, guitar: 0.20, pad: 0.06 }[sound] || 0.10;
-    const t0 = ctx.currentTime + 0.02;
-    const voiced = spreadChordOctaves(pcs);
-    voiced.forEach((v, i) => {
-      const freq = 440 * Math.pow(2, (v.midi - 69) / 12);
-      noteFunc(ctx, freq, t0 + i * 0.008, 3.5, gain);
-    });
-    btn.classList.add('playing');
-    setTimeout(() => btn.classList.remove('playing'), 3500);
+    const play = () => {
+      const t0 = ctx.currentTime + 0.02;
+      const voiced = spreadChordOctaves(pcs);
+      voiced.forEach((v, i) => {
+        const freq = 440 * Math.pow(2, (v.midi - 69) / 12);
+        makePianoNote(ctx, freq, t0 + i * 0.008, 3.5, 0.11);
+      });
+      btn.classList.add('playing');
+      setTimeout(() => btn.classList.remove('playing'), 3500);
+    };
+    if (ctx.state !== 'running') ctx.resume().then(play).catch(play);
+    else play();
   });
   card.appendChild(btn);
 }
