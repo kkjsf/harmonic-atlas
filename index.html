@@ -3806,12 +3806,6 @@ function render(){
   const isGuitar   = ['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
   const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
 
-  // Request landscape on mobile for views that benefit from wide layout
-  const wantsLandscape = ['arpeggio','scale','mandolin-scale'].includes(state.view);
-  if (screen.orientation && screen.orientation.lock) {
-    if (wantsLandscape) screen.orientation.lock('landscape').catch(() => {});
-    else screen.orientation.unlock();
-  }
   document.querySelectorAll('.view-tab').forEach(t => {
     const tv = t.dataset.view;
     const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv===state.view;
@@ -7712,6 +7706,26 @@ document.querySelector('.controls').addEventListener('click',e=>{
   btn.classList.add('active');state.mode=btn.dataset.n;render();
 });
 
+const LANDSCAPE_VIEWS = new Set(['arpeggio','scale','mandolin-scale']);
+function requestLandscapeIfNeeded(view) {
+  if (!screen.orientation || !screen.orientation.lock) return;
+  if (LANDSCAPE_VIEWS.has(view)) {
+    const el = document.documentElement;
+    const doLock = () => screen.orientation.lock('landscape').catch(() => {});
+    if (document.fullscreenElement) {
+      doLock();
+    } else if (el.requestFullscreen) {
+      el.requestFullscreen().then(doLock).catch(() => {});
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+      doLock();
+    }
+  } else {
+    if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    screen.orientation.unlock();
+  }
+}
+
 document.getElementById('view-tabs').addEventListener('click',e=>{
   const tab = e.target.closest('.view-tab');
   if(!tab || tab.classList.contains('disabled')) return;
@@ -7731,6 +7745,7 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
   document.getElementById('guitar-sub-tabs').style.display  =isGuitar2  ?'flex':'none';
   document.getElementById('mandolin-sub-tabs').style.display=isMandolin2?'flex':'none';
+  requestLandscapeIfNeeded(state.view);
   renderView(scaleNotes,scaleData);
   wireChordCards();
 });
@@ -7744,6 +7759,7 @@ document.getElementById('guitar-sub-tabs').addEventListener('click',e=>{
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
+  requestLandscapeIfNeeded(state.view);
   renderView(scaleNotes,scaleData);
   wireChordCards();
 });
@@ -7757,6 +7773,7 @@ document.getElementById('mandolin-sub-tabs').addEventListener('click',e=>{
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
+  requestLandscapeIfNeeded(state.view);
   renderView(scaleNotes,scaleData);
   wireChordCards();
 });
