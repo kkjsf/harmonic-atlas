@@ -3682,7 +3682,7 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-intervals">Intervals: 1 · ${negCh.iv.slice(1).map(iName).join(' · ')}</div>`;
         addCardStaff(negCard, negCh.notes || []);
         addCardPlayBtn(negCard, negCh.notes || []);
-        addCardAddBtn(negCard, negCh.root, negCh.sym, roman, negCh.notes, negCh.qual);
+        addCardAddBtn(negCard, negCh.root, negCh.sym, romans[di], negCh.notes, negCh.qual);
         const negRootPc = noteNameToPc(negCh.root);
         if (negRootPc >= 0 && n >= 4) {
           const improDiv = makeImproDiv(negCh.qual, negRootPc);
@@ -4643,10 +4643,9 @@ function renderArpeggios(scaleNotes, scaleData) {
         card.innerHTML = `<div style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px">${pos.label} · click to zoom</div>${makeArpeggioDiagram(pos.notes, chRootPc)}`;
         card.addEventListener('mouseenter', () => { card.style.borderColor='rgba(201,168,76,.45)'; card.style.boxShadow='0 2px 12px rgba(0,0,0,.5)'; });
         card.addEventListener('mouseleave', () => { card.style.borderColor='rgba(255,255,255,0.06)'; card.style.boxShadow=''; });
-        card.addEventListener('click', () => {
-          requestLandscapeIfNeeded('arpeggio');
-          showSvgModal(makeArpeggioDiagram(pos.notes, chRootPc, 680), `${chordNotes[0]}<sup>${sym}</sup> — ${pos.label}`);
-        });
+        card.addEventListener('click', () =>
+          showSvgModal(makeArpeggioDiagram(pos.notes, chRootPc, 680), `${chordNotes[0]}<sup>${sym}</sup> — ${pos.label}`, true)
+        );
         grid.appendChild(card);
       });
       sec.appendChild(grid);
@@ -4842,8 +4841,8 @@ function computeScalePositions(intervals, rootPc) {
   return positions;
 }
 
-// Generic SVG zoom modal (reuses #diag-modal id)
-function showSvgModal(svgHtml, title) {
+// Generic SVG zoom modal — landscape:true requests fullscreen + orientation lock on mobile
+function showSvgModal(svgHtml, title, landscape = false) {
   document.getElementById('diag-modal')?.remove();
   const modal = document.createElement('div');
   modal.id = 'diag-modal';
@@ -4861,12 +4860,32 @@ function showSvgModal(svgHtml, title) {
   modal.appendChild(inner);
   inner.addEventListener('click', e => e.stopPropagation());
   modal.addEventListener('click', () => {
-    modal.remove();
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
     const hint = document.getElementById('rotate-hint');
     if (hint) hint.style.display = 'none';
-    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+    modal.remove();
   });
   document.body.appendChild(modal);
+  // Request landscape on mobile — must happen synchronously in the click handler (user gesture)
+  if (landscape) {
+    const isMobile = 'ontouchstart' in window || window.innerWidth < 900;
+    if (isMobile && screen.orientation && screen.orientation.lock) {
+      const doLock = () => screen.orientation.lock('landscape').catch(() => {
+        // Fullscreen not available or failed — show rotate hint as fallback
+        const h = document.getElementById('rotate-hint');
+        if (h && window.innerHeight > window.innerWidth) h.style.display = 'flex';
+      });
+      if (document.fullscreenElement) {
+        doLock();
+      } else {
+        const el = document.documentElement;
+        const fs = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (fs) fs.call(el).then(doLock).catch(doLock);
+        else doLock();
+      }
+    }
+  }
 }
 
 function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs, strNamesTop, maxFret, showCAGED) {
@@ -4926,11 +4945,10 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
   fullBoard.className = 'scale-full-board';
   fullBoard.title = 'Click to zoom';
   fullBoard.innerHTML = makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 820, showNotes, openPCs, strNamesTop);
-  fullBoard.addEventListener('click', () => {
-    requestLandscapeIfNeeded('scale');
+  fullBoard.addEventListener('click', () =>
     showSvgModal(makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 900, showNotes, openPCs, strNamesTop),
-      `${scaleName} — Full Fretboard`);
-  });
+      `${scaleName} — Full Fretboard`, true)
+  );
   fullSec.appendChild(fullBoard);
   container.appendChild(fullSec);
 
@@ -4951,11 +4969,10 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
     card.className = 'scale-pos-card';
     const svgSmall = makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 260, showNotes, openPCs, strNamesTop);
     card.innerHTML = `<div class="scale-pos-label">${pos.label}</div>${svgSmall}`;
-    card.addEventListener('click', () => {
-      requestLandscapeIfNeeded('scale');
+    card.addEventListener('click', () =>
       showSvgModal(makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 560, showNotes, openPCs, strNamesTop),
-        `${scaleName} — ${pos.label}`);
-    });
+        `${scaleName} — ${pos.label}`, true)
+    );
     posGrid.appendChild(card);
   });
 
@@ -7715,21 +7732,6 @@ document.querySelector('.controls').addEventListener('click',e=>{
   btn.classList.add('active');state.mode=btn.dataset.n;render();
 });
 
-const LANDSCAPE_VIEWS = new Set(['arpeggio','scale','mandolin-scale']);
-function requestLandscapeIfNeeded(view) {
-  const wantsLandscape = LANDSCAPE_VIEWS.has(view);
-  // Try silent lock (works in installed PWA on Android, silently fails in browser)
-  if (screen.orientation && screen.orientation.lock) {
-    if (wantsLandscape) screen.orientation.lock('landscape').catch(() => {});
-    else screen.orientation.unlock();
-  }
-  // Show/hide rotate hint for portrait mobile users
-  const hint = document.getElementById('rotate-hint');
-  if (!hint) return;
-  const isMobile = window.innerWidth < 900 || ('ontouchstart' in window);
-  const isPortrait = window.innerHeight > window.innerWidth;
-  hint.style.display = (wantsLandscape && isMobile && isPortrait) ? 'flex' : 'none';
-}
 
 document.getElementById('view-tabs').addEventListener('click',e=>{
   const tab = e.target.closest('.view-tab');
