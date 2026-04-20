@@ -3403,7 +3403,10 @@ function addCardPlayBtn(card, notes) {
   btn.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10"><polygon points="1,1 8,5 1,9" fill="currentColor"/></svg>';
   btn.addEventListener('click', e => {
     e.stopPropagation();
-    const ctx = getAudioCtx();
+    // Use progAudioCtx only if already running — never create or resume it here
+    // to avoid corrupting the context state before progPlay() can unlock it.
+    const ctx = (progAudioCtx && progAudioCtx.state === 'running') ? progAudioCtx
+      : new (window.AudioContext || window.webkitAudioContext)();
     const play = () => {
       const t0 = ctx.currentTime + 0.02;
       const voiced = spreadChordOctaves(pcs);
@@ -3414,8 +3417,8 @@ function addCardPlayBtn(card, notes) {
       btn.classList.add('playing');
       setTimeout(() => btn.classList.remove('playing'), 3500);
     };
-    if (ctx.state !== 'running') ctx.resume().then(play).catch(play);
-    else play();
+    if (ctx.state === 'running') play();
+    else ctx.resume().then(play).catch(() => {});
   });
   card.appendChild(btn);
 }
