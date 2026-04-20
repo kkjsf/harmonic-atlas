@@ -379,7 +379,7 @@
     color: var(--text); font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; padding: 6px 12px; border-radius: 3px;
     pointer-events: none; opacity: 0; transition: opacity .15s;
-    white-space: nowrap; letter-spacing: .06em;
+    white-space: nowrap; letter-spacing: .06em; line-height: 1.6;
     box-shadow: 0 4px 16px rgba(0,0,0,.4);
   }
   #cof-tooltip.visible { opacity: 1; }
@@ -419,7 +419,7 @@
   .cof-leg-dot { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
 
   /* Right panel: chord degrees */
-  .right-panel {}
+  .right-panel { min-width: 0; }
 
   /* Degree sections */
   .degree-section { scroll-margin-top:24px; }
@@ -521,8 +521,11 @@
   }
   .scale-pos-card:hover { border-color:rgba(201,168,76,.5); box-shadow:0 2px 12px rgba(0,0,0,.5); }
   .scale-pos-label { font-size:9px; font-family:'IBM Plex Mono',monospace; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:5px; }
-  .scale-full-board { overflow-x:auto; cursor:pointer; padding:4px 0 2px; }
+  .scale-full-board { overflow-x:auto; overflow-y:hidden; touch-action:pan-x; cursor:pointer; padding:4px 0 2px; -webkit-overflow-scrolling:touch; }
   .scale-full-board:hover svg { opacity:.85; }
+  @media (max-width:700px) {
+    .scale-full-board::after { content:'← swipe →'; display:block; font-size:8px; color:var(--muted); text-align:center; margin-top:4px; font-family:'IBM Plex Mono',monospace; letter-spacing:.1em; opacity:.6; }
+  }
 
   /* ── Guitar diagram card ── */
   .diag-card {
@@ -743,8 +746,8 @@
     background: var(--surface2);
     border: 1px solid var(--border2);
     border-radius: 4px;
-    padding: 18px 20px 16px;
-    min-width: 130px; flex: 1 1 130px; max-width: 200px;
+    padding: 22px 24px 20px;
+    min-width: 170px; flex: 1 1 170px; max-width: 260px;
     position: relative; cursor: pointer;
     transition: border-color .18s, box-shadow .18s;
     user-select: none;
@@ -756,13 +759,13 @@
   }
   .zoom-slot-name {
     font-family: 'Playfair Display', serif;
-    font-size: 22px; font-weight: 700; color: var(--cream);
-    line-height: 1; margin-bottom: 4px;
+    font-size: 32px; font-weight: 700; color: var(--cream);
+    line-height: 1; margin-bottom: 6px;
   }
-  .zoom-slot-name sup { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold2); vertical-align: super; }
+  .zoom-slot-name sup { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--gold2); vertical-align: super; }
   .zoom-slot-roman {
-    font-family: 'EB Garamond', serif; font-size: 14px;
-    font-weight: 600; color: var(--dim); margin-bottom: 10px;
+    font-family: 'EB Garamond', serif; font-size: 17px;
+    font-weight: 600; color: var(--dim); margin-bottom: 12px;
   }
   .zoom-slot-notes {
     display: flex; flex-wrap: wrap; gap: 5px;
@@ -791,6 +794,14 @@
   body.light-theme .zoom-slot { background: #ede8de; border-color: #cec8ba; }
   body.light-theme .zoom-slot-name { color: #302818; }
   body.light-theme .zoom-slot-roman { color: #8a7a60; }
+  @media (max-width: 600px) {
+    #prog-zoom-panel { padding: 18px 14px 20px; }
+    .zoom-slots-wrap { gap: 10px; }
+    .zoom-slot { min-width: calc(50% - 5px); max-width: calc(50% - 5px); flex: 0 0 calc(50% - 5px); padding: 16px 14px 14px; }
+    .zoom-slot-name { font-size: 26px; }
+    .zoom-slot-roman { font-size: 14px; }
+    .zoom-note-pill { font-size: 10px; padding: 2px 6px; }
+  }
   .slot-beat-btn {
     width: 16px; height: 16px; border-radius: 2px; border: 1px solid var(--border2);
     background: var(--surface); color: var(--muted); font-size: 11px; line-height: 1;
@@ -990,6 +1001,28 @@
     background: rgba(224,80,80,.1); border: 1px solid rgba(224,80,80,.25);
     border-radius: 2px; padding: 1px 5px; margin-bottom: 5px;
   }
+  /* Note transformation hover tooltip */
+  .neg-transform-tip {
+    display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%); z-index: var(--z-tooltip);
+    background: #0d1117; border: 1px solid rgba(224,80,80,.4);
+    border-radius: 4px; padding: 8px 12px; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,.6);
+    pointer-events: none;
+  }
+  .neg-transform-tip::after {
+    content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+    border: 5px solid transparent; border-top-color: rgba(224,80,80,.4);
+  }
+  .neg-transform-tip.visible { display: block; }
+  .neg-transform-row {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: #c0b8a8; line-height: 1.7;
+  }
+  .neg-transform-row .ntr-from { color: var(--gold2); min-width: 24px; text-align: right; }
+  .neg-transform-row .ntr-arrow { color: #e07070; opacity: .7; }
+  .neg-transform-row .ntr-to { color: #e07070; min-width: 24px; }
 
 
   /* ══════════════════════════════════════
@@ -2030,6 +2063,7 @@
   <div class="guitar-sub-tabs" id="mandolin-sub-tabs" style="display:none">
     <button class="guitar-sub-tab active" data-view="mandolin" id="tab-mando-chords">Chords</button>
     <button class="guitar-sub-tab" data-view="mandolin-scale" id="tab-mando-scale">Scale</button>
+    <button class="guitar-sub-tab" data-view="mandolin-chop" id="tab-mando-chop">Chop</button>
   </div>
   <div id="compare-panel" style="display:none">
     <div class="compare-cols" id="compare-cols">
@@ -2741,9 +2775,9 @@ function drawCoF(rootPc, scaleIntervals){
     const aS=i*30-15, aE=i*30+15, ang=i*30;
     const majPc=COF_PC[i], minPc=COF_MIN_PC[i], dimPc=COF_DIM_PC[i];
 
-    const hlMaj=majSet.has(majPc);
-    const hlMin=minSet.has(minPc);
-    const hlDim=dimSet.has(dimPc);
+    const hlMaj=!negHarmonyActive && majSet.has(majPc);
+    const hlMin=!negHarmonyActive && minSet.has(minPc);
+    const hlDim=!negHarmonyActive && dimSet.has(dimPc);
 
     // Find which degree index(es) this CoF slot maps to (for chord highlighting)
     // majPc → find in scale; minPc → find in scale; dimPc → find in scale
@@ -2880,7 +2914,12 @@ function drawCoF(rootPc, scaleIntervals){
 
     // Show tooltip for all slices
     const ringLabel = ring==='maj'?'Major':ring==='min'?'Minor':'Diminished';
-    tooltip.textContent = `${lbl} - ${ringLabel}`;
+    const negTxt = (!isNaN(deg) && deg >= 0) ? buildNegTransformText(deg) : null;
+    if (negTxt) {
+      tooltip.innerHTML = `<strong>${lbl} — ${ringLabel}</strong><br><span style="font-size:10px;opacity:.85">${negTxt}</span>`;
+    } else {
+      tooltip.textContent = `${lbl} - ${ringLabel}`;
+    }
     tooltip.classList.add('visible');
   });
 
@@ -3579,9 +3618,10 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-notes-row">${makeNotePills(negCh.notes)}</div>
           <div class="chord-intervals">Intervals: 1 · ${negCh.iv.slice(1).map(iName).join(' · ')}</div>`;
         addCardStaff(negCard, negCh.notes || []);
-        if (n >= 4) {
-          const negRootPc = noteNameToPc(negCh.root);
-          if (negRootPc >= 0) { const improDiv = makeImproDiv(negCh.qual, negRootPc); if (improDiv) negCard.appendChild(improDiv); }
+        const negRootPc = noteNameToPc(negCh.root);
+        if (negRootPc >= 0 && n >= 4) {
+          const improDiv = makeImproDiv(negCh.qual, negRootPc);
+          if (improDiv) negCard.appendChild(improDiv);
         }
       } else {
         negCard.className = 'neg-card';
@@ -3591,6 +3631,24 @@ function renderChords(scaleNotes, scaleData){
       pair.appendChild(card);
       pair.appendChild(arrow);
       pair.appendChild(negCard);
+
+      // Hover tooltip: show note-by-note transform when hovering the original card (7th+ only)
+      if (negCh && n >= 4) {
+        const tip = document.createElement('div');
+        tip.className = 'neg-transform-tip';
+        const txt = buildNegTransformText(di);
+        if (txt) {
+          tip.innerHTML = txt.split('  ·  ').map(part => {
+            const [f, t] = part.split(' → ');
+            return `<div class="neg-transform-row"><span class="ntr-from">${f}</span><span class="ntr-arrow">→</span><span class="ntr-to">${t}</span></div>`;
+          }).join('');
+          pair.style.position = 'relative';
+          pair.appendChild(tip);
+          card.addEventListener('mouseenter', () => tip.classList.add('visible'));
+          card.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+        }
+      }
+
       sec.appendChild(pair);
     } else {
       const grid=document.createElement('div');
@@ -3678,7 +3736,7 @@ function render(){
     state.view='diagrams'; state.lastGuitarView='diagrams';
   }
   const isGuitar   = ['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
-  const isMandolin = ['mandolin','mandolin-scale'].includes(state.view);
+  const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
   document.querySelectorAll('.view-tab').forEach(t => {
     const tv = t.dataset.view;
     const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv===state.view;
@@ -3714,6 +3772,7 @@ function renderView(scaleNotes,scaleData){
   else if(state.view==='drop3')     renderDropVoicings(scaleNotes,scaleData,3);
   else if(state.view==='mandolin')        renderMandolin(scaleNotes,scaleData);
   else if(state.view==='mandolin-scale') renderMandolinScale(scaleNotes,scaleData);
+  else if(state.view==='mandolin-chop')  renderMandolinChop(scaleNotes,scaleData);
 }
 
 // ══════════════════════════════════════════════
@@ -4107,7 +4166,46 @@ function renderDiagrams(scaleNotes, scaleData) {
 
     chords.forEach((ch, ci) => {
       const chRootPc = noteNameToPc(ch.notes[0]);
-      grid.appendChild(makeDiagCard(chRootPc, ch.notes, ch.sym, ch.qual, ch.iv, ci*.05));
+      const mainCard = makeDiagCard(chRootPc, ch.notes, ch.sym, ch.qual, ch.iv, ci*.05);
+
+      if (negHarmonyActive && n >= 4) {
+        // Wrap original + neg in a paired container
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'display:flex;align-items:flex-start;gap:6px;grid-column:1/-1;';
+
+        const negCh = buildNegChord(ch.notes, parseInt(state.key));
+        const arrow = document.createElement('div');
+        arrow.style.cssText = 'display:flex;align-items:center;padding-top:36px;color:rgba(224,112,112,.5);font-size:14px;flex-shrink:0';
+        arrow.textContent = '↔';
+
+        if (negCh) {
+          const negRootPc = noteNameToPc(negCh.root);
+          const negCard = makeDiagCard(negRootPc, negCh.notes, negCh.sym, negCh.qual, negCh.iv, ci*.05 + .05);
+          // Tint the neg card
+          negCard.style.borderColor = 'rgba(220,80,80,.3)';
+          negCard.style.background = 'rgba(220,80,80,.04)';
+          const tag = document.createElement('div');
+          tag.style.cssText = 'font-size:7px;letter-spacing:.12em;color:#e07070;text-transform:uppercase;margin-bottom:4px;font-family:"IBM Plex Mono",monospace;';
+          tag.textContent = '↔ Negative';
+          negCard.insertBefore(tag, negCard.firstChild);
+
+          // Show transform tooltip on hover of original card
+          const txt = buildNegTransformText(di);
+          if (txt) {
+            mainCard.title = txt.replace(/  ·  /g, '  |  ');
+            mainCard.style.cursor = 'help';
+          }
+
+          wrap.appendChild(mainCard);
+          wrap.appendChild(arrow);
+          wrap.appendChild(negCard);
+        } else {
+          wrap.appendChild(mainCard);
+        }
+        grid.appendChild(wrap);
+      } else {
+        grid.appendChild(mainCard);
+      }
     });
 
     sec.appendChild(grid);
@@ -4553,7 +4651,7 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
   const DOT_R = 7;
   const lc = 'rgba(255,255,255,0.14)';
 
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;max-width:100%">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">`;
 
   // Fret-marker dots (3,5,7,9,12,15)
   const strBottom = padT + strGap * (numStr - 1);
@@ -4683,8 +4781,8 @@ function showSvgModal(svgHtml, title) {
     animation:fadeIn .15s ease;padding:20px;box-sizing:border-box`;
   const inner = document.createElement('div');
   inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
-    padding:24px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;
-    cursor:default;max-width:min(96vw,960px);overflow-x:auto;`;
+    padding:16px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;
+    cursor:default;max-width:min(96vw,960px);overflow-x:auto;-webkit-overflow-scrolling:touch;`;
   inner.innerHTML = `
     <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">${title}</div>
     <div style="overflow-x:auto;max-width:100%">${svgHtml}</div>
@@ -4801,6 +4899,138 @@ function renderMandolinScale(scaleNotes, scaleData) {
   const MANDO_STR_TOP   = ['e','A','D','G'];          // top→bottom in SVG
   renderScaleTabFor(container, scaleNotes, scaleData, 'Mandolin',
     MANDO_OPEN_PC, MANDO_STR_TOP, 12, false);
+}
+
+// ── Closed (moveable) mandolin voicings for chop chords ──────────
+function computeClosedMandoVoicing(pcs, stringIndices) {
+  const PC = pcs.map(p => ((p%12)+12)%12);
+  const candidates = PC.map((pc, i) => {
+    const strPc = MANDO_MIDI[stringIndices[i]] % 12;
+    const base  = (pc - strPc + 12) % 12;
+    const start = base === 0 ? 12 : base;  // skip open string
+    const opts  = [];
+    for (let f = start; f <= 16; f += 12) opts.push(f);
+    return opts;
+  });
+  let best = null, bestScore = Infinity;
+  function search(idx, cur) {
+    if (idx === PC.length) {
+      const pitches = cur.map((f,i) => MANDO_MIDI[stringIndices[i]] + f);
+      for (let i=1;i<pitches.length;i++) if (pitches[i] <= pitches[i-1]) return;
+      const span = Math.max(...cur) - Math.min(...cur);
+      if (span > 5) return;
+      const minF = Math.min(...cur);
+      const score = span * 8 + minF * 4;
+      if (score < bestScore) { bestScore = score; best = [...cur]; }
+      return;
+    }
+    for (const fret of candidates[idx]) { cur.push(fret); search(idx+1, cur); cur.pop(); }
+  }
+  search(0, []);
+  return best;
+}
+
+function getChopMandoVoicing(rootPc, ivArray) {
+  const allPcs = ivArray.map(iv => ((rootPc+iv)%12+12)%12);
+  let pcs = allPcs.length <= 4 ? [...new Set(allPcs)] :
+    [...new Set([0,1,3,allPcs.length-1].map(i => ((rootPc+ivArray[Math.min(i,ivArray.length-1)])%12+12)%12))];
+  while (pcs.length < 4) pcs.push(pcs[pcs.length % Math.max(1,pcs.length-1)]);
+  pcs = pcs.slice(0,4);
+  function allPerms(arr) {
+    if (arr.length<=1) return [arr];
+    return arr.flatMap((x,i)=>allPerms([...arr.slice(0,i),...arr.slice(i+1)]).map(p=>[x,...p]));
+  }
+  const ss = [0,1,2,3];
+  let best = null, bestScore = Infinity;
+  for (const assign of allPerms(pcs)) {
+    const v = computeClosedMandoVoicing(assign, ss);
+    if (!v) continue;
+    const span = Math.max(...v) - Math.min(...v);
+    const minF = Math.min(...v);
+    const score = span * 8 + minF * 4;
+    if (score < bestScore) { bestScore = score; best = { frets: v, pcs: assign }; }
+  }
+  return best ? { frets4: best.frets, pcs4: best.pcs } : null;
+}
+
+function renderMandolinChop(scaleNotes, scaleData) {
+  const container = document.getElementById('all-degrees');
+  container.innerHTML = '';
+
+  const hRow = document.createElement('div');
+  hRow.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;';
+  hRow.innerHTML = `
+    <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-family:'IBM Plex Mono',monospace;font-weight:600">Mandolin Chop Chords</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)">G · D · A · E &nbsp;·&nbsp; Closed positions</span>`;
+  container.appendChild(hRow);
+
+  const desc = document.createElement('div');
+  desc.style.cssText = 'font-size:9px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:560px;font-family:"IBM Plex Mono",monospace;letter-spacing:.03em;border-left:2px solid var(--border2);padding-left:10px';
+  desc.textContent = 'Chop chords use closed (moveable) shapes — no open strings. Strike and immediately release finger pressure for the classic backbeat chop on beats 2 & 4.';
+  container.appendChild(desc);
+
+  const rootPc  = parseInt(state.key);
+  const scaleLen = scaleNotes.length;
+  const DNAMES  = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const romans  = computeAllRomans(scaleData.intervals, scaleData);
+
+  scaleNotes.forEach((_, di) => {
+    const sec = document.createElement('div');
+    sec.className = 'degree-section';
+    sec.id = `mando-chop-deg-${di}`;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'degree-header';
+    hdr.innerHTML = `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`;
+    sec.appendChild(hdr);
+
+    const grid = document.createElement('div');
+    grid.className = 'chords-grid';
+
+    [3, 4].forEach(n => {
+      const notes    = buildChord(scaleNotes, di, n);
+      const iv       = chordIntervals(scaleData.intervals, di, n);
+      const { sym, quality } = getChordSymbol(notes[0], iv);
+      const chRootPc = noteNameToPc(notes[0]);
+      const voicing  = getChopMandoVoicing(chRootPc, iv);
+
+      const card = document.createElement('div');
+      card.className = 'diag-card';
+
+      const badge = document.createElement('div');
+      badge.style.cssText = 'font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;';
+      badge.textContent = n === 3 ? 'Triad' : '7th';
+      card.appendChild(badge);
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'diag-chord-name';
+      nameDiv.innerHTML = `${notes[0]}<sup>${sym}</sup>`;
+      card.appendChild(nameDiv);
+
+      const qualDiv = document.createElement('div');
+      qualDiv.className = 'diag-quality';
+      qualDiv.textContent = quality;
+      card.appendChild(qualDiv);
+
+      if (voicing) {
+        card.insertAdjacentHTML('beforeend', makeMandoDiagram(voicing.frets4, voicing.pcs4, chRootPc, 116));
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => showMandoDiagramModal(voicing.frets4, voicing.pcs4, chRootPc, `${notes[0]}${sym}`));
+      } else {
+        card.insertAdjacentHTML('beforeend', '<div style="color:var(--muted);font-size:10px;padding:20px 0;text-align:center">-</div>');
+      }
+
+      const notesDiv = document.createElement('div');
+      notesDiv.className = 'diag-notes';
+      notesDiv.textContent = notes.join(' · ');
+      card.appendChild(notesDiv);
+      grid.appendChild(card);
+    });
+
+    sec.appendChild(grid);
+    if (di < scaleLen-1) { const dv=document.createElement('div'); dv.className='section-divider'; sec.appendChild(dv); }
+    container.appendChild(sec);
+  });
 }
 
 // Drop 2: close position = 1-3-5-7, drop 2nd-from-top (5) one octave
@@ -6235,6 +6465,8 @@ function buildPresets(scaleNotes, scaleData) {
 // ══════════════════════════════════════════════
 
 let negHarmonyActive = false;
+let _savedNegHarmony = false;
+let _prevIsIonian = true;
 
 // Build the CoF-slot lookup once (COF_PC is defined above)
 const COF_SLOT_OF = (() => {
@@ -6286,6 +6518,27 @@ function bestRootForNeg(pcs) {
     if (!best || score > best.score) best = { rootPc: rootCand, ivs, ...c, score };
   }
   return best;
+}
+
+// Returns "C → G  ·  E → Eb  ·  G → C  ·  B → Ab" for a given scale degree (7th chords only)
+function buildNegTransformText(di) {
+  if (!negHarmonyActive || state.scale !== 'Major (Ionian)') return null;
+  const n = parseInt(state.mode);
+  if (isNaN(n) || n < 4) return null;
+  const rootPc = parseInt(state.key);
+  const scaleData = SCALES[state.scale];
+  if (!scaleData) return null;
+  const scaleNotes = spellScale(rootPc, scaleData.intervals, scaleData);
+  const chordNotes = buildChord(scaleNotes, di, Math.min(n, scaleNotes.length));
+  if (chordNotes.length < 4) return null;
+  return chordNotes.map(noteName => {
+    const p = noteNameToPc(noteName);
+    if (p < 0) return `${noteName} → ?`;
+    const mirP = negMirrorPcCoF(p, rootPc);
+    const cands = PITCH_CANDIDATES[mirP];
+    const mirName = (PREFER_FLAT_PC.has(mirP) && cands.length > 1) ? cands[1] : cands[0];
+    return `${noteName} → ${mirName}`;
+  }).join('  ·  ');
 }
 
 // Build the full negative chord object from an original chord's notes and tonic
@@ -6365,65 +6618,74 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
     svg.appendChild(t);
   });
 
-  // ── 2. Per-note mirror connector lines ───────────────────
-  // For each note that appears in a diatonic chord, draw a curved
-  // dashed line connecting its CoF slot to its mirrored slot.
-  // This shows the individual pitch mirrors, not just root-to-root.
+  // ── 2. Directed green arrows: scale note → its mirror ────────
   if (!scaleIntervals) return;
 
-  // Collect all unique scale pitch-classes
-  const scalePcs = new Set(
-    scaleIntervals.map(iv => (tonic + iv) % 12)
-  );
+  // Arrowhead marker (green)
+  const defs = mk('defs');
+  const marker = mk('marker');
+  marker.setAttribute('id', 'neg-arrow-head');
+  marker.setAttribute('markerWidth', '7'); marker.setAttribute('markerHeight', '7');
+  marker.setAttribute('refX', '6'); marker.setAttribute('refY', '3');
+  marker.setAttribute('orient', 'auto'); marker.setAttribute('class', 'neg-axis');
+  const arrowPath = mk('path');
+  arrowPath.setAttribute('d', 'M0,0 L0,6 L7,3 z');
+  arrowPath.setAttribute('fill', 'rgba(80,210,130,0.9)');
+  marker.appendChild(arrowPath);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
 
-  // For each scale pc, draw arc to its mirror
-  const drawn = new Set();
+  const scalePcs = new Set(scaleIntervals.map(iv => (tonic + iv) % 12));
+  const r = R_INN - 16;
+
   scalePcs.forEach(pc => {
     const mirPc = negMirrorPcCoF(pc, tonic);
-    // Avoid drawing the same pair twice
-    const key = [Math.min(pc, mirPc), Math.max(pc, mirPc)].join('-');
-    if (drawn.has(key)) return;
-    drawn.add(key);
+    if (pc === mirPc) return; // note maps to itself — no arrow needed
 
-    const origSlot = COF_SLOT_OF[pc];
-    const mirSlot  = COF_SLOT_OF[mirPc];
-    const origAng  = origSlot * 30;
-    const mirAng   = mirSlot  * 30;
+    const origAng = COF_SLOT_OF[pc]  * 30;
+    const mirAng  = COF_SLOT_OF[mirPc] * 30;
 
-    // Draw the arc at a radius just inside the inner ring
-    const r = R_INN - 14;
     const [x1, y1] = pxy(r, origAng);
     const [x2, y2] = pxy(r, mirAng);
 
-    // Quadratic bezier: control point pulled toward center for a nice curve
+    // Bezier control point pulled toward centre for a nice curve
     const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-    const cx = CX + (mx - CX) * 0.2;
-    const cy = CY + (my - CY) * 0.2;
+    const cpx = CX + (mx - CX) * 0.18;
+    const cpy = CY + (my - CY) * 0.18;
 
-    const path = mk('path');
-    path.setAttribute('d', `M${x1.toFixed(1)},${y1.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`);
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke', 'rgba(224,100,100,0.5)');
-    path.setAttribute('stroke-width', '1.4');
-    path.setAttribute('stroke-dasharray', '3,3');
-    path.setAttribute('class', 'neg-axis');
-    svg.appendChild(path);
+    // Shorten tail slightly so the arrow starts a few px from the source dot
+    const tailDx = x1 - cpx, tailDy = y1 - cpy;
+    const tailLen = Math.hypot(tailDx, tailDy);
+    const sx = x1 - (tailDx / tailLen) * 4;
+    const sy = y1 - (tailDy / tailLen) * 4;
 
-    // Small dot at the mirrored end
-    const dot = mk('circle');
-    dot.setAttribute('cx', x2.toFixed(1)); dot.setAttribute('cy', y2.toFixed(1));
-    dot.setAttribute('r', '2.8');
-    dot.setAttribute('fill', '#e07070'); dot.setAttribute('opacity', '0.7');
-    dot.setAttribute('class', 'neg-axis');
-    svg.appendChild(dot);
+    const arrow = mk('path');
+    arrow.setAttribute('d', `M${sx.toFixed(1)},${sy.toFixed(1)} Q${cpx.toFixed(1)},${cpy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`);
+    arrow.setAttribute('fill', 'none');
+    arrow.setAttribute('stroke', 'rgba(80,210,130,0.75)');
+    arrow.setAttribute('stroke-width', '1.6');
+    arrow.setAttribute('marker-end', 'url(#neg-arrow-head)');
+    arrow.setAttribute('class', 'neg-axis');
+    svg.appendChild(arrow);
 
-    // Small dot at the original end too (dimmer)
-    const dot2 = mk('circle');
-    dot2.setAttribute('cx', x1.toFixed(1)); dot2.setAttribute('cy', y1.toFixed(1));
-    dot2.setAttribute('r', '2');
-    dot2.setAttribute('fill', '#e07070'); dot2.setAttribute('opacity', '0.35');
-    dot2.setAttribute('class', 'neg-axis');
-    svg.appendChild(dot2);
+    // Gold dot at source (scale note)
+    const srcDot = mk('circle');
+    srcDot.setAttribute('cx', x1.toFixed(1)); srcDot.setAttribute('cy', y1.toFixed(1));
+    srcDot.setAttribute('r', '3'); srcDot.setAttribute('fill', '#c9a84c');
+    srcDot.setAttribute('opacity', '0.85'); srcDot.setAttribute('class', 'neg-axis');
+    svg.appendChild(srcDot);
+
+    // Source note name (small, gold) just outside the inner ring
+    const srcName = PITCH_CANDIDATES[pc][0];
+    const [nlx, nly] = pxy(r - 10, origAng);
+    const nt = mk('text');
+    nt.setAttribute('x', nlx.toFixed(1)); nt.setAttribute('y', nly.toFixed(1));
+    nt.setAttribute('text-anchor', 'middle'); nt.setAttribute('dominant-baseline', 'central');
+    nt.setAttribute('font-family', 'IBM Plex Mono,monospace'); nt.setAttribute('font-size', '7.5');
+    nt.setAttribute('fill', '#c9a84c'); nt.setAttribute('opacity', '0.9');
+    nt.setAttribute('pointer-events', 'none'); nt.setAttribute('class', 'neg-axis');
+    nt.textContent = srcName;
+    svg.appendChild(nt);
   });
 
   // ── 3. Red highlight on mirrored CoF slots ────────────────
@@ -7330,16 +7592,18 @@ function syncNegToggle() {
   const row      = document.getElementById('neg-toggle-row');
 
   if (!isIonian) {
-    // Lock and force off
+    if (_prevIsIonian) _savedNegHarmony = toggle.checked; // save on exit from Ionian
     toggle.checked = false;
     negHarmonyActive = false;
     row.classList.remove('neg-active');
     row.classList.add('neg-locked');
+    _prevIsIonian = false;
   } else {
     row.classList.remove('neg-locked');
-    // Restore whatever the toggle says
+    if (!_prevIsIonian) toggle.checked = _savedNegHarmony; // restore only on transition back
     negHarmonyActive = toggle.checked;
     row.classList.toggle('neg-active', negHarmonyActive);
+    _prevIsIonian = true;
   }
 }
 
@@ -7421,7 +7685,7 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   const isGuitar2  =['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
-  const isMandolin2=['mandolin','mandolin-scale'].includes(state.view);
+  const isMandolin2=['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
   document.querySelectorAll('.view-tab').forEach(t=>{
     const v=t.dataset.view;
     t.classList.toggle('active', v==='guitar'?isGuitar2:v==='mandolin'?isMandolin2:v===state.view);
@@ -8246,7 +8510,15 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
       </div>
       <div class="guide-kv">
         <span class="guide-kv-key">Mandolin</span>
-        <span class="guide-kv-val">Chord diagrams for mandolin (G-D-A-E tuning). Supports triads through extended chords with chop chord voicings.</span>
+        <span class="guide-kv-val">Three sub-tabs for mandolin (G-D-A-E tuning):</span>
+      </div>
+      <div class="guide-kv" style="margin-left:18px">
+        <span class="guide-kv-key">Chords</span>
+        <span class="guide-kv-val">Standard mandolin chord diagrams, may include open strings. Click to zoom.</span>
+        <span class="guide-kv-key">Scale</span>
+        <span class="guide-kv-val">Full fretboard scale map for mandolin. Swipe horizontally on mobile.</span>
+        <span class="guide-kv-key">Chop</span>
+        <span class="guide-kv-val"><strong>Chop chords</strong> — closed (moveable) shapes with no open strings, shown for both triads and 7th chords. Strike and immediately mute by releasing finger pressure for the classic backbeat chop on beats 2 &amp; 4. These shapes can be moved anywhere on the neck.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
@@ -8352,10 +8624,18 @@ body.light-theme .guide-p, body.light-theme .guide-tip-text, body.light-theme .g
         <span class="guide-chord-pill">G7 → Cø7 (neg)</span>
         <span class="guide-chord-pill">Am → F (neg)</span>
       </div>
-      <p class="guide-p">The axis is shown as a <strong style="color:#e05050">red dashed line</strong> on the Circle of Fifths, with arcs connecting mirrored pitch pairs. Only available in Ionian (Major) mode.</p>
+      <p class="guide-p">The axis is shown as a <strong style="color:#e05050">red dashed line</strong> on the Circle of Fifths, with arcs connecting mirrored pitch pairs. Only available in Ionian (Major) mode. When active, the Circle of Fifths shows only the mirror arcs (diatonic highlights are suppressed).</p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Original card</span>
+        <span class="guide-kv-val">Left card — the diatonic chord as usual.</span>
+        <span class="guide-kv-key">Negative card</span>
+        <span class="guide-kv-val">Right card — the mirrored chord with its own guitar voicing diagram. <strong>Hover the pair</strong> to see a tooltip showing how each note transforms (e.g. C → G, E → E♭, G → C, B → A♭ for Cmaj7).</span>
+        <span class="guide-kv-key">Persistence</span>
+        <span class="guide-kv-val">The toggle state is saved. If you switch to another scale and return to Ionian, Negative Harmony re-activates automatically.</span>
+      </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🪞</span>
-        <span class="guide-tip-text">Use negative harmony to find unexpected chord substitutions - the negative of a ii–V–I in C major is a iii–II–I progression, giving a completely different colour with the same functional logic.</span>
+        <span class="guide-tip-text">Use negative harmony to find unexpected chord substitutions — the negative of a ii–V–I in C major is a iii–II–I progression, giving a completely different colour with the same functional logic.</span>
       </div>
     </section>
 
