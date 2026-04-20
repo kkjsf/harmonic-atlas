@@ -444,9 +444,15 @@
 
   .chord-card { background:var(--surface); border:1px solid var(--border); padding:16px 18px; border-radius:2px; position:relative; overflow:hidden; transition:all .2s; }
   .chord-play-btn { position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.22); color:var(--gold2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; }
-  .chord-card:hover .chord-play-btn { opacity:1; }
+  .chord-add-btn { position:absolute; top:8px; right:34px; width:22px; height:22px; border-radius:50%; background:rgba(124,111,160,.08); border:1px solid rgba(124,111,160,.22); color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; font-size:16px; font-weight:300; line-height:1; }
+  .chord-card:hover .chord-play-btn,
+  .chord-card:hover .chord-add-btn { opacity:1; }
+  .neg-card:hover .chord-play-btn,
+  .neg-card:hover .chord-add-btn { opacity:1; }
   .chord-play-btn:hover { background:rgba(201,168,76,.25); color:var(--cream); }
   .chord-play-btn.playing { opacity:1; background:rgba(201,168,76,.35); color:var(--cream); }
+  .chord-add-btn:hover { background:rgba(124,111,160,.25); color:var(--cream); }
+  .chord-add-btn.just-added { opacity:1; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:none} }
   .chord-card { animation:fadeUp .24s ease both; }
   .chord-card::after { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--accent); transform:scaleY(0); transform-origin:bottom; transition:transform .2s; }
@@ -839,14 +845,6 @@
     pointer-events:none;
   }
 
-  /* Chord card add-to-prog affordance */
-  .chord-card { cursor: pointer; }
-  .chord-card::before {
-    content: '+'; position:absolute; top:8px; right:10px;
-    font-size:16px; color:var(--accent); opacity:0; transition:opacity .15s;
-    font-weight:300; line-height:1;
-  }
-  .chord-card:hover::before { opacity:.7; }
   .chord-card.just-added { animation: addFlash .35s ease both; }
   @keyframes addFlash {
     0%   { box-shadow: 0 0 0 0 rgba(124,111,160,.8); }
@@ -3430,6 +3428,22 @@ function addCardPlayBtn(card, notes) {
   card.appendChild(btn);
 }
 
+function addCardAddBtn(card, name, sym, roman, notes, quality) {
+  if (!notes || !notes.length) return;
+  const btn = document.createElement('button');
+  btn.className = 'chord-add-btn';
+  btn.title = 'Add to progression';
+  btn.setAttribute('aria-label', 'Add to progression');
+  btn.textContent = '+';
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    card.classList.add('just-added');
+    card.addEventListener('animationend', () => card.classList.remove('just-added'), {once:true});
+    addToProgression(name, sym, roman, notes, quality);
+  });
+  card.appendChild(btn);
+}
+
 // ── Jazz impro scale suggestions ──
 const IMPRO_MAP = [
   { match: q => q.includes('Aug Dominant') || (q.includes('7') && q.includes('♯5') && !q.includes('Δ')), scales: ['Whole Tone', 'Lydian Augmented'] },
@@ -3584,6 +3598,7 @@ function renderChords(scaleNotes, scaleData){
 
         addCardStaff(card, chord.notes);
         addCardPlayBtn(card, chord.notes);
+        addCardAddBtn(card, chord.root, chord.sym, '', chord.notes, chord.quality);
         grid.appendChild(card);
       });
       sec.appendChild(grid);
@@ -3634,6 +3649,7 @@ function renderChords(scaleNotes, scaleData){
         <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
       addCardStaff(card, chordNotes);
       addCardPlayBtn(card, chordNotes);
+      addCardAddBtn(card, chordNotes[0], sym, roman, chordNotes, quality);
       if (quality.includes('Dom') && !quality.includes('sus')) {
         const rPc = noteNameToPc(chordNotes[0]);
         if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
@@ -3664,6 +3680,8 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-notes-row">${makeNotePills(negCh.notes)}</div>
           <div class="chord-intervals">Intervals: 1 · ${negCh.iv.slice(1).map(iName).join(' · ')}</div>`;
         addCardStaff(negCard, negCh.notes || []);
+        addCardPlayBtn(negCard, negCh.notes || []);
+        addCardAddBtn(negCard, negCh.root, negCh.sym, roman, negCh.notes, negCh.qual);
         const negRootPc = noteNameToPc(negCh.root);
         if (negRootPc >= 0 && n >= 4) {
           const improDiv = makeImproDiv(negCh.qual, negRootPc);
@@ -3717,6 +3735,7 @@ function renderChords(scaleNotes, scaleData){
               <div class="chord-intervals">Intervals: 1 · ${ch.iv.slice(1).map(iName).join(' · ')}</div>`;
             addCardStaff(card, ch.notes);
             addCardPlayBtn(card, ch.notes);
+            addCardAddBtn(card, ch.notes[0], ch.sym, '', ch.notes, ch.qual);
             grid.appendChild(card);
           });
         }
@@ -3733,6 +3752,7 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
         addCardStaff(card, chordNotes);
         addCardPlayBtn(card, chordNotes);
+        addCardAddBtn(card, chordNotes[0], sym, roman, chordNotes, quality);
         const rPc = noteNameToPc(chordNotes[0]);
         if (quality.includes('Dom') && !quality.includes('sus')) {
           if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
@@ -3785,6 +3805,13 @@ function render(){
   }
   const isGuitar   = ['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
   const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
+
+  // Request landscape on mobile for views that benefit from wide layout
+  const wantsLandscape = ['arpeggio','scale','mandolin-scale'].includes(state.view);
+  if (screen.orientation && screen.orientation.lock) {
+    if (wantsLandscape) screen.orientation.lock('landscape').catch(() => {});
+    else screen.orientation.unlock();
+  }
   document.querySelectorAll('.view-tab').forEach(t => {
     const tv = t.dataset.view;
     const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv===state.view;
@@ -6392,44 +6419,8 @@ function addToProgression(name, sym, roman, notes, quality) {
   renderProgSlots();
 }
 
-// ── Wire chord cards (called after each render) ─
-function wireChordCards() {
-  // Diatonic chord cards
-  document.querySelectorAll('.chord-card').forEach(card => {
-    // Avoid double-binding
-    if (card.dataset.progBound) return;
-    card.dataset.progBound = '1';
-    card.addEventListener('click', () => {
-      // Read data from card DOM
-      const nameEl  = card.querySelector('.chord-root');
-      const qualEl  = card.querySelector('.chord-quality');
-      const notesEl = card.querySelectorAll('.cn');
-      const degEl   = card.closest('.degree-section');
-
-      if (!nameEl) return;
-
-      // Extract root name and symbol from the chord-root element
-      // The text is like "Cmaj7" with a <sup> for the symbol
-      const sup  = nameEl.querySelector('sup');
-      const sym  = sup ? sup.textContent.trim() : '';
-      const name = nameEl.childNodes[0].textContent.trim();
-
-      // Roman numeral from the section header
-      const romanEl = degEl ? degEl.querySelector('.degree-num') : null;
-      const roman   = romanEl ? romanEl.textContent.trim() : '';
-
-      // Notes from note pills
-      const notes = [...notesEl].map(n => n.textContent.trim());
-      const qual  = qualEl ? qualEl.textContent.trim() : '';
-
-      // Flash feedback
-      card.classList.add('just-added');
-      card.addEventListener('animationend', () => card.classList.remove('just-added'), {once:true});
-
-      addToProgression(name, sym, roman, notes, qual);
-    });
-  });
-}
+// ── Wire chord cards — no-op, add-to-prog now handled by + button on each card ─
+function wireChordCards() {}
 
 // ── Zoom view renderer ──────────────────────────
 function renderProgZoom() {
@@ -7406,17 +7397,14 @@ function renderComparison() {
       </div>`;
     }
     container.innerHTML = colHtml;
-    // Wire clicks to add to progression
+    // Add + buttons to comparison cards
     container.querySelectorAll('.chord-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const di = parseInt(card.dataset.di);
-        const chordNotes = buildChord(scaleNotes, di, Math.min(4, n));
-        const iv = chordIntervals(ivs, di, Math.min(4, n));
-        const { sym, quality } = getChordSymbol(chordNotes[0], iv);
-        addToProgression(chordNotes[0], sym, romans[di], chordNotes, quality);
-        card.classList.add('just-added');
-        card.addEventListener('animationend', () => card.classList.remove('just-added'), {once:true});
-      });
+      const di = parseInt(card.dataset.di);
+      const chordNotes = buildChord(scaleNotes, di, Math.min(4, n));
+      const iv = chordIntervals(ivs, di, Math.min(4, n));
+      const { sym, quality } = getChordSymbol(chordNotes[0], iv);
+      addCardPlayBtn(card, chordNotes);
+      addCardAddBtn(card, chordNotes[0], sym, romans[di], chordNotes, quality);
     });
   }
 
