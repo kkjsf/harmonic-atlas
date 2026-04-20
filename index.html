@@ -1855,10 +1855,15 @@
     <div style="display:flex;justify-content:center">
       <svg class="cof-svg-el" id="cof-svg" viewBox="0 0 400 400" width="380" height="380"></svg>
     </div>
-    <div class="cof-legend">
+    <div class="cof-legend" id="cof-legend-normal">
       <div class="cof-leg-item"><div class="cof-leg-dot" style="background:rgba(201,168,76,0.55)"></div>Major</div>
       <div class="cof-leg-item"><div class="cof-leg-dot" style="background:rgba(124,111,160,0.65)"></div>Minor</div>
       <div class="cof-leg-item"><div class="cof-leg-dot" style="background:rgba(212,129,58,0.55)"></div>Dim</div>
+    </div>
+    <div class="cof-legend" id="cof-legend-neg" style="display:none">
+      <div class="cof-leg-item"><div class="cof-leg-dot" style="background:rgba(60,140,240,0.7)"></div>Origin</div>
+      <div class="cof-leg-item"><div class="cof-leg-dot" style="background:rgba(220,70,70,0.7)"></div>Destination</div>
+      <div class="cof-leg-item"><div class="cof-leg-dot" style="background:rgba(240,210,60,0.8)"></div>Both</div>
     </div>
     <div class="neg-toggle-row" id="neg-toggle-row">
       <label class="neg-toggle" title="Toggle Negative Harmony" id="neg-toggle-label">
@@ -2804,9 +2809,9 @@ function drawCoF(rootPc, scaleIntervals){
     // ── Outer ring (major) ──
     const sO=mk('path');
     sO.setAttribute('d',arcPath(R_OUT,R_MID+1,aS,aE));
-    const outerFill = negColor === 'both'   ? 'rgba(240,210,60,0.35)'
-                    : negColor === 'origin' ? 'rgba(60,140,240,0.35)'
-                    : negColor === 'dest'   ? 'rgba(220,70,70,0.35)'
+    const outerFill = negColor === 'both'   ? 'rgba(240,210,60,0.55)'
+                    : negColor === 'origin' ? 'rgba(60,140,240,0.55)'
+                    : negColor === 'dest'   ? 'rgba(220,70,70,0.55)'
                     : hlMaj                 ? getThemeColor('rgba(201,168,76,0.3)','rgba(138,92,10,0.55)')
                                             : getThemeColor('#0e1318','#ccc7ba');
     sO.setAttribute('fill', outerFill);
@@ -7686,6 +7691,12 @@ function syncNegToggle() {
     row.classList.toggle('neg-active', negHarmonyActive);
     _prevIsIonian = true;
   }
+  updateCofLegend();
+}
+
+function updateCofLegend() {
+  document.getElementById('cof-legend-normal').style.display = negHarmonyActive ? 'none' : '';
+  document.getElementById('cof-legend-neg').style.display    = negHarmonyActive ? '' : 'none';
 }
 
 document.getElementById('neg-harmony-toggle').addEventListener('change', function() {
@@ -7695,6 +7706,7 @@ document.getElementById('neg-harmony-toggle').addEventListener('change', functio
   }
   negHarmonyActive = this.checked;
   document.getElementById('neg-toggle-row').classList.toggle('neg-active', negHarmonyActive);
+  updateCofLegend();
   render();
 });
 
