@@ -3411,11 +3411,19 @@ function addCardPlayBtn(card, notes) {
       if (!samplerReady) return;
       const voiced = spreadChordOctaves(pcs);
       const now = Tone.now() + 0.02;
+      // Chord hit — all notes together with slight strum
       voiced.forEach((v, i) => {
-        sampler.triggerAttackRelease(midiToNoteName(v.midi), 3.5, now + i * 0.008);
+        sampler.triggerAttackRelease(midiToNoteName(v.midi), 2.0, now + i * 0.008);
       });
+      // Arpeggio — each note in sequence after chord decays a bit
+      const arpStart = now + 1.2;
+      const arpStep  = 0.22;
+      voiced.forEach((v, i) => {
+        sampler.triggerAttackRelease(midiToNoteName(v.midi), 1.6, arpStart + i * arpStep);
+      });
+      const totalMs = ((1.2 + voiced.length * arpStep) * 1000 + 1600);
       btn.classList.add('playing');
-      setTimeout(() => btn.classList.remove('playing'), 3500);
+      setTimeout(() => btn.classList.remove('playing'), totalMs);
     };
     Tone.start().then(play).catch(() => {});
   });
@@ -8131,12 +8139,14 @@ body.light-theme #tech-panel { background: #faf7f2; }
     </div>
 
     <div class="tech-section">
-      <div class="tech-section-title">Web Audio Engine</div>
-      <div class="tech-row"><span class="tech-key">API</span><span class="tech-val">Web Audio API - <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">AudioContext</code>, no external audio libraries</span></div>
-      <div class="tech-row"><span class="tech-key">Piano (only)</span><span class="tech-val">6-partial additive synthesis (triangle + sine); slight inharmonicity; noise click transient (bandpass 2800 Hz); HP at 60 Hz. Only sound engine in the progression builder.</span></div>
-      <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button embedded inside the staff SVG as a <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code> element; click toggles play/stop; notes scheduled via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makePianoNote()</code> at 350 ms per note</span></div>
+      <div class="tech-section-title">Audio Engine</div>
+      <div class="tech-row"><span class="tech-key">Library</span><span class="tech-val">Tone.js 14.8.49 (CDN) — wraps Web Audio API; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.getContext().rawContext</code> aliased as <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">progAudioCtx</code> for timing reads only</span></div>
+      <div class="tech-row"><span class="tech-key">Sound source</span><span class="tech-val">Salamander Grand Piano — real recorded piano samples (mp3); loaded once via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> on page init; "⟳ loading samples…" shown until ready</span></div>
+      <div class="tech-row"><span class="tech-key">Chord card playback</span><span class="tech-val">Strummed chord hit (notes staggered 8 ms) then ascending arpeggio starting 1.2 s later; all via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.triggerAttackRelease()</code></span></div>
+      <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button embedded inside the staff SVG as a <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code> element; click toggles play/stop; notes scheduled via sampler at 350 ms per note</span></div>
       <div class="tech-row"><span class="tech-key">Rhythm patterns</span><span class="tech-val">6 patterns (Straight/Folk/Rock/Ballad/Bossa/Waltz) applied to <em>all</em> chords in the progression; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations()</code> maps pattern beats to chord duration; up-beats reverse note order; last hit sustains to end of slot</span></div>
-      <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> - assigns each note the minimum octave that keeps it strictly ascending from C3</span></div>
+      <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> — assigns each note the minimum octave that keeps it strictly ascending from C3</span></div>
+      <div class="tech-row"><span class="tech-key">iOS/PWA unlock</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.start()</code> called on first user gesture (touch/click/keydown); <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.releaseAll()</code> on stop</span></div>
       <div class="tech-row"><span class="tech-key">Loop</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">progLoop</code> flag checked in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tick()</code> on sequence end; button state uses <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classList.toggle('active')</code> synced between main and zoom panels</span></div>
       <div class="tech-row"><span class="tech-key">Drums/metronome</span><span class="tech-val">Click (triangle osc, 1400/900 Hz), Kick (sine 180→50 Hz sweep), Snare (noise + HP 1500 Hz), Hi-hat (noise + HP 7000 Hz)</span></div>
     </div>
