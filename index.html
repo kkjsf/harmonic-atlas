@@ -2769,6 +2769,13 @@ function drawCoF(rootPc, scaleIntervals){
 
   const{majSet,minSet,dimSet}=computeCofHighlights(rootPc,scaleIntervals);
 
+  // Negative harmony outer-ring sets: origin (blue), destination (red), both (yellow)
+  let negOriginPcs = null, negDestPcs = null;
+  if (negHarmonyActive) {
+    negOriginPcs = new Set(scaleIntervals.map(iv => (rootPc + iv) % 12));
+    negDestPcs   = new Set([...negOriginPcs].map(pc => negMirrorPcCoF(pc, rootPc)));
+  }
+
   // Background
   const bg=mk('circle');
   bg.setAttribute('cx',CX);bg.setAttribute('cy',CY);bg.setAttribute('r',R_OUT+4);
@@ -2783,6 +2790,11 @@ function drawCoF(rootPc, scaleIntervals){
     const hlMin=!negHarmonyActive && minSet.has(minPc);
     const hlDim=!negHarmonyActive && dimSet.has(dimPc);
 
+    // Negative harmony outer-ring classification
+    const isOrigin = negOriginPcs && negOriginPcs.has(majPc);
+    const isDest   = negDestPcs   && negDestPcs.has(majPc);
+    const negColor = isOrigin && isDest ? 'both' : isOrigin ? 'origin' : isDest ? 'dest' : null;
+
     // Find which degree index(es) this CoF slot maps to (for chord highlighting)
     // majPc → find in scale; minPc → find in scale; dimPc → find in scale
     const majDeg = scaleIntervals.findIndex((_,di)=>(rootPc+scaleIntervals[di])%12===majPc);
@@ -2792,7 +2804,12 @@ function drawCoF(rootPc, scaleIntervals){
     // ── Outer ring (major) ──
     const sO=mk('path');
     sO.setAttribute('d',arcPath(R_OUT,R_MID+1,aS,aE));
-    sO.setAttribute('fill', hlMaj ? getThemeColor('rgba(201,168,76,0.3)','rgba(138,92,10,0.55)') : getThemeColor('#0e1318','#ccc7ba'));
+    const outerFill = negColor === 'both'   ? 'rgba(240,210,60,0.35)'
+                    : negColor === 'origin' ? 'rgba(60,140,240,0.35)'
+                    : negColor === 'dest'   ? 'rgba(220,70,70,0.35)'
+                    : hlMaj                 ? getThemeColor('rgba(201,168,76,0.3)','rgba(138,92,10,0.55)')
+                                            : getThemeColor('#0e1318','#ccc7ba');
+    sO.setAttribute('fill', outerFill);
     sO.setAttribute('stroke',getThemeColor('#1e2530','#9a9180')); sO.setAttribute('stroke-width','1.5');
     if(hlMaj){
       sO.setAttribute('class','cof-slice');
@@ -2834,9 +2851,15 @@ function drawCoF(rootPc, scaleIntervals){
     lt.setAttribute('x',lx.toFixed(1)); lt.setAttribute('y',ly.toFixed(1));
     lt.setAttribute('text-anchor','middle'); lt.setAttribute('dominant-baseline','central');
     lt.setAttribute('font-family','Playfair Display,serif');
-    lt.setAttribute('font-size', hlMaj ? (COF_MAJ[i].includes('/')?'11':'17') : (COF_MAJ[i].includes('/')?'10':'14'));
-    lt.setAttribute('font-weight', hlMaj ? '700' : '400');
-    lt.setAttribute('fill', hlMaj ? getThemeColor('#f0d878','#3a1e00') : getThemeColor('#3a4250','#6a6050'));
+    const outerActive = hlMaj || !!negColor;
+    lt.setAttribute('font-size', outerActive ? (COF_MAJ[i].includes('/')?'11':'17') : (COF_MAJ[i].includes('/')?'10':'14'));
+    lt.setAttribute('font-weight', outerActive ? '700' : '400');
+    const labelFill = negColor === 'both'   ? '#f0d840'
+                    : negColor === 'origin' ? '#70b8f0'
+                    : negColor === 'dest'   ? '#f07070'
+                    : hlMaj                 ? getThemeColor('#f0d878','#3a1e00')
+                                            : getThemeColor('#3a4250','#6a6050');
+    lt.setAttribute('fill', labelFill);
     lt.setAttribute('pointer-events','none');
     lt.textContent=COF_MAJ[i];
     svg.appendChild(lt);
