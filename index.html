@@ -197,9 +197,11 @@
     color: var(--text);
     opacity: .88;
   }
+  .scale-hero-desc-inline { display: none; }
   @media(max-width:700px) {
     .scale-hero-body { flex-direction: column; gap: 16px; }
-    .scale-hero-right { flex: 1 1 auto; max-width: 100%; }
+    .scale-hero-right { display: none; }
+    .scale-hero-desc-inline { display: block; margin-bottom: 10px; }
   }
 
   .scale-hero-name {
@@ -1396,7 +1398,9 @@
     .main-layout { grid-template-columns:1fr; }
     .left-panel { position:static; }
     .chords-grid { grid-template-columns:1fr 1fr; }
-    .compare-cols { grid-template-columns: 1fr; }
+    .compare-cols { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .compare-cols .chord-card { padding: 6px; }
+    .compare-cols .chord-root { font-size: 16px; }
   }
   @media(max-width:560px){
     html { zoom: 1; }
@@ -1602,7 +1606,7 @@
 <div class="wrap">
   <header id="page-top">
     <div class="logo-eyebrow">Music Theory Reference</div>
-    <h1 class="logo-title"><img src="icons/icon-192.png" alt="" style="height:1.3em;width:1.3em;vertical-align:middle;margin-right:10px;border-radius:6px;position:relative;top:-0.05em;">Harmonic <em>Atlas</em></h1>
+    <h1 class="logo-title">Harmonic <em>Atlas</em></h1>
     <p class="logo-sub">Scale harmonization &amp; chord explorer</p>
   </header>
 
@@ -2887,6 +2891,7 @@ function renderScaleInfo(scaleNotes, scaleData){
           <div class="scale-hero-name"><em>${rootNote}</em> ${modeName}</div>
         </div>
         <div class="scale-hero-identity">${identity}</div>
+        ${descHtml ? `<div class="scale-hero-desc scale-hero-desc-inline">${scaleData.desc}</div>` : ''}
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
           <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Notes</span>
           <button id="intervals-toggle" title="Show/hide interval steps between notes">
@@ -3346,8 +3351,89 @@ function makeImproDiv(quality, chordRootPc) {
   return div;
 }
 
+// Modal showing guitar chord diagrams for all altered dominant voicings of a given root.
+function showAltDominantDiagrams(rootPc, rootName) {
+  document.getElementById('alt-dom-modal')?.remove();
+  const alts = [
+    { sym:'7',    iv:[0,4,7,10],    label:'Dom 7' },
+    { sym:'7♭9',  iv:[0,4,10,13],   label:'Dom 7♭9' },
+    { sym:'7♯9',  iv:[0,4,10,15],   label:'Dom 7♯9' },
+    { sym:'7♭5',  iv:[0,4,6,10],    label:'Dom 7♭5' },
+    { sym:'7♯5',  iv:[0,4,8,10],    label:'Dom 7♯5 (Aug7)' },
+    { sym:'7♯11', iv:[0,4,10,18],   label:'Dom 7♯11' },
+    { sym:'7♭13', iv:[0,4,10,20],   label:'Dom 7♭13' },
+    { sym:'7♭9♭13',iv:[0,4,10,13,20],label:'7♭9♭13' },
+  ];
+
+  const modal = document.createElement('div');
+  modal.id = 'alt-dom-modal';
+  modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.88);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    animation:fadeIn .15s ease;overflow-y:auto;padding:24px 0;`;
+
+  const inner = document.createElement('div');
+  inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
+    padding:24px 28px;cursor:default;max-width:92vw;width:680px;`;
+  inner.addEventListener('click', e => e.stopPropagation());
+
+  const titleDiv = document.createElement('div');
+  titleDiv.style.cssText = `font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8;margin-bottom:4px;`;
+  titleDiv.textContent = `${rootName} — Altered Dominant Voicings`;
+  inner.appendChild(titleDiv);
+
+  const subtitleDiv = document.createElement('div');
+  subtitleDiv.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:20px;`;
+  subtitleDiv.textContent = 'Shell voicings (3rd + 7th + alteration). Click a diagram to zoom.';
+  inner.appendChild(subtitleDiv);
+
+  const grid = document.createElement('div');
+  grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:16px;`;
+
+  alts.forEach(alt => {
+    const v = getBasicVoicing(rootPc, alt.iv);
+    const cell = document.createElement('div');
+    cell.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:4px;`;
+
+    const lbl = document.createElement('div');
+    lbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--muted);letter-spacing:.08em;text-align:center;`;
+    lbl.textContent = rootName + alt.sym;
+    cell.appendChild(lbl);
+
+    if (v) {
+      const svgWrap = document.createElement('div');
+      svgWrap.style.cssText = `cursor:pointer;`;
+      svgWrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, rootPc, 130);
+      svgWrap.addEventListener('click', () => showDiagramModal(v.frets6, v.pcs6, rootPc, rootName + alt.sym));
+      cell.appendChild(svgWrap);
+    } else {
+      const noVoice = document.createElement('div');
+      noVoice.style.cssText = `color:var(--muted);font-size:9px;padding:16px 0;`;
+      noVoice.textContent = '—';
+      cell.appendChild(noVoice);
+    }
+
+    const qualLbl = document.createElement('div');
+    qualLbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:var(--dim);letter-spacing:.05em;text-align:center;`;
+    qualLbl.textContent = alt.label;
+    cell.appendChild(qualLbl);
+
+    grid.appendChild(cell);
+  });
+
+  inner.appendChild(grid);
+
+  const closeHint = document.createElement('div');
+  closeHint.style.cssText = `font-size:10px;color:#4a5566;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;margin-top:20px;text-align:center;`;
+  closeHint.textContent = 'CLICK ANYWHERE TO CLOSE';
+  inner.appendChild(closeHint);
+
+  modal.appendChild(inner);
+  modal.addEventListener('click', () => modal.remove());
+  document.body.appendChild(modal);
+}
+
 // Build the alteration pills div for any dominant chord root.
-// Shows ♭9/♯9/♯11/♭13/alt with actual note names + tritone sub with notes.
+// Shows ♭9/♯9/♯11/♭13 with actual note names + tritone sub with notes.
 function makeAltPillsDiv(domRootPc, rootName) {
   const rootLi = letterIndex(rootName);
   const altNote = (letterOff, iv) => {
@@ -3367,7 +3453,8 @@ function makeAltPillsDiv(domRootPc, rootName) {
     { sym:'7♯9',  color:'#e09050', note: altNote(1,3) },
     { sym:'7♯11', color:'#70a0e0', note: altNote(3,6) },
     { sym:'7♭13', color:'#9070c0', note: altNote(5,8) },
-    { sym:'7alt', color:'#c06070', note: altScaleName + ' mel.min.' },
+    { sym:'7♭5',  color:'#a0b870', note: altNote(4,6) },
+    { sym:'7♯5',  color:'#70b8a0', note: altNote(4,8) },
   ].forEach(alt => {
     const pill = document.createElement('span');
     pill.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 5px;border-radius:2px;border:1px solid ${alt.color}40;background:${alt.color}12;color:${alt.color};letter-spacing:.05em;cursor:default;`;
@@ -3375,6 +3462,13 @@ function makeAltPillsDiv(domRootPc, rootName) {
     pill.textContent = `${rootName}${alt.sym} · ${alt.note}`;
     div.appendChild(pill);
   });
+  // Guitar charts button for altered dominant voicings
+  const altChartBtn = document.createElement('button');
+  altChartBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 7px;border-radius:2px;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.07);color:var(--gold2);letter-spacing:.05em;cursor:pointer;margin-left:2px;`;
+  altChartBtn.textContent = '🎸 voicings';
+  altChartBtn.title = `Altered dominant guitar voicings for ${rootName}7`;
+  altChartBtn.addEventListener('click', e => { e.stopPropagation(); showAltDominantDiagrams(domRootPc, rootName); });
+  div.appendChild(altChartBtn);
   const tritPill = document.createElement('span');
   tritPill.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 5px;border-radius:2px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.1);color:var(--gold2);letter-spacing:.05em;cursor:default;margin-left:2px;`;
   tritPill.title = `Tritone sub: ${tritName}7 shares guide tones with ${rootName}7`;
@@ -3453,14 +3547,14 @@ function renderChords(scaleNotes, scaleData){
         if (chord.iv.length >= 4) {
           const rPc = noteNameToPc(chord.root);
           if (rPc >= 0) {
-            const improDiv = makeImproDiv(chord.quality, rPc);
+            const improDiv = makeImproDiv(chord.qual, rPc);
             if (improDiv) card.appendChild(improDiv);
           }
         }
 
         addCardStaff(card, chord.notes);
         addCardPlayBtn(card, chord.notes);
-        addCardAddBtn(card, chord.root, chord.sym, '', chord.notes, chord.quality);
+        addCardAddBtn(card, chord.root, chord.sym, '', chord.notes, chord.qual);
         grid.appendChild(card);
       });
       sec.appendChild(grid);
@@ -3954,7 +4048,7 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
         const isRoot = pc !== -1 && ((pc%12+12)%12) === ((rootPc%12+12)%12);
         const isBarreNote = barre && fr === barre.fret && s >= barre.fromStr && s <= barre.toStr;
         const fill = isRoot ? '#c9a84c' : isBarreNote ? '#5c5075' : '#6a5f90';
-        const dotR = Math.max(6.5, fretH * 0.34);
+        const dotR = Math.min(Math.max(6.5, fretH * 0.34), strGap * 0.44);
         const lbl  = pc !== -1 ? pcToName(((pc%12)+12)%12) : '';
         g.push(`<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}"/>`);
         if (lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dotR*0.88}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
@@ -5396,7 +5490,7 @@ function makeMandoDiagram(frets4, pcs4, rootPc, w) {
           const y=padT+(dispF-0.5)*fretH;
           const isRoot=pc!==-1&&((pc%12+12)%12)===((rootPc%12+12)%12);
           const fill=isRoot?'#c9a84c':'#6a5f90';
-          const dr=Math.max(5.5,fretH*0.32);
+          const dr=Math.min(Math.max(5.5,fretH*0.32),strGap*0.44);
           const lbl=pc!==-1?pcToName(((pc%12)+12)%12):'';
           g.push(`<circle cx="${x}" cy="${y}" r="${dr}" fill="${fill}"/>`);
           if(lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dr*0.85}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
@@ -6815,10 +6909,11 @@ function findScaleRelationships(rootPc, scaleName) {
       }
     }
 
-    // Closely related: 1-2 semitones away root, near-total overlap
+    // Closely related: 1-2 semitones away root, near-total overlap (exclude perfect overlaps, those are relative)
     for (let delta of [-1,1,-2,2]) {
       const r2 = (rootPc + delta + 12) % 12;
       const sh = countSharedNotes(ivA, data.intervals, rootPc, r2);
+      if (sh >= totalNotes) continue; // already in relative
       if (sh >= totalNotes - 1) {
         const nn = PREFER_FLAT_PC.has(r2) && PITCH_CANDIDATES[r2].length > 1 ? PITCH_CANDIDATES[r2][1] : PITCH_CANDIDATES[r2][0];
         const lbl = nn + ' ' + name;
@@ -8312,7 +8407,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <p class="guide-p" style="margin-bottom:6px"><strong>Chromatic modes:</strong></p>
       <div class="guide-kv">
         <span class="guide-kv-key">Secondary Dom.</span>
-        <span class="guide-kv-val">V7 chords targeting each diatonic degree (V/ii, V/IV, etc.). Each card shows common alterations — <strong>7♭9, 7♯9, 7♯11, 7♭13, 7alt</strong> — and a <strong>♭II tritone substitution</strong> (the dominant a tritone away, which shares the guide tones).</span>
+        <span class="guide-kv-val">V7 chords targeting each diatonic degree (V/ii, V/IV, etc.). Each card shows common alterations — <strong>7♭9, 7♯9, 7♯11, 7♭13, 7♭5, 7♯5</strong> — a <strong>♭II tritone substitution</strong>, and a <strong>🎸 voicings</strong> button opening guitar chord diagrams for all altered dominant shapes.</span>
         <span class="guide-kv-key">Secondary Dim.</span>
         <span class="guide-kv-val">vii° chords a semitone below each diatonic root. Tighter chromatic pull than secondary dominants.</span>
         <span class="guide-kv-key">Secondary Sub.</span>
