@@ -2283,6 +2283,12 @@ function iName(s){
   return names[s] !== undefined ? names[s] : (s + 'st');
 }
 
+// When perfect 5th (7) is present, semitone 8 is ♭6 not ♯5
+function iNameCtx(s, iv) {
+  if (s === 8 && iv.includes(7)) return '♭6';
+  return iName(s);
+}
+
 function classifyChord(iv){
   // ═══ LEAD-SHEET STANDARD CHORD NAMING ═══
   // Rules:
@@ -3358,9 +3364,8 @@ function showAltDominantDiagrams(rootPc, rootName) {
     { sym:'7',    iv:[0,4,7,10],    label:'Dom 7' },
     { sym:'7♭9',  iv:[0,4,10,13],   label:'Dom 7♭9' },
     { sym:'7♯9',  iv:[0,4,10,15],   label:'Dom 7♯9' },
-    { sym:'7♭5',  iv:[0,4,6,10],    label:'Dom 7♭5' },
     { sym:'7♯5',  iv:[0,4,8,10],    label:'Dom 7♯5 (Aug7)' },
-    { sym:'7♯11', iv:[0,4,10,18],   label:'Dom 7♯11' },
+    { sym:'7♯11', iv:[0,4,10,18],   label:'Dom 7♯11 / 7♭5' },
     { sym:'7♭13', iv:[0,4,10,20],   label:'Dom 7♭13' },
     { sym:'7♭9♭13',iv:[0,4,10,13,20],label:'7♭9♭13' },
   ];
@@ -3536,7 +3541,7 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-root">${chord.root}<sup>${chord.sym}</sup></div>
           <div class="chord-quality">${chord.qual}</div>
           <div class="chord-notes-row">${makeNotePills(chord.notes)}</div>
-          <div class="chord-intervals">Intervals: 1 · ${chord.iv.slice(1).map(iName).join(' · ')}</div>`;
+          <div class="chord-intervals">Intervals: 1 · ${chord.iv.slice(1).map(s => iNameCtx(s, chord.iv)).join(' · ')}</div>`;
 
         // V7 alterations and tritone substitution (secdom only)
         if (isSecDom) {
@@ -3602,7 +3607,7 @@ function renderChords(scaleNotes, scaleData){
         <div class="chord-root">${chordNotes[0]}<sup>${sym}</sup></div>
         <div class="chord-quality">${quality}</div>
         <div class="chord-notes-row">${makeNotePills(chordNotes)}</div>
-        <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
+        <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(s => iNameCtx(s, iv)).join(' · ')}</div>`;
       addCardStaff(card, chordNotes);
       addCardPlayBtn(card, chordNotes);
       addCardAddBtn(card, chordNotes[0], sym, romans[di], chordNotes, quality);
@@ -3634,7 +3639,7 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-root">${negCh.root}<sup>${negCh.sym}</sup></div>
           <div class="chord-quality">${negCh.qual}</div>
           <div class="chord-notes-row">${makeNotePills(negCh.notes)}</div>
-          <div class="chord-intervals">Intervals: 1 · ${negCh.iv.slice(1).map(iName).join(' · ')}</div>`;
+          <div class="chord-intervals">Intervals: 1 · ${negCh.iv.slice(1).map(s => iNameCtx(s, negCh.iv)).join(' · ')}</div>`;
         addCardStaff(negCard, negCh.notes || []);
         addCardPlayBtn(negCard, negCh.notes || []);
         addCardAddBtn(negCard, negCh.root, negCh.sym, romans[di], negCh.notes, negCh.qual);
@@ -3688,7 +3693,7 @@ function renderChords(scaleNotes, scaleData){
               <div class="chord-root">${ch.notes[0]}<sup>${ch.sym}</sup></div>
               <div class="chord-quality">${ch.qual}</div>
               <div class="chord-notes-row">${makeNotePills(ch.notes)}</div>
-              <div class="chord-intervals">Intervals: 1 · ${ch.iv.slice(1).map(iName).join(' · ')}</div>`;
+              <div class="chord-intervals">Intervals: 1 · ${ch.iv.slice(1).map(s => iNameCtx(s, ch.iv)).join(' · ')}</div>`;
             addCardStaff(card, ch.notes);
             addCardPlayBtn(card, ch.notes);
             addCardAddBtn(card, ch.notes[0], ch.sym, '', ch.notes, ch.qual);
@@ -3705,7 +3710,7 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-root">${chordNotes[0]}<sup>${sym}</sup></div>
           <div class="chord-quality">${quality}</div>
           <div class="chord-notes-row">${makeNotePills(chordNotes)}</div>
-          <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(iName).join(' · ')}</div>`;
+          <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(s => iNameCtx(s, iv)).join(' · ')}</div>`;
         addCardStaff(card, chordNotes);
         addCardPlayBtn(card, chordNotes);
         addCardAddBtn(card, chordNotes[0], sym, romans[di], chordNotes, quality);
@@ -4464,7 +4469,7 @@ function computeArpeggioPositions(chordPcs, rootPc) {
 
 // Horizontal fretboard arpeggio diagram. Strings horizontal (E bottom, e top).
 // notes: array of { str, fret, pc }
-function makeArpeggioDiagram(notes, rootPc, w=440) {
+function makeArpeggioDiagram(notes, rootPc, w=440, pcNameMap=null) {
   const rootPcN = ((rootPc%12)+12)%12;
   const allFrets = notes.map(n => n.fret).filter(f => f > 0);
   if (!allFrets.length) return '';
@@ -4517,7 +4522,8 @@ function makeArpeggioDiagram(notes, rootPc, w=440) {
     } else {
       const cx = padL + (fret - startFret - 0.5) * fretW;
       svg += `<circle cx="${cx.toFixed(1)}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}"/>`;
-      svg += `<text x="${cx.toFixed(1)}" y="${(y+0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="8" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${pcToName(pc)}</text>`;
+      const noteName = (pcNameMap && pcNameMap[pc]) ? pcNameMap[pc] : pcToName(pc);
+      svg += `<text x="${cx.toFixed(1)}" y="${(y+0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="8" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${noteName}</text>`;
     }
   }
 
@@ -4584,6 +4590,7 @@ function renderArpeggios(scaleNotes, scaleData) {
     chordLbl.innerHTML = `${chordNotes[0]}<sup style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--gold2);vertical-align:super">${sym}</sup>`;
     sec.appendChild(chordLbl);
 
+    const pcNameMap = Object.fromEntries(chordNotes.map(n => [noteNameToPc(n), n]));
     const positions = computeArpeggioPositions(pcs, chRootPc);
     if (positions.length === 0) {
       const msg = document.createElement('div'); msg.className = 'empty-msg';
@@ -4595,11 +4602,11 @@ function renderArpeggios(scaleNotes, scaleData) {
         const card = document.createElement('div');
         card.style.cssText = `padding:5px 6px 3px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:3px;animation-delay:${delay}s;cursor:pointer;transition:border-color .15s,box-shadow .15s`;
         delay += 0.03;
-        card.innerHTML = `<div style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px">${pos.label} · click to zoom</div>${makeArpeggioDiagram(pos.notes, chRootPc)}`;
+        card.innerHTML = `<div style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px">${pos.label} · click to zoom</div>${makeArpeggioDiagram(pos.notes, chRootPc, 440, pcNameMap)}`;
         card.addEventListener('mouseenter', () => { card.style.borderColor='rgba(201,168,76,.45)'; card.style.boxShadow='0 2px 12px rgba(0,0,0,.5)'; });
         card.addEventListener('mouseleave', () => { card.style.borderColor='rgba(255,255,255,0.06)'; card.style.boxShadow=''; });
         card.addEventListener('click', () =>
-          showSvgModal(makeArpeggioDiagram(pos.notes, chRootPc, 680), `${chordNotes[0]}<sup>${sym}</sup> — ${pos.label}`, true)
+          showSvgModal(makeArpeggioDiagram(pos.notes, chRootPc, 680, pcNameMap), `${chordNotes[0]}<sup>${sym}</sup> — ${pos.label}`, true)
         );
         grid.appendChild(card);
       });
@@ -4957,7 +4964,7 @@ function computeClosedMandoVoicing(pcs, stringIndices) {
   const candidates = PC.map((pc, i) => {
     const strPc = MANDO_MIDI[stringIndices[i]] % 12;
     const base  = (pc - strPc + 12) % 12;
-    const start = base;  // open strings allowed
+    const start = base === 0 ? 12 : base; // no open strings (not transposable)
     const opts  = [];
     for (let f = start; f <= 16; f += 12) opts.push(f);
     return opts;
@@ -5445,7 +5452,7 @@ function getMandolinVoicing(rootPc, ivArray) {
 function makeMandoDiagram(frets4, pcs4, rootPc, w) {
   w = w || 120;
   const NUM_FRET = 5;
-  const padL = 18, padR = 10, padT = 22, padB = 22;
+  const padL = 18, padR = 18, padT = 22, padB = 22;
   const strGap = (w - padL - padR) / 3;
   const fretH  = Math.round((w - padL - padR) * 0.44);
   const gridH  = NUM_FRET * fretH;
@@ -5454,7 +5461,7 @@ function makeMandoDiagram(frets4, pcs4, rootPc, w) {
   const minP   = played.length ? Math.min(...played) : 0;
   const startF = minP <= 1 ? 0 : minP - 1;
   const g = [];
-  g.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">`);
+  g.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block" overflow="hidden">`);
   if (startF===0) {
     g.push(`<rect x="${padL-1}" y="${padT-4}" width="${strGap*3+2}" height="5" rx="1.5" fill="#b8b0a0"/>`);
   } else {
@@ -5490,7 +5497,7 @@ function makeMandoDiagram(frets4, pcs4, rootPc, w) {
           const y=padT+(dispF-0.5)*fretH;
           const isRoot=pc!==-1&&((pc%12+12)%12)===((rootPc%12+12)%12);
           const fill=isRoot?'#c9a84c':'#6a5f90';
-          const dr=Math.min(Math.max(5.5,fretH*0.32),strGap*0.44);
+          const dr=Math.min(Math.max(5.5,fretH*0.32),strGap*0.44,padR-1);
           const lbl=pc!==-1?pcToName(((pc%12)+12)%12):'';
           g.push(`<circle cx="${x}" cy="${y}" r="${dr}" fill="${fill}"/>`);
           if(lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dr*0.85}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
