@@ -20,7 +20,8 @@ Interactive music theory reference — scales, chords, guitar/mandolin voicings,
 
 Each scale degree shows a chord card with:
 - Chord name, quality, and note names
-- **▶ play button** (top-right corner, appears on hover) — plays a strummed chord hit then an ascending arpeggio via Tone.js
+- **▶ play button** (top-right corner, appears on hover) — strummed full chord
+- **arp button** — ascending arpeggio playback
 - Staff notation toggle
 - Improv scale suggestions (e.g. Dorian over a minor 7th)
 - **+ button** — adds the chord to the progression builder
@@ -39,11 +40,32 @@ Each scale degree shows a chord card with:
 ### Progression builder
 
 - Click the **+** button on any chord card to add it to the progression
-- Drag to reorder; set per-chord beat count
-- **Play / Stop** — plays the progression in loop using Tone.js + Salamander Grand Piano samples
+- Drag to reorder; set per-chord beat count with **−/+** buttons
+- Per-chord **F / A** toggle — Full (strummed) or Arpeggio mode
+- Per-chord **note value** dropdown (Whole / Half / Quarter / Eighth / 16th) — controls how many times the chord repeats within its beat window
+- Per-chord **arp pattern** dropdown (↑ Up / ↓ Down / ↑↓ Up-Down / ↓↑ Down-Up) — visible in arp mode
+- **Play / Stop** — plays the progression using Tone.js + Salamander Grand Piano samples
 - BPM, time signature, swing, and strum-pattern controls
 - **Zoom view** — full-screen progression view with playhead
 - Export as text chord chart
+
+### Compositions
+
+Draft and save multi-chord compositions with full playback control:
+
+- **+ New** — creates a new composition (stored in `localStorage`)
+- **↙ Import progression** — copies the current progression builder into the composition
+- Per-chord controls (same as progression builder): F/A mode, note value, arp pattern, beat count (−/+)
+- Per-chord **reorder** — ◀ ▶ arrows in the card header to shift chord position
+- **Compact view** toggle — collapses all cards to chord name + degree only; individual cards can also be tapped/clicked to expand on mobile
+- **Play / Stop** — Transport-based playback (supports reliable Stop)
+- **BPM** input, **Loop** toggle
+- **Drums** toggle — adds synthesized kick + snare + hi-hat; style selector:
+  - *Rock (hat)* — kick on beats 1 & 3, snare on 2 & 4, closed hi-hat on every 8th note
+  - *Simple* — kick + snare only, no hi-hat
+  - *Hi-hat only* — hi-hat 8ths only
+- **Notes** textarea — free text for lyrics, key, feel, etc.
+- Compositions persist across reloads via `localStorage` key `harmonic-compositions`
 
 ---
 
@@ -120,33 +142,68 @@ git push
 
 ### Audio subsystem
 
-`initSampler()` creates a `Tone.Sampler` backed by Salamander mp3 files and connects it to `Tone.getDestination()`. All three audio paths share the same sampler:
+`initSampler()` creates a `Tone.Sampler` backed by Salamander mp3 files and connects it to `Tone.getDestination()`. Audio paths:
 
-| Path | Function |
+| Path | Engine |
 |---|---|
-| Chord card play button | `addCardPlayBtn` → `sampler.triggerAttackRelease` |
+| Chord card play/arp buttons | `addCardPlayBtn` → `sampler.triggerAttackRelease` |
 | Scale staff playback | `schedule()` inside the staff SVG click handler |
-| Progression player | `playChordAt` → strum hits via `getStrumDurations` |
+| Progression player | `playChordAt` (full/strum) or `_progScheduleArp` / `_progScheduleFull` |
+| Composition player | `Tone.Transport.schedule` → sampler (supports reliable Stop/Loop) |
+| Composition drums | Raw Web Audio API — `_synthKick`, `_synthSnare`, `_synthHihat` |
 
-`Tone.start()` is called on first user interaction (touchstart/mousedown/keydown) to satisfy the browser autoplay policy. `Tone.getContext().rawContext` is aliased as `progAudioCtx` solely to read `ctx.currentTime` for scheduling offsets — all actual audio is routed through Tone.
+`Tone.start()` is called on first user interaction to satisfy browser autoplay policy. Composition playback uses `Tone.Transport` exclusively — this enables `Tone.Transport.cancel(0)` for a clean stop. A `_compPlayGen` counter guards stale callbacks after stop.
 
-`progStop()` calls `sampler.releaseAll()` to immediately silence all playing notes.
+Progression playback uses direct `ctx.currentTime` scheduling (not Transport) — `progStop()` calls `sampler.releaseAll()` to silence notes.
 
 ### Key functions
 
 | Function | Purpose |
 |---|---|
 | `initSampler()` | Creates Tone.Sampler, shows/hides loading indicator |
-| `midiToNoteName(midi)` | Converts MIDI int → Tone note string (e.g. 60 → "C4") |
-| `spreadChordOctaves(pcs)` | Voices a set of pitch classes across octaves for smooth ascending playback |
-| `playChordAt(ctx, pcs, startTime, duration, sound)` | Schedules a chord with strum pattern via sampler |
-| `getStrumDurations(duration, beats)` | Returns strum hit timing/velocity pattern |
+| `midiToNoteName(midi)` | MIDI int → Tone note string (e.g. 60 → "C4") |
+| `spreadChordOctaves(pcs)` | Voices pitch classes across octaves for smooth playback |
+| `playChordAt(ctx, pcs, startTime, duration, sound)` | Schedules a strummed chord (strum patterns, bass emphasis) |
+| `_arpIndex(s, n, pattern)` | Maps step index to voiced note index for a given arp pattern |
+| `_progScheduleArp(pcs, start, dur, noteVal, beatDur, pattern)` | Arp playback for progression builder |
+| `_progScheduleFull(ctx, pcs, start, dur, noteVal, beatDur)` | Repeated full chord for non-default note values |
+| `_synthKick(actx, time)` | Synthesized kick: sub oscillator + click transient |
+| `_synthSnare(actx, time)` | Synthesized snare: bandpass noise + tonal body |
+| `_synthHihat(actx, time, open)` | Synthesized hi-hat: highpass noise burst |
+| `compStartPlayback(id)` / `compStopPlayback()` | Composition Transport-based playback |
+| `compRenderDetail(comp)` / `compRenderChordRow(comp)` | Composition UI rendering |
+| `compLoad()` / `compSave()` / `compUpdate()` / `compCreate()` / `compDelete()` | localStorage CRUD for compositions |
 | `progPlay()` / `progStop()` | Progression playback start/stop |
-| `addCardPlayBtn(card, notes)` | Adds ▶ button to chord cards (chord + arpeggio) |
-| `addCardStaff(card, notes)` | Adds staff notation toggle to chord cards |
-| `wireChordCards()` | No-op (add-to-progression now handled by per-card `+` button via `addCardAddBtn`) |
-| `computeClosedMandoVoicing` / `getChopMandoVoicing` | Mandolin chop chord voicings |
+| `renderProgSlots()` | Renders progression builder chord slots |
+| `addCardPlayBtn(card, notes)` | Adds full + arp play buttons to chord cards |
 | `makeScaleFretboardSVG` | Full horizontal fretboard SVG |
+| `computeClosedMandoVoicing` / `getChopMandoVoicing` | Mandolin chop chord voicings |
+
+### Composition data model
+
+Each composition is a plain JS object stored as JSON in `localStorage`:
+
+```js
+{
+  id: "comp_<timestamp>",
+  title: "My progression",
+  bpm: 90,
+  loop: false,
+  drums: true,
+  drumsStyle: "rock",       // "rock" | "simple" | "hihat"
+  text: "verse idea...",
+  chords: [
+    {
+      name: "C", sym: "maj7", roman: "Imaj7",
+      pcs: [0, 4, 7, 11],   // pitch classes
+      beats: 4,              // duration in beats
+      noteVal: 2,            // 1=whole 2=half 4=quarter 8=eighth 16=sixteenth
+      playMode: "full",      // "full" | "arp"
+      arpPattern: "up"       // "up" | "down" | "updown" | "downup"
+    }
+  ]
+}
+```
 
 ### Service worker cache
 

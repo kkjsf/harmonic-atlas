@@ -437,13 +437,18 @@
 
   .chord-card { background:var(--surface); border:1px solid var(--border); padding:16px 18px; border-radius:2px; position:relative; overflow:hidden; transition:all .2s; }
   .chord-play-btn { position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.22); color:var(--gold2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; }
-  .chord-add-btn { position:absolute; top:8px; right:34px; width:22px; height:22px; border-radius:50%; background:rgba(124,111,160,.08); border:1px solid rgba(124,111,160,.22); color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; font-size:16px; font-weight:300; line-height:1; }
+  .chord-arp-btn { position:absolute; top:8px; right:34px; width:22px; height:22px; border-radius:50%; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.22); color:var(--gold2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; }
+  .chord-add-btn { position:absolute; top:8px; right:60px; width:22px; height:22px; border-radius:50%; background:rgba(124,111,160,.08); border:1px solid rgba(124,111,160,.22); color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; font-size:16px; font-weight:300; line-height:1; }
   .chord-card:hover .chord-play-btn,
+  .chord-card:hover .chord-arp-btn,
   .chord-card:hover .chord-add-btn { opacity:1; }
   .neg-card:hover .chord-play-btn,
+  .neg-card:hover .chord-arp-btn,
   .neg-card:hover .chord-add-btn { opacity:1; }
   .chord-play-btn:hover { background:rgba(201,168,76,.25); color:var(--cream); }
   .chord-play-btn.playing { opacity:1; background:rgba(201,168,76,.35); color:var(--cream); }
+  .chord-arp-btn:hover { background:rgba(201,168,76,.25); color:var(--cream); }
+  .chord-arp-btn.playing { opacity:1; background:rgba(201,168,76,.35); color:var(--cream); }
   .chord-add-btn:hover { background:rgba(124,111,160,.25); color:var(--cream); }
   .chord-add-btn.just-added { opacity:1; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:none} }
@@ -1057,6 +1062,221 @@
   }
   #tech-btn:hover { border-color: var(--accent2); color: var(--accent2); background: var(--surface2); }
 
+  #comp-btn {
+    position: fixed; top: 16px; right: 16px;
+    z-index: var(--z-popover);
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--border2); background: var(--surface); color: var(--muted);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .2s; box-shadow: 0 2px 12px rgba(0,0,0,.4);
+  }
+  #comp-btn:hover { border-color: var(--gold); color: var(--gold2); background: var(--surface2); }
+  #comp-btn.active { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.12); }
+
+  #comp-overlay {
+    display: none; position: fixed; inset: 0; z-index: 8000;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  #comp-overlay.open { display: flex; }
+  #comp-modal {
+    background: var(--surface); border: 1px solid var(--border2); border-radius: 8px;
+    width: 100%; max-width: 860px; max-height: 88vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 8px 40px rgba(0,0,0,.6);
+  }
+  #comp-modal-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px 12px; border-bottom: 1px solid var(--border2); flex-shrink: 0;
+  }
+  #comp-modal-title {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--gold2); flex: 1;
+  }
+  #comp-new-btn {
+    background: none; border: 1px solid var(--border2); color: var(--text);
+    cursor: pointer; border-radius: 3px; padding: 4px 10px;
+    font-size: 10px; font-family: 'IBM Plex Mono', monospace; transition: all .15s;
+  }
+  #comp-new-btn:hover { border-color: var(--gold); color: var(--gold2); }
+  #comp-close-btn {
+    background: none; border: 1px solid var(--border2); color: var(--muted);
+    cursor: pointer; border-radius: 50%; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all .15s;
+  }
+  #comp-close-btn:hover { border-color: var(--text); color: var(--text); }
+  #comp-layout { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+  #comp-list-panel {
+    width: 190px; flex-shrink: 0; border-right: 1px solid var(--border2);
+    overflow-y: auto; padding: 8px 0;
+  }
+  .comp-list-item {
+    padding: 9px 14px; cursor: pointer;
+    border-left: 2px solid transparent; transition: background .12s, border-color .12s;
+    display: flex; flex-direction: column;
+  }
+  .comp-list-item:hover { background: rgba(255,255,255,.04); }
+  .comp-list-item.active { border-left-color: var(--gold); background: rgba(201,168,76,.06); }
+  .comp-list-title { font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .comp-list-count { font-size: 9px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+  .comp-list-empty { padding: 16px 14px; font-size: 10px; color: var(--muted); line-height: 1.6; }
+  #comp-detail-panel {
+    flex: 1; overflow-y: auto; padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .comp-empty-state {
+    display: flex; align-items: center; justify-content: center;
+    height: 100%; color: var(--muted); font-size: 11px; text-align: center;
+  }
+  .comp-detail-top { display: flex; align-items: center; gap: 8px; }
+  .comp-title-input {
+    background: none; border: none; border-bottom: 1px solid var(--border2);
+    color: var(--text); font-size: 16px; font-family: inherit;
+    padding: 4px 0; flex: 1; outline: none; transition: border-color .15s;
+  }
+  .comp-title-input:focus { border-bottom-color: var(--gold); }
+  .comp-del-comp-btn {
+    background: none; border: 1px solid var(--border2); color: var(--muted);
+    cursor: pointer; border-radius: 3px; padding: 3px 8px;
+    font-size: 9px; font-family: 'IBM Plex Mono', monospace; transition: all .15s; flex-shrink: 0;
+  }
+  .comp-del-comp-btn:hover { border-color: #e06060; color: #e06060; }
+  .comp-section-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .comp-chord-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; min-height: 40px; }
+  .comp-chord-card {
+    position: relative; background: var(--surface2);
+    border: 1px solid var(--border2); border-radius: 4px;
+    padding: 6px 8px 4px; display: flex; flex-direction: column;
+    align-items: center; gap: 2px; min-width: 80px;
+  }
+  .comp-chord-name { font-size: 11px; font-weight: 600; color: var(--text); }
+  .comp-chord-roman { font-size: 8px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  .comp-chord-del {
+    position: absolute; top: -7px; right: -7px;
+    width: 15px; height: 15px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border2);
+    color: var(--muted); font-size: 11px; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    line-height: 1; padding: 0; z-index: 2;
+  }
+  .comp-chord-card:hover .comp-chord-del { display: flex; }
+  .comp-chord-del:hover { color: #e06060; border-color: #e06060; }
+  .comp-slots-hint { font-size: 10px; color: var(--muted); padding: 6px 0; }
+  .comp-play-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .comp-play-btn, .comp-stop-btn {
+    background: none; border: 1px solid var(--border2); color: var(--text);
+    cursor: pointer; border-radius: 3px; padding: 5px 12px;
+    font-size: 10px; font-family: 'IBM Plex Mono', monospace;
+    display: flex; align-items: center; gap: 5px; transition: all .15s;
+  }
+  .comp-play-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold2); }
+  .comp-stop-btn:hover:not(:disabled) { border-color: #e06060; color: #e06060; }
+  .comp-play-btn:disabled, .comp-stop-btn:disabled { opacity: .4; cursor: default; }
+  .comp-bpm-input {
+    width: 52px; background: var(--surface2); border: 1px solid var(--border2);
+    color: var(--text); border-radius: 2px; padding: 4px 6px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; text-align: center;
+  }
+  .comp-import-btn {
+    background: none; border: 1px solid var(--border2); color: var(--muted);
+    cursor: pointer; border-radius: 3px; padding: 3px 9px;
+    font-size: 9px; font-family: 'IBM Plex Mono', monospace; transition: all .15s;
+  }
+  .comp-import-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .comp-notes-input {
+    width: 100%; min-height: 100px; background: var(--surface2);
+    border: 1px solid var(--border2); color: var(--text); border-radius: 4px;
+    padding: 10px; font-family: inherit; font-size: 12px; line-height: 1.6;
+    resize: vertical; outline: none; box-sizing: border-box; transition: border-color .15s;
+  }
+  .comp-notes-input:focus { border-color: var(--accent); }
+  .comp-beat-ctrl { display:flex; align-items:center; gap:3px; margin-top:5px; }
+  .comp-beat-btn { width:15px; height:15px; border-radius:2px; background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; padding:0; line-height:1; transition:all .1s; flex-shrink:0; }
+  .comp-beat-btn:hover { border-color:var(--gold); color:var(--gold2); }
+  .comp-beat-val { color:var(--muted); min-width:20px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:9px; }
+  .comp-mode-wrap { display:flex; align-items:center; gap:5px; margin-left:auto; }
+  .comp-mode-label { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; }
+  .comp-mode-btns { display:flex; border:1px solid var(--border2); border-radius:3px; overflow:hidden; }
+  .comp-mode-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:4px 9px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .12s; }
+  .comp-mode-btn.active { background:rgba(201,168,76,.18); color:var(--gold2); }
+  .comp-mode-btn:hover:not(.active) { color:var(--text); }
+  /* Per-chord mode + note-value controls (comp cards & prog slots) */
+  .chord-ctrl-row { display:flex; align-items:center; gap:2px; margin-top:4px; flex-wrap:nowrap; }
+  .chord-ctrl-btn { height:14px; min-width:14px; padding:0 3px; border-radius:2px; background:none; border:1px solid var(--border2); color:var(--muted); font-size:7px; cursor:pointer; line-height:1; transition:all .1s; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
+  .chord-ctrl-btn:hover:not(.c-active):not(.c-arp) { border-color:var(--text); color:var(--text); }
+  .chord-ctrl-btn.c-active { background:rgba(201,168,76,.2); color:var(--gold2); border-color:rgba(201,168,76,.45); }
+  .chord-ctrl-btn.c-arp   { background:rgba(124,111,160,.25); color:var(--accent2); border-color:rgba(124,111,160,.5); }
+  .chord-ctrl-sep { width:3px; flex-shrink:0; border-left:1px solid var(--border2); height:10px; margin:0 1px; }
+  .comp-loop-btn { background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; border-radius:3px; padding:4px 9px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .15s; }
+  .comp-loop-btn.active { border-color:var(--gold); color:var(--gold2); background:rgba(201,168,76,.12); }
+  .comp-loop-btn:hover:not(.active) { color:var(--text); }
+  /* Prog slot gets a bit more room for the new row */
+  .prog-slot { min-width: 86px; }
+  /* Composition drums toggle */
+  .comp-drums-row { display:flex; align-items:center; gap:8px; margin-top:4px; }
+  .comp-drums-btn { background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; border-radius:3px; padding:4px 9px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .15s; }
+  .comp-drums-btn.active { border-color:var(--gold); color:var(--gold2); background:rgba(201,168,76,.12); }
+  .comp-drums-btn:hover:not(.active) { color:var(--text); }
+  .comp-drums-hint { font-size:9px; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
+  /* Comp card header/body split */
+  .comp-card-header {
+    display:flex; align-items:baseline; gap:5px; width:100%;
+    cursor:pointer; padding:2px 0;
+  }
+  .comp-card-toggle { font-size:8px; color:var(--muted); margin-left:auto; flex-shrink:0; }
+  .comp-card-body { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
+  /* Comp card notes line */
+  .comp-chord-notes { font-family:'IBM Plex Mono',monospace; font-size:8px; color:var(--dim); letter-spacing:.03em; margin-top:2px; text-align:center; line-height:1.4; }
+  /* Note value + arp pattern dropdowns */
+  .comp-nv-select, .comp-arp-select {
+    background:var(--surface); border:1px solid var(--border2); color:var(--muted);
+    border-radius:2px; padding:2px 4px; font-size:8px; font-family:'IBM Plex Mono',monospace;
+    cursor:pointer; outline:none; width:100%; margin-top:3px;
+  }
+  .comp-nv-select:focus, .comp-arp-select:focus { border-color:var(--accent); }
+  .comp-hidden { display:none !important; }
+  /* Compact mode (global toggle or mobile default) */
+  .comp-chord-row.compact-mode .comp-card-body { display:none !important; }
+  .comp-chord-row.compact-mode .comp-card-toggle { display:none; }
+  .comp-chord-row.compact-mode .comp-chord-card { cursor:default; }
+  /* Mobile: compact by default unless expanded */
+  @media (max-width: 600px) {
+    .comp-chord-card:not(.expanded):not(.comp-chord-row.compact-mode *) .comp-card-body { display:none; }
+    .comp-chord-card.expanded { border-color:var(--accent); }
+    .comp-chord-card { min-width:70px; }
+  }
+  /* Desktop: always show body + toggle arrow hidden */
+  @media (min-width: 601px) {
+    .comp-card-toggle { display:none; }
+    .comp-card-header { cursor:default; }
+  }
+  /* Chord reorder arrows */
+  .comp-card-mv {
+    background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:9px; padding:0 2px; line-height:1; flex-shrink:0;
+    transition:color .1s;
+  }
+  .comp-card-mv:hover:not(:disabled) { color:var(--gold2); }
+  .comp-card-mv:disabled { opacity:.25; cursor:default; }
+  /* Compact toggle button */
+  .comp-compact-btn {
+    background:none; border:1px solid var(--border2); color:var(--muted);
+    cursor:pointer; border-radius:3px; padding:2px 7px; font-size:9px;
+    font-family:'IBM Plex Mono',monospace; transition:all .15s; margin-left:auto;
+  }
+  .comp-compact-btn.active { border-color:var(--gold); color:var(--gold2); background:rgba(201,168,76,.1); }
+  .comp-compact-btn:hover:not(.active) { color:var(--text); }
+  /* Drums style select */
+  .comp-drums-style {
+    background:var(--surface); border:1px solid var(--border2); color:var(--muted);
+    border-radius:2px; padding:2px 4px; font-size:8px; font-family:'IBM Plex Mono',monospace;
+    cursor:pointer; outline:none;
+  }
+  .comp-drums-style:focus { border-color:var(--accent); }
+
   /* ══════════════════════════════════════
      COMPARE BAR
   ══════════════════════════════════════ */
@@ -1575,8 +1795,15 @@
     .chord-name { font-size:18px; }
     .view-tabs { gap:4px; flex-wrap:wrap; }
     .view-tab { padding: 5px 8px; font-size:9px; gap:3px; }
+    #comp-btn { width:30px; height:30px; right:12px; top:12px; }
     #guide-btn { width:30px; height:30px; right:50px; top:12px; }
     #tech-btn { width:30px; height:30px; right:88px; top:12px; }
+    #comp-overlay { padding: 0; }
+    #comp-modal { max-height: 100vh; border-radius: 0; }
+    #comp-layout { flex-direction: column; }
+    #comp-list-panel { width: 100%; max-height: 110px; border-right: none; border-bottom: 1px solid var(--border2); display: flex; overflow-x: auto; overflow-y: hidden; padding: 6px; flex-direction: row; gap: 0; }
+    .comp-list-item { flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; padding: 6px 10px; white-space: nowrap; }
+    .comp-list-item.active { border-bottom-color: var(--gold); border-left-color: transparent; }
     .prog-slot { min-width: 70px; }
     .mode-groups { flex-direction:column; gap:6px; }
     .strum-patterns { gap:3px; }
@@ -1595,6 +1822,14 @@
     <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
     <path d="M6.2 6.2C6.2 5.1 7 4.4 8 4.4s1.8.7 1.8 1.8c0 1-.6 1.4-1.3 1.9C7.9 8.5 7.6 9 7.6 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
     <circle cx="7.6" cy="11.4" r=".7" fill="currentColor"/>
+  </svg>
+</button>
+<button id="comp-btn" title="Compositions" aria-label="Open compositions">
+  <svg width="15" height="16" viewBox="0 0 15 16" fill="none">
+    <rect x="2" y="2" width="11" height="13" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="5" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="5" y1="8.5" x2="10" y2="8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="5" y1="11" x2="8" y2="11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
   </svg>
 </button>
 <button id="tech-btn" title="Technical Details" aria-label="Open technical details">
@@ -3271,34 +3506,50 @@ function addCardPlayBtn(card, notes) {
   if (!notes || !notes.length) return;
   const pcs = [...new Set(notes.map(n => noteNameToPc(n)).filter(p => p >= 0))].sort((a,b)=>a-b);
   if (!pcs.length) return;
-  const btn = document.createElement('button');
-  btn.className = 'chord-play-btn';
-  btn.title = 'Play chord';
-  btn.setAttribute('aria-label', 'Play chord');
-  btn.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10"><polygon points="1,1 8,5 1,9" fill="currentColor"/></svg>';
-  btn.addEventListener('click', e => {
+
+  // Full chord button — all notes simultaneously with slight strum spread
+  const fullBtn = document.createElement('button');
+  fullBtn.className = 'chord-play-btn';
+  fullBtn.title = 'Play chord';
+  fullBtn.setAttribute('aria-label', 'Play chord');
+  fullBtn.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10"><polygon points="1,1 8,5 1,9" fill="currentColor"/></svg>';
+  fullBtn.addEventListener('click', e => {
     e.stopPropagation();
-    const play = () => {
+    Tone.start().then(() => {
       if (!samplerReady) return;
       const voiced = spreadChordOctaves(pcs);
       const now = Tone.now() + 0.02;
-      // Chord hit — all notes together with slight strum
       voiced.forEach((v, i) => {
         sampler.triggerAttackRelease(midiToNoteName(v.midi), 2.0, now + i * 0.008);
       });
-      // Arpeggio — each note in sequence after chord decays a bit
-      const arpStart = now + 1.2;
-      const arpStep  = 0.22;
-      voiced.forEach((v, i) => {
-        sampler.triggerAttackRelease(midiToNoteName(v.midi), 1.6, arpStart + i * arpStep);
-      });
-      const totalMs = ((1.2 + voiced.length * arpStep) * 1000 + 1600);
-      btn.classList.add('playing');
-      setTimeout(() => btn.classList.remove('playing'), totalMs);
-    };
-    Tone.start().then(play).catch(() => {});
+      fullBtn.classList.add('playing');
+      setTimeout(() => fullBtn.classList.remove('playing'), voiced.length * 8 + 2000);
+    }).catch(() => {});
   });
-  card.appendChild(btn);
+
+  // Arpeggio button — ascending note sequence
+  const arpBtn = document.createElement('button');
+  arpBtn.className = 'chord-arp-btn';
+  arpBtn.title = 'Play arpeggio';
+  arpBtn.setAttribute('aria-label', 'Play arpeggio');
+  arpBtn.innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9"><circle cx="1.5" cy="7.5" r="1.2" fill="currentColor"/><circle cx="4.5" cy="4.5" r="1.2" fill="currentColor"/><circle cx="7.5" cy="1.5" r="1.2" fill="currentColor"/></svg>';
+  arpBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    Tone.start().then(() => {
+      if (!samplerReady) return;
+      const voiced = spreadChordOctaves(pcs);
+      const now = Tone.now() + 0.02;
+      const arpStep = 0.22;
+      voiced.forEach((v, i) => {
+        sampler.triggerAttackRelease(midiToNoteName(v.midi), 1.6, now + i * arpStep);
+      });
+      arpBtn.classList.add('playing');
+      setTimeout(() => arpBtn.classList.remove('playing'), voiced.length * arpStep * 1000 + 1600);
+    }).catch(() => {});
+  });
+
+  card.appendChild(fullBtn);
+  card.appendChild(arpBtn);
 }
 
 function addCardAddBtn(card, name, sym, roman, notes, quality) {
@@ -6095,6 +6346,105 @@ function playChordAt(ctx, pcs, startTime, duration, sound) {
   });
 }
 
+function _arpIndex(s, n, pattern) {
+  if (n <= 1) return 0;
+  switch (pattern) {
+    case 'down': return (n - 1) - (s % n);
+    case 'updown': { const p = 2*(n-1); const r = s % p; return r < n ? r : p - r; }
+    case 'downup': { const p = 2*(n-1); const r = s % p; return r < n ? (n-1-r) : r-n+1; }
+    default: return s % n; // up
+  }
+}
+
+function _progScheduleArp(pcs, startAudioTime, totalDur, noteVal, beatDur, arpPattern) {
+  if (!pcs || !pcs.length || !samplerReady) return;
+  const stepDur = beatDur * 4 / noteVal;
+  const nSteps  = Math.max(1, Math.round(totalDur / stepDur));
+  const voiced  = spreadChordOctaves([...new Set(pcs.map(p=>((p%12)+12)%12))].sort((a,b)=>a-b));
+  const noteDur = Math.min(stepDur * 1.08, 2.5);
+  const now = Tone.now();
+  for (let s = 0; s < nSteps; s++) {
+    const v = voiced[_arpIndex(s, voiced.length, arpPattern || 'up')];
+    const toneT = now + (startAudioTime + s * stepDur - Tone.getContext().rawContext.currentTime);
+    sampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, toneT);
+  }
+}
+
+function _progScheduleFull(ctx, pcs, startAudioTime, totalDur, noteVal, beatDur) {
+  if (!pcs || !pcs.length || !samplerReady) return;
+  const stepDur = beatDur * 4 / noteVal;
+  const nSteps  = Math.max(1, Math.round(totalDur / stepDur));
+  const voiced  = spreadChordOctaves([...new Set(pcs.map(p=>((p%12)+12)%12))].sort((a,b)=>a-b));
+  const noteDur = Math.min(stepDur * 0.92, 2.5);
+  const now = Tone.now();
+  for (let s = 0; s < nSteps; s++) {
+    const toneT = now + (startAudioTime + s * stepDur - Tone.getContext().rawContext.currentTime);
+    voiced.forEach((v, i) => {
+      sampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, toneT + i * 0.008);
+    });
+  }
+}
+
+function _synthKick(actx, time) {
+  // Sub oscillator
+  const sub = actx.createOscillator();
+  const subG = actx.createGain();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(100, time);
+  sub.frequency.exponentialRampToValueAtTime(35, time + 0.12);
+  subG.gain.setValueAtTime(1.2, time);
+  subG.gain.exponentialRampToValueAtTime(0.001, time + 0.45);
+  sub.connect(subG); subG.connect(actx.destination);
+  sub.start(time); sub.stop(time + 0.5);
+  // Click transient
+  const clk = actx.createOscillator();
+  const clkG = actx.createGain();
+  clk.type = 'triangle';
+  clk.frequency.setValueAtTime(400, time);
+  clk.frequency.exponentialRampToValueAtTime(80, time + 0.025);
+  clkG.gain.setValueAtTime(0.7, time);
+  clkG.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+  clk.connect(clkG); clkG.connect(actx.destination);
+  clk.start(time); clk.stop(time + 0.05);
+}
+
+function _synthSnare(actx, time) {
+  // Noise body
+  const bufSize = Math.floor(actx.sampleRate * 0.2);
+  const buf = actx.createBuffer(1, bufSize, actx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+  const src = actx.createBufferSource(); src.buffer = buf;
+  const bp  = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2800; bp.Q.value = 0.8;
+  const nG  = actx.createGain();
+  src.connect(bp); bp.connect(nG); nG.connect(actx.destination);
+  nG.gain.setValueAtTime(0.65, time);
+  nG.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+  src.start(time); src.stop(time + 0.22);
+  // Tonal body
+  const body = actx.createOscillator(); body.type = 'sine'; body.frequency.value = 185;
+  const bG   = actx.createGain();
+  body.connect(bG); bG.connect(actx.destination);
+  bG.gain.setValueAtTime(0.3, time);
+  bG.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
+  body.start(time); body.stop(time + 0.08);
+}
+
+function _synthHihat(actx, time, open) {
+  const dur = open ? 0.22 : 0.055;
+  const bufSize = Math.floor(actx.sampleRate * dur);
+  const buf = actx.createBuffer(1, bufSize, actx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+  const src = actx.createBufferSource(); src.buffer = buf;
+  const hp  = actx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
+  const hG  = actx.createGain();
+  src.connect(hp); hp.connect(hG); hG.connect(actx.destination);
+  hG.gain.setValueAtTime(0.28, time);
+  hG.gain.exponentialRampToValueAtTime(0.001, time + dur);
+  src.start(time); src.stop(time + dur + 0.01);
+}
+
 // ── Playback engine ────────────────────────────
 let progNodes = [];   // AudioScheduledSourceNodes created during playback
 let progGainNodes = []; // GainNodes for fade-out on stop
@@ -6180,10 +6530,18 @@ function progPlay() {
 
     try {
       progression.forEach((ch, i) => {
-        playChordAt(ctx, ch.pcs, audioT + schedule[i].t, schedule[i].duration, sound);
+        const st = audioT + schedule[i].t;
+        const dur = schedule[i].duration;
+        if (ch.playMode === 'arp') {
+          _progScheduleArp(ch.pcs, st, dur, ch.noteVal || 4, beatDur, ch.arpPattern);
+        } else if ((ch.noteVal || 4) !== 4) {
+          _progScheduleFull(ctx, ch.pcs, st, dur, ch.noteVal, beatDur);
+        } else {
+          playChordAt(ctx, ch.pcs, st, dur, sound);
+        }
         if (metronomeEnabled) {
           const beats = ch.beats || progGetBeats();
-          playDrumMeasure(ctx, audioT + schedule[i].t, beats, beatDur);
+          playDrumMeasure(ctx, st, beats, beatDur);
         }
       });
     } finally {
@@ -6306,6 +6664,8 @@ function renderProgSlots() {
     slot.dataset.idx = i;
     const noteList = (ch.notes || []).join(' · ');
     const isFirst = i === 0, isLast = i === progression.length - 1;
+    const slotMode = ch.playMode || 'full';
+    const slotNv   = ch.noteVal  || 4;
     slot.innerHTML = `
       <div class="prog-slot-name">${ch.name}<sup>${ch.sym}</sup></div>
       <div class="prog-slot-roman">${ch.roman}</div>
@@ -6315,6 +6675,23 @@ function renderProgSlots() {
         <span class="prog-slot-beats">${ch.beats}b</span>
         <button class="slot-beat-btn slot-beat-inc" title="More beats">+</button>
       </div>
+      <div class="chord-ctrl-row" style="margin-top:3px">
+        <button class="chord-ctrl-btn${slotMode==='full'?' c-active':''}" data-sc="mode-full" title="Full chord">F</button>
+        <button class="chord-ctrl-btn${slotMode==='arp'?' c-arp':''}" data-sc="mode-arp" title="Arpeggio">A</button>
+      </div>
+      <select class="comp-nv-select" data-sc="nv" style="margin-top:2px;width:100%">
+        <option value="1"${slotNv===1?' selected':''}>Whole</option>
+        <option value="2"${slotNv===2?' selected':''}>Half</option>
+        <option value="4"${slotNv===4?' selected':''}>Quarter</option>
+        <option value="8"${slotNv===8?' selected':''}>Eighth</option>
+        <option value="16"${slotNv===16?' selected':''}>16th</option>
+      </select>
+      <select class="comp-nv-select comp-arp-select${slotMode!=='arp'?' comp-hidden':''}" data-sc="arp-pattern" style="margin-top:2px;width:100%">
+        <option value="up"${(ch.arpPattern||'up')==='up'?' selected':''}>↑ Up</option>
+        <option value="down"${ch.arpPattern==='down'?' selected':''}>↓ Down</option>
+        <option value="updown"${ch.arpPattern==='updown'?' selected':''}>↑↓ Up-Down</option>
+        <option value="downup"${ch.arpPattern==='downup'?' selected':''}>↓↑ Down-Up</option>
+      </select>
       <div style="display:flex;gap:3px;margin-top:3px">
         <button class="slot-beat-btn slot-move-left" title="Move left" ${isFirst?'disabled':''} style="opacity:${isFirst?.3:1}">◀</button>
         <button class="slot-beat-btn slot-move-right" title="Move right" ${isLast?'disabled':''} style="opacity:${isLast?.3:1}">▶</button>
@@ -6362,6 +6739,33 @@ function renderProgSlots() {
       renderProgSlots();
     });
 
+    slot.querySelectorAll('[data-sc]').forEach(btn => {
+      const evType = btn.tagName === 'SELECT' ? 'change' : 'click';
+      btn.addEventListener(evType, e => {
+        e.stopPropagation();
+        const sc = btn.dataset.sc;
+        if (sc === 'mode-full') {
+          ch.playMode = 'full';
+          slot.querySelectorAll('[data-sc^="mode"]').forEach(b => b.classList.remove('c-active','c-arp'));
+          slot.querySelector('[data-sc="mode-full"]').classList.add('c-active');
+          slot.querySelector('[data-sc="arp-pattern"]')?.classList.add('comp-hidden');
+          if (progPlaying) { progStop(); progPlay(); }
+        } else if (sc === 'mode-arp') {
+          ch.playMode = 'arp';
+          slot.querySelectorAll('[data-sc^="mode"]').forEach(b => b.classList.remove('c-active','c-arp'));
+          slot.querySelector('[data-sc="mode-arp"]').classList.add('c-arp');
+          slot.querySelector('[data-sc="arp-pattern"]')?.classList.remove('comp-hidden');
+          if (progPlaying) { progStop(); progPlay(); }
+        } else if (sc === 'nv') {
+          ch.noteVal = parseInt(btn.value);
+          if (progPlaying) { progStop(); progPlay(); }
+        } else if (sc === 'arp-pattern') {
+          ch.arpPattern = btn.value;
+          if (progPlaying) { progStop(); progPlay(); }
+        }
+      });
+    });
+
     // Drag-to-reorder
     slot.addEventListener('dragstart', e => {
       progDragIdx = i;
@@ -6396,8 +6800,8 @@ function addToProgression(name, sym, roman, notes, quality) {
   openSection('prog-body'); // auto-expand on first add
   // pcs: pitch classes from note names (0-11 only, exclude -1 for unknown notes)
   const pcs = notes.map(n => noteNameToPc(n)).filter(p => p >= 0 && p <= 11);
-  const beats = progGetBeats(); // capture current global setting as this slot's default
-  progression.push({ name, sym, roman, notes, pcs, quality, beats });
+  const beats = progGetBeats();
+  progression.push({ name, sym, roman, notes, pcs, quality, beats, playMode: 'full', noteVal: 4 });
   renderProgSlots();
 }
 
@@ -8111,6 +8515,21 @@ document.getElementById('all-degrees').addEventListener('click', e => {
   </div>
 </div>
 
+<!-- ══════ COMPOSITIONS OVERLAY ══════ -->
+<div id="comp-overlay">
+  <div id="comp-modal">
+    <div id="comp-modal-header">
+      <span id="comp-modal-title">Compositions</span>
+      <button id="comp-new-btn">+ New</button>
+      <button id="comp-close-btn">×</button>
+    </div>
+    <div id="comp-layout">
+      <div id="comp-list-panel"></div>
+      <div id="comp-detail-panel"><div class="comp-empty-state">No compositions yet.<br>Click + New to create one.</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- ══════ PROGRESSION ZOOM OVERLAY ══════ -->
 <div id="prog-zoom-overlay">
   <div id="prog-zoom-panel">
@@ -8933,6 +9352,432 @@ function unlockScroll() {
   });
 
 })();
+
+// ── Compositions ───────────────────────────────────────────────────────────
+const COMP_KEY = 'harmonic-compositions';
+let compActiveId = null;
+let compIsPlaying = false;
+
+function _escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function compLoad() {
+  try { return JSON.parse(localStorage.getItem(COMP_KEY) || '[]'); } catch(e) { return []; }
+}
+function compSave(comps) {
+  localStorage.setItem(COMP_KEY, JSON.stringify(comps));
+}
+function compCreate() {
+  const comp = { id: Date.now().toString(36) + Math.random().toString(36).slice(2), title: 'Untitled', text: '', chords: [], bpm: 90, createdAt: Date.now() };
+  const comps = compLoad();
+  comps.unshift(comp);
+  compSave(comps);
+  return comp;
+}
+function compUpdate(id, changes) {
+  const comps = compLoad();
+  const c = comps.find(c => c.id === id);
+  if (!c) return;
+  Object.assign(c, changes, { updatedAt: Date.now() });
+  compSave(comps);
+}
+function compDelete(id) {
+  const comps = compLoad().filter(c => c.id !== id);
+  compSave(comps);
+}
+
+function openCompositions() {
+  document.getElementById('comp-overlay').classList.add('open');
+  document.getElementById('comp-btn').classList.add('active');
+  compRenderList();
+  const comps = compLoad();
+  if (compActiveId && comps.find(c => c.id === compActiveId)) {
+    compRenderDetail(comps.find(c => c.id === compActiveId));
+  } else if (comps.length) {
+    compSelectId(comps[0].id);
+  } else {
+    document.getElementById('comp-detail-panel').innerHTML = '<div class="comp-empty-state">No compositions yet.<br>Click + New to start.</div>';
+  }
+}
+function closeCompositions() {
+  document.getElementById('comp-overlay').classList.remove('open');
+  document.getElementById('comp-btn').classList.remove('active');
+  compStopPlayback();
+}
+
+function compSelectId(id) {
+  compActiveId = id;
+  compRenderList();
+  const comp = compLoad().find(c => c.id === id);
+  if (comp) compRenderDetail(comp);
+}
+
+function compRenderList() {
+  const comps = compLoad();
+  const panel = document.getElementById('comp-list-panel');
+  panel.innerHTML = '';
+  if (!comps.length) {
+    panel.innerHTML = '<div class="comp-list-empty">No compositions yet.</div>';
+    return;
+  }
+  comps.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'comp-list-item' + (c.id === compActiveId ? ' active' : '');
+    item.innerHTML = `<span class="comp-list-title">${_escHtml(c.title || 'Untitled')}</span><span class="comp-list-count">${c.chords.length} chord${c.chords.length !== 1 ? 's' : ''}</span>`;
+    item.addEventListener('click', () => compSelectId(c.id));
+    panel.appendChild(item);
+  });
+}
+
+function compRenderDetail(comp) {
+  if (!comp) return;
+  const panel = document.getElementById('comp-detail-panel');
+  panel.innerHTML = `
+    <div class="comp-detail-top">
+      <input class="comp-title-input" value="${_escHtml(comp.title)}" placeholder="Untitled">
+      <button class="comp-del-comp-btn" title="Delete composition">Delete</button>
+    </div>
+    <div>
+      <div style="display:flex;align-items:center;margin-bottom:6px">
+        <div class="comp-section-label" style="margin-bottom:0">Chords</div>
+        <button class="comp-compact-btn" id="comp-compact-btn" title="Toggle compact view">Compact</button>
+      </div>
+      <div class="comp-chord-row" id="comp-chord-row"></div>
+    </div>
+    <div class="comp-play-row">
+      <button class="comp-play-btn" id="comp-play-btn">
+        <svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play
+      </button>
+      <button class="comp-stop-btn" id="comp-stop-btn" disabled>
+        <svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="1" width="6" height="6" rx=".5" fill="currentColor"/></svg>Stop
+      </button>
+      <input class="comp-bpm-input" id="comp-bpm-input" type="number" min="40" max="240" value="${comp.bpm || 90}">
+      <span style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace">BPM</span>
+      <button class="comp-loop-btn${comp.loop?' active':''}" id="comp-loop-btn" title="Loop playback">
+        <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 3.5Q1 1 4 1h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M7 0l2 1.5L7 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11 6.5Q11 9 8 9H3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M5 10.5l-2-1.5 2-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        Loop
+      </button>
+      <button class="comp-import-btn" id="comp-import-btn" title="Copy current progression into this composition">↙ Import progression</button>
+    </div>
+    <div class="comp-drums-row">
+      <button class="comp-drums-btn${comp.drums?' active':''}" id="comp-drums-btn">Drums</button>
+      <select class="comp-drums-style" id="comp-drums-style"${!comp.drums?' disabled':''}>
+        <option value="rock"${(comp.drumsStyle||'rock')==='rock'?' selected':''}>Rock (hat)</option>
+        <option value="simple"${comp.drumsStyle==='simple'?' selected':''}>Simple</option>
+        <option value="hihat"${comp.drumsStyle==='hihat'?' selected':''}>Hi-hat only</option>
+      </select>
+    </div>
+    <div>
+      <div class="comp-section-label">Notes</div>
+      <textarea class="comp-notes-input" id="comp-notes-input" placeholder="Lyrics, ideas, key, feel…">${_escHtml(comp.text || '')}</textarea>
+    </div>`;
+
+  compRenderChordRow(comp);
+
+  panel.querySelector('.comp-title-input').addEventListener('input', e => {
+    compUpdate(comp.id, { title: e.target.value });
+    compRenderList();
+  });
+  panel.querySelector('.comp-del-comp-btn').addEventListener('click', () => {
+    if (!confirm(`Delete "${comp.title || 'Untitled'}"?`)) return;
+    compDelete(comp.id);
+    compActiveId = null;
+    compRenderList();
+    const remaining = compLoad();
+    if (remaining.length) { compActiveId = remaining[0].id; compRenderList(); compRenderDetail(remaining[0]); }
+    else panel.innerHTML = '<div class="comp-empty-state">No compositions yet.<br>Click + New to start.</div>';
+  });
+  document.getElementById('comp-play-btn').addEventListener('click', () => compStartPlayback(comp.id));
+  document.getElementById('comp-stop-btn').addEventListener('click', compStopPlayback);
+  document.getElementById('comp-bpm-input').addEventListener('change', e => {
+    compUpdate(comp.id, { bpm: parseInt(e.target.value) || 90 });
+  });
+  document.getElementById('comp-loop-btn').addEventListener('click', () => {
+    const cur = compLoad().find(c => c.id === comp.id);
+    const next = !(cur?.loop);
+    compUpdate(comp.id, { loop: next });
+    document.getElementById('comp-loop-btn').classList.toggle('active', next);
+  });
+  document.getElementById('comp-import-btn').addEventListener('click', () => {
+    if (!progression.length) return;
+    const chords = progression.map(ch => ({
+      name: ch.name, sym: ch.sym, roman: ch.roman,
+      pcs: ch.pcs || ch.notes.map(n => noteNameToPc(n)).filter(p => p >= 0 && p <= 11),
+      beats: ch.beats || 4
+    }));
+    compUpdate(comp.id, { chords });
+    const updated = compLoad().find(c => c.id === comp.id);
+    compRenderChordRow(updated);
+    compRenderList();
+  });
+  document.getElementById('comp-compact-btn').addEventListener('click', () => {
+    const row = document.getElementById('comp-chord-row');
+    const on = row.classList.toggle('compact-mode');
+    document.getElementById('comp-compact-btn').classList.toggle('active', on);
+  });
+  document.getElementById('comp-drums-btn').addEventListener('click', () => {
+    const cur = compLoad().find(c => c.id === comp.id);
+    const next = !(cur?.drums);
+    compUpdate(comp.id, { drums: next });
+    document.getElementById('comp-drums-btn').classList.toggle('active', next);
+    document.getElementById('comp-drums-style').disabled = !next;
+  });
+  document.getElementById('comp-drums-style').addEventListener('change', e => {
+    compUpdate(comp.id, { drumsStyle: e.target.value });
+  });
+  panel.querySelector('.comp-notes-input').addEventListener('input', e => {
+    compUpdate(comp.id, { text: e.target.value });
+  });
+}
+
+function compRenderChordRow(comp) {
+  const row = document.getElementById('comp-chord-row');
+  if (!row) return;
+  row.innerHTML = '';
+  if (!comp.chords || !comp.chords.length) {
+    row.innerHTML = '<span class="comp-slots-hint">Click "↙ Import progression" to add chords.</span>';
+    return;
+  }
+  comp.chords.forEach((ch, i) => {
+    const card = document.createElement('div');
+    card.className = 'comp-chord-card';
+    const mode  = ch.playMode   || 'full';
+    const nv    = ch.noteVal    || 2;
+    const beats = ch.beats      || 4;
+    const ap    = ch.arpPattern || 'up';
+    const noteList = (ch.pcs || []).map(p => pcToName(((p % 12) + 12) % 12)).join(' · ');
+    const nvLabels  = {1:'Whole',2:'Half',4:'Quarter',8:'Eighth',16:'16th'};
+    const arpLabels = {up:'↑ Up',down:'↓ Down',updown:'↑↓ Up-Down',downup:'↓↑ Down-Up'};
+    const isFirst = i === 0, isLast = i === comp.chords.length - 1;
+    card.innerHTML = `
+      <div class="comp-card-header" title="Tap to expand/collapse">
+        <button class="comp-card-mv" data-dir="left" ${isFirst?'disabled':''} title="Move left">◀</button>
+        <span class="comp-chord-name">${_escHtml(ch.sym || ch.name || '?')}</span>
+        <span class="comp-chord-roman">${_escHtml(ch.roman || '')}</span>
+        <span class="comp-card-toggle">▸</span>
+        <button class="comp-card-mv" data-dir="right" ${isLast?'disabled':''} title="Move right">▶</button>
+      </div>
+      <div class="comp-card-body">
+        <div class="comp-chord-notes">${_escHtml(noteList)}</div>
+        <div class="chord-ctrl-row" style="margin-top:5px">
+          <button class="chord-ctrl-btn${mode==='full'?' c-active':''}" data-cc="mode-full" title="Full chord">F</button>
+          <button class="chord-ctrl-btn${mode==='arp'?' c-arp':''}" data-cc="mode-arp" title="Arpeggio">A</button>
+          <div class="chord-ctrl-sep"></div>
+          <select class="comp-nv-select" title="Note value">
+            ${[1,2,4,8,16].map(v=>`<option value="${v}"${nv===v?' selected':''}>${nvLabels[v]}</option>`).join('')}
+          </select>
+        </div>
+        <select class="comp-arp-select${mode!=='arp'?' comp-hidden':''}" title="Arp pattern">
+          ${Object.entries(arpLabels).map(([v,l])=>`<option value="${v}"${ap===v?' selected':''}>${l}</option>`).join('')}
+        </select>
+        <div class="comp-beat-ctrl" title="Duration in beats">
+          <button class="comp-beat-btn" data-action="dec">−</button>
+          <span class="comp-beat-val">${beats}b</span>
+          <button class="comp-beat-btn" data-action="inc">+</button>
+        </div>
+      </div>
+      <button class="comp-chord-del" title="Remove">×</button>`;
+
+    card.querySelector('.comp-card-header').addEventListener('click', e => {
+      if (e.target.classList.contains('comp-card-mv')) return;
+      e.stopPropagation();
+      card.classList.toggle('expanded');
+      card.querySelector('.comp-card-toggle').textContent = card.classList.contains('expanded') ? '▾' : '▸';
+    });
+    card.querySelectorAll('.comp-card-mv').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const dir = btn.dataset.dir;
+        const comps = compLoad();
+        const c = comps.find(c => c.id === comp.id);
+        if (!c) return;
+        const j = dir === 'left' ? i - 1 : i + 1;
+        if (j < 0 || j >= c.chords.length) return;
+        [c.chords[i], c.chords[j]] = [c.chords[j], c.chords[i]];
+        compSave(comps);
+        const row = document.getElementById('comp-chord-row');
+        const wasCompact = row?.classList.contains('compact-mode');
+        compRenderChordRow(c);
+        if (wasCompact) document.getElementById('comp-chord-row')?.classList.add('compact-mode');
+        compRenderList();
+      });
+    });
+    card.querySelectorAll('[data-cc^="mode"]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const comps = compLoad();
+        const c = comps.find(c => c.id === comp.id);
+        if (!c) return;
+        const isFull = btn.dataset.cc === 'mode-full';
+        c.chords[i].playMode = isFull ? 'full' : 'arp';
+        compSave(comps);
+        card.querySelectorAll('[data-cc^="mode"]').forEach(b => b.classList.remove('c-active','c-arp'));
+        if (isFull) btn.classList.add('c-active'); else btn.classList.add('c-arp');
+        card.querySelector('.comp-arp-select').classList.toggle('comp-hidden', isFull);
+      });
+    });
+    card.querySelector('.comp-nv-select').addEventListener('change', e => {
+      e.stopPropagation();
+      const comps = compLoad();
+      const c = comps.find(c => c.id === comp.id);
+      if (!c) return;
+      c.chords[i].noteVal = parseInt(e.target.value);
+      compSave(comps);
+    });
+    card.querySelector('.comp-arp-select').addEventListener('change', e => {
+      e.stopPropagation();
+      const comps = compLoad();
+      const c = comps.find(c => c.id === comp.id);
+      if (!c) return;
+      c.chords[i].arpPattern = e.target.value;
+      compSave(comps);
+    });
+    card.querySelector('[data-action="dec"]').addEventListener('click', e => {
+      e.stopPropagation();
+      const comps = compLoad();
+      const c = comps.find(c => c.id === comp.id);
+      if (!c) return;
+      c.chords[i].beats = Math.max(1, (c.chords[i].beats || 4) - 1);
+      compSave(comps);
+      card.querySelector('.comp-beat-val').textContent = c.chords[i].beats + 'b';
+    });
+    card.querySelector('[data-action="inc"]').addEventListener('click', e => {
+      e.stopPropagation();
+      const comps = compLoad();
+      const c = comps.find(c => c.id === comp.id);
+      if (!c) return;
+      c.chords[i].beats = Math.min(16, (c.chords[i].beats || 4) + 1);
+      compSave(comps);
+      card.querySelector('.comp-beat-val').textContent = c.chords[i].beats + 'b';
+    });
+    card.querySelector('.comp-chord-del').addEventListener('click', e => {
+      e.stopPropagation();
+      const comps = compLoad();
+      const c = comps.find(c => c.id === comp.id);
+      if (c) { c.chords.splice(i, 1); compSave(comps); compRenderChordRow(c); compRenderList(); }
+    });
+    row.appendChild(card);
+  });
+}
+
+let _compPlayGen = 0;
+
+function compStartPlayback(id) {
+  compStopPlayback();
+  const comp = compLoad().find(c => c.id === id);
+  if (!comp || !comp.chords.length || !samplerReady) return;
+  const gen = ++_compPlayGen;
+
+  Tone.start().then(() => {
+    Tone.Transport.stop();
+    Tone.Transport.cancel(0);
+    Tone.Transport.bpm.value = comp.bpm || 90;
+
+    const bpm = comp.bpm || 90;
+    const beatDur = 60 / bpm;
+    let tOffset = 0;
+
+    comp.chords.forEach(ch => {
+      const totalDur   = (ch.beats || 4) * beatDur;
+      const noteVal    = ch.noteVal    || 2;
+      const playMode   = ch.playMode   || 'full';
+      const arpPattern = ch.arpPattern || 'up';
+      const stepDur    = beatDur * 4 / noteVal;
+      const nSteps     = Math.max(1, Math.round(totalDur / stepDur));
+      const pcs        = ch.pcs || [];
+      const voiced     = spreadChordOctaves([...new Set(pcs.map(p=>((p%12)+12)%12))].sort((a,b)=>a-b));
+      const noteDur    = Math.min(stepDur * 1.08, 2.5);
+
+      for (let s = 0; s < nSteps; s++) {
+        const t  = tOffset + s * stepDur;
+        const vi = _arpIndex(s, voiced.length, arpPattern);
+        if (playMode === 'arp') {
+          Tone.Transport.schedule(time => {
+            if (_compPlayGen !== gen || !samplerReady) return;
+            sampler.triggerAttackRelease(midiToNoteName(voiced[vi].midi), noteDur, time);
+          }, t);
+        } else {
+          Tone.Transport.schedule(time => {
+            if (_compPlayGen !== gen || !samplerReady) return;
+            voiced.forEach((v, i) => {
+              sampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time + i * 0.008);
+            });
+          }, t);
+        }
+      }
+      tOffset += totalDur;
+    });
+
+    const totalDur = tOffset;
+
+    if (comp.drums) {
+      const totalBeats = comp.chords.reduce((s, ch) => s + (ch.beats || 4), 0);
+      const style = comp.drumsStyle || 'rock';
+      const halfBeat = beatDur / 2;
+      for (let b = 0; b < totalBeats; b++) {
+        const bt = b * beatDur;
+        const isKick  = b % 4 === 0 || b % 4 === 2;
+        const isSnare = b % 4 === 1 || b % 4 === 3;
+        if (isKick) {
+          Tone.Transport.schedule(time => { if (_compPlayGen !== gen) return; _synthKick(Tone.getContext().rawContext, time); }, bt);
+        } else if (isSnare) {
+          Tone.Transport.schedule(time => { if (_compPlayGen !== gen) return; _synthSnare(Tone.getContext().rawContext, time); }, bt);
+        }
+        if (style === 'rock' || style === 'hihat') {
+          Tone.Transport.schedule(time => { if (_compPlayGen !== gen) return; _synthHihat(Tone.getContext().rawContext, time, false); }, bt);
+          if (b < totalBeats - 1 || comp.loop) {
+            Tone.Transport.schedule(time => { if (_compPlayGen !== gen) return; _synthHihat(Tone.getContext().rawContext, time, false); }, bt + halfBeat);
+          }
+        }
+      }
+    }
+
+    if (comp.loop) {
+      Tone.Transport.loop = true;
+      Tone.Transport.loopStart = 0;
+      Tone.Transport.loopEnd = totalDur;
+    } else {
+      Tone.Transport.loop = false;
+    }
+
+    Tone.Transport.start('+0.05');
+    compIsPlaying = true;
+
+    const playBtn = document.getElementById('comp-play-btn');
+    const stopBtn = document.getElementById('comp-stop-btn');
+    if (playBtn) playBtn.disabled = true;
+    if (stopBtn) stopBtn.disabled = false;
+
+    if (!comp.loop) {
+      setTimeout(() => { if (_compPlayGen === gen) compStopPlayback(); }, (totalDur + 0.5) * 1000);
+    }
+  }).catch(() => {});
+}
+
+function compStopPlayback() {
+  _compPlayGen++;
+  try { Tone.Transport.stop(); Tone.Transport.cancel(0); } catch(e) {}
+  if (sampler) sampler.releaseAll();
+  compIsPlaying = false;
+  const playBtn = document.getElementById('comp-play-btn');
+  const stopBtn = document.getElementById('comp-stop-btn');
+  if (playBtn) playBtn.disabled = false;
+  if (stopBtn) stopBtn.disabled = true;
+}
+
+// Wire compositions UI
+document.getElementById('comp-btn').addEventListener('click', openCompositions);
+document.getElementById('comp-close-btn').addEventListener('click', closeCompositions);
+document.getElementById('comp-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('comp-overlay')) closeCompositions();
+});
+document.getElementById('comp-new-btn').addEventListener('click', () => {
+  const comp = compCreate();
+  compActiveId = comp.id;
+  compRenderList();
+  compRenderDetail(comp);
+});
 
 // ── Wake lock: keep screen on during playback ──────────────────────────────
 async function _acquireWakeLock() {
