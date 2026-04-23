@@ -1276,6 +1276,31 @@
     cursor:pointer; outline:none;
   }
   .comp-drums-style:focus { border-color:var(--accent); }
+  /* Chord search bar */
+  .comp-chord-search-wrap { position:relative; margin-bottom:8px; }
+  .comp-chord-search {
+    width:100%; background:var(--surface2); border:1px solid var(--border2);
+    color:var(--text); border-radius:3px; padding:6px 10px;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; outline:none;
+    box-sizing:border-box; transition:border-color .15s;
+  }
+  .comp-chord-search:focus { border-color:var(--accent); }
+  .comp-chord-search::placeholder { color:var(--muted); }
+  .comp-chord-search-dropdown {
+    position:absolute; top:calc(100% + 2px); left:0; right:0; z-index:300;
+    background:var(--surface); border:1px solid var(--border2); border-radius:3px;
+    max-height:210px; overflow-y:auto; display:none; box-shadow:0 4px 16px rgba(0,0,0,.4);
+  }
+  .comp-chord-search-dropdown.open { display:block; }
+  .comp-search-item {
+    display:flex; align-items:center; gap:8px; padding:5px 10px;
+    cursor:pointer; transition:background .1s; border-bottom:1px solid var(--border);
+  }
+  .comp-search-item:last-child { border-bottom:none; }
+  .comp-search-item:hover { background:var(--surface2); }
+  .comp-search-name { font-size:12px; font-weight:600; color:var(--text); min-width:54px; flex-shrink:0; }
+  .comp-search-cat { font-size:8px; color:var(--muted); font-family:'IBM Plex Mono',monospace; letter-spacing:.06em; flex-shrink:0; }
+  .comp-search-notes { font-size:8px; color:var(--dim); font-family:'IBM Plex Mono',monospace; margin-left:auto; }
 
   /* ══════════════════════════════════════
      COMPARE BAR
@@ -9430,6 +9455,55 @@ function compRenderList() {
   });
 }
 
+function buildCompChordPool() {
+  const rootPc = parseInt(state.key);
+  const scaleData = SCALES[state.scale];
+  if (!scaleData) return [];
+  const scaleNotes = spellScale(rootPc, scaleData.intervals, scaleData);
+  const romans = computeAllRomans(scaleData.intervals, scaleData);
+  const n = scaleData.intervals.length;
+  const pool = [];
+  const _pcs = notes => notes.map(n => noteNameToPc(n)).filter(p => p >= 0 && p <= 11);
+
+  // Diatonic 7th chords
+  for (let di = 0; di < n; di++) {
+    const notes = buildChord(scaleNotes, di, 4);
+    const iv = chordIntervals(scaleData.intervals, di, 4);
+    const {sym, quality} = getChordSymbol(notes[0], iv);
+    pool.push({ category:'Diatonic', name:notes[0], sym, roman:romans[di], notes, pcs:_pcs(notes), quality });
+  }
+  // Secondary dominants
+  buildSecondaryDominants(rootPc, scaleData.intervals, romans).forEach(({label, chord}) => {
+    pool.push({ category:'Sec.Dom', name:chord.root, sym:chord.sym, roman:label, notes:chord.notes, pcs:_pcs(chord.notes), quality:chord.qual });
+  });
+  // Secondary subdominants
+  buildSecondarySubdominants(rootPc, scaleData.intervals, romans).forEach(({label, chord}) => {
+    pool.push({ category:'Sec.Sub', name:chord.root, sym:chord.sym, roman:label, notes:chord.notes, pcs:_pcs(chord.notes), quality:chord.qual });
+  });
+  // Secondary diminished
+  buildSecondaryDiminished(rootPc, scaleData.intervals, romans, scaleNotes).forEach(({label, chord}) => {
+    pool.push({ category:'Sec.Dim', name:chord.root, sym:chord.sym, roman:label, notes:chord.notes, pcs:_pcs(chord.notes), quality:chord.qual });
+  });
+  // Chromatic mediants
+  buildChromaticMediants(rootPc, scaleData.intervals, romans).forEach(({label, chord}) => {
+    pool.push({ category:'Chr.Med', name:chord.root, sym:chord.sym, roman:label, notes:chord.notes, pcs:_pcs(chord.notes), quality:chord.qual });
+  });
+  // Negative harmony chords
+  for (let di = 0; di < n; di++) {
+    const src = buildChord(scaleNotes, di, 4);
+    const neg = buildNegChord(src, rootPc);
+    if (!neg) continue;
+    pool.push({ category:'Negative', name:neg.root, sym:neg.sym, roman:`neg/${romans[di]}`, notes:neg.notes, pcs:_pcs(neg.notes), quality:neg.qual||'' });
+  }
+  // Deduplicate by root+sym
+  const seen = new Set();
+  return pool.filter(ch => {
+    const key = ch.name + ch.sym;
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+}
+
 function compRenderDetail(comp) {
   if (!comp) return;
   const panel = document.getElementById('comp-detail-panel');
@@ -9442,6 +9516,10 @@ function compRenderDetail(comp) {
       <div style="display:flex;align-items:center;margin-bottom:6px">
         <div class="comp-section-label" style="margin-bottom:0">Chords</div>
         <button class="comp-compact-btn" id="comp-compact-btn" title="Toggle compact view">Compact</button>
+      </div>
+      <div class="comp-chord-search-wrap">
+        <input class="comp-chord-search" id="comp-chord-search" placeholder="Add chord — type name, note, or category…" autocomplete="off" spellcheck="false">
+        <div class="comp-chord-search-dropdown" id="comp-chord-search-dd"></div>
       </div>
       <div class="comp-chord-row" id="comp-chord-row"></div>
     </div>
@@ -9500,17 +9578,68 @@ function compRenderDetail(comp) {
     document.getElementById('comp-loop-btn').classList.toggle('active', next);
   });
   document.getElementById('comp-import-btn').addEventListener('click', () => {
-    if (!progression.length) return;
+    if (!progression.length) { alert('No chords in the progression builder yet.'); return; }
     const chords = progression.map(ch => ({
-      name: ch.name, sym: ch.sym, roman: ch.roman,
-      pcs: ch.pcs || ch.notes.map(n => noteNameToPc(n)).filter(p => p >= 0 && p <= 11),
-      beats: ch.beats || 4
+      name: ch.name, sym: ch.sym, roman: ch.roman, notes: ch.notes,
+      pcs: ch.pcs || (ch.notes||[]).map(n => noteNameToPc(n)).filter(p => p >= 0 && p <= 11),
+      beats: ch.beats || 4, noteVal: ch.noteVal || 2,
+      playMode: ch.playMode || 'full', arpPattern: ch.arpPattern || 'up'
     }));
     compUpdate(comp.id, { chords });
     const updated = compLoad().find(c => c.id === comp.id);
     compRenderChordRow(updated);
     compRenderList();
+    const btn = document.getElementById('comp-import-btn');
+    btn.textContent = '✓ Imported';
+    setTimeout(() => { btn.textContent = '↙ Import progression'; }, 1500);
   });
+
+  // Chord search
+  (() => {
+    const inp = document.getElementById('comp-chord-search');
+    const dd  = document.getElementById('comp-chord-search-dd');
+    let pool = null, items = [];
+
+    function showDd(q) {
+      if (!pool) pool = buildCompChordPool();
+      const s = (q||'').toLowerCase().trim();
+      items = pool.filter(ch => {
+        if (!s) return true;
+        const full = (ch.name + ch.sym).toLowerCase();
+        return full.includes(s) ||
+               ch.quality.toLowerCase().includes(s) ||
+               ch.roman.toLowerCase().includes(s) ||
+               ch.notes.join(' ').toLowerCase().includes(s) ||
+               ch.category.toLowerCase().includes(s);
+      }).slice(0, 35);
+      if (!items.length) { dd.classList.remove('open'); return; }
+      dd.innerHTML = items.map((ch, i) => `
+        <div class="comp-search-item" data-i="${i}">
+          <span class="comp-search-name">${_escHtml(ch.name + ch.sym)}</span>
+          <span class="comp-search-cat">${_escHtml(ch.category)}</span>
+          <span class="comp-search-notes">${_escHtml(ch.notes.slice(0,4).join(' · '))}</span>
+        </div>`).join('');
+      dd.querySelectorAll('.comp-search-item').forEach(el => {
+        el.addEventListener('mousedown', e => {
+          e.preventDefault();
+          const ch = items[+el.dataset.i];
+          const comps = compLoad();
+          const c = comps.find(c => c.id === comp.id);
+          if (!c) return;
+          c.chords.push({ name:ch.name, sym:ch.sym, roman:ch.roman, notes:ch.notes, pcs:ch.pcs, quality:ch.quality, beats:4, noteVal:2, playMode:'full', arpPattern:'up' });
+          compSave(comps);
+          compRenderChordRow(compLoad().find(c => c.id === comp.id));
+          compRenderList();
+          inp.value = ''; dd.classList.remove('open');
+        });
+      });
+      dd.classList.add('open');
+    }
+
+    inp.addEventListener('focus', () => { pool = null; showDd(inp.value); });
+    inp.addEventListener('input', () => showDd(inp.value));
+    inp.addEventListener('blur', () => setTimeout(() => dd.classList.remove('open'), 160));
+  })();
   document.getElementById('comp-compact-btn').addEventListener('click', () => {
     const row = document.getElementById('comp-chord-row');
     const on = row.classList.toggle('compact-mode');
@@ -9550,10 +9679,12 @@ function compRenderChordRow(comp) {
     const nvLabels  = {1:'Whole',2:'Half',4:'Quarter',8:'Eighth',16:'16th'};
     const arpLabels = {up:'↑ Up',down:'↓ Down',updown:'↑↓ Up-Down',downup:'↓↑ Down-Up'};
     const isFirst = i === 0, isLast = i === comp.chords.length - 1;
+    const chDisplayName = ch.name && ch.sym && !ch.sym.startsWith(ch.name)
+      ? ch.name + ch.sym : (ch.sym || ch.name || '?');
     card.innerHTML = `
       <div class="comp-card-header" title="Tap to expand/collapse">
         <button class="comp-card-mv" data-dir="left" ${isFirst?'disabled':''} title="Move left">◀</button>
-        <span class="comp-chord-name">${_escHtml(ch.sym || ch.name || '?')}</span>
+        <span class="comp-chord-name">${_escHtml(chDisplayName)}</span>
         <span class="comp-chord-roman">${_escHtml(ch.roman || '')}</span>
         <span class="comp-card-toggle">▸</span>
         <button class="comp-card-mv" data-dir="right" ${isLast?'disabled':''} title="Move right">▶</button>
