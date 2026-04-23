@@ -1261,6 +1261,11 @@
   }
   .comp-card-mv:hover:not(:disabled) { color:var(--gold2); }
   .comp-card-mv:disabled { opacity:.25; cursor:default; }
+  .comp-card-sub {
+    background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:11px; padding:0 2px; line-height:1; flex-shrink:0; transition:color .1s;
+  }
+  .comp-card-sub:hover { color:var(--accent2); }
   /* Compact toggle button */
   .comp-compact-btn {
     background:none; border:1px solid var(--border2); color:var(--muted);
@@ -7812,7 +7817,7 @@ document.addEventListener('click', e => {
   if (_subPopover && !_subPopover.contains(e.target)) closeSubPopover();
 });
 
-function showSlotSubPopover(triggerEl, ch, slotIdx) {
+function showSlotSubPopover(triggerEl, ch, slotIdx, onAdd) {
   closeSubPopover();
 
   const rootPc = noteNameToPc(ch.name);
@@ -7922,11 +7927,13 @@ function showSlotSubPopover(triggerEl, ch, slotIdx) {
       }
       const newPcs = subChordPcs(rpc, rsym);
       const newNotes = newPcs.map(p => NOTES_FROM_PC[p]);
-      progression.splice(slotIdx + 1, 0, {
-        name: rname, sym: rsym, roman: '?', notes: newNotes, pcs: newPcs,
-        quality: rqual, beats: progGetBeats()
-      });
-      renderProgSlots();
+      const newChord = { name: rname, sym: rsym, roman: '?', notes: newNotes, pcs: newPcs, quality: rqual };
+      if (onAdd) {
+        onAdd(newChord);
+      } else {
+        progression.splice(slotIdx + 1, 0, { ...newChord, beats: progGetBeats() });
+        renderProgSlots();
+      }
       closeSubPopover();
     });
   });
@@ -9488,13 +9495,37 @@ function buildCompChordPool() {
   buildChromaticMediants(rootPc, scaleData.intervals, romans).forEach(({label, chord}) => {
     pool.push({ category:'Chr.Med', name:chord.root, sym:chord.sym, roman:label, notes:chord.notes, pcs:_pcs(chord.notes), quality:chord.qual });
   });
-  // Negative harmony chords
-  for (let di = 0; di < n; di++) {
-    const src = buildChord(scaleNotes, di, 4);
-    const neg = buildNegChord(src, rootPc);
-    if (!neg) continue;
-    pool.push({ category:'Negative', name:neg.root, sym:neg.sym, roman:`neg/${romans[di]}`, notes:neg.notes, pcs:_pcs(neg.notes), quality:neg.qual||'' });
+  // Negative harmony — major scale only
+  if (state.scale === 'Major (Ionian)') {
+    for (let di = 0; di < n; di++) {
+      const src = buildChord(scaleNotes, di, 4);
+      const neg = buildNegChord(src, rootPc);
+      if (!neg) continue;
+      pool.push({ category:'Negative', name:neg.root, sym:neg.sym, roman:`neg/${romans[di]}`, notes:neg.notes, pcs:_pcs(neg.notes), quality:neg.qual||'' });
+    }
   }
+  // Altered dominants (V7 and each secondary dominant root)
+  const altDefs = [
+    { sym:'7♭9',  iv:[0,4,7,10,1]  },
+    { sym:'7♯9',  iv:[0,4,7,10,3]  },
+    { sym:'7♯5',  iv:[0,4,8,10]    },
+    { sym:'7♯11', iv:[0,4,7,10,6]  },
+    { sym:'7♭13', iv:[0,4,7,10,8]  },
+    { sym:'7alt', iv:[0,4,8,10,1,8]},
+  ];
+  const altDomRoots = new Set();
+  altDomRoots.add((rootPc + 7) % 12); // natural V
+  buildSecondaryDominants(rootPc, scaleData.intervals, romans).forEach(({chord}) => {
+    altDomRoots.add((noteNameToPc(chord.root) + 12) % 12);
+  });
+  altDomRoots.forEach(dr => {
+    const dn = chromaticPcName(dr, PREFER_FLAT_PC.has(dr));
+    altDefs.forEach(({ sym, iv }) => {
+      const pcs = iv.map(i => (dr + i) % 12);
+      const notes = spellChordFromRoot(dr, dn, iv.map(i => i % 12));
+      pool.push({ category:'Alt.Dom', name:dn, sym, roman:`${dn}${sym}`, notes, pcs, quality:'Altered Dominant' });
+    });
+  });
   // Deduplicate by root+sym
   const seen = new Set();
   return pool.filter(ch => {
@@ -9687,6 +9718,7 @@ function compRenderChordRow(comp) {
         <span class="comp-chord-name">${_escHtml(chDisplayName)}</span>
         <span class="comp-chord-roman">${_escHtml(ch.roman || '')}</span>
         <span class="comp-card-toggle">▸</span>
+        <button class="comp-card-sub" title="Substitution ideas">≈</button>
         <button class="comp-card-mv" data-dir="right" ${isLast?'disabled':''} title="Move right">▶</button>
       </div>
       <div class="comp-card-body">
@@ -9715,6 +9747,22 @@ function compRenderChordRow(comp) {
       e.stopPropagation();
       card.classList.toggle('expanded');
       card.querySelector('.comp-card-toggle').textContent = card.classList.contains('expanded') ? '▾' : '▸';
+    });
+    card.querySelector('.comp-card-sub').addEventListener('click', e => {
+      e.stopPropagation();
+      showSlotSubPopover(e.currentTarget, ch, i, newChord => {
+        const comps = compLoad();
+        const c = comps.find(c => c.id === comp.id);
+        if (!c) return;
+        c.chords.splice(i + 1, 0, { ...newChord, beats: 4, noteVal: 2, playMode: 'full', arpPattern: 'up' });
+        compSave(comps);
+        const updated = compLoad().find(c => c.id === comp.id);
+        const row = document.getElementById('comp-chord-row');
+        const wasCompact = row?.classList.contains('compact-mode');
+        compRenderChordRow(updated);
+        if (wasCompact) document.getElementById('comp-chord-row')?.classList.add('compact-mode');
+        compRenderList();
+      });
     });
     card.querySelectorAll('.comp-card-mv').forEach(btn => {
       btn.addEventListener('click', e => {
