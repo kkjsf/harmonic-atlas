@@ -5956,23 +5956,89 @@ function initSampler() {
   }).toDestination();
 }
 
-// ── Guitar sampler (nylon) ──────────────────────
+// ── Guitar synthesizer (nylon-string model) ─────
+// No network dependency — fully synthesized via Web Audio API
 let guitarSampler = null;
-let guitarSamplerReady = false;
+let guitarSamplerReady = true; // always ready
+
+const _NOTE_PC_MAP = {C:0,Db:1,'C#':1,D:2,Eb:3,'D#':3,E:4,F:5,Gb:6,'F#':6,G:7,Ab:8,'G#':8,A:9,Bb:10,'A#':10,B:11};
+function _noteNameToMidi(name) {
+  const m = name.match(/^([A-G][b#]?)(-?\d+)$/);
+  if (!m) return 60;
+  const pc = _NOTE_PC_MAP[m[1]];
+  return pc !== undefined ? (parseInt(m[2]) + 1) * 12 + pc : 60;
+}
+
+class GuitarSynth {
+  get loaded() { return true; }
+  releaseAll() {}
+  triggerAttackRelease(noteName, duration, time, velocity = 0.8) {
+    const actx = Tone.getContext().rawContext;
+    const midi = _noteNameToMidi(noteName);
+    const freq = 440 * Math.pow(2, (midi - 69) / 12);
+    const vel  = Math.max(0.05, Math.min(1, velocity || 0.8));
+    const dur  = Math.min(typeof duration === 'number' ? duration : 2.0, 3.0);
+
+    const master = actx.createGain();
+    master.connect(actx.destination);
+    // Guitar-like envelope: fast attack, long exponential decay
+    master.gain.setValueAtTime(0, time);
+    master.gain.linearRampToValueAtTime(vel * 0.5, time + 0.004);
+    master.gain.exponentialRampToValueAtTime(vel * 0.18, time + 0.12);
+    master.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+    // Fundamental (triangle — warm, not harsh)
+    const osc = actx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    // Slight pitch settle (string stretching on pick)
+    osc.frequency.setValueAtTime(freq * 1.006, time);
+    osc.frequency.exponentialRampToValueAtTime(freq, time + 0.04);
+    osc.connect(master);
+    osc.start(time); osc.stop(time + dur + 0.05);
+
+    // 2nd harmonic — decays faster
+    const osc2 = actx.createOscillator();
+    osc2.type = 'sine'; osc2.frequency.value = freq * 2;
+    const g2 = actx.createGain();
+    g2.gain.setValueAtTime(vel * 0.22, time);
+    g2.gain.exponentialRampToValueAtTime(0.001, time + dur * 0.4);
+    osc2.connect(g2); g2.connect(master);
+    osc2.start(time); osc2.stop(time + dur * 0.4 + 0.02);
+
+    // 3rd harmonic — very brief
+    const osc3 = actx.createOscillator();
+    osc3.type = 'sine'; osc3.frequency.value = freq * 3;
+    const g3 = actx.createGain();
+    g3.gain.setValueAtTime(vel * 0.10, time);
+    g3.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+    osc3.connect(g3); g3.connect(master);
+    osc3.start(time); osc3.stop(time + 0.1);
+
+    // Pick noise — brief, bright
+    const nSize = Math.max(64, Math.floor(actx.sampleRate * 0.012));
+    const nBuf  = actx.createBuffer(1, nSize, actx.sampleRate);
+    const nd    = nBuf.getChannelData(0);
+    for (let i = 0; i < nSize; i++) nd[i] = Math.random() * 2 - 1;
+    const nSrc = actx.createBufferSource(); nSrc.buffer = nBuf;
+    const nbp  = actx.createBiquadFilter();
+    nbp.type = 'bandpass'; nbp.frequency.value = Math.min(freq * 5, 9000); nbp.Q.value = 2;
+    const ng = actx.createGain();
+    ng.gain.setValueAtTime(vel * 0.25, time);
+    ng.gain.exponentialRampToValueAtTime(0.001, time + 0.012);
+    nSrc.connect(nbp); nbp.connect(ng); ng.connect(master);
+    nSrc.start(time); nSrc.stop(time + 0.015);
+
+    // Body warmth — low shelf boost
+    const body = actx.createBiquadFilter();
+    body.type = 'lowshelf'; body.frequency.value = 280; body.gain.value = 4;
+    master.disconnect(); master.connect(body); body.connect(actx.destination);
+  }
+}
 
 function initGuitarSampler() {
   if (guitarSampler) return;
-  guitarSampler = new Tone.Sampler({
-    urls: {
-      'Ab2':'Ab2.mp3','B2':'B2.mp3','Db3':'Db3.mp3','E3':'E3.mp3',
-      'G3':'G3.mp3','Ab3':'Ab3.mp3','B3':'B3.mp3','Db4':'Db4.mp3',
-      'E4':'E4.mp3','G4':'G4.mp3','Ab4':'Ab4.mp3','B4':'B4.mp3',
-      'Db5':'Db5.mp3','E5':'E5.mp3','G5':'G5.mp3','Ab5':'Ab5.mp3',
-    },
-    release: 1.2,
-    baseUrl: 'https://tonejs.github.io/audio/guitar-nylon/',
-    onload: () => { guitarSamplerReady = true; }
-  }).toDestination();
+  guitarSampler = new GuitarSynth();
 }
 
 // ── Audio Context ───────────────────────────────
@@ -9741,6 +9807,7 @@ function compRenderDetail(comp) {
           compSave(comps);
           compRenderChordRow(compLoad().find(c => c.id === comp.id));
           compRenderList();
+          if (compIsPlaying) compPendingRestart = true;
           inp.value = ''; dd.classList.remove('open');
         });
       });
@@ -10003,7 +10070,7 @@ function compRenderChordRow(comp) {
       e.stopPropagation();
       const comps = compLoad();
       const c = comps.find(c => c.id === comp.id);
-      if (c) { c.chords.splice(i, 1); compSave(comps); compRenderChordRow(c); compRenderList(); }
+      if (c) { c.chords.splice(i, 1); compSave(comps); compRenderChordRow(c); compRenderList(); if (compIsPlaying) compPendingRestart = true; }
     });
     row.appendChild(card);
   });
