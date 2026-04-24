@@ -1,6 +1,6 @@
 # 🎵 Harmonic Atlas
 
-Interactive music theory reference — scales, chords, guitar/mandolin voicings, chord progression builder. Runs as an installable PWA (Progressive Web App) directly in the browser.
+Interactive music theory reference — scales, chords, guitar/mandolin voicings, composition tool with improvisation mode. Runs as an installable PWA (Progressive Web App) directly in the browser.
 
 **Live app:** https://kkjsf.github.io/harmonic-atlas
 
@@ -23,8 +23,7 @@ Each scale degree shows a chord card with:
 - **▶ play button** (top-right corner, appears on hover) — strummed full chord
 - **arp button** — ascending arpeggio playback
 - Staff notation toggle
-- Improv scale suggestions (e.g. Dorian over a minor 7th)
-- **+ button** — adds the chord to the progression builder
+- **+ button** — adds the chord to the composition tool
 
 ### Guitar tab
 
@@ -37,45 +36,62 @@ Each scale degree shows a chord card with:
 - **Scale voicings** tab — scale positions on 4 strings
 - **Chop Chords** tab — closed-position triads and 7th chords for the chop technique
 
-### Progression builder
+### Composition tool (purple ♩ button, top-right)
 
-- Click the **+** button on any chord card to add it to the progression
-- Drag to reorder; set per-chord beat count with **−/+** buttons
-- Per-chord **F / A** toggle — Full (strummed) or Arpeggio mode
-- Per-chord **note value** dropdown (Whole / Half / Quarter / Eighth / 16th) — controls how many times the chord repeats within its beat window
-- Per-chord **arp pattern** dropdown (↑ Up / ↓ Down / ↑↓ Up-Down / ↓↑ Down-Up) — visible in arp mode
-- **Play / Stop** — plays the progression using Tone.js + Salamander Grand Piano samples
-- BPM, time signature, swing, and strum-pattern controls
-- **Zoom view** — full-screen progression view with playhead
-- Export as text chord chart
-
-### Compositions
-
-Draft and save multi-chord compositions with full playback control:
+Draft and save multi-chord compositions with full playback and improvisation support:
 
 - **+ New** — creates a new composition (stored in `localStorage`)
-- **↙ Import progression** — copies the current progression builder into the composition
-- Per-chord controls (same as progression builder): F/A mode, note value, arp pattern, beat count (−/+)
-- Per-chord **reorder** — ◀ ▶ arrows in the card header to shift chord position
-- **Compact view** toggle — collapses all cards to chord name + degree only; individual cards can also be tapped/clicked to expand on mobile
-- **Play / Stop** — Transport-based playback (supports reliable Stop)
+- **↙ Import progression** — copies the current scale's diatonic chords into the composition
+- Chord search bar — type to find any chord and add it
+
+**Per-chord controls:**
+- **F / A** toggle — Full (strummed) or Arpeggio mode
+- **Note value** dropdown (Whole / Half / Quarter / 8th / 16th) — controls strum rate (full) or arp step speed
+- **Arp pattern** dropdown (↑ Up / ↓ Down / ↑↓ / ↓↑) — visible in arp mode
+- **Beat count** (−/+) — duration of the chord in beats
+- **◀ ▶** — reorder chords within the composition
+- **≈** — chord substitution suggestions
+
+**Global controls (All row):**
+- **Full / Arp ↑ / Arp ↓ / Arp ↕** — set all chords to the same mode at once
+- **Note value dropdown** — applies the selected speed to all chords immediately
+
+**Playback:**
+- **Play / Stop** — Transport-based playback (supports reliable loop + live updates)
 - **BPM** input, **Loop** toggle
-- **Drums** toggle — adds synthesized kick + snare + hi-hat; style selector:
-  - *Rock (hat)* — kick on beats 1 & 3, snare on 2 & 4, closed hi-hat on every 8th note
-  - *Simple* — kick + snare only, no hi-hat
-  - *Hi-hat only* — hi-hat 8ths only
-- **Notes** textarea — free text for lyrics, key, feel, etc.
-- Compositions persist across reloads via `localStorage` key `harmonic-compositions`
+- **Strum** pattern selector (Straight / Folk / Ballad / Pop / Jazz / etc.)
+- **Swing** selector (Straight / Light / Medium / Hard)
+- **Drums** toggle + style selector (Auto / Rock / Funk / Jazz / Bossa / Waltz / Ballad / Reggae / HiHat / Click) — synthesized kick, snare, hi-hat, ride, clap via Web Audio API; Auto maps strum pattern to a matching drum style
+- **Sound** selector — Piano (Salamander Grand) or Guitar (real acoustic guitar samples, nbrosowsky)
+- Live loop update — adding/removing/reordering chords takes effect at the next loop cycle (no need to stop)
+
+**Compact view** toggle — collapses all cards to chord name + degree only; individual cards expand on tap.
+
+**♪ Improvise button** — opens the improvisation overlay:
+- Large chord name + Roman numeral
+- All chord tones shown as note bubbles
+- **Scale suggestions** — quality-based, musically correct recommendations:
+  - Maj7 / Δ7 → Ionian, Lydian, Major Pentatonic
+  - Dom7 / 9 / altered → Mixolydian, Altered, Lydian Dominant, Blues
+  - Min7 → Dorian, Aeolian, Minor Pentatonic, Phrygian
+  - Half-dim / ø7 → Locrian, Locrian ♯2
+  - Dim7 → Diminished (H-W), Diminished (W-H)
+  - Aug → Whole Tone, Lydian Augmented
+- **Next chord** preview
+- **Timeline bar** with animated playhead showing position in the loop
+- **⏸ Pause / Resume** button — pauses/resumes playback without leaving the overlay
 
 ---
 
 ## Audio
 
-All audio uses **Tone.js** with the **Salamander Grand Piano** sample library — real recorded piano samples, not synthesized tones. Samples load once on page open (a small "⟳ loading samples…" indicator shows during loading).
-
-- Chord play button: strummed chord → ascending arpeggio
-- Scale staff: ascending scale playback
-- Progression player: strummed chords with bass note emphasis and slight humanization
+| Sound | Engine |
+|---|---|
+| Piano | Tone.js Sampler → Salamander Grand Piano samples (CDN) |
+| Guitar | Tone.js Sampler → nbrosowsky acoustic guitar samples (CDN, 36 notes) |
+| Drums | Raw Web Audio API synthesis (`_synthKick`, `_synthSnare`, `_synthHihat`, `_synthRide`, `_synthClap`) |
+| Scale staff | `sampler.triggerAttackRelease` via Tone.Transport |
+| Chord card buttons | `sampler.triggerAttackRelease` directly |
 
 ---
 
@@ -85,7 +101,7 @@ All audio uses **Tone.js** with the **Salamander Grand Piano** sample library �
 
 ```
 harmonic-atlas/
-├── index.html          ← The entire app (HTML + CSS + JS, ~9000 lines)
+├── index.html          ← The entire app (HTML + CSS + JS, ~10 000 lines)
 ├── manifest.json       ← PWA config (name, icon, theme)
 ├── sw.js               ← Service worker (network-first for HTML, cache-first for assets)
 ├── dev-server.js       ← Local dev server with live-reload
@@ -136,52 +152,45 @@ git push
 
 - **Single-file app** — all CSS, JS, and HTML live in `index.html`. Intentional: easier to share and edit.
 - **No JS framework** — vanilla JS only. External resources: Google Fonts (CSS) and Tone.js (audio, loaded from CDN).
-- **Audio:** Tone.js 14.8.49 (CDN) + Salamander Grand Piano samples (CDN, streamed on load)
+- **Audio:** Tone.js 14.8.49 (CDN) + Salamander Grand Piano + nbrosowsky acoustic guitar samples
 - **Theme:** dark mode only
 - **PWA:** `manifest.json` + `sw.js`. Service worker uses network-first for HTML navigation and cache-first for static assets.
 
 ### Audio subsystem
 
-`initSampler()` creates a `Tone.Sampler` backed by Salamander mp3 files and connects it to `Tone.getDestination()`. Audio paths:
+`initSampler()` creates a `Tone.Sampler` backed by Salamander mp3 files. `initGuitarSampler()` creates a second `Tone.Sampler` backed by nbrosowsky acoustic guitar mp3s (loaded lazily when Guitar sound is selected).
 
 | Path | Engine |
 |---|---|
 | Chord card play/arp buttons | `addCardPlayBtn` → `sampler.triggerAttackRelease` |
-| Scale staff playback | `schedule()` inside the staff SVG click handler |
-| Progression player | `playChordAt` (full/strum) or `_progScheduleArp` / `_progScheduleFull` |
-| Composition player | `Tone.Transport.schedule` → sampler (supports reliable Stop/Loop) |
-| Composition drums | Raw Web Audio API — `_synthKick`, `_synthSnare`, `_synthHihat` |
+| Scale staff playback | `Tone.Transport.schedule` → sampler |
+| Composition player | `Tone.Transport.schedule` → `activeSampler` (piano or guitar) |
+| Composition drums | Raw Web Audio API — `_synthKick`, `_synthSnare`, `_synthHihat`, `_synthRide`, `_synthClap` |
 
-`Tone.start()` is called on first user interaction to satisfy browser autoplay policy. Composition playback uses `Tone.Transport` exclusively — this enables `Tone.Transport.cancel(0)` for a clean stop. A `_compPlayGen` counter guards stale callbacks after stop.
-
-Progression playback uses direct `ctx.currentTime` scheduling (not Transport) — `progStop()` calls `sampler.releaseAll()` to silence notes.
+`Tone.start()` is called on first user interaction to satisfy browser autoplay policy. Composition playback uses `Tone.Transport` exclusively — this enables `Tone.Transport.cancel(0)` for a clean stop. A `_compPlayGen` counter guards stale callbacks after stop. A `compPendingRestart` flag triggers a seamless loop restart at the next cycle boundary when chords are modified during playback.
 
 ### Key functions
 
 | Function | Purpose |
 |---|---|
-| `initSampler()` | Creates Tone.Sampler, shows/hides loading indicator |
+| `initSampler()` | Creates Tone.Sampler for piano, shows/hides loading indicator |
+| `initGuitarSampler()` | Creates Tone.Sampler for acoustic guitar (lazy) |
 | `midiToNoteName(midi)` | MIDI int → Tone note string (e.g. 60 → "C4") |
 | `spreadChordOctaves(pcs)` | Voices pitch classes across octaves for smooth playback |
-| `playChordAt(ctx, pcs, startTime, duration, sound)` | Schedules a strummed chord (strum patterns, bass emphasis) |
+| `getStrumDurations(chDur, beats)` | Returns hit objects `{offset, dur, velocity, up, isFirst}` based on active strum + swing |
 | `_arpIndex(s, n, pattern)` | Maps step index to voiced note index for a given arp pattern |
-| `_progScheduleArp(pcs, start, dur, noteVal, beatDur, pattern)` | Arp playback for progression builder |
-| `_progScheduleFull(ctx, pcs, start, dur, noteVal, beatDur)` | Repeated full chord for non-default note values |
-| `_synthKick(actx, time)` | Synthesized kick: sub oscillator + click transient |
-| `_synthSnare(actx, time)` | Synthesized snare: bandpass noise + tonal body |
-| `_synthHihat(actx, time, open)` | Synthesized hi-hat: highpass noise burst |
+| `_synthKick / _synthSnare / _synthHihat / _synthRide / _synthClap` | Drum synthesis via Web Audio API |
 | `compStartPlayback(id)` / `compStopPlayback()` | Composition Transport-based playback |
 | `compRenderDetail(comp)` / `compRenderChordRow(comp)` | Composition UI rendering |
 | `compLoad()` / `compSave()` / `compUpdate()` / `compCreate()` / `compDelete()` | localStorage CRUD for compositions |
-| `progPlay()` / `progStop()` | Progression playback start/stop |
-| `renderProgSlots()` | Renders progression builder chord slots |
-| `addCardPlayBtn(card, notes)` | Adds full + arp play buttons to chord cards |
+| `getImprovSuggestions(chord)` | Quality-based scale suggestions for the improv overlay |
+| `updateImprovOverlay(comp, idx)` | Updates improv overlay for the currently playing chord |
 | `makeScaleFretboardSVG` | Full horizontal fretboard SVG |
 | `computeClosedMandoVoicing` / `getChopMandoVoicing` | Mandolin chop chord voicings |
 
 ### Composition data model
 
-Each composition is a plain JS object stored as JSON in `localStorage`:
+Each composition is a plain JS object stored as JSON in `localStorage` (key: `harmonic-compositions`):
 
 ```js
 {
@@ -190,14 +199,17 @@ Each composition is a plain JS object stored as JSON in `localStorage`:
   bpm: 90,
   loop: false,
   drums: true,
-  drumsStyle: "rock",       // "rock" | "simple" | "hihat"
+  drumsStyle: "funk",      // "auto"|"rock"|"funk"|"jazz"|"bossa"|"waltz"|"ballad"|"reggae"|"hihat"|"click"
+  sound: "piano",          // "piano" | "guitar"
+  strum: "Straight",       // strum pattern name
+  swing: 0,                // 0=straight, 30=light, 55=medium, 75=hard
   text: "verse idea...",
   chords: [
     {
-      name: "C", sym: "maj7", roman: "Imaj7",
+      name: "C", sym: "Δ7", roman: "IΔ7",
       pcs: [0, 4, 7, 11],   // pitch classes
       beats: 4,              // duration in beats
-      noteVal: 2,            // 1=whole 2=half 4=quarter 8=eighth 16=sixteenth
+      noteVal: 4,            // 1=whole 2=half 4=quarter 8=eighth 16=sixteenth
       playMode: "full",      // "full" | "arp"
       arpPattern: "up"       // "up" | "down" | "updown" | "downup"
     }

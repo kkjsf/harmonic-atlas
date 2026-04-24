@@ -9623,7 +9623,6 @@ function compRenderDetail(comp) {
         <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 3.5Q1 1 4 1h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M7 0l2 1.5L7 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11 6.5Q11 9 8 9H3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M5 10.5l-2-1.5 2-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
         Loop
       </button>
-      <button class="comp-pause-btn" id="comp-pause-btn" disabled title="Pause / Resume">⏸</button>
       <button class="comp-improv-btn" id="comp-improv-btn" title="Improvisation mode — see chord notes + scale suggestions">♪ Improvise</button>
     </div>
     <div class="strum-row" style="margin-bottom:4px;flex-wrap:wrap;gap:4px">
@@ -10021,55 +10020,72 @@ function compRenderChordRow(comp) {
 }
 
 function getImprovSuggestions(chord) {
-  const suggestions = [];
-  const keyPc = ((parseInt(state.key) || 0) + 12) % 12;
-  const scaleData = SCALES[state.scale];
+  const q    = (chord.quality || '').trim();
   const rootPc = chord.pcs?.[0] ?? -1;
-  const rootName = rootPc >= 0 ? pcToName(rootPc) : '';
-  const quality = (chord.quality || '').toLowerCase();
+  const root   = rootPc >= 0 ? pcToName(rootPc) : '';
+  const sugg   = [];
+  const add    = (scale, tip) => sugg.push({ scale: `${root} ${scale}`, tip });
 
-  if (rootPc >= 0 && scaleData?.intervals) {
-    const degreeInterval = ((rootPc - keyPc) + 12) % 12;
-    const degreeIdx = scaleData.intervals.indexOf(degreeInterval);
-    if (degreeIdx >= 0) {
-      const majorModeTips = [
-        ['Ionian (Major)', 'Tonic — bright, resolved, home base'],
-        ['Dorian', 'Minor with a raised 6th — jazz, soul, funk'],
-        ['Phrygian', 'Dark, Spanish flavor — flat 2nd tension'],
-        ['Lydian', 'Dreamy, floating — the raised 4th lifts it'],
-        ['Mixolydian', 'Dominant — the b7 creates pull toward I'],
-        ['Aeolian (Natural Minor)', 'Dark, melancholic — classic minor'],
-        ['Locrian', 'Unstable, dissonant — resolves strongly'],
-      ];
-      const tip = majorModeTips[degreeIdx];
-      if (tip) suggestions.push({ scale: `${rootName} ${tip[0]}`, tip: tip[1] });
-    }
+  // Detect chord category from the quality strings produced by classifyChord()
+  const isDom     = /^(Dominant|Dom |Aug Dom|Altered Dom|Aug Dominant)/.test(q);
+  const isMaj7    = /^(Major 7|Maj 7|Major 9|Augmented Δ)/.test(q);
+  const isMinMaj  = /^Minor-Ma/.test(q);
+  const isMin7    = /^Minor (7|9|1)/.test(q) && !isMinMaj;
+  const isHalf    = /^Half-Dim/.test(q);
+  const isDim     = /^(Dim|Diminished)/.test(q) && !isHalf;
+  const isAug     = q === 'Augmented' || /^Aug Maj/.test(q);
+  const isMajor   = q === 'Major' || q === 'Major ♭5' || q === '';
+  const isMinor   = q === 'Minor' || q === 'Minor 6th' || q === 'Minor ♯5';
+
+  if (isDom) {
+    const hasAlt = /Alt|♭9|♯9|♯5/.test(q);
+    add('Mixolydian', 'b7 creates pull toward tonic — essential dominant sound');
+    if (hasAlt)
+      add('Altered (7th mode Mel. Minor)', 'b9 #9 #11 b13 — matches the alteration, maximum tension');
+    else
+      add('Lydian Dominant (4th mode Mel. Minor)', '#11 adds tritone color without harsh alterations');
+    add('Diminished (H-W)', 'Works over dom7b9 — chromatic tension, resolves strongly');
+    add('Blues scale', 'b3 b5 b7 — gritty and expressive over any dominant');
+  } else if (isMaj7) {
+    add('Ionian (Major scale)', 'Tonic — bright, resolved, home base');
+    add('Lydian (4th mode)', '#4 gives a floating, ethereal quality — ideal over IVΔ7');
+    add('Major Pentatonic', 'Safe and bright — 5 notes, zero tension');
+    add('Lydian Augmented (3rd mode Mel. Minor)', '#4 and #5 — modern jazz over Δ7♯5');
+  } else if (isMinMaj) {
+    add('Melodic Minor (ascending)', '1 2 b3 4 5 6 7 — defines the chord exactly');
+    add('Harmonic Minor', 'Raised 7th creates leading tone — classical and tango feel');
+    add('Minor Pentatonic', 'Simpler option — omits the characteristic tension');
+  } else if (isMin7) {
+    add('Dorian', 'Natural minor + raised 6th — jazz and soul standard');
+    add('Aeolian (Natural Minor)', 'Dark and melancholic — classical minor feel');
+    add('Minor Pentatonic', 'Universal — blues, rock, jazz, works everywhere');
+    add('Phrygian', 'Flat 2nd — dark, Spanish / flamenco flavor');
+  } else if (isHalf) {
+    add('Locrian', 'Parent-key mode — b2 and b5 match the chord tones');
+    add('Locrian ♯2 (6th mode Mel. Minor)', 'Raised 2nd gives a smoother, less dissonant sound');
+    add('Diminished (H-W)', 'b3 and b5 of the scale fit ø7 chord tones');
+  } else if (isDim) {
+    add('Diminished (H-W)', 'Symmetric 8-note scale — every note fits dim7 perfectly');
+    add('Diminished (W-H)', 'Inverted symmetric scale — equally valid, different color');
+    add('Altered (7th mode Mel. Minor)', 'Over dim7 functioning as 7b9 — resolves to major');
+  } else if (isAug) {
+    add('Whole Tone', 'All whole steps — ambiguous and impressionistic, matches #5');
+    add('Lydian Augmented (3rd mode Mel. Minor)', '#4 and #5 — Coltrane / Wayne Shorter territory');
+    add('Altered (7th mode Mel. Minor)', 'b13 = #5 — when aug functions as a dominant');
+  } else if (isMajor) {
+    add('Ionian (Major scale)', 'Follow the key — bright and resolved');
+    add('Lydian', '#4 gives a floating quality — works over I and IV');
+    add('Major Pentatonic', 'Safe and bright — 5 notes, no clashes');
+  } else if (isMinor) {
+    add('Dorian', 'Raised 6th — bright minor, jazz standard');
+    add('Aeolian (Natural Minor)', 'Classic natural minor — dark, melancholic');
+    add('Minor Pentatonic', 'Universal — blues, rock, jazz');
+  } else {
+    add('Major Pentatonic', 'Safe starting point over any major-flavored chord');
+    add('Minor Pentatonic', 'Universal — bluesy, works over most chords');
   }
 
-  if (quality.includes('dom') || (quality.includes('7') && !quality.includes('maj7') && !quality.includes('min7'))) {
-    if (!suggestions.some(s => s.scale.includes('Mixolydian')))
-      suggestions.push({ scale: `${rootName} Mixolydian`, tip: 'Classic over dominant — b7 creates tension toward tonic' });
-    suggestions.push({ scale: `${rootName} Altered (7th mode Mel. Minor)`, tip: 'b9 #9 b5 b13 — maximum jazz tension' });
-  }
-  if (quality.includes('maj7') || quality === 'major') {
-    if (!suggestions.some(s => s.scale.includes('Lydian') || s.scale.includes('Ionian')))
-      suggestions.push({ scale: `${rootName} Lydian`, tip: '#4 gives a floating, ethereal quality' });
-    suggestions.push({ scale: `${rootName} Major Pentatonic`, tip: 'Safe and bright — 5 notes, zero tension' });
-  }
-  if (quality.includes('min7') || quality === 'minor' || quality.includes('m7')) {
-    if (!suggestions.some(s => s.scale.includes('Dorian') || s.scale.includes('Phrygian') || s.scale.includes('Aeolian')))
-      suggestions.push({ scale: `${rootName} Dorian`, tip: 'Natural minor + bright 6th — jazz and funk standard' });
-    suggestions.push({ scale: `${rootName} Minor Pentatonic`, tip: 'Universal — blues, rock, jazz, works everywhere' });
-  }
-  if (quality.includes('dim') || quality.includes('°')) {
-    suggestions.push({ scale: `${rootName} Diminished (H-W)`, tip: 'Half-whole diminished — 8 notes, symmetric' });
-    suggestions.push({ scale: `${rootName} Locrian`, tip: 'Mode from the parent key — resolves to nearby minor' });
-  }
-  if (quality.includes('aug') || quality.includes('+')) {
-    suggestions.push({ scale: `${rootName} Whole Tone`, tip: 'All whole steps — dreamy, impressionistic' });
-    suggestions.push({ scale: `${rootName} Lydian Augmented`, tip: '3rd mode Mel. Minor — #4 and #5' });
-  }
-  return suggestions.slice(0, 4);
+  return sugg.slice(0, 4);
 }
 
 function updateImprovOverlay(comp, idx) {
@@ -10407,6 +10423,7 @@ if ('serviceWorker' in navigator) {
 </script>
 <div id="comp-improv-overlay">
   <button class="improv-close-btn" id="improv-close-btn">✕ Close</button>
+  <button class="comp-pause-btn" id="comp-pause-btn" disabled title="Pause / Resume" style="position:fixed;top:14px;right:90px">⏸</button>
   <div class="improv-chord-name" id="improv-chord-name">—</div>
   <div class="improv-chord-roman" id="improv-chord-roman"></div>
   <div class="improv-notes" id="improv-notes"></div>
