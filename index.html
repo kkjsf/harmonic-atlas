@@ -10189,32 +10189,43 @@ function compStartPlayback(id) {
         const mode   = ch.playMode   || 'full';
         const arpPat = ch.arpPattern || 'up';
         const beats  = ch.beats || 4;
+        const nv     = ch.noteVal || 4;
 
-        const strumHits = getStrumDurations(chDur, beats);
+        const stepDur    = beatDur * 4 / nv;
+        const nSteps     = Math.max(1, Math.round(chDur / stepDur));
+        const swingRatio = progSwing > 0 ? progSwing / 200 : 0;
+        const strumHits  = getStrumDurations(chDur, beats); // still used for velocity feel
 
         if (mode === 'arp') {
-          strumHits.forEach((hit, s) => {
+          for (let s = 0; s < nSteps; s++) {
             const v = voiced[_arpIndex(s, voiced.length, arpPat)];
-            if (!v) return;
-            const noteDur = Math.min(hit.dur * 1.6, 2.5);
-            const t = tOffset + hit.offset;
+            if (!v) continue;
+            const isOff   = s % 2 === 1;
+            const swingOff = isOff ? stepDur * swingRatio : 0;
+            const t        = tOffset + s * stepDur + swingOff;
+            const noteDur  = Math.min(stepDur * 1.5, 2.0);
+            const beatPos  = s % Math.max(1, nv / 4);
+            const vel      = beatPos === 0 ? 0.85 : (beatPos % 2 === 0 ? 0.70 : 0.58);
             Tone.Transport.schedule(time => {
               if (_compPlayGen !== gen || !activeReady()) return;
-              activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time, hit.velocity * 0.85);
+              activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time, vel);
             }, t);
-          });
+          }
         } else {
-          strumHits.forEach(hit => {
+          for (let s = 0; s < nSteps; s++) {
+            const hit  = strumHits[s % strumHits.length] || { velocity: 0.72, up: false, isFirst: s === 0 };
+            const isOff = s % 2 === 1;
+            const swingOff = isOff ? stepDur * swingRatio : 0;
+            const t        = tOffset + s * stepDur + swingOff;
+            const noteDur  = Math.max(0.2, stepDur * 1.4 + 0.15);
             const notesOrdered = hit.up ? [...voiced].reverse() : voiced;
-            const noteDur = Math.max(0.2, (chDur - hit.offset) + 0.25);
-            const t = tOffset + hit.offset;
             notesOrdered.forEach((v, ni) => {
               Tone.Transport.schedule(time => {
                 if (_compPlayGen !== gen || !activeReady()) return;
                 activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time + ni * 0.008, hit.velocity);
               }, t);
             });
-            if (hit.isFirst && voiced.length > 0) {
+            if (s === 0 && voiced.length > 0) {
               const rootMidi = voiced[0].midi - 12;
               if (rootMidi >= 28) {
                 Tone.Transport.schedule(time => {
@@ -10223,7 +10234,7 @@ function compStartPlayback(id) {
                 }, t);
               }
             }
-          });
+          }
         }
         tOffset += chDur;
       });
