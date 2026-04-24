@@ -6673,7 +6673,9 @@ function progPlay() {
 
 function progStop() {
   progPlaying = false;
+  try { progReverbNode?.disconnect(); } catch(e){}
   progReverbNode = null;
+  try { progMasterBus?.disconnect(); } catch(e){}
   progMasterBus = null;
   if (sampler) sampler.releaseAll();
   _releaseWakeLock();
@@ -8572,6 +8574,10 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <button id="tech-close" aria-label="Close">×</button>
     <div class="tech-title">Technical Details</div>
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
+
+    <div class="tech-section" style="margin-bottom:8px">
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v11 &nbsp;·&nbsp; deployed 2026-04-24</span></div>
+    </div>
 
     <div class="tech-section">
       <div class="tech-section-title">Stack &amp; Platform</div>
