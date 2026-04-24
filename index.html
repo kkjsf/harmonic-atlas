@@ -9797,11 +9797,20 @@ function compRenderDetail(comp) {
       const comps = compLoad(); const c = comps.find(x => x.id === comp.id); if (!c) return;
       c.chords.forEach(ch => {
         ch.playMode = mode;
-        if (mode === 'arp') { ch.arpPattern = arpPat; ch.noteVal = nv; }
+        ch.noteVal = nv;
+        if (mode === 'arp') ch.arpPattern = arpPat;
       });
       compSave(comps); compRenderChordRow(c);
       if (compIsPlaying) compPendingRestart = true;
     });
+  });
+  // Global noteVal alone — apply speed to all without changing mode
+  document.getElementById('comp-global-nv')?.addEventListener('change', e => {
+    const nv = parseInt(e.target.value) || 4;
+    const comps = compLoad(); const c = comps.find(x => x.id === comp.id); if (!c) return;
+    c.chords.forEach(ch => { ch.noteVal = nv; });
+    compSave(comps); compRenderChordRow(c);
+    if (compIsPlaying) compPendingRestart = true;
   });
   // Improvisation mode
   document.getElementById('comp-improv-btn').addEventListener('click', () => {
