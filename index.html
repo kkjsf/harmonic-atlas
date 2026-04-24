@@ -1887,10 +1887,20 @@
   .improv-seg { height:100%; border-radius:2px; background:var(--border2); transition:background .15s; }
   .improv-seg.active { background:var(--accent); }
   .improv-playhead { position:absolute; top:-3px; width:2px; height:16px; background:white; border-radius:1px; transform:translateX(-50%); transition:left .08s linear; pointer-events:none; }
-  /* Pause button */
-  .comp-pause-btn { background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; border-radius:3px; padding:4px 8px; font-size:11px; font-family:'IBM Plex Mono',monospace; transition:all .12s; line-height:1; }
-  .comp-pause-btn:hover:not(:disabled) { border-color:var(--accent); color:var(--accent2); }
-  .comp-pause-btn:disabled { opacity:.35; cursor:default; }
+  /* Pause button — in improv overlay, big touch target */
+  #comp-pause-btn {
+    position:fixed; top:12px; right:88px; z-index:9001;
+    width:40px; height:40px; border-radius:50%;
+    background:rgba(124,111,160,.2); border:1.5px solid var(--accent); color:var(--accent2);
+    font-size:16px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .15s; line-height:1;
+  }
+  #comp-pause-btn:disabled { opacity:.25; cursor:default; pointer-events:none; }
+  #comp-pause-btn:not(:disabled):hover { background:rgba(124,111,160,.4); border-color:var(--accent2); }
+  @media (max-width:480px) {
+    #comp-pause-btn { width:50px; height:50px; font-size:22px; top:10px; right:70px; }
+  }
   /* Comp button purple background */
   #comp-btn { background:var(--accent); border-color:var(--accent); color:#fff; }
   #comp-btn:hover { background:var(--accent2); border-color:var(--accent2); color:#fff; }
@@ -8613,15 +8623,18 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
     <div class="tech-section">
       <div class="tech-section-title">Audio Engine</div>
-      <div class="tech-row"><span class="tech-key">Library</span><span class="tech-val">Tone.js 14.8.49 (CDN) — wraps Web Audio API; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.getContext().rawContext</code> aliased as <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">progAudioCtx</code> for timing reads only</span></div>
-      <div class="tech-row"><span class="tech-key">Sound source</span><span class="tech-val">Salamander Grand Piano — real recorded piano samples (mp3); loaded once via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> on page init; "⟳ loading samples…" shown until ready</span></div>
-      <div class="tech-row"><span class="tech-key">Chord card playback</span><span class="tech-val">Strummed chord hit (notes staggered 8 ms) then ascending arpeggio starting 1.2 s later; all via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.triggerAttackRelease()</code></span></div>
-      <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button embedded inside the staff SVG as a <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code> element; click toggles play/stop; notes scheduled via sampler at 350 ms per note</span></div>
-      <div class="tech-row"><span class="tech-key">Rhythm patterns</span><span class="tech-val">6 patterns (Straight/Folk/Rock/Ballad/Bossa/Waltz) applied to <em>all</em> chords in the progression; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations()</code> maps pattern beats to chord duration; up-beats reverse note order; last hit sustains to end of slot</span></div>
-      <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> — assigns each note the minimum octave that keeps it strictly ascending from C3</span></div>
-      <div class="tech-row"><span class="tech-key">iOS/PWA unlock</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.start()</code> called on first user gesture (touch/click/keydown); <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.releaseAll()</code> on stop</span></div>
-      <div class="tech-row"><span class="tech-key">Loop</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">progLoop</code> flag checked in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tick()</code> on sequence end; button state uses <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classList.toggle('active')</code> synced between main and zoom panels</span></div>
-      <div class="tech-row"><span class="tech-key">Drums/metronome</span><span class="tech-val">Click (triangle osc, 1400/900 Hz), Kick (sine 180→50 Hz sweep), Snare (noise + HP 1500 Hz), Hi-hat (noise + HP 7000 Hz)</span></div>
+      <div class="tech-row"><span class="tech-key">Library</span><span class="tech-val">Tone.js 14.8.49 (CDN) — wraps Web Audio API. Two samplers: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler</code> (piano, loads on init) and <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">guitarSampler</code> (guitar, lazy-loaded on first use).</span></div>
+      <div class="tech-row"><span class="tech-key">Piano samples</span><span class="tech-val">Salamander Grand Piano — real mp3 samples via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> (tonejs.github.io/audio/salamander/). Loads on page init. "⟳ loading…" indicator while pending.</span></div>
+      <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val">nbrosowsky acoustic guitar — 36 real mp3 samples (nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/). Tone.js pitch-shifts between recorded notes. Loaded lazily when Guitar sound is selected.</span></div>
+      <div class="tech-row"><span class="tech-key">Chord card playback</span><span class="tech-val">Strummed chord (notes staggered 8 ms) then ascending arpeggio at +1.2 s; all via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.triggerAttackRelease()</code>. Always piano regardless of composition sound setting.</span></div>
+      <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button inside the staff SVG (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code>); notes scheduled via sampler at 350 ms/note.</span></div>
+      <div class="tech-row"><span class="tech-key">Composition player</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Transport</code>-based scheduling — enables accurate loop, stop, and live update. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_compPlayGen</code> counter cancels stale callbacks after stop. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compPendingRestart</code> flag triggers seamless loop restart when chords change during playback.</span></div>
+      <div class="tech-row"><span class="tech-key">Note value / timing</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">stepDur = beatDur × 4 / noteVal</code>. Arp mode: fixed step interval at noteVal rate with swing offset on odd steps. Full mode: strum rate at noteVal, velocity from strum pattern (cycling).</span></div>
+      <div class="tech-row"><span class="tech-key">Strum patterns</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">STRUM_PATTERNS</code> object — each pattern defines beat arrays with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{d, a, g}</code> flags (downstroke, accent, ghost). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations(dur, beats)</code> converts to hit objects with velocity (accent=1.0, normal=0.72, up=0.48, ghost=0.22).</span></div>
+      <div class="tech-row"><span class="tech-key">Drums</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DRUM_PATTERNS</code> — 9 styles (Rock/Funk/Jazz/Bossa/Waltz/Ballad/Reggae/HiHat/Click), each with bpm+subdiv+beat arrays. Synthesised entirely via Web Audio API: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthKick</code> (sub+punch), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthSnare</code> (dual bandpass), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthHihat</code> (HP 8.5 kHz), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthRide</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthClap</code> (3 layered bursts). Auto mode maps strum pattern name to matching drum style.</span></div>
+      <div class="tech-row"><span class="tech-key">Improv suggestions</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getImprovSuggestions(chord)</code> — quality-first regex matching against <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> output strings. No degree-based lookup — scale choice is determined by chord type (dom7→Mixolydian/Altered, Δ7→Ionian/Lydian, m7→Dorian, ø7→Locrian/Locrian♯2, etc.).</span></div>
+      <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> — assigns minimum octave keeping notes strictly ascending from C3.</span></div>
+      <div class="tech-row"><span class="tech-key">iOS/PWA unlock</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.start()</code> on first user gesture; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.releaseAll()</code> on stop.</span></div>
     </div>
 
     <div class="tech-section">
@@ -8644,7 +8657,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val"><a href="https://www.jazzguitar.be/blog/drop-2-chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Drop 2</a>; <a href="https://www.jazzguitar.be/blog/drop-3-chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Drop 3</a></span></div>
       <div class="tech-row"><span class="tech-key">Arpeggio shapes</span><span class="tech-val"><a href="https://www.jazzguitar.be/blog/guitar-arpeggios/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Guitar Arpeggios</a> - CAGED arpeggio positions for 7th chords</span></div>
       <div class="tech-row"><span class="tech-key">Negative harmony</span><span class="tech-val">Ernst Levy, <em>A Theory of Harmony</em> (1985); Jacob Collier interviews; <a href="https://www.youtube.com/watch?v=9-EHgH4LZEQ" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">Adam Neely's Negative Harmony explanation</a></span></div>
-      <div class="tech-row"><span class="tech-key">Karplus-Strong</span><span class="tech-val">Karplus &amp; Strong (1983) "Digital Synthesis of Plucked String and Drum Timbres" - Computer Music Journal</span></div>
+      <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val"><a href="https://github.com/nbrosowsky/tonejs-instruments" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">nbrosowsky/tonejs-instruments</a> — open-source real instrument samples for Tone.js</span></div>
       <div class="tech-row"><span class="tech-key">Scale modes</span><span class="tech-val"><a href="https://www.musictheory.net/lessons/mode" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">musictheory.net modes</a>; Mark Levine, <em>The Jazz Theory Book</em>; Jerry Bergonzi, <em>Inside Improvisation</em></span></div>
     </div>
   </div>
@@ -8828,6 +8841,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <li><a class="guide-toc-link" href="#g-relationships">Scale Relationships</a></li>
         <li><a class="guide-toc-link" href="#g-cadences">Cadence Suggester</a></li>
         <li><a class="guide-toc-link" href="#g-progression">Progression Builder</a></li>
+        <li><a class="guide-toc-link" href="#g-composition">Composition &amp; Improvisation</a></li>
         <li><a class="guide-toc-link" href="#g-neg">Negative Harmony</a></li>
         <li><a class="guide-toc-link" href="#g-compare">Scale Comparison</a></li>
         <li><a class="guide-toc-link" href="#g-tips">Pro Tips</a></li>
@@ -9088,6 +9102,87 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-val">Load classic progressions (I–IV–V–I, ii–V–I, etc.) instantly transposed to your current key.</span>
         <span class="guide-kv-key">Expand</span>
         <span class="guide-kv-val">The expand button opens a fullscreen overlay with larger chord slots, a progress bar, and all transport controls mirrored.</span>
+      </div>
+    </section>
+
+    <!-- COMPOSITION & IMPROVISATION -->
+    <section class="guide-section" id="g-composition">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon" style="background:rgba(124,111,160,.12);border-color:rgba(124,111,160,.35);color:var(--accent2)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><ellipse cx="6" cy="14" rx="3" ry="2" transform="rotate(-15 6 14)"/><rect x="8.6" y="3.5" width="1.4" height="10" rx=".7"/><path d="M10 3.5 C13.5 4.5 15 8 12 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num" style="color:var(--accent2)">09b</div>
+          <div class="guide-section-title">Composition &amp; Improvisation</div>
+        </div>
+      </div>
+      <p class="guide-p">The <strong>purple ♩ button</strong> (top-right) opens the Composition tool — a full-featured sequencer for building, saving, and practising over chord progressions. Multiple compositions are saved in the browser (localStorage) and persist across reloads.</p>
+
+      <p class="guide-p" style="margin-bottom:6px"><strong>Building a progression</strong></p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">+ New</span>
+        <span class="guide-kv-val">Creates a blank composition. Give it a title by clicking the name field.</span>
+        <span class="guide-kv-key">Search bar</span>
+        <span class="guide-kv-val">Type any chord name (e.g. "Cm7", "Fmaj7", "G7") to find and add chords. Results are filtered live.</span>
+        <span class="guide-kv-key">↙ Import</span>
+        <span class="guide-kv-val">Copies the current progression builder into the composition instantly.</span>
+        <span class="guide-kv-key">◀ ▶</span>
+        <span class="guide-kv-val">Reorder chords within the composition without stopping playback.</span>
+        <span class="guide-kv-key">≈ Substitutions</span>
+        <span class="guide-kv-val">Chord substitution popover — sus chords, relative major/minor, tritone sub, approach chords.</span>
+      </div>
+
+      <p class="guide-p" style="margin-bottom:6px"><strong>Per-chord controls</strong></p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">F / A</span>
+        <span class="guide-kv-val"><strong>Full</strong> — strum the whole chord. <strong>Arp</strong> — play notes one at a time in sequence.</span>
+        <span class="guide-kv-key">Note value</span>
+        <span class="guide-kv-val">Whole / Half / Quarter / 8th / 16th — sets how fast notes repeat (strum rate for Full, step speed for Arp). This actually affects the sound — 16th is four notes per beat.</span>
+        <span class="guide-kv-key">Arp pattern</span>
+        <span class="guide-kv-val">↑ Up · ↓ Down · ↑↓ Up-Down · ↓↑ Down-Up. Visible only in Arp mode.</span>
+        <span class="guide-kv-key">− / +</span>
+        <span class="guide-kv-val">Beat count for this chord (1–16 beats).</span>
+      </div>
+
+      <p class="guide-p" style="margin-bottom:6px"><strong>Global controls (All row)</strong></p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Full / Arp ↑↓↕</span>
+        <span class="guide-kv-val">Set every chord to the same mode at once.</span>
+        <span class="guide-kv-key">Note value dropdown</span>
+        <span class="guide-kv-val">Apply the same speed to all chords in one click.</span>
+      </div>
+
+      <p class="guide-p" style="margin-bottom:6px"><strong>Playback</strong></p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">BPM</span><span class="guide-kv-val">40–240. Changes take effect at the next loop cycle.</span>
+        <span class="guide-kv-key">Loop</span><span class="guide-kv-val">Cycles indefinitely. Adding, removing, or reordering chords during playback takes effect at the next cycle — no need to stop.</span>
+        <span class="guide-kv-key">Strum</span><span class="guide-kv-val">Rhythmic feel for the whole composition — Straight, Folk, Ballad, Pop, Jazz, Funk, Reggae, Bossa, Waltz…</span>
+        <span class="guide-kv-key">Swing</span><span class="guide-kv-val">Straight / Light / Medium / Hard — delays off-beat notes to create swing or shuffle feel.</span>
+        <span class="guide-kv-key">Drums</span><span class="guide-kv-val">Synthesized drum pattern (Web Audio API). Style selector: Auto (matches strum pattern), Rock, Funk, Jazz, Bossa, Waltz, Ballad, Reggae, HiHat, Click.</span>
+        <span class="guide-kv-key">Sound</span><span class="guide-kv-val"><strong>Piano</strong> — Salamander Grand Piano samples. <strong>Guitar</strong> — real acoustic guitar samples (loads on first use).</span>
+      </div>
+
+      <p class="guide-p" style="margin-bottom:6px"><strong>♪ Improvise — the overlay</strong></p>
+      <p class="guide-p">Open the Improvise view during playback to see the current chord in full-screen focus. This is designed for <em>playing along in real time</em>.</p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Chord name</span><span class="guide-kv-val">Large chord symbol and Roman numeral highlight what's playing right now.</span>
+        <span class="guide-kv-key">Note bubbles</span><span class="guide-kv-val">All notes of the chord displayed as pills — use them as anchor tones when improvising.</span>
+        <span class="guide-kv-key">What to play</span><span class="guide-kv-val">Quality-based scale suggestions — determined by the chord type, not the key degree:<br>
+          <strong>Δ7</strong> → Ionian, Lydian, Major Pentatonic<br>
+          <strong>dom7</strong> → Mixolydian, Lydian Dominant (#11)<br>
+          <strong>dom7b9 / altered</strong> → Altered scale (b9 #9 #11 b13)<br>
+          <strong>m7</strong> → Dorian, Aeolian, Minor Pentatonic<br>
+          <strong>ø7</strong> → Locrian, Locrian ♯2<br>
+          <strong>dim7</strong> → Diminished (H-W) or (W-H)<br>
+          <strong>aug</strong> → Whole Tone, Lydian Augmented
+        </span>
+        <span class="guide-kv-key">Next chord</span><span class="guide-kv-val">Preview of the upcoming chord so you can prepare your line.</span>
+        <span class="guide-kv-key">Timeline</span><span class="guide-kv-val">Animated playhead showing your position within the loop. Segments proportional to chord beat counts.</span>
+        <span class="guide-kv-key">⏸ Pause</span><span class="guide-kv-val">Large circular button (top-right of overlay) — pause and resume without leaving the improv view. Touch-friendly on mobile.</span>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">🎸</span>
+        <span class="guide-tip-text">Workflow: set up a ii–V–I loop, switch to Guitar sound, open Improvise, and use the scale suggestions to practise over each chord change in real time. The next-chord preview gives you one bar to prepare your phrase.</span>
       </div>
     </section>
 
@@ -10423,7 +10518,7 @@ if ('serviceWorker' in navigator) {
 </script>
 <div id="comp-improv-overlay">
   <button class="improv-close-btn" id="improv-close-btn">✕ Close</button>
-  <button class="comp-pause-btn" id="comp-pause-btn" disabled title="Pause / Resume" style="position:fixed;top:14px;right:90px">⏸</button>
+  <button id="comp-pause-btn" disabled title="Pause / Resume" aria-label="Pause or resume playback">⏸</button>
   <div class="improv-chord-name" id="improv-chord-name">—</div>
   <div class="improv-chord-roman" id="improv-chord-roman"></div>
   <div class="improv-notes" id="improv-notes"></div>
