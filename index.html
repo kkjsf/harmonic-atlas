@@ -1887,20 +1887,16 @@
   .improv-seg { height:100%; border-radius:2px; background:var(--border2); transition:background .15s; }
   .improv-seg.active { background:var(--accent); }
   .improv-playhead { position:absolute; top:-3px; width:2px; height:16px; background:white; border-radius:1px; transform:translateX(-50%); transition:left .08s linear; pointer-events:none; }
-  /* Pause button — in improv overlay, big touch target */
+  /* Play/Pause button — centred below note bubbles in improv overlay */
   #comp-pause-btn {
-    position:fixed; top:12px; right:88px; z-index:9001;
-    width:40px; height:40px; border-radius:50%;
-    background:rgba(124,111,160,.2); border:1.5px solid var(--accent); color:var(--accent2);
-    font-size:16px; cursor:pointer;
+    width:64px; height:64px; border-radius:50%;
+    background:rgba(124,111,160,.25); border:2px solid var(--accent); color:#fff;
+    font-size:24px; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    transition:all .15s; line-height:1;
+    transition:all .18s; line-height:1; margin:18px auto 0; flex-shrink:0;
   }
-  #comp-pause-btn:disabled { opacity:.25; cursor:default; pointer-events:none; }
-  #comp-pause-btn:not(:disabled):hover { background:rgba(124,111,160,.4); border-color:var(--accent2); }
-  @media (max-width:480px) {
-    #comp-pause-btn { width:50px; height:50px; font-size:22px; top:10px; right:70px; }
-  }
+  #comp-pause-btn:hover { background:rgba(124,111,160,.5); border-color:var(--accent2); }
+  @media (max-width:480px) { #comp-pause-btn { width:72px; height:72px; font-size:28px; } }
   /* Comp button purple background */
   #comp-btn { background:var(--accent); border-color:var(--accent); color:#fff; }
   #comp-btn:hover { background:var(--accent2); border-color:var(--accent2); color:#fff; }
@@ -9869,11 +9865,12 @@ function compRenderDetail(comp) {
     if (e.target.value === 'guitar') initGuitarSampler();
     if (compIsPlaying) compPendingRestart = true;
   });
-  // Pause / resume
+  // Play / Pause / Resume
   let compIsPaused = false;
   document.getElementById('comp-pause-btn').addEventListener('click', () => {
-    if (!compIsPlaying) return;
-    if (compIsPaused) {
+    if (!compIsPlaying) {
+      compStartPlayback(comp.id);
+    } else if (compIsPaused) {
       Tone.Transport.start();
       compIsPaused = false;
       document.getElementById('comp-pause-btn').textContent = '⏸';
@@ -10136,44 +10133,44 @@ function getImprovSuggestions(chord) {
     const hasAlt = /Alt|♭9|♯9|♯5/.test(q);
     add('Mixolydian', 'b7 creates pull toward tonic — essential dominant sound');
     if (hasAlt)
-      add('Altered (7th mode Mel. Minor)', 'b9 #9 #11 b13 — matches the alteration, maximum tension');
+      add('Altered', 'b9 #9 #11 b13 — matches the alteration, maximum tension');
     else
-      add('Lydian Dominant (4th mode Mel. Minor)', '#11 adds tritone color without harsh alterations');
+      add('Lydian Dominant', '#11 adds tritone color without harsh alterations');
     add('Diminished (H-W)', 'Works over dom7b9 — chromatic tension, resolves strongly');
     add('Blues scale', 'b3 b5 b7 — gritty and expressive over any dominant');
   } else if (isMaj7) {
-    add('Ionian (Major scale)', 'Tonic — bright, resolved, home base');
-    add('Lydian (4th mode)', '#4 gives a floating, ethereal quality — ideal over IVΔ7');
+    add('Ionian', 'Tonic — bright, resolved, home base');
+    add('Lydian', '#4 gives a floating, ethereal quality — ideal over IVΔ7');
     add('Major Pentatonic', 'Safe and bright — 5 notes, zero tension');
-    add('Lydian Augmented (3rd mode Mel. Minor)', '#4 and #5 — modern jazz over Δ7♯5');
+    add('Lydian Augmented', '#4 and #5 — modern jazz over Δ7♯5');
   } else if (isMinMaj) {
-    add('Melodic Minor (ascending)', '1 2 b3 4 5 6 7 — defines the chord exactly');
+    add('Melodic Minor', '1 2 b3 4 5 6 7 — defines the chord exactly');
     add('Harmonic Minor', 'Raised 7th creates leading tone — classical and tango feel');
     add('Minor Pentatonic', 'Simpler option — omits the characteristic tension');
   } else if (isMin7) {
     add('Dorian', 'Natural minor + raised 6th — jazz and soul standard');
-    add('Aeolian (Natural Minor)', 'Dark and melancholic — classical minor feel');
+    add('Aeolian', 'Dark and melancholic — classical minor feel');
     add('Minor Pentatonic', 'Universal — blues, rock, jazz, works everywhere');
     add('Phrygian', 'Flat 2nd — dark, Spanish / flamenco flavor');
   } else if (isHalf) {
     add('Locrian', 'Parent-key mode — b2 and b5 match the chord tones');
-    add('Locrian ♯2 (6th mode Mel. Minor)', 'Raised 2nd gives a smoother, less dissonant sound');
+    add('Locrian ♯2', 'Raised 2nd gives a smoother, less dissonant sound');
     add('Diminished (H-W)', 'b3 and b5 of the scale fit ø7 chord tones');
   } else if (isDim) {
     add('Diminished (H-W)', 'Symmetric 8-note scale — every note fits dim7 perfectly');
     add('Diminished (W-H)', 'Inverted symmetric scale — equally valid, different color');
-    add('Altered (7th mode Mel. Minor)', 'Over dim7 functioning as 7b9 — resolves to major');
+    add('Altered', 'Over dim7 functioning as 7b9 — resolves to major');
   } else if (isAug) {
     add('Whole Tone', 'All whole steps — ambiguous and impressionistic, matches #5');
-    add('Lydian Augmented (3rd mode Mel. Minor)', '#4 and #5 — Coltrane / Wayne Shorter territory');
-    add('Altered (7th mode Mel. Minor)', 'b13 = #5 — when aug functions as a dominant');
+    add('Lydian Augmented', '#4 and #5 — Coltrane / Wayne Shorter territory');
+    add('Altered', 'b13 = #5 — when aug functions as a dominant');
   } else if (isMajor) {
-    add('Ionian (Major scale)', 'Follow the key — bright and resolved');
+    add('Ionian', 'Follow the key — bright and resolved');
     add('Lydian', '#4 gives a floating quality — works over I and IV');
     add('Major Pentatonic', 'Safe and bright — 5 notes, no clashes');
   } else if (isMinor) {
     add('Dorian', 'Raised 6th — bright minor, jazz standard');
-    add('Aeolian (Natural Minor)', 'Classic natural minor — dark, melancholic');
+    add('Aeolian', 'Classic natural minor — dark, melancholic');
     add('Minor Pentatonic', 'Universal — blues, rock, jazz');
   } else {
     add('Major Pentatonic', 'Safe starting point over any major-flavored chord');
@@ -10454,7 +10451,7 @@ function compStopPlayback() {
   const pauseBtn = document.getElementById('comp-pause-btn');
   if (playBtn)  playBtn.disabled  = false;
   if (stopBtn)  stopBtn.disabled  = true;
-  if (pauseBtn) { pauseBtn.disabled = true; pauseBtn.textContent = '⏸'; }
+  if (pauseBtn) { pauseBtn.textContent = '▶'; }
 }
 
 // Wire compositions UI
@@ -10518,10 +10515,10 @@ if ('serviceWorker' in navigator) {
 </script>
 <div id="comp-improv-overlay">
   <button class="improv-close-btn" id="improv-close-btn">✕ Close</button>
-  <button id="comp-pause-btn" disabled title="Pause / Resume" aria-label="Pause or resume playback">⏸</button>
   <div class="improv-chord-name" id="improv-chord-name">—</div>
   <div class="improv-chord-roman" id="improv-chord-roman"></div>
   <div class="improv-notes" id="improv-notes"></div>
+  <button id="comp-pause-btn" title="Play / Pause" aria-label="Play or pause playback">▶</button>
   <div class="improv-suggestions">
     <div class="improv-sugg-label">What to play</div>
     <div id="improv-sugg-list"></div>
