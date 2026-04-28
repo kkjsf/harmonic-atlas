@@ -4219,8 +4219,10 @@ function getBasicVoicing(rootPc, ivArray) {
     return best ? {ss,frets:best.frets,pcs:best.pcs,score:bestScore} : null;
   }
 
-  const stringSets = allPcs.length <= 3
+  const stringSets = pcs.length <= 3
     ? [[1,2,3,4],[2,3,4,5],[0,1,2,3],[1,2,3,4,5],[0,1,2,3,4],[3,4,5]]
+    : pcs.length >= 5
+    ? [[1,2,3,4,5],[0,1,2,3,4]]
     : [[1,2,3,4],[2,3,4,5],[0,1,2,3]];
   let globalBest=null, globalScore=Infinity;
   for(const ss of stringSets) {
