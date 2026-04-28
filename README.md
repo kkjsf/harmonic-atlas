@@ -27,9 +27,16 @@ Each scale degree shows a chord card with:
 
 ### Guitar tab
 
-- Chord diagrams for all scale-degree chords
-- **Full fretboard** — shows scale positions across all 6 strings; swipe/scroll horizontally
-- CAGED-position voicings
+Four sub-tabs:
+
+- **Basic** — chord diagrams for all scale-degree chords; root-as-bass priority; barre shapes shown with purple bar
+- **Arpeggios** — horizontal CAGED arpeggio shapes for 7th chords (E/A/D/G/C forms, 5-fret window)
+- **Drop 2 / Drop 3** — jazz voicings: all 4 inversions × 3 string sets; slash notation for inversion (e.g. Gmaj7/B)
+- **Alt. Dom** — altered dominant voicings for every dominant chord in the current key (V7 + secondary dominants). Covers 9 chord types: 7♭9, 7♯9, 7♯11, 7♭13, 7♭9♭13, 7♭5♭9, 7♭5♯9, 7♯5♭9, 7♯5♯9. Each shows up to 3 moveable shapes (root on E / A / D string) with span ≤ 4 frets. Tab is hidden when the scale has no dominant chords.
+
+**Chord diagram navigation** — click any diagram to open it enlarged. Use ◀ ▶ buttons, swipe left/right, or arrow keys to step through all diagrams in the current view. The previous and next chord names are shown as context labels.
+
+**Chord List view** — on screens ≥ 900 px, degree sections are laid out in two columns for a more compact overview.
 
 ### Mandolin tab
 
@@ -187,6 +194,8 @@ git push
 | `updateImprovOverlay(comp, idx)` | Updates improv overlay for the currently playing chord |
 | `makeScaleFretboardSVG` | Full horizontal fretboard SVG |
 | `computeClosedMandoVoicing` / `getChopMandoVoicing` | Mandolin chop chord voicings |
+| `computeVoicingFromTemplate(rootPc, template)` | Derives guitar frets/pcs from a semitone-offset template; enforces ascending pitch per string and span ≤ 4 frets |
+| `showDiagramModal(…, navList, navIdx)` | Zoom overlay with smooth in-place navigation (fade swap 80 ms, swipe, arrow keys, prev/next context labels) |
 
 ### Composition data model
 

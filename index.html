@@ -435,6 +435,12 @@
   /* Chord grid - always 2 columns */
   .chords-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
+  /* Chord list view — degree sections in 2 columns on desktop */
+  @media(min-width:900px){
+    .chord-list-view { display:grid; grid-template-columns:1fr 1fr; gap:0 28px; align-items:start; }
+    .chord-list-view .degree-section { min-width:0; }
+  }
+
   .chord-card { background:var(--surface); border:1px solid var(--border); padding:16px 18px; border-radius:2px; position:relative; overflow:hidden; transition:all .2s; }
   .chord-play-btn { position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.22); color:var(--gold2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; }
   .chord-arp-btn { position:absolute; top:8px; right:34px; width:22px; height:22px; border-radius:50%; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.22); color:var(--gold2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; padding:0; z-index:2; flex-shrink:0; }
@@ -2199,6 +2205,7 @@
     <button class="view-tab active" data-view="list"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="5.6" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="9.2" width="7" height="1.8" rx=".5" fill="currentColor" opacity=".5"/></svg>Chord List</button>
     <button class="view-tab" data-view="guitar" id="tab-guitar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="9" r="1.2" fill="currentColor"/></svg>Guitar</button>
     <button class="view-tab" data-view="mandolin" id="tab-mandolin"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><ellipse cx="6.5" cy="8" rx="3.5" ry="4.5" stroke="currentColor" stroke-width="1.1" fill="none"/><line x1="6.5" y1="1" x2="6.5" y2="3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.5" y1="4" x2="8.5" y2="4" stroke="currentColor" stroke-width="1" opacity=".6"/><circle cx="6.5" cy="8" r="1" fill="currentColor" opacity=".4"/></svg>Mandolin</button>
+    <button class="view-tab" data-view="altdom" id="tab-altdom"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="10" r="1.2" fill="currentColor"/><circle cx="9" cy="6" r="1.2" fill="currentColor"/></svg>Alt. Dom</button>
   </div>
   <div class="guitar-sub-tabs" id="guitar-sub-tabs" style="display:none">
     <button class="guitar-sub-tab active" data-view="diagrams" id="tab-diagrams">Basic</button>
@@ -3676,102 +3683,6 @@ function makeImproDiv(quality, chordRootPc) {
   return div;
 }
 
-// Modal showing guitar chord diagrams for all altered dominant voicings of a given root.
-function showAltDominantDiagrams(rootPc, rootName) {
-  document.getElementById('alt-dom-modal')?.remove();
-  const alts = [
-    { sym:'7♭9',  iv:[0,4,10,13],   label:'Dom 7♭9' },
-    { sym:'7♯9',  iv:[0,4,10,15],   label:'Dom 7♯9' },
-    { sym:'7♭13', iv:[0,4,8,10],    label:'Dom 7♭13 / ♯5 (enharmonic)' },
-    { sym:'7♯11', iv:[0,4,10,18],   label:'Dom 7♯11 / 7♭5' },
-    { sym:'7♭9♭13',iv:[0,4,10,13,20],label:'7♭9♭13' },
-  ];
-
-  const modal = document.createElement('div');
-  modal.id = 'alt-dom-modal';
-  modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.88);
-    display:flex;align-items:flex-start;justify-content:center;cursor:pointer;
-    animation:fadeIn .15s ease;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:24px 0;`;
-
-  const inner = document.createElement('div');
-  inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
-    padding:24px 28px;cursor:default;max-width:92vw;width:680px;`;
-  inner.addEventListener('click', e => e.stopPropagation());
-
-  const titleDiv = document.createElement('div');
-  titleDiv.style.cssText = `font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8;margin-bottom:4px;`;
-  titleDiv.textContent = `${rootName} — Altered Dominant Voicings`;
-  inner.appendChild(titleDiv);
-
-  const tritPc2 = (rootPc + 6) % 12;
-  const tritName2 = chromaticPcName(tritPc2, PREFER_FLAT_PC.has(tritPc2));
-  const subtitleDiv = document.createElement('div');
-  subtitleDiv.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.06em;margin-bottom:20px;line-height:1.6;`;
-  subtitleDiv.innerHTML = `Movable shapes — slide to any root. Also apply to <span style="color:var(--gold2);font-weight:600;">${tritName2}7</span> (tritone sub). Click a diagram to zoom.`;
-  inner.appendChild(subtitleDiv);
-
-  const grid = document.createElement('div');
-  grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px 16px;`;
-
-  alts.forEach(alt => {
-    const vE = getBasicVoicing(rootPc, alt.iv, 0);
-    const vA = getBasicVoicing(rootPc, alt.iv, 1);
-
-    const group = document.createElement('div');
-    group.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:5px;`;
-
-    const lbl = document.createElement('div');
-    lbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--muted);letter-spacing:.08em;text-align:center;`;
-    lbl.textContent = rootName + alt.sym;
-    group.appendChild(lbl);
-
-    const pair = document.createElement('div');
-    pair.style.cssText = `display:flex;gap:10px;align-items:flex-start;`;
-
-    [[vE, 'E str.'], [vA, 'A str.']].forEach(([v, strLbl]) => {
-      const cell = document.createElement('div');
-      cell.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:2px;`;
-      const sl = document.createElement('div');
-      sl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--dim);letter-spacing:.1em;`;
-      sl.textContent = strLbl;
-      cell.appendChild(sl);
-      if (v) {
-        const svgWrap = document.createElement('div');
-        svgWrap.style.cssText = `cursor:pointer;`;
-        svgWrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, rootPc, 110);
-        svgWrap.addEventListener('click', () => showDiagramModal(v.frets6, v.pcs6, rootPc, rootName + alt.sym));
-        cell.appendChild(svgWrap);
-      } else {
-        const noVoice = document.createElement('div');
-        noVoice.style.cssText = `color:var(--muted);font-size:9px;padding:20px 8px;`;
-        noVoice.textContent = '—';
-        cell.appendChild(noVoice);
-      }
-      pair.appendChild(cell);
-    });
-
-    group.appendChild(pair);
-
-    const qualLbl = document.createElement('div');
-    qualLbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:var(--dim);letter-spacing:.05em;text-align:center;`;
-    qualLbl.textContent = alt.label;
-    group.appendChild(qualLbl);
-
-    grid.appendChild(group);
-  });
-
-  inner.appendChild(grid);
-
-  const closeHint = document.createElement('div');
-  closeHint.style.cssText = `font-size:10px;color:#4a5566;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;margin-top:20px;text-align:center;`;
-  closeHint.textContent = 'CLICK ANYWHERE TO CLOSE';
-  inner.appendChild(closeHint);
-
-  modal.appendChild(inner);
-  modal.addEventListener('click', () => modal.remove());
-  document.body.appendChild(modal);
-}
-
 // Build the alteration pills div for any dominant chord root.
 // Shows ♭9/♯9/♯11/♭13 with actual note names + tritone sub with notes.
 function makeAltPillsDiv(domRootPc, rootName) {
@@ -3792,7 +3703,22 @@ function makeAltPillsDiv(domRootPc, rootName) {
   altChartBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 7px;border-radius:2px;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.07);color:var(--gold2);letter-spacing:.05em;cursor:pointer;`;
   altChartBtn.textContent = '🎸 altered voicings';
   altChartBtn.title = `Altered dominant guitar voicings for ${rootName}7`;
-  altChartBtn.addEventListener('click', e => { e.stopPropagation(); showAltDominantDiagrams(domRootPc, rootName); });
+  altChartBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    state.view = 'altdom';
+    document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === 'altdom'));
+    document.getElementById('guitar-sub-tabs').style.display = 'none';
+    document.getElementById('mandolin-sub-tabs').style.display = 'none';
+    const _rPc = parseInt(state.key), _sd = SCALES[state.scale];
+    const _sn = spellScale(_rPc, _sd.intervals, _sd);
+    renderView(_sn, _sd);
+    wireChordCards();
+    // Scroll to the relevant chord section
+    setTimeout(() => {
+      const sec = document.querySelector(`[data-altdom-root="${domRootPc}"]`);
+      if (sec) sec.scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 80);
+  });
   div.appendChild(altChartBtn);
   const tritPill = document.createElement('span');
   tritPill.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 5px;border-radius:2px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.1);color:var(--gold2);letter-spacing:.05em;cursor:default;`;
@@ -4084,6 +4010,17 @@ function render(){
   if (state.view==='arpeggio' && !has7thChords) {
     state.view='diagrams'; state.lastGuitarView='diagrams';
   }
+  // Alt. Dom tab: enabled when the harmonisation contains dom7 chords
+  let hasAltDom = state.mode === 'secdom';
+  if (!hasAltDom && has7thChords) {
+    for (let di = 0; di < scaleNotes.length; di++) {
+      const iv = chordIntervals(scaleData.intervals, di, 4);
+      const { quality } = getChordSymbol(scaleNotes[di], iv);
+      if (quality.includes('Dom') && !quality.includes('sus')) { hasAltDom = true; break; }
+    }
+  }
+  document.getElementById('tab-altdom').classList.toggle('disabled', !hasAltDom);
+  if (state.view === 'altdom' && !hasAltDom) { state.view = 'list'; }
   const isGuitar   = ['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
   const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
 
@@ -4113,7 +4050,215 @@ function render(){
   }, 60);
 }
 
+// ── Alt Dominant Tab ─────────────────────────────────────────────────────────
+
+// Voicing templates: each shape is a fixed assignment of chord tones to strings.
+// ivs[] = semitones from root assigned to strings[] in order.
+// computeVoicingFromTemplate ensures ascending pitches and span ≤ 4.
+// ivs = semitone offsets from root (mod 12 pc). Template strings: 0=E2,1=A2,2=D3,3=G3,4=B3,5=e4.
+// Shapes verified for G root (pc=7): all ascending, span≤4.
+const ALT_DOM_VOICINGS = [
+  { sym:'7♭9',    label:'R · M3 · ♭7 · ♭9',         enharmonic:null,
+    iv:[0,4,10,1], shapes:[
+    { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,10,1] },  // G: 3-2-3-1  span2
+    { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,10,1] },  // G: x-10-9-10-9-x  span1
+    { name:'D str.',  strings:[2,3,4,5], ivs:[0,4,10,1] },  // G: x-x-5-4-6-4  span2
+  ]},
+  { sym:'7♯9',    label:'R · M3 · ♭7 · ♯9',         enharmonic:'♯9 = ♭3 (enharmonic)',
+    iv:[0,4,10,3], shapes:[
+    { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,10,3] },  // G: 3-2-3-3  span1
+    { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,10,3] },  // G: x-10-9-10-11-x  span2
+    { name:'D str.',  strings:[2,3,4,5], ivs:[0,4,10,3] },  // G: x-x-5-4-6-6  span2
+  ]},
+  { sym:'7♯11',   label:'R · M3 · ♭7 · ♯11',        enharmonic:'♯11 = ♭5 (tritone)',
+    iv:[0,4,10,6], shapes:[
+    { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,4] },  // G: 3-4-3-4  span1  R-♯11-♭7-M3
+    { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,4] },  // G: x-10-11-10-12-x  span2
+    { name:'A str.²', strings:[1,2,3,4], ivs:[0,4,6,10] },  // G: x-10-9-6-6-x  span4  R-M3-♯11-♭7
+    { name:'D str.',  strings:[2,3,4,5], ivs:[0,6,10,4] },  // G: x-x-5-6-6-7  span2
+  ]},
+  { sym:'7♭13',   label:'R · M3 · ♭7 · ♭13',        enharmonic:'♭13 = ♯5 (aug 5th)',
+    iv:[0,4,10,8], shapes:[
+    { name:'E str.',  strings:[0,1,2,4], ivs:[0,4,10,8] },  // G: 3-2-3-x-4-x  span2  R-M3-♭7-♭13
+    { name:'A str.',  strings:[1,2,3,5], ivs:[0,4,10,8] },  // G: x-10-9-10-x-11  span2
+    { name:'A str.²', strings:[1,2,3,4], ivs:[0,4,8,10] },  // G: x-10-9-8-6-x  span4  R-M3-♭13-♭7
+    { name:'D str.',  strings:[2,3,4,5], ivs:[0,8,10,4] },  // G: x-x-5-8-6-7  span3
+  ]},
+  { sym:'7♭9♭13', label:'R · M3 · ♭7 · ♭9 · ♭13',  enharmonic:'♭9=A♭ · ♭13=♯5',
+    iv:[0,4,10,1,8], shapes:[
+    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,1,8] },  // 5 strings span2
+    { name:'E str.',  strings:[0,1,2,3,4], ivs:[0,4,10,1,8] },  // 5 strings span3
+  ]},
+  { sym:'7♭5♭9',  label:'R · ♭5 · ♭7 · ♭9',        enharmonic:'♭5 = ♯11 (tritone)',
+    iv:[0,6,10,1], shapes:[
+    { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,1] },  // 3-4-3-1 span3
+    { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,1] },  // 10-11-10-9 span2
+    { name:'D str.',  strings:[2,3,4,5], ivs:[0,6,10,1] },  // 5-6-6-4 span2
+  ]},
+  { sym:'7♭5♯9',  label:'R · ♭5 · ♭7 · ♯9',        enharmonic:'♭5=♯11 · ♯9=♭3',
+    iv:[0,6,10,3], shapes:[
+    { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,3] },  // 3-4-3-3 span1
+    { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,3] },  // 10-11-10-11 span1
+  ]},
+  { sym:'7♯5♭9',  label:'R · M3 · ♯5 · ♭9',        enharmonic:'♯5 = ♭13 (aug 5th)',
+    iv:[0,4,8,1], shapes:[
+    { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,8,1] },   // 10-9-8-9 span2
+    { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,8,1] },   // 3-2-1-1 span2
+  ]},
+  { sym:'7♯5♯9',  label:'R · M3 · ♯5 · ♯9',        enharmonic:'♯5=♭13 · ♯9=♭3',
+    iv:[0,4,8,3], shapes:[
+    { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,8,3] },   // 10-9-8-11 span3
+    { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,8,3] },   // 3-2-1-3 span2
+  ]},
+];
+
+function computeVoicingFromTemplate(rootPc, template) {
+  const frets = template.strings.map((s, i) => {
+    const sPc = GUITAR_MIDI[s] % 12;
+    const nPc = ((rootPc + template.ivs[i]) % 12 + 12) % 12;
+    return (nPc - sPc + 12) % 12;
+  });
+  for (let i = 1; i < frets.length; i++) {
+    const prevPitch = GUITAR_MIDI[template.strings[i-1]] + frets[i-1];
+    while (GUITAR_MIDI[template.strings[i]] + frets[i] <= prevPitch) frets[i] += 12;
+  }
+  if (Math.max(...frets) - Math.min(...frets) > 4) return null;
+  const frets6 = [-1,-1,-1,-1,-1,-1], pcs6 = [-1,-1,-1,-1,-1,-1];
+  template.strings.forEach((s,i) => {
+    frets6[s] = frets[i];
+    pcs6[s]   = ((rootPc + template.ivs[i]) % 12 + 12) % 12;
+  });
+  return { frets6, pcs6 };
+}
+
+function renderAltDomTab(scaleNotes, scaleData) {
+  const container = document.getElementById('all-degrees');
+  container.innerHTML = '';
+  const rootPc = parseInt(state.key);
+  const domRoots = [];
+
+  if (state.mode === 'secdom') {
+    const romans = computeAllRomans(scaleData.intervals, scaleData);
+    buildSecondaryDominants(rootPc, scaleData.intervals, romans).forEach(item => {
+      const pc = noteNameToPc(item.chord.root);
+      if (pc >= 0 && !domRoots.find(r => r.pc === pc))
+        domRoots.push({ pc, name: item.chord.root });
+    });
+  } else {
+    const n = 4;
+    for (let di = 0; di < scaleNotes.length; di++) {
+      const chordNotes = buildChord(scaleNotes, di, n);
+      const iv = chordIntervals(scaleData.intervals, di, n);
+      const { quality } = getChordSymbol(chordNotes[0], iv);
+      if (quality.includes('Dom') && !quality.includes('sus')) {
+        const pc = noteNameToPc(chordNotes[0]);
+        if (pc >= 0) domRoots.push({ pc, name: chordNotes[0] });
+      }
+    }
+  }
+
+  if (!domRoots.length) {
+    const msg = document.createElement('div');
+    msg.className = 'empty-msg'; msg.style.padding = '32px 0';
+    msg.textContent = 'No dominant chords in this harmonisation.';
+    container.appendChild(msg);
+    return;
+  }
+
+  const intro = document.createElement('div');
+  intro.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.06em;margin-bottom:24px;line-height:1.7;`;
+  intro.innerHTML = `Movable shapes · all voiced in close position (span ≤ 4 frets) · click to zoom<br>A-string shapes also apply to the tritone sub (♭II7 = a half-step above the target).`;
+  container.appendChild(intro);
+
+  domRoots.forEach(({ pc: domPc, name: domName }) => {
+    const tritPc   = (domPc + 6) % 12;
+    const tritName = chromaticPcName(tritPc, PREFER_FLAT_PC.has(tritPc));
+
+    const section = document.createElement('div');
+    section.dataset.altdomRoot = domPc;
+    section.style.cssText = `margin-bottom:28px;`;
+
+    const title = document.createElement('div');
+    title.style.cssText = `font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#f0e8d8;margin-bottom:16px;`;
+    title.innerHTML = `${domName}7 <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);font-weight:400;letter-spacing:.07em;">tritone sub: ${tritName}7</span>`;
+    section.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px 16px;`;
+
+    // Pre-build nav list for all valid shapes for this root
+    const rootNavList = [];
+    ALT_DOM_VOICINGS.forEach(alt => {
+      alt.shapes.forEach(shape => {
+        const v = computeVoicingFromTemplate(domPc, shape);
+        if (v) rootNavList.push({ frets6: v.frets6, pcs6: v.pcs6, rootPc: domPc, title: `${domName}${alt.sym}` });
+      });
+    });
+    let rootNavIdx = 0;
+
+    ALT_DOM_VOICINGS.forEach(alt => {
+      const group = document.createElement('div');
+      group.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:5px;`;
+
+      const lbl = document.createElement('div');
+      lbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream);letter-spacing:.06em;text-align:center;font-weight:600;margin-bottom:2px;`;
+      lbl.textContent = domName + alt.sym;
+      group.appendChild(lbl);
+
+      const shapesRow = document.createElement('div');
+      shapesRow.style.cssText = `display:flex;gap:10px;align-items:flex-start;`;
+      let anyShape = false;
+
+      alt.shapes.forEach(shape => {
+        const v = computeVoicingFromTemplate(domPc, shape);
+        const cell = document.createElement('div');
+        cell.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:2px;`;
+        const sl = document.createElement('div');
+        sl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;`;
+        sl.textContent = shape.name;
+        cell.appendChild(sl);
+        if (v) {
+          anyShape = true;
+          const ni = rootNavIdx++;
+          const svgWrap = document.createElement('div');
+          svgWrap.style.cssText = `cursor:pointer;`;
+          svgWrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, domPc, 155);
+          svgWrap.addEventListener('click', () => showDiagramModal(null, null, null, null, rootNavList, ni));
+          cell.appendChild(svgWrap);
+        } else {
+          const noVoice = document.createElement('div');
+          noVoice.style.cssText = `color:var(--muted);font-size:11px;padding:30px 12px;`;
+          noVoice.textContent = '—';
+          cell.appendChild(noVoice);
+        }
+        shapesRow.appendChild(cell);
+      });
+
+      group.appendChild(shapesRow);
+
+      const qualLbl = document.createElement('div');
+      qualLbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.05em;text-align:center;`;
+      qualLbl.textContent = alt.label;
+      group.appendChild(qualLbl);
+      if (alt.enharmonic) {
+        const ehLbl = document.createElement('div');
+        ehLbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(201,168,76,.45);letter-spacing:.04em;text-align:center;margin-top:1px;`;
+        ehLbl.textContent = alt.enharmonic;
+        group.appendChild(ehLbl);
+      }
+
+      if (!anyShape) group.style.opacity = '0.35';
+      grid.appendChild(group);
+    });
+
+    section.appendChild(grid);
+    const dv = document.createElement('div'); dv.className='section-divider'; section.appendChild(dv);
+    container.appendChild(section);
+  });
+}
+
 function renderView(scaleNotes,scaleData){
+  document.getElementById('all-degrees').className = state.view === 'list' ? 'chord-list-view' : '';
   if(state.view==='list')           renderChords(scaleNotes,scaleData);
   else if(state.view==='diagrams')  renderDiagrams(scaleNotes,scaleData);
   else if(state.view==='arpeggio')  renderArpeggios(scaleNotes,scaleData);
@@ -4123,6 +4268,7 @@ function renderView(scaleNotes,scaleData){
   else if(state.view==='mandolin')        renderMandolin(scaleNotes,scaleData);
   else if(state.view==='mandolin-scale') renderMandolinScale(scaleNotes,scaleData);
   else if(state.view==='mandolin-chop')  renderMandolinChop(scaleNotes,scaleData);
+  else if(state.view==='altdom')    renderAltDomTab(scaleNotes,scaleData);
 }
 
 // ══════════════════════════════════════════════
@@ -4402,30 +4548,192 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
 }
 
 // ── Modal for zoomed diagram ──────────────────────────────────────────
-function showDiagramModal(frets6, pcs6, rootPc, title) {
-  document.getElementById('diag-modal')?.remove();
-  const modal = document.createElement('div');
-  modal.id = 'diag-modal';
-  modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.88);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;
-    animation:fadeIn .15s ease`;
-  const inner = document.createElement('div');
-  inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
-    padding:28px 32px;display:flex;flex-direction:column;align-items:center;gap:14px;
-    cursor:default;max-width:90vw;`;
-  inner.innerHTML = `
-    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#f0e8d8">${title}</div>
-    ${makeChordDiagram(frets6, pcs6, rootPc, 280)}
-    <div style="font-size:10px;color:#4a5566;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">CLICK ANYWHERE TO CLOSE</div>`;
-  modal.appendChild(inner);
-  inner.addEventListener('click', e => e.stopPropagation());
-  modal.addEventListener('click', () => modal.remove());
-  document.body.appendChild(modal);
+function showDiagramModal(frets6, pcs6, rootPc, title, navList, navIdx) {
+  const hasNav = navList && navList.length > 1;
+  const idx    = hasNav ? (navIdx || 0) : 0;
+  const cur    = hasNav ? navList[idx] : { frets6, pcs6, rootPc, title };
+  const hasPrev = hasNav && idx > 0;
+  const hasNext = hasNav && idx < navList.length - 1;
+  const prevTitle = hasPrev ? navList[idx-1].title : '';
+  const nextTitle = hasNext ? navList[idx+1].title : '';
+
+  // Hoisted so the isNew block can reference it
+  function onModalKey(e) {
+    const m = document.getElementById('diag-modal');
+    if (!m) { document.removeEventListener('keydown', onModalKey); return; }
+    const s = m._nav;
+    if (e.key === 'Escape') { m.remove(); document.removeEventListener('keydown', onModalKey); }
+    if (s) {
+      if (e.key === 'ArrowLeft'  && s.idx > 0)                     showDiagramModal(null,null,null,null,s.navList,s.idx-1);
+      if (e.key === 'ArrowRight' && s.idx < s.navList.length - 1)  showDiagramModal(null,null,null,null,s.navList,s.idx+1);
+    }
+  }
+
+  let modal = document.getElementById('diag-modal');
+  const isNew = !modal;
+  if (isNew) {
+    modal = document.createElement('div');
+    modal.id = 'diag-modal';
+    modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.88);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;`;
+    modal.addEventListener('click', () => { modal.remove(); document.removeEventListener('keydown', onModalKey); });
+    let tx = 0;
+    modal.addEventListener('touchstart', e => { tx = e.changedTouches[0].clientX; }, {passive:true});
+    modal.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx;
+      const s = modal._nav;
+      if (!s) return;
+      if (dx >  55 && s.idx > 0)                    showDiagramModal(null,null,null,null,s.navList,s.idx-1);
+      if (dx < -55 && s.idx < s.navList.length - 1) showDiagramModal(null,null,null,null,s.navList,s.idx+1);
+    });
+    document.addEventListener('keydown', onModalKey);
+    document.body.appendChild(modal);
+  }
+
+  modal._nav = hasNav ? { navList, idx } : null;
+
+  const navHtml = hasNav ? `
+    <div style="display:flex;align-items:center;gap:10px;width:100%;">
+      <div style="flex:1;min-width:0;text-align:right;font-size:9px;color:#6a7a9a;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${prevTitle}">${prevTitle}</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <button id="dm-prev" style="background:none;border:1px solid ${hasPrev?'#3e4a5a':'#1e2530'};color:${hasPrev?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasPrev?'pointer':'default'};font-size:14px;line-height:1;">◀</button>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4a5566;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
+        <button id="dm-next" style="background:none;border:1px solid ${hasNext?'#3e4a5a':'#1e2530'};color:${hasNext?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasNext?'pointer':'default'};font-size:14px;line-height:1;">▶</button>
+      </div>
+      <div style="flex:1;min-width:0;font-size:9px;color:#6a7a9a;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
+    </div>` : '';
+
+  const contentHtml = `
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8">${cur.title}</div>
+    ${makeChordDiagram(cur.frets6, cur.pcs6, cur.rootPc, 260)}
+    ${navHtml}
+    <div style="font-size:9px;color:#4a5566;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">${hasNav?'← swipe or arrows →  ·  ':''}click anywhere to close</div>`;
+
+  function bindNavBtns() {
+    if (!hasNav) return;
+    modal.querySelector('#dm-prev')?.addEventListener('click', e => { e.stopPropagation(); if (hasPrev) showDiagramModal(null,null,null,null,navList,idx-1); });
+    modal.querySelector('#dm-next')?.addEventListener('click', e => { e.stopPropagation(); if (hasNext) showDiagramModal(null,null,null,null,navList,idx+1); });
+  }
+
+  let inner = modal.querySelector('#dm-inner');
+  if (!inner) {
+    inner = document.createElement('div');
+    inner.id = 'dm-inner';
+    inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
+      padding:24px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;
+      cursor:default;max-width:90vw;transition:opacity 0.08s ease;`;
+    inner.addEventListener('click', e => e.stopPropagation());
+    inner.innerHTML = contentHtml;
+    modal.appendChild(inner);
+    bindNavBtns();
+  } else {
+    inner.style.opacity = '0';
+    setTimeout(() => { inner.innerHTML = contentHtml; inner.style.opacity = '1'; bindNavBtns(); }, 80);
+  }
 }
 
 // ══════════════════════════════════════════════
 // RENDER: GUITAR DIAGRAMS VIEW
 // ══════════════════════════════════════════════
+
+function showAltDomModal(rootPc, rootName) {
+  document.getElementById('altdom-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.id = 'altdom-modal';
+  modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.92);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    animation:fadeIn .15s ease;padding:16px;`;
+
+  const inner = document.createElement('div');
+  inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:6px;
+    cursor:default;max-width:820px;width:100%;max-height:90vh;display:flex;flex-direction:column;`;
+
+  const header = document.createElement('div');
+  header.style.cssText = `padding:20px 24px 16px;border-bottom:1px solid #1e2530;display:flex;align-items:baseline;gap:12px;flex-shrink:0;flex-wrap:wrap;`;
+  header.innerHTML = `
+    <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8;">${rootName}7 · Altered Dominant Voicings</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.1em;flex:1;">movable · span ≤ 4 frets · click diagram to zoom</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4a5566;letter-spacing:.1em;cursor:pointer;flex-shrink:0;" id="altdom-close">✕</span>`;
+  inner.appendChild(header);
+
+  const body = document.createElement('div');
+  body.style.cssText = `overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:18px;`;
+
+  // Pre-build nav list for zoom navigation across all shapes
+  const modalNavList = [];
+  ALT_DOM_VOICINGS.forEach(alt => {
+    alt.shapes.forEach(shape => {
+      const v = computeVoicingFromTemplate(rootPc, shape);
+      if (v) modalNavList.push({ frets6: v.frets6, pcs6: v.pcs6, rootPc, title: `${rootName}${alt.sym}` });
+    });
+  });
+  let modalNavIdx = 0;
+
+  ALT_DOM_VOICINGS.forEach((alt, ai) => {
+    const row = document.createElement('div');
+
+    const typeHdr = document.createElement('div');
+    typeHdr.style.cssText = `display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px;`;
+    typeHdr.innerHTML = `
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--cream);">${rootName}${alt.sym}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);">${alt.label}</span>
+      ${alt.enharmonic ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(201,168,76,.55);letter-spacing:.05em;">${alt.enharmonic}</span>` : ''}`;
+    row.appendChild(typeHdr);
+
+    const shapesRow = document.createElement('div');
+    shapesRow.style.cssText = `display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;`;
+    let anyShape = false;
+
+    alt.shapes.forEach(shape => {
+      const v = computeVoicingFromTemplate(rootPc, shape);
+      const cell = document.createElement('div');
+      cell.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:3px;`;
+      const nameLbl = document.createElement('div');
+      nameLbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:.1em;`;
+      nameLbl.textContent = shape.name;
+      cell.appendChild(nameLbl);
+      if (v) {
+        anyShape = true;
+        const ni = modalNavIdx++;
+        const wrap = document.createElement('div');
+        wrap.style.cssText = `cursor:pointer;`;
+        wrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, rootPc, 138);
+        wrap.addEventListener('click', () => showDiagramModal(null, null, null, null, modalNavList, ni));
+        cell.appendChild(wrap);
+      } else {
+        const noVoice = document.createElement('div');
+        noVoice.style.cssText = `color:var(--muted);font-size:11px;padding:28px 18px;`;
+        noVoice.textContent = '—';
+        cell.appendChild(noVoice);
+      }
+      shapesRow.appendChild(cell);
+    });
+
+    if (!anyShape) row.style.opacity = '0.35';
+    row.appendChild(shapesRow);
+    if (ai < ALT_DOM_VOICINGS.length - 1) {
+      const dv = document.createElement('div');
+      dv.style.cssText = `height:1px;background:#1a2030;margin-top:14px;`;
+      row.appendChild(dv);
+    }
+    body.appendChild(row);
+  });
+
+  const footer = document.createElement('div');
+  footer.style.cssText = `padding:10px 24px;border-top:1px solid #1e2530;font-family:'IBM Plex Mono',monospace;font-size:8px;color:#3a4555;letter-spacing:.1em;flex-shrink:0;`;
+  footer.textContent = 'CLICK OUTSIDE OR PRESS ESC TO CLOSE';
+  inner.appendChild(body);
+  inner.appendChild(footer);
+  modal.appendChild(inner);
+
+  inner.addEventListener('click', e => e.stopPropagation());
+  modal.addEventListener('click', () => modal.remove());
+  header.querySelector('#altdom-close').addEventListener('click', () => modal.remove());
+  document.addEventListener('keydown', function onEsc(e) {
+    if (e.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', onEsc); }
+  });
+  document.body.appendChild(modal);
+}
 
 function makeDiagCard(chRootPc, notes, sym, qual, iv, animDelay) {
   const voicing = getBasicVoicing(chRootPc, iv);
@@ -4438,7 +4746,14 @@ function makeDiagCard(chRootPc, notes, sym, qual, iv, animDelay) {
   if (voicing) {
     diagSvg = makeChordDiagram(voicing.frets6, voicing.pcs6, chRootPc, 128);
     card.style.cursor = 'pointer';
-    card.addEventListener('click', () => showDiagramModal(voicing.frets6, voicing.pcs6, chRootPc, title));
+    card._voicing = { frets6: voicing.frets6, pcs6: voicing.pcs6, rootPc: chRootPc, title };
+    card.dataset.navCard = 'guitar';
+    card.addEventListener('click', () => {
+      const all = Array.from(document.querySelectorAll('.diag-card[data-nav-card="guitar"]'));
+      const navList = all.map(c => c._voicing);
+      const ni = all.indexOf(card);
+      showDiagramModal(null, null, null, null, navList, ni >= 0 ? ni : 0);
+    });
     const voicedPcs = new Set(voicing.pcs6.filter(p=>p!==-1).map(p=>((p%12)+12)%12));
     const filtered = notes.filter(n => voicedPcs.has(((noteNameToPc(n))%12+12)%12));
     if (filtered.length) displayNotes = filtered;
@@ -4448,6 +4763,16 @@ function makeDiagCard(chRootPc, notes, sym, qual, iv, animDelay) {
     <div class="diag-quality">${qual}</div>
     ${diagSvg}
     <div class="diag-notes">${displayNotes.join(' · ')}</div>`;
+  if (qual.includes('Dom') && !qual.includes('sus')) {
+    const altBtn = document.createElement('button');
+    altBtn.style.cssText = `margin-top:8px;padding:4px 8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:3px;color:rgba(201,168,76,.7);font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.09em;cursor:pointer;text-transform:uppercase;display:block;width:100%;`;
+    altBtn.textContent = '🎸 Altered voicings';
+    altBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      showAltDomModal(chRootPc, notes[0]);
+    });
+    card.appendChild(altBtn);
+  }
   return card;
 }
 
@@ -4701,7 +5026,14 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
           const card = document.createElement('div');
           card.className = `drop-card d${dropNum}-card`;
           card.style.cssText += `border-color:${col.border};cursor:pointer;animation-delay:${totalCards*.04}s;`;
-          card.addEventListener('click', ()=>showDiagramModal(frets6, pcs6, chRootPc, title));
+          card._voicing = { frets6, pcs6, rootPc: chRootPc, title };
+          card.dataset.navCard = 'drop';
+          card.addEventListener('click', () => {
+            const all = Array.from(document.querySelectorAll('.drop-card[data-nav-card="drop"]'));
+            const navList = all.map(c => c._voicing);
+            const ni = all.indexOf(card);
+            showDiagramModal(null, null, null, null, navList, ni >= 0 ? ni : 0);
+          });
           card.innerHTML = `
             <div class="drop-str-label" style="color:${col.label};opacity:.7">strings ${strLabel}</div>
             ${makeChordDiagram(frets6, pcs6, chRootPc, 118)}
@@ -5402,7 +5734,14 @@ function renderMandolinChop(scaleNotes, scaleData) {
       if (voicing) {
         card.insertAdjacentHTML('beforeend', makeMandoDiagram(voicing.frets4, voicing.pcs4, chRootPc, 116));
         card.style.cursor = 'pointer';
-        card.addEventListener('click', () => showMandoDiagramModal(voicing.frets4, voicing.pcs4, chRootPc, `${notes[0]}${sym}`));
+        card._voicing = { frets4: voicing.frets4, pcs4: voicing.pcs4, rootPc: chRootPc, title: `${notes[0]}${sym}` };
+        card.dataset.navCard = 'mando';
+        card.addEventListener('click', () => {
+          const all = Array.from(document.querySelectorAll('[data-nav-card="mando"]'));
+          const navList = all.map(c => c._voicing);
+          const ni = all.indexOf(card);
+          showMandoDiagramModal(null, null, null, null, navList, ni >= 0 ? ni : 0);
+        });
       } else {
         card.insertAdjacentHTML('beforeend', '<div style="color:var(--muted);font-size:10px;padding:20px 0;text-align:center">-</div>');
       }
@@ -5839,23 +6178,87 @@ function makeMandoDiagram(frets4, pcs4, rootPc, w) {
   return g.join('');
 }
 
-function showMandoDiagramModal(frets4, pcs4, rootPc, title) {
-  document.getElementById('diag-modal')?.remove();
-  const modal = document.createElement('div');
-  modal.id = 'diag-modal';
-  modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.88);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;animation:fadeIn .15s ease`;
-  const inner = document.createElement('div');
-  inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
-    padding:28px 32px;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:default;max-width:90vw;`;
-  inner.innerHTML = `
-    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#f0e8d8">${title}</div>
-    ${makeMandoDiagram(frets4, pcs4, rootPc, 240)}
-    <div style="font-size:9px;color:#4a5566;font-family:'IBM Plex Mono',monospace">Mandolin G · D · A · E &nbsp;·&nbsp; click to close</div>`;
-  modal.appendChild(inner);
-  inner.addEventListener('click', e => e.stopPropagation());
-  modal.addEventListener('click', () => modal.remove());
-  document.body.appendChild(modal);
+function showMandoDiagramModal(frets4, pcs4, rootPc, title, navList, navIdx) {
+  const hasNav = navList && navList.length > 1;
+  const idx    = hasNav ? (navIdx || 0) : 0;
+  const cur    = hasNav ? navList[idx] : { frets4, pcs4, rootPc, title };
+  const hasPrev = hasNav && idx > 0;
+  const hasNext = hasNav && idx < navList.length - 1;
+  const prevTitle = hasPrev ? navList[idx-1].title : '';
+  const nextTitle = hasNext ? navList[idx+1].title : '';
+
+  function onModalKey(e) {
+    const m = document.getElementById('diag-modal');
+    if (!m) { document.removeEventListener('keydown', onModalKey); return; }
+    const s = m._nav;
+    if (e.key === 'Escape') { m.remove(); document.removeEventListener('keydown', onModalKey); }
+    if (s) {
+      if (e.key === 'ArrowLeft'  && s.idx > 0)                     showMandoDiagramModal(null,null,null,null,s.navList,s.idx-1);
+      if (e.key === 'ArrowRight' && s.idx < s.navList.length - 1)  showMandoDiagramModal(null,null,null,null,s.navList,s.idx+1);
+    }
+  }
+
+  let modal = document.getElementById('diag-modal');
+  const isNew = !modal;
+  if (isNew) {
+    modal = document.createElement('div');
+    modal.id = 'diag-modal';
+    modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.88);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;`;
+    modal.addEventListener('click', () => { modal.remove(); document.removeEventListener('keydown', onModalKey); });
+    let tx = 0;
+    modal.addEventListener('touchstart', e => { tx = e.changedTouches[0].clientX; }, {passive:true});
+    modal.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx;
+      const s = modal._nav;
+      if (!s) return;
+      if (dx >  55 && s.idx > 0)                    showMandoDiagramModal(null,null,null,null,s.navList,s.idx-1);
+      if (dx < -55 && s.idx < s.navList.length - 1) showMandoDiagramModal(null,null,null,null,s.navList,s.idx+1);
+    });
+    document.addEventListener('keydown', onModalKey);
+    document.body.appendChild(modal);
+  }
+
+  modal._nav = hasNav ? { navList, idx } : null;
+
+  const navHtml = hasNav ? `
+    <div style="display:flex;align-items:center;gap:10px;width:100%;">
+      <div style="flex:1;min-width:0;text-align:right;font-size:9px;color:#6a7a9a;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${prevTitle}">${prevTitle}</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <button id="dm-prev" style="background:none;border:1px solid ${hasPrev?'#3e4a5a':'#1e2530'};color:${hasPrev?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasPrev?'pointer':'default'};font-size:14px;line-height:1;">◀</button>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4a5566;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
+        <button id="dm-next" style="background:none;border:1px solid ${hasNext?'#3e4a5a':'#1e2530'};color:${hasNext?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasNext?'pointer':'default'};font-size:14px;line-height:1;">▶</button>
+      </div>
+      <div style="flex:1;min-width:0;font-size:9px;color:#6a7a9a;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
+    </div>` : '';
+
+  const contentHtml = `
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8">${cur.title}</div>
+    ${makeMandoDiagram(cur.frets4, cur.pcs4, cur.rootPc, 240)}
+    ${navHtml}
+    <div style="font-size:9px;color:#4a5566;font-family:'IBM Plex Mono',monospace">Mandolin G · D · A · E${hasNav?' · ← swipe or arrows →':''} · click to close</div>`;
+
+  function bindNavBtns() {
+    if (!hasNav) return;
+    modal.querySelector('#dm-prev')?.addEventListener('click', e => { e.stopPropagation(); if (hasPrev) showMandoDiagramModal(null,null,null,null,navList,idx-1); });
+    modal.querySelector('#dm-next')?.addEventListener('click', e => { e.stopPropagation(); if (hasNext) showMandoDiagramModal(null,null,null,null,navList,idx+1); });
+  }
+
+  let inner = modal.querySelector('#dm-inner');
+  if (!inner) {
+    inner = document.createElement('div');
+    inner.id = 'dm-inner';
+    inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
+      padding:24px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;
+      cursor:default;max-width:90vw;transition:opacity 0.08s ease;`;
+    inner.addEventListener('click', e => e.stopPropagation());
+    inner.innerHTML = contentHtml;
+    modal.appendChild(inner);
+    bindNavBtns();
+  } else {
+    inner.style.opacity = '0';
+    setTimeout(() => { inner.innerHTML = contentHtml; inner.style.opacity = '1'; bindNavBtns(); }, 80);
+  }
 }
 
 function renderMandolin(scaleNotes, scaleData) {
@@ -5924,7 +6327,14 @@ function renderMandolin(scaleNotes, scaleData) {
       if (voicing) {
         diagHTML = makeMandoDiagram(voicing.frets4, voicing.pcs4, chRootPc, 116);
         card.style.cursor = 'pointer';
-        card.addEventListener('click', () => showMandoDiagramModal(voicing.frets4, voicing.pcs4, chRootPc, title));
+        card._voicing = { frets4: voicing.frets4, pcs4: voicing.pcs4, rootPc: chRootPc, title };
+        card.dataset.navCard = 'mando';
+        card.addEventListener('click', () => {
+          const all = Array.from(document.querySelectorAll('[data-nav-card="mando"]'));
+          const navList = all.map(c => c._voicing);
+          const ni = all.indexOf(card);
+          showMandoDiagramModal(null, null, null, null, navList, ni >= 0 ? ni : 0);
+        });
         const voicedPcs = new Set(voicing.pcs4.filter(p=>p!==-1).map(p=>((p%12)+12)%12));
         const filtered = ch.notes.filter(n => voicedPcs.has(((noteNameToPc(n))%12+12)%12));
         if (filtered.length) displayNotes = filtered;
@@ -8658,7 +9068,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v11 &nbsp;·&nbsp; deployed 2026-04-24</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v12 &nbsp;·&nbsp; deployed 2026-04-28</span></div>
     </div>
 
     <div class="tech-section">
@@ -8685,7 +9095,8 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Jazz shell voicing</span><span class="tech-val">Extended chords (9th+) reduce to [root, 3rd, 7th, highest extension] - 5th dropped. Standard jazz practice for playable shapes.</span></div>
       <div class="tech-row"><span class="tech-key">Shape search</span><span class="tech-val">Exhaustive permutation search over 4-string sets [1-4, 2-5, 3-6]; span ≤6 frets; scored by span × 8 + fret position penalty</span></div>
       <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val">Drop 2: 2nd-from-top voice lowered an octave. Drop 3: 3rd-from-top lowered. Both follow jazzguitar.be standard across all 4 inversions × 3 string sets. No open strings. Inversion shown in slash notation (e.g. Gmaj7/B).</span></div>
-      <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Generated inline via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordDiagram()</code>; click-to-zoom modal at 280px width; pitch-class labels on fret dots</span></div>
+      <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Generated inline via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordDiagram()</code>; click-to-zoom modal at 280px width; pitch-class labels on fret dots. Modal is persistent (single DOM element reused across navigations); inner panel fades at 80 ms; prev/next chord names shown as context labels.</span></div>
+      <div class="tech-row"><span class="tech-key">Alt. Dom tab</span><span class="tech-val">Dedicated <em>Alt. Dom</em> sub-tab under Guitar showing altered dominant shapes for the V7 and secondary dominants of the current key. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">ALT_DOM_VOICINGS</code> constant (9 chord types) + <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">computeVoicingFromTemplate(rootPc, template)</code> derives frets6/pcs6 from semitone-offset templates; enforces ascending pitch per string and hard span ≤ 4 frets. Reference: Dirk Laukens <em>Dominant Chords For Jazz Guitar</em>.</span></div>
     </div>
 
     <div class="tech-section">
@@ -9127,6 +9538,8 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-val">Jazz voicing: the 2nd-highest note of a close-position chord dropped one octave. Shows all 4 inversions × 3 string sets (E-A-D-G, A-D-G-B, D-G-B-e). No open strings. Inversion label shown as slash notation, e.g. <strong>Gmaj7/B</strong> for 1st inversion.</span>
         <span class="guide-kv-key">Drop 3</span>
         <span class="guide-kv-val">Jazz voicing: the 3rd-highest note dropped one octave. Wider, more open voicings on non-adjacent string sets. Same 4 inversions × 3 sets. Used in big-band arranging. Click any diagram to zoom.</span>
+        <span class="guide-kv-key">Alt. Dom</span>
+        <span class="guide-kv-val">Altered dominant voicings for all dominant chords in the current key (V7, secondary dominants). Covers <strong>9 chord types</strong>: 7♭9, 7♯9, 7♯11, 7♭13, 7♭9♭13, 7♭5♭9, 7♭5♯9, 7♯5♭9, 7♯5♯9. Each shows up to 3 moveable shapes (E-str., A-str., D-str.) with the root on a different string. Shapes are compact (span ≤ 4 frets). A tritone-substitution note is shown for each root. Only appears when the scale contains dominant chords.</span>
       </div>
       <div class="guide-kv">
         <span class="guide-kv-key">Mandolin</span>
@@ -9143,6 +9556,14 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
         <span class="guide-tip-text">Drop 2 and Drop 3 voicings follow the jazzguitar.be standard. Arpeggio shapes use the CAGED system to map 5 positions across the fretboard for each 7th chord.</span>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">👆</span>
+        <span class="guide-tip-text"><strong>Diagram zoom &amp; navigation:</strong> click any chord diagram to open it enlarged. Use the <strong>◀ ▶</strong> buttons, swipe left/right, or arrow keys to navigate between all diagrams in the current view. The previous and next chord names are shown as context labels so you know what's coming before you swipe.</span>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">🖥️</span>
+        <span class="guide-tip-text"><strong>Two-column chord list:</strong> on screens ≥ 900 px wide, the Chord List view arranges degree sections in two columns for a more compact overview.</span>
       </div>
     </section>
 
@@ -10372,10 +10793,12 @@ function getImprovSuggestions(chord) {
   if (isDom) {
     const hasAlt = /Alt|♭9|♯9|♯5/.test(q);
     add('Mixolydian', 'b7 creates pull toward tonic — essential dominant sound');
-    if (hasAlt)
-      add('Altered', 'b9 #9 #11 b13 — matches the alteration, maximum tension');
-    else
+    if (hasAlt) {
+      const altRootName = rootPc >= 0 ? pcToName((rootPc + 1) % 12) : '♭II';
+      add('Altered scale', `Mode 7 of melodic minor — play ${altRootName} mel. minor over ${root}7alt · all tensions: ♭9 ♯9 ♯11 ♭13`);
+    } else {
       add('Lydian Dominant', '#11 adds tritone color without harsh alterations');
+    }
     add('Diminished (H-W)', 'Works over dom7b9 — chromatic tension, resolves strongly');
     add('Blues scale', 'b3 b5 b7 — gritty and expressive over any dominant');
   } else if (isMaj7) {
