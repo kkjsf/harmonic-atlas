@@ -228,4 +228,4 @@ Each composition is a plain JS object stored as JSON in `localStorage` (key: `ha
 
 ### Service worker cache
 
-Cache key: `harmonic-atlas-v10`. Bump the version in `sw.js` when adding new static assets that need to be cached offline. HTML is always fetched fresh (network-first).
+Cache key: `harmonic-atlas-v12`. Bump the version in `sw.js` when adding new static assets that need to be cached offline. HTML is always fetched fresh (network-first).
