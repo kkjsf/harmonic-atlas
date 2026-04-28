@@ -2205,7 +2205,6 @@
     <button class="view-tab active" data-view="list"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="5.6" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="9.2" width="7" height="1.8" rx=".5" fill="currentColor" opacity=".5"/></svg>Chord List</button>
     <button class="view-tab" data-view="guitar" id="tab-guitar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="9" r="1.2" fill="currentColor"/></svg>Guitar</button>
     <button class="view-tab" data-view="mandolin" id="tab-mandolin"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><ellipse cx="6.5" cy="8" rx="3.5" ry="4.5" stroke="currentColor" stroke-width="1.1" fill="none"/><line x1="6.5" y1="1" x2="6.5" y2="3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.5" y1="4" x2="8.5" y2="4" stroke="currentColor" stroke-width="1" opacity=".6"/><circle cx="6.5" cy="8" r="1" fill="currentColor" opacity=".4"/></svg>Mandolin</button>
-    <button class="view-tab" data-view="altdom" id="tab-altdom"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="10" r="1.2" fill="currentColor"/><circle cx="9" cy="6" r="1.2" fill="currentColor"/></svg>Alt. Dom</button>
   </div>
   <div class="guitar-sub-tabs" id="guitar-sub-tabs" style="display:none">
     <button class="guitar-sub-tab active" data-view="diagrams" id="tab-diagrams">Basic</button>
@@ -3705,19 +3704,7 @@ function makeAltPillsDiv(domRootPc, rootName) {
   altChartBtn.title = `Altered dominant guitar voicings for ${rootName}7`;
   altChartBtn.addEventListener('click', e => {
     e.stopPropagation();
-    state.view = 'altdom';
-    document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === 'altdom'));
-    document.getElementById('guitar-sub-tabs').style.display = 'none';
-    document.getElementById('mandolin-sub-tabs').style.display = 'none';
-    const _rPc = parseInt(state.key), _sd = SCALES[state.scale];
-    const _sn = spellScale(_rPc, _sd.intervals, _sd);
-    renderView(_sn, _sd);
-    wireChordCards();
-    // Scroll to the relevant chord section
-    setTimeout(() => {
-      const sec = document.querySelector(`[data-altdom-root="${domRootPc}"]`);
-      if (sec) sec.scrollIntoView({ behavior:'smooth', block:'start' });
-    }, 80);
+    showAltDomModal(domRootPc, rootName);
   });
   div.appendChild(altChartBtn);
   const tritPill = document.createElement('span');
@@ -4010,17 +3997,6 @@ function render(){
   if (state.view==='arpeggio' && !has7thChords) {
     state.view='diagrams'; state.lastGuitarView='diagrams';
   }
-  // Alt. Dom tab: enabled when the harmonisation contains dom7 chords
-  let hasAltDom = state.mode === 'secdom';
-  if (!hasAltDom && has7thChords) {
-    for (let di = 0; di < scaleNotes.length; di++) {
-      const iv = chordIntervals(scaleData.intervals, di, 4);
-      const { quality } = getChordSymbol(scaleNotes[di], iv);
-      if (quality.includes('Dom') && !quality.includes('sus')) { hasAltDom = true; break; }
-    }
-  }
-  document.getElementById('tab-altdom').classList.toggle('disabled', !hasAltDom);
-  if (state.view === 'altdom' && !hasAltDom) { state.view = 'list'; }
   const isGuitar   = ['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
   const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
 
@@ -4268,7 +4244,6 @@ function renderView(scaleNotes,scaleData){
   else if(state.view==='mandolin')        renderMandolin(scaleNotes,scaleData);
   else if(state.view==='mandolin-scale') renderMandolinScale(scaleNotes,scaleData);
   else if(state.view==='mandolin-chop')  renderMandolinChop(scaleNotes,scaleData);
-  else if(state.view==='altdom')    renderAltDomTab(scaleNotes,scaleData);
 }
 
 // ══════════════════════════════════════════════
@@ -4457,7 +4432,7 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
   // Need enough fret slots so the highest note fits: dispFr = maxPlayed - startFret
   const NUM_FRET = played.length ? Math.max(4, maxPlayed - startFret) : 4;
 
-  const padL = 22, padR = 12, padT = 22, padB = 20;
+  const padL = 22, padR = 22, padT = 22, padB = 20;
   const strGap = (w - padL - padR) / (NUM_STR - 1);
   const fretH  = Math.round((w - padL - padR) * 0.38);
   const gridH  = NUM_FRET * fretH;
@@ -4467,7 +4442,7 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
   const barre = detectBarre(frets6);
 
   const g = [];
-  g.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">`);
+  g.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;overflow:visible">`);
 
   // Nut or fret position marker
   if (startFret === 0) {
@@ -4594,13 +4569,13 @@ function showDiagramModal(frets6, pcs6, rootPc, title, navList, navIdx) {
 
   const navHtml = hasNav ? `
     <div style="display:flex;align-items:center;gap:10px;width:100%;">
-      <div style="flex:1;min-width:0;text-align:right;font-size:9px;color:#6a7a9a;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${prevTitle}">${prevTitle}</div>
+      <div style="flex:1;min-width:0;text-align:right;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${prevTitle}">${prevTitle}</div>
       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
         <button id="dm-prev" style="background:none;border:1px solid ${hasPrev?'#3e4a5a':'#1e2530'};color:${hasPrev?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasPrev?'pointer':'default'};font-size:14px;line-height:1;">◀</button>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4a5566;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6878;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
         <button id="dm-next" style="background:none;border:1px solid ${hasNext?'#3e4a5a':'#1e2530'};color:${hasNext?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasNext?'pointer':'default'};font-size:14px;line-height:1;">▶</button>
       </div>
-      <div style="flex:1;min-width:0;font-size:9px;color:#6a7a9a;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
+      <div style="flex:1;min-width:0;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
     </div>` : '';
 
   const contentHtml = `
@@ -6223,13 +6198,13 @@ function showMandoDiagramModal(frets4, pcs4, rootPc, title, navList, navIdx) {
 
   const navHtml = hasNav ? `
     <div style="display:flex;align-items:center;gap:10px;width:100%;">
-      <div style="flex:1;min-width:0;text-align:right;font-size:9px;color:#6a7a9a;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${prevTitle}">${prevTitle}</div>
+      <div style="flex:1;min-width:0;text-align:right;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${prevTitle}">${prevTitle}</div>
       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
         <button id="dm-prev" style="background:none;border:1px solid ${hasPrev?'#3e4a5a':'#1e2530'};color:${hasPrev?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasPrev?'pointer':'default'};font-size:14px;line-height:1;">◀</button>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4a5566;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6878;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
         <button id="dm-next" style="background:none;border:1px solid ${hasNext?'#3e4a5a':'#1e2530'};color:${hasNext?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasNext?'pointer':'default'};font-size:14px;line-height:1;">▶</button>
       </div>
-      <div style="flex:1;min-width:0;font-size:9px;color:#6a7a9a;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
+      <div style="flex:1;min-width:0;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
     </div>` : '';
 
   const contentHtml = `
