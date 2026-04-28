@@ -3703,43 +3703,61 @@ function showAltDominantDiagrams(rootPc, rootName) {
   titleDiv.textContent = `${rootName} — Altered Dominant Voicings`;
   inner.appendChild(titleDiv);
 
+  const tritPc2 = (rootPc + 6) % 12;
+  const tritName2 = chromaticPcName(tritPc2, PREFER_FLAT_PC.has(tritPc2));
   const subtitleDiv = document.createElement('div');
-  subtitleDiv.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:20px;`;
-  subtitleDiv.textContent = 'Shell voicings (3rd + 7th + alteration). Click a diagram to zoom.';
+  subtitleDiv.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.06em;margin-bottom:20px;line-height:1.6;`;
+  subtitleDiv.innerHTML = `Movable shapes — slide to any root. Also apply to <span style="color:var(--gold2);font-weight:600;">${tritName2}7</span> (tritone sub). Click a diagram to zoom.`;
   inner.appendChild(subtitleDiv);
 
   const grid = document.createElement('div');
-  grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:16px;`;
+  grid.style.cssText = `display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px 16px;`;
 
   alts.forEach(alt => {
-    const v = getBasicVoicing(rootPc, alt.iv);
-    const cell = document.createElement('div');
-    cell.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:4px;`;
+    const vE = getBasicVoicing(rootPc, alt.iv, 0);
+    const vA = getBasicVoicing(rootPc, alt.iv, 1);
+
+    const group = document.createElement('div');
+    group.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:5px;`;
 
     const lbl = document.createElement('div');
     lbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--muted);letter-spacing:.08em;text-align:center;`;
     lbl.textContent = rootName + alt.sym;
-    cell.appendChild(lbl);
+    group.appendChild(lbl);
 
-    if (v) {
-      const svgWrap = document.createElement('div');
-      svgWrap.style.cssText = `cursor:pointer;`;
-      svgWrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, rootPc, 130);
-      svgWrap.addEventListener('click', () => showDiagramModal(v.frets6, v.pcs6, rootPc, rootName + alt.sym));
-      cell.appendChild(svgWrap);
-    } else {
-      const noVoice = document.createElement('div');
-      noVoice.style.cssText = `color:var(--muted);font-size:9px;padding:16px 0;`;
-      noVoice.textContent = '—';
-      cell.appendChild(noVoice);
-    }
+    const pair = document.createElement('div');
+    pair.style.cssText = `display:flex;gap:10px;align-items:flex-start;`;
+
+    [[vE, 'E str.'], [vA, 'A str.']].forEach(([v, strLbl]) => {
+      const cell = document.createElement('div');
+      cell.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:2px;`;
+      const sl = document.createElement('div');
+      sl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--dim);letter-spacing:.1em;`;
+      sl.textContent = strLbl;
+      cell.appendChild(sl);
+      if (v) {
+        const svgWrap = document.createElement('div');
+        svgWrap.style.cssText = `cursor:pointer;`;
+        svgWrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, rootPc, 110);
+        svgWrap.addEventListener('click', () => showDiagramModal(v.frets6, v.pcs6, rootPc, rootName + alt.sym));
+        cell.appendChild(svgWrap);
+      } else {
+        const noVoice = document.createElement('div');
+        noVoice.style.cssText = `color:var(--muted);font-size:9px;padding:20px 8px;`;
+        noVoice.textContent = '—';
+        cell.appendChild(noVoice);
+      }
+      pair.appendChild(cell);
+    });
+
+    group.appendChild(pair);
 
     const qualLbl = document.createElement('div');
     qualLbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:var(--dim);letter-spacing:.05em;text-align:center;`;
     qualLbl.textContent = alt.label;
-    cell.appendChild(qualLbl);
+    group.appendChild(qualLbl);
 
-    grid.appendChild(cell);
+    grid.appendChild(group);
   });
 
   inner.appendChild(grid);
@@ -4167,7 +4185,7 @@ function computeGuitarVoicing(pcs, stringIndices, ascendingPitch=true) {
 // Enforces root as the lowest sounding pitch (bass register) when possible
 // Uses 4-string closed voicings across strings [1-4], [2-5], [3-6]
 // Returns {frets6, pcs6} with unused strings = -1.
-function getBasicVoicing(rootPc, ivArray) {
+function getBasicVoicing(rootPc, ivArray, bassStr = null) {
   const allPcs = ivArray.map(iv=>((rootPc+iv)%12+12)%12);
   const rootPcNorm = ((rootPc%12)+12)%12;
 
@@ -4219,7 +4237,11 @@ function getBasicVoicing(rootPc, ivArray) {
     return best ? {ss,frets:best.frets,pcs:best.pcs,score:bestScore} : null;
   }
 
-  const stringSets = pcs.length <= 3
+  const stringSets = bassStr === 0
+    ? (pcs.length >= 5 ? [[0,1,2,3,4]] : [[0,1,2,3]])
+    : bassStr === 1
+    ? (pcs.length >= 5 ? [[1,2,3,4,5]] : [[1,2,3,4]])
+    : pcs.length <= 3
     ? [[1,2,3,4],[2,3,4,5],[0,1,2,3],[1,2,3,4,5],[0,1,2,3,4],[3,4,5]]
     : pcs.length >= 5
     ? [[1,2,3,4,5],[0,1,2,3,4]]
