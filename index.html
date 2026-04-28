@@ -3770,31 +3770,16 @@ function makeAltPillsDiv(domRootPc, rootName) {
   const altScaleName = chromaticPcName((domRootPc + 1) % 12, true);
   const div = document.createElement('div');
   div.style.cssText = 'margin-top:6px;display:flex;flex-wrap:wrap;gap:3px;';
-  [
-    { sym:'7♭9',  color:'#e07070', note: altNote(1,1) },
-    { sym:'7♯9',  color:'#e09050', note: altNote(1,3) },
-    { sym:'7♯11', color:'#70a0e0', note: altNote(3,6) },
-    { sym:'7♭13', color:'#9070c0', note: altNote(5,8) },
-    { sym:'7♭5',  color:'#a0b870', note: altNote(4,6) },
-    { sym:'7♯5',  color:'#70b8a0', note: altNote(4,8) },
-  ].forEach(alt => {
-    const pill = document.createElement('span');
-    pill.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 5px;border-radius:2px;border:1px solid ${alt.color}40;background:${alt.color}12;color:${alt.color};letter-spacing:.05em;cursor:default;`;
-    pill.title = `${rootName}${alt.sym}`;
-    pill.textContent = `${rootName}${alt.sym} · ${alt.note}`;
-    div.appendChild(pill);
-  });
-  // Guitar charts button for altered dominant voicings
   const altChartBtn = document.createElement('button');
-  altChartBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 7px;border-radius:2px;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.07);color:var(--gold2);letter-spacing:.05em;cursor:pointer;margin-left:2px;`;
-  altChartBtn.textContent = '🎸 voicings';
+  altChartBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 7px;border-radius:2px;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.07);color:var(--gold2);letter-spacing:.05em;cursor:pointer;`;
+  altChartBtn.textContent = '🎸 altered voicings';
   altChartBtn.title = `Altered dominant guitar voicings for ${rootName}7`;
   altChartBtn.addEventListener('click', e => { e.stopPropagation(); showAltDominantDiagrams(domRootPc, rootName); });
   div.appendChild(altChartBtn);
   const tritPill = document.createElement('span');
-  tritPill.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 5px;border-radius:2px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.1);color:var(--gold2);letter-spacing:.05em;cursor:default;margin-left:2px;`;
+  tritPill.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:1px 5px;border-radius:2px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.1);color:var(--gold2);letter-spacing:.05em;cursor:default;`;
   tritPill.title = `Tritone sub: ${tritName}7 shares guide tones with ${rootName}7`;
-  tritPill.textContent = `♭II ${tritName}7 · ${tritNotes.join(' ')}`;
+  tritPill.textContent = `♭II ${tritName}7`;
   div.appendChild(tritPill);
   return div;
 }
@@ -4188,6 +4173,10 @@ function getBasicVoicing(rootPc, ivArray) {
 
   function jazzVoicingPcs(ivArr, root) {
     if(ivArr.length <= 4) return allPcs;
+    // if index 2 is a 7th (♭7=10, M7=11) rather than a 5th, return all pcs
+    // so the guitar voicing algorithm can fit all chord tones (e.g. 7♭9♭13)
+    const idx2is7th = ivArr[2] % 12 === 10 || ivArr[2] % 12 === 11;
+    if(idx2is7th) return allPcs;
     const keep = [0,1,3];
     if(ivArr.length >= 5) keep.push(4);
     if(ivArr.length >= 6) keep.push(5);
