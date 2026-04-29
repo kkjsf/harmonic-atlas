@@ -4591,9 +4591,10 @@ function showDiagramModal(frets6, pcs6, rootPc, title, navList, navIdx) {
       <div style="flex:1;min-width:0;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
     </div>` : '';
 
+  const diagSize = Math.min(420, Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.72));
   const contentHtml = `
-    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8">${cur.title}</div>
-    ${makeChordDiagram(cur.frets6, cur.pcs6, cur.rootPc, 260, cur.forceSharpPcs||null)}
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#f0e8d8">${cur.title}</div>
+    <div style="max-width:100%;overflow:hidden;">${makeChordDiagram(cur.frets6, cur.pcs6, cur.rootPc, diagSize, cur.forceSharpPcs||null)}</div>
     ${navHtml}
     <div style="font-size:9px;color:#4a5566;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">${hasNav?'← swipe or arrows →  ·  ':''}click anywhere to close</div>`;
 
@@ -4607,9 +4608,9 @@ function showDiagramModal(frets6, pcs6, rootPc, title, navList, navIdx) {
   if (!inner) {
     inner = document.createElement('div');
     inner.id = 'dm-inner';
-    inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
-      padding:24px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;
-      cursor:default;max-width:90vw;transition:opacity 0.08s ease;`;
+    inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:6px;
+      padding:28px 32px;display:flex;flex-direction:column;align-items:center;gap:16px;
+      cursor:default;width:min(92vw,520px);max-height:92vh;overflow:auto;transition:opacity 0.08s ease;`;
     inner.addEventListener('click', e => e.stopPropagation());
     inner.innerHTML = contentHtml;
     modal.appendChild(inner);
@@ -4649,7 +4650,29 @@ function showAltDomModal(rootPc, rootName) {
   inner.appendChild(header);
 
   const body = document.createElement('div');
-  body.style.cssText = `overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:18px;`;
+  body.style.cssText = `overflow-y:auto;padding:0 24px 18px;display:flex;flex-direction:column;gap:0;position:relative;`;
+
+  // TOC chips
+  const toc = document.createElement('div');
+  toc.style.cssText = `display:flex;flex-wrap:wrap;gap:5px;padding:12px 0 10px;position:sticky;top:0;background:#141820;z-index:2;border-bottom:1px solid #1a2030;margin-bottom:14px;`;
+  ALT_DOM_VOICINGS.forEach((alt, ai) => {
+    const chip = document.createElement('button');
+    chip.dataset.tocIdx = ai;
+    chip.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7a8fa8;background:#1a2030;border:1px solid #2a3545;border-radius:3px;padding:3px 7px;cursor:pointer;letter-spacing:.04em;transition:color .12s,border-color .12s;`;
+    chip.textContent = rootName + alt.sym;
+    chip.addEventListener('mouseenter', () => { chip.style.color='#adc4e0'; chip.style.borderColor='#3e5070'; });
+    chip.addEventListener('mouseleave', () => {
+      if (!chip._active) { chip.style.color='#7a8fa8'; chip.style.borderColor='#2a3545'; }
+    });
+    toc.appendChild(chip);
+  });
+  body.appendChild(toc);
+
+  // Sticky current-section indicator
+  const stickyBar = document.createElement('div');
+  stickyBar.id = 'altdom-sticky';
+  stickyBar.style.cssText = `position:sticky;top:46px;z-index:2;background:#141820;padding:4px 0 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8fa8c8;letter-spacing:.06em;display:none;`;
+  body.appendChild(stickyBar);
 
   // Pre-build nav list for zoom navigation across all shapes
   const modalNavList = [];
@@ -4662,8 +4685,13 @@ function showAltDomModal(rootPc, rootName) {
   });
   let modalNavIdx = 0;
 
+  const sectionEls = [];
   ALT_DOM_VOICINGS.forEach((alt, ai) => {
     const row = document.createElement('div');
+    row.dataset.altdomSym = alt.sym;
+    row.dataset.altdomIdx = ai;
+    row.style.cssText = `padding-top:14px;`;
+    sectionEls.push(row);
 
     const typeHdr = document.createElement('div');
     typeHdr.style.cssText = `display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px;`;
@@ -4707,11 +4735,39 @@ function showAltDomModal(rootPc, rootName) {
     body.appendChild(row);
   });
 
+  // Wire TOC chips to scroll rows into view
+  toc.querySelectorAll('button[data-toc-idx]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const idx = parseInt(chip.dataset.tocIdx);
+      sectionEls[idx]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
   const footer = document.createElement('div');
   footer.style.cssText = `padding:10px 24px;border-top:1px solid #1e2530;font-family:'IBM Plex Mono',monospace;font-size:8px;color:#3a4555;letter-spacing:.1em;flex-shrink:0;`;
   footer.textContent = 'CLICK OUTSIDE OR PRESS ESC TO CLOSE';
   inner.appendChild(body);
   inner.appendChild(footer);
+
+  // IntersectionObserver: track which section is most visible (must be after body is in DOM)
+  const tritPcAlt = (rootPc + 6) % 12;
+  const observer = new IntersectionObserver(entries => {
+    // Find the entry with the largest intersection ratio
+    let best = null;
+    entries.forEach(entry => { if (entry.isIntersecting && (!best || entry.intersectionRatio > best.intersectionRatio)) best = entry; });
+    if (!best) return;
+    const idx = parseInt(best.target.dataset.altdomIdx);
+    const chip = toc.querySelector(`button[data-toc-idx="${idx}"]`);
+    stickyBar.style.display = 'block';
+    const altEntry = ALT_DOM_VOICINGS[idx];
+    const tritSubName = chromaticPcName(tritPcAlt, PREFER_FLAT_PC.has(tritPcAlt));
+    stickyBar.textContent = `${rootName}${altEntry.sym}  ·  tritone sub: ${tritSubName}7`;
+    toc.querySelectorAll('button[data-toc-idx]').forEach(c => {
+      c._active = false; c.style.color='#7a8fa8'; c.style.borderColor='#2a3545';
+    });
+    if (chip) { chip._active = true; chip.style.color='#c9d8eb'; chip.style.borderColor='#4e6a8a'; }
+  }, { root: body, threshold: [0, 0.1, 0.25, 0.5, 1] });
+  sectionEls.forEach(el => observer.observe(el));
   modal.appendChild(inner);
 
   inner.addEventListener('click', e => e.stopPropagation());
