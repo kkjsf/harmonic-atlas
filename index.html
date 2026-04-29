@@ -5519,12 +5519,15 @@ function showSvgModal(svgHtml, title, landscape = false) {
     animation:fadeIn .15s ease;padding:20px;box-sizing:border-box`;
   const inner = document.createElement('div');
   inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;
-    padding:16px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;
-    cursor:default;max-width:min(96vw,960px);overflow-x:auto;-webkit-overflow-scrolling:touch;`;
+    padding:12px 14px;display:flex;flex-direction:column;align-items:stretch;gap:10px;
+    cursor:default;width:min(98vw,1400px);max-height:96vh;overflow:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box;`;
   inner.innerHTML = `
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">${title}</div>
-    <div style="overflow-x:auto;max-width:100%">${svgHtml}</div>
-    <div style="font-size:10px;color:#3a4556;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">CLICK ANYWHERE TO CLOSE</div>`;
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);flex-shrink:0">${title}</div>
+    <div style="overflow:auto;width:100%;display:flex;align-items:flex-start;justify-content:center">${svgHtml}</div>
+    <div style="font-size:10px;color:#3a4556;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;flex-shrink:0">CLICK ANYWHERE TO CLOSE</div>`;
+  // Scale SVG to fill available width
+  const svgEl = inner.querySelector('svg');
+  if (svgEl) { svgEl.style.width = '100%'; svgEl.style.height = 'auto'; svgEl.style.display = 'block'; }
   modal.appendChild(inner);
   inner.addEventListener('click', e => e.stopPropagation());
   modal.addEventListener('click', () => {
