@@ -4034,56 +4034,68 @@ function render(){
 // ivs = semitone offsets from root (mod 12 pc). Template strings: 0=E2,1=A2,2=D3,3=G3,4=B3,5=e4.
 // Shapes verified for G root (pc=7): all ascending, span≤4.
 const ALT_DOM_VOICINGS = [
-  { sym:'7♭9',    label:'R · M3 · ♭7 · ♭9',         enharmonic:null,             sharpIvs:[],
+  { sym:'7♭9',    label:'R · M3 · ♭7 · ♭9',              enharmonic:null,                   sharpIvs:[],
     iv:[0,4,10,1], shapes:[
-    { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,10,1] },  // G: 3-2-3-1  span2
-    { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,10,1] },  // G: x-10-9-10-9-x  span1
-    { name:'D str.',  strings:[2,3,4,5], ivs:[0,4,10,1] },  // G: x-x-5-4-6-4  span2
+    { name:'E str.',  strings:[0,1,2,3],   ivs:[0,4,10,1] },
+    { name:'A str.',  strings:[1,2,3,4],   ivs:[0,4,10,1] },
+    { name:'D str.',  strings:[2,3,4,5],   ivs:[0,4,10,1] },
   ]},
-  { sym:'7♯9',    label:'R · M3 · ♭7 · ♯9',         enharmonic:'♯9 = ♭3 (enharmonic)', sharpIvs:[3],
+  { sym:'7♯9',    label:'R · M3 · ♭7 · ♯9',              enharmonic:'♯9 = ♭3 (enharmonic)', sharpIvs:[3],
     iv:[0,4,10,3], shapes:[
-    { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,10,3] },  // G: 3-2-3-3  span1
-    { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,10,3] },  // G: x-10-9-10-11-x  span2
-    { name:'D str.',  strings:[2,3,4,5], ivs:[0,4,10,3] },  // G: x-x-5-4-6-6  span2
+    { name:'E str.',  strings:[0,1,2,3],   ivs:[0,4,10,3] },
+    { name:'A str.',  strings:[1,2,3,4],   ivs:[0,4,10,3] },
+    { name:'D str.',  strings:[2,3,4,5],   ivs:[0,4,10,3] },
   ]},
-  { sym:'7♯11',   label:'R · M3 · ♭7 · ♯11',        enharmonic:'♯11 = ♭5 (tritone)', sharpIvs:[6],
+  { sym:'7sus4♭9', label:'R · P4 · ♭7 · ♭9',             enharmonic:null,                   sharpIvs:[],
+    iv:[0,5,10,1], shapes:[
+    { name:'D str.',  strings:[2,3,4,5],   ivs:[0,5,10,1] },
+  ]},
+  { sym:'13♭9',   label:'R · M3 · ♭7 · ♭9 · 13',         enharmonic:null,                   sharpIvs:[],
+    iv:[0,4,10,1,9], shapes:[
+    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,1,9] },
+    { name:'rootless',strings:[2,3,4,5],   ivs:[4,10,1,9] },
+  ]},
+  { sym:'13♯9',   label:'R · M3 · ♭7 · ♯9 · 13',         enharmonic:'♯9 = ♭3 (enharmonic)', sharpIvs:[3],
+    iv:[0,4,10,3,9], shapes:[
+    { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,4,9,3] },
+  ]},
+  { sym:'7♯11',   label:'R · M3 · ♭7 · ♯11',             enharmonic:'♯11 = ♭5 (tritone)',   sharpIvs:[6],
     iv:[0,4,10,6], shapes:[
-    { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,4] },  // G: 3-4-3-4  span1  R-♯11-♭7-M3
-    { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,4] },  // G: x-10-11-10-12-x  span2
-    { name:'A str.²', strings:[1,2,3,4], ivs:[0,4,6,10] },  // G: x-10-9-6-6-x  span4  R-M3-♯11-♭7
-    { name:'D str.',  strings:[2,3,4,5], ivs:[0,6,10,4] },  // G: x-x-5-6-6-7  span2
+    { name:'E str.',  strings:[0,1,2,3],   ivs:[0,6,10,4] },
+    { name:'A str.',  strings:[1,2,3,4],   ivs:[0,6,10,4] },
+    { name:'A str.²', strings:[1,2,3,4],   ivs:[0,4,6,10] },
+    { name:'D str.',  strings:[2,3,4,5],   ivs:[0,6,10,4] },
   ]},
-  { sym:'7♭13',   label:'R · M3 · ♭7 · ♭13',        enharmonic:'♭13 = ♯5 (aug 5th)', sharpIvs:[],
+  { sym:'7♭13',   label:'R · M3 · ♭7 · ♭13',             enharmonic:'♭13 = ♯5 (aug 5th)',   sharpIvs:[],
     iv:[0,4,10,8], shapes:[
-    { name:'E str.',  strings:[0,1,2,4], ivs:[0,4,10,8] },  // G: 3-2-3-x-4-x  span2  R-M3-♭7-♭13
-    { name:'A str.',  strings:[1,2,3,5], ivs:[0,4,10,8] },  // G: x-10-9-10-x-11  span2
-    { name:'A str.²', strings:[1,2,3,4], ivs:[0,4,8,10] },  // G: x-10-9-8-6-x  span4  R-M3-♭13-♭7
+    { name:'E str.',  strings:[0,1,2,4],   ivs:[0,4,10,8] },
+    { name:'A str.',  strings:[1,2,3,5],   ivs:[0,4,10,8] },
+    { name:'A str.²', strings:[1,2,3,4],   ivs:[0,4,8,10] },
   ]},
-  { sym:'7♭9♭13', label:'R · M3 · ♭7 · ♭9 · ♭13',  enharmonic:'♭9=A♭ · ♭13=♯5',   sharpIvs:[],
+  { sym:'7♭9♭13', label:'R · M3 · ♭7 · ♭9 · ♭13',        enharmonic:'♭9=D♭ · ♭13=A♭',      sharpIvs:[],
     iv:[0,4,10,1,8], shapes:[
-    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,1,8] },  // 5 strings span2
-    { name:'E str.',  strings:[0,1,2,3,4], ivs:[0,4,10,1,8] },  // 5 strings span3
+    { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,4,8,1] },
+    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,1,8] },
   ]},
-  { sym:'7♭5♭9',  label:'R · ♭5 · ♭7 · ♭9',        enharmonic:'♭5 = ♯11 (tritone)', sharpIvs:[],
-    iv:[0,6,10,1], shapes:[
-    { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,1] },  // 3-4-3-1 span3
-    { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,1] },  // 10-11-10-9 span2
-    { name:'D str.',  strings:[2,3,4,5], ivs:[0,6,10,1] },  // 5-6-6-4 span2
+  { sym:'7♭5♭9',  label:'R · M3 · ♭5 · ♭7 · ♭9',         enharmonic:'♭5 = ♯11 (tritone)',   sharpIvs:[],
+    iv:[0,4,6,10,1], shapes:[
+    { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,4,6,1] },
+    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,1,6] },
   ]},
-  { sym:'7♭5♯9',  label:'R · ♭5 · ♭7 · ♯9',        enharmonic:'♭5=♯11 · ♯9=♭3',   sharpIvs:[3],
-    iv:[0,6,10,3], shapes:[
-    { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,3] },  // 3-4-3-3 span1
-    { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,3] },  // 10-11-10-11 span1
+  { sym:'7♭5♯9',  label:'R · M3 · ♭5 · ♭7 · ♯9',         enharmonic:'♭5=♯11 · ♯9=♭3',      sharpIvs:[3],
+    iv:[0,4,6,10,3], shapes:[
+    { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,4,6,3] },
+    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,3,6] },
   ]},
-  { sym:'7♯5♭9',  label:'R · M3 · ♯5 · ♭9',        enharmonic:'♯5 = ♭13 (aug 5th)', sharpIvs:[8],
-    iv:[0,4,8,1], shapes:[
-    { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,8,1] },   // 10-9-8-9 span2
-    { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,8,1] },   // 3-2-1-1 span2
+  { sym:'7♯5♭9',  label:'R · M3 · ♭7 · ♯5 · ♭9',         enharmonic:'♯5 = ♭13 (aug 5th)',   sharpIvs:[8],
+    iv:[0,4,8,10,1], shapes:[
+    { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,4,8,1] },
+    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,1,8] },
   ]},
-  { sym:'7♯5♯9',  label:'R · M3 · ♯5 · ♯9',        enharmonic:'♯5=♭13 · ♯9=♭3',   sharpIvs:[3,8],
-    iv:[0,4,8,3], shapes:[
-    { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,8,3] },   // 10-9-8-11 span3
-    { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,8,3] },   // 3-2-1-3 span2
+  { sym:'7♯5♯9',  label:'R · M3 · ♭7 · ♯5 · ♯9',         enharmonic:'♯5=♭13 · ♯9=♭3',      sharpIvs:[3,8],
+    iv:[0,4,8,10,3], shapes:[
+    { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,3,8,4] },
+    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,3,8] },
   ]},
 ];
 
@@ -4624,10 +4636,14 @@ function showAltDomModal(rootPc, rootName) {
   inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:6px;
     cursor:default;max-width:820px;width:100%;max-height:90vh;display:flex;flex-direction:column;`;
 
+  const tritPc   = (rootPc + 6) % 12;
+  const tritName = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'][tritPc];
+
   const header = document.createElement('div');
   header.style.cssText = `padding:20px 24px 16px;border-bottom:1px solid #1e2530;display:flex;align-items:baseline;gap:12px;flex-shrink:0;flex-wrap:wrap;`;
   header.innerHTML = `
     <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8;">${rootName}7 · Altered Dominant Voicings</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6a7a8f;letter-spacing:.08em;">tritone sub: ${tritName}7</span>
     <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.1em;flex:1;">movable · span ≤ 4 frets · click diagram to zoom</span>
     <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4a5566;letter-spacing:.1em;cursor:pointer;flex-shrink:0;" id="altdom-close">✕</span>`;
   inner.appendChild(header);
