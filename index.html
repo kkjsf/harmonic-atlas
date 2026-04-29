@@ -4034,58 +4034,63 @@ function render(){
 // ivs = semitone offsets from root (mod 12 pc). Template strings: 0=E2,1=A2,2=D3,3=G3,4=B3,5=e4.
 // Shapes verified for G root (pc=7): all ascending, span≤4.
 const ALT_DOM_VOICINGS = [
-  { sym:'7♭9',    label:'R · M3 · ♭7 · ♭9',         enharmonic:null,
+  { sym:'7♭9',    label:'R · M3 · ♭7 · ♭9',         enharmonic:null,             sharpIvs:[],
     iv:[0,4,10,1], shapes:[
     { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,10,1] },  // G: 3-2-3-1  span2
     { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,10,1] },  // G: x-10-9-10-9-x  span1
     { name:'D str.',  strings:[2,3,4,5], ivs:[0,4,10,1] },  // G: x-x-5-4-6-4  span2
   ]},
-  { sym:'7♯9',    label:'R · M3 · ♭7 · ♯9',         enharmonic:'♯9 = ♭3 (enharmonic)',
+  { sym:'7♯9',    label:'R · M3 · ♭7 · ♯9',         enharmonic:'♯9 = ♭3 (enharmonic)', sharpIvs:[3],
     iv:[0,4,10,3], shapes:[
     { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,10,3] },  // G: 3-2-3-3  span1
     { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,10,3] },  // G: x-10-9-10-11-x  span2
     { name:'D str.',  strings:[2,3,4,5], ivs:[0,4,10,3] },  // G: x-x-5-4-6-6  span2
   ]},
-  { sym:'7♯11',   label:'R · M3 · ♭7 · ♯11',        enharmonic:'♯11 = ♭5 (tritone)',
+  { sym:'7♯11',   label:'R · M3 · ♭7 · ♯11',        enharmonic:'♯11 = ♭5 (tritone)', sharpIvs:[6],
     iv:[0,4,10,6], shapes:[
     { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,4] },  // G: 3-4-3-4  span1  R-♯11-♭7-M3
     { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,4] },  // G: x-10-11-10-12-x  span2
     { name:'A str.²', strings:[1,2,3,4], ivs:[0,4,6,10] },  // G: x-10-9-6-6-x  span4  R-M3-♯11-♭7
     { name:'D str.',  strings:[2,3,4,5], ivs:[0,6,10,4] },  // G: x-x-5-6-6-7  span2
   ]},
-  { sym:'7♭13',   label:'R · M3 · ♭7 · ♭13',        enharmonic:'♭13 = ♯5 (aug 5th)',
+  { sym:'7♭13',   label:'R · M3 · ♭7 · ♭13',        enharmonic:'♭13 = ♯5 (aug 5th)', sharpIvs:[],
     iv:[0,4,10,8], shapes:[
     { name:'E str.',  strings:[0,1,2,4], ivs:[0,4,10,8] },  // G: 3-2-3-x-4-x  span2  R-M3-♭7-♭13
     { name:'A str.',  strings:[1,2,3,5], ivs:[0,4,10,8] },  // G: x-10-9-10-x-11  span2
     { name:'A str.²', strings:[1,2,3,4], ivs:[0,4,8,10] },  // G: x-10-9-8-6-x  span4  R-M3-♭13-♭7
   ]},
-  { sym:'7♭9♭13', label:'R · M3 · ♭7 · ♭9 · ♭13',  enharmonic:'♭9=A♭ · ♭13=♯5',
+  { sym:'7♭9♭13', label:'R · M3 · ♭7 · ♭9 · ♭13',  enharmonic:'♭9=A♭ · ♭13=♯5',   sharpIvs:[],
     iv:[0,4,10,1,8], shapes:[
     { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,1,8] },  // 5 strings span2
     { name:'E str.',  strings:[0,1,2,3,4], ivs:[0,4,10,1,8] },  // 5 strings span3
   ]},
-  { sym:'7♭5♭9',  label:'R · ♭5 · ♭7 · ♭9',        enharmonic:'♭5 = ♯11 (tritone)',
+  { sym:'7♭5♭9',  label:'R · ♭5 · ♭7 · ♭9',        enharmonic:'♭5 = ♯11 (tritone)', sharpIvs:[],
     iv:[0,6,10,1], shapes:[
     { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,1] },  // 3-4-3-1 span3
     { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,1] },  // 10-11-10-9 span2
     { name:'D str.',  strings:[2,3,4,5], ivs:[0,6,10,1] },  // 5-6-6-4 span2
   ]},
-  { sym:'7♭5♯9',  label:'R · ♭5 · ♭7 · ♯9',        enharmonic:'♭5=♯11 · ♯9=♭3',
+  { sym:'7♭5♯9',  label:'R · ♭5 · ♭7 · ♯9',        enharmonic:'♭5=♯11 · ♯9=♭3',   sharpIvs:[3],
     iv:[0,6,10,3], shapes:[
     { name:'E str.',  strings:[0,1,2,3], ivs:[0,6,10,3] },  // 3-4-3-3 span1
     { name:'A str.',  strings:[1,2,3,4], ivs:[0,6,10,3] },  // 10-11-10-11 span1
   ]},
-  { sym:'7♯5♭9',  label:'R · M3 · ♯5 · ♭9',        enharmonic:'♯5 = ♭13 (aug 5th)',
+  { sym:'7♯5♭9',  label:'R · M3 · ♯5 · ♭9',        enharmonic:'♯5 = ♭13 (aug 5th)', sharpIvs:[8],
     iv:[0,4,8,1], shapes:[
     { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,8,1] },   // 10-9-8-9 span2
     { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,8,1] },   // 3-2-1-1 span2
   ]},
-  { sym:'7♯5♯9',  label:'R · M3 · ♯5 · ♯9',        enharmonic:'♯5=♭13 · ♯9=♭3',
+  { sym:'7♯5♯9',  label:'R · M3 · ♯5 · ♯9',        enharmonic:'♯5=♭13 · ♯9=♭3',   sharpIvs:[3,8],
     iv:[0,4,8,3], shapes:[
     { name:'A str.',  strings:[1,2,3,4], ivs:[0,4,8,3] },   // 10-9-8-11 span3
     { name:'E str.',  strings:[0,1,2,3], ivs:[0,4,8,3] },   // 3-2-1-3 span2
   ]},
 ];
+
+function altDomSharpPcs(rootPc, sharpIvs) {
+  if (!sharpIvs?.length) return null;
+  return new Set(sharpIvs.map(iv => ((rootPc + iv) % 12 + 12) % 12));
+}
 
 function computeVoicingFromTemplate(rootPc, template) {
   const frets = template.strings.map((s, i) => {
@@ -4164,9 +4169,10 @@ function renderAltDomTab(scaleNotes, scaleData) {
     // Pre-build nav list for all valid shapes for this root
     const rootNavList = [];
     ALT_DOM_VOICINGS.forEach(alt => {
+      const fsp = altDomSharpPcs(domPc, alt.sharpIvs);
       alt.shapes.forEach(shape => {
         const v = computeVoicingFromTemplate(domPc, shape);
-        if (v) rootNavList.push({ frets6: v.frets6, pcs6: v.pcs6, rootPc: domPc, title: `${domName}${alt.sym}` });
+        if (v) rootNavList.push({ frets6: v.frets6, pcs6: v.pcs6, rootPc: domPc, title: `${domName}${alt.sym}`, forceSharpPcs: fsp });
       });
     });
     let rootNavIdx = 0;
@@ -4183,29 +4189,24 @@ function renderAltDomTab(scaleNotes, scaleData) {
       const shapesRow = document.createElement('div');
       shapesRow.style.cssText = `display:flex;gap:10px;align-items:flex-start;`;
       let anyShape = false;
+      const fsp = altDomSharpPcs(domPc, alt.sharpIvs);
 
       alt.shapes.forEach(shape => {
         const v = computeVoicingFromTemplate(domPc, shape);
+        if (!v) return;
+        anyShape = true;
+        const ni = rootNavIdx++;
         const cell = document.createElement('div');
         cell.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:2px;`;
         const sl = document.createElement('div');
         sl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;`;
         sl.textContent = shape.name;
         cell.appendChild(sl);
-        if (v) {
-          anyShape = true;
-          const ni = rootNavIdx++;
-          const svgWrap = document.createElement('div');
-          svgWrap.style.cssText = `cursor:pointer;`;
-          svgWrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, domPc, 155);
-          svgWrap.addEventListener('click', () => showDiagramModal(null, null, null, null, rootNavList, ni));
-          cell.appendChild(svgWrap);
-        } else {
-          const noVoice = document.createElement('div');
-          noVoice.style.cssText = `color:var(--muted);font-size:11px;padding:30px 12px;`;
-          noVoice.textContent = '—';
-          cell.appendChild(noVoice);
-        }
+        const svgWrap = document.createElement('div');
+        svgWrap.style.cssText = `cursor:pointer;`;
+        svgWrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, domPc, 155, fsp);
+        svgWrap.addEventListener('click', () => showDiagramModal(null, null, null, null, rootNavList, ni));
+        cell.appendChild(svgWrap);
         shapesRow.appendChild(cell);
       });
 
@@ -4420,7 +4421,7 @@ function detectBarre(frets6) {
   return null;
 }
 
-function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
+function makeChordDiagram(frets6, pcs6, rootPc, w=140, forceSharpPcs=null) {
   const NUM_STR  = 6;
 
   // Determine fret window first so NUM_FRET can adapt to the actual span
@@ -4504,7 +4505,8 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140) {
         const isBarreNote = barre && fr === barre.fret && s >= barre.fromStr && s <= barre.toStr;
         const fill = isRoot ? '#c9a84c' : isBarreNote ? '#5c5075' : '#6a5f90';
         const dotR = Math.min(Math.max(6.5, fretH * 0.34), strGap * 0.44);
-        const lbl  = pc !== -1 ? pcToName(((pc%12)+12)%12) : '';
+        const _pc  = ((pc%12)+12)%12;
+        const lbl  = pc !== -1 ? (forceSharpPcs?.has(_pc) ? NOTE_NAMES_SHARP[_pc] : pcToName(_pc)) : '';
         g.push(`<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}"/>`);
         if (lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dotR*0.88}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
       }
@@ -4579,7 +4581,7 @@ function showDiagramModal(frets6, pcs6, rootPc, title, navList, navIdx) {
 
   const contentHtml = `
     <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8">${cur.title}</div>
-    ${makeChordDiagram(cur.frets6, cur.pcs6, cur.rootPc, 260)}
+    ${makeChordDiagram(cur.frets6, cur.pcs6, cur.rootPc, 260, cur.forceSharpPcs||null)}
     ${navHtml}
     <div style="font-size:9px;color:#4a5566;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">${hasNav?'← swipe or arrows →  ·  ':''}click anywhere to close</div>`;
 
@@ -4636,9 +4638,10 @@ function showAltDomModal(rootPc, rootName) {
   // Pre-build nav list for zoom navigation across all shapes
   const modalNavList = [];
   ALT_DOM_VOICINGS.forEach(alt => {
+    const fsp = altDomSharpPcs(rootPc, alt.sharpIvs);
     alt.shapes.forEach(shape => {
       const v = computeVoicingFromTemplate(rootPc, shape);
-      if (v) modalNavList.push({ frets6: v.frets6, pcs6: v.pcs6, rootPc, title: `${rootName}${alt.sym}` });
+      if (v) modalNavList.push({ frets6: v.frets6, pcs6: v.pcs6, rootPc, title: `${rootName}${alt.sym}`, forceSharpPcs: fsp });
     });
   });
   let modalNavIdx = 0;
@@ -4657,29 +4660,24 @@ function showAltDomModal(rootPc, rootName) {
     const shapesRow = document.createElement('div');
     shapesRow.style.cssText = `display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;`;
     let anyShape = false;
+    const fsp = altDomSharpPcs(rootPc, alt.sharpIvs);
 
     alt.shapes.forEach(shape => {
       const v = computeVoicingFromTemplate(rootPc, shape);
+      if (!v) return;
+      anyShape = true;
+      const ni = modalNavIdx++;
       const cell = document.createElement('div');
       cell.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:3px;`;
       const nameLbl = document.createElement('div');
       nameLbl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:.1em;`;
       nameLbl.textContent = shape.name;
       cell.appendChild(nameLbl);
-      if (v) {
-        anyShape = true;
-        const ni = modalNavIdx++;
-        const wrap = document.createElement('div');
-        wrap.style.cssText = `cursor:pointer;`;
-        wrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, rootPc, 138);
-        wrap.addEventListener('click', () => showDiagramModal(null, null, null, null, modalNavList, ni));
-        cell.appendChild(wrap);
-      } else {
-        const noVoice = document.createElement('div');
-        noVoice.style.cssText = `color:var(--muted);font-size:11px;padding:28px 18px;`;
-        noVoice.textContent = '—';
-        cell.appendChild(noVoice);
-      }
+      const wrap = document.createElement('div');
+      wrap.style.cssText = `cursor:pointer;`;
+      wrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, rootPc, 138, fsp);
+      wrap.addEventListener('click', () => showDiagramModal(null, null, null, null, modalNavList, ni));
+      cell.appendChild(wrap);
       shapesRow.appendChild(cell);
     });
 
