@@ -1983,6 +1983,34 @@
   #comp-btn { background:var(--accent); border-color:var(--accent); color:#fff; }
   #comp-btn:hover { background:var(--accent2); border-color:var(--accent2); color:#fff; }
   #comp-btn.active { background:var(--accent2); border-color:var(--accent2); color:#fff; }
+
+  /* ── Desktop transport footer + style panel ── */
+  #comp-transport {
+    border-top:1px solid var(--border2); background:var(--surface);
+    padding:10px 18px; display:flex; align-items:center; gap:10px;
+    flex-shrink:0; flex-wrap:wrap;
+  }
+  #comp-style-panel {
+    border-top:1px solid var(--border2); background:var(--surface2);
+    padding:12px 18px; display:none; flex-wrap:wrap; gap:12px 22px;
+    align-items:flex-start; flex-shrink:0;
+  }
+  #comp-style-panel.open { display:flex; }
+  #comp-style-panel > * { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+  .comp-style-toggle {
+    margin-left:auto; background:none; border:1px solid var(--border2);
+    color:var(--muted); cursor:pointer; border-radius:3px; padding:5px 12px;
+    font-size:10px; font-family:'IBM Plex Mono',monospace; transition:all .15s;
+    white-space:nowrap;
+  }
+  .comp-style-toggle.open { border-color:var(--accent2); color:var(--accent2); }
+  @media (max-width:600px) {
+    #comp-transport { display:none !important; }
+    #comp-style-panel { display:none !important; }
+  }
+  @media (min-width:601px) {
+    #comp-settings-section { display:none !important; }
+  }
 </style>
 </head>
 <body>
@@ -9287,6 +9315,10 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div id="comp-list-panel"></div>
       <div id="comp-detail-panel"><div class="comp-empty-state">No compositions yet.<br>Click + New to create one.</div></div>
     </div>
+    <!-- Desktop style panel (fixed, collapsible — hidden on mobile) -->
+    <div id="comp-style-panel"></div>
+    <!-- Desktop transport footer (hidden on mobile) -->
+    <div id="comp-transport"></div>
     <!-- Mobile edit bottom bar (hidden on desktop) -->
     <div id="comp-mob-edit-bar">
       <button class="mob-bar-btn primary" id="mob-edit-play-btn">
@@ -10692,7 +10724,7 @@ function compRenderDetail(comp) {
   });
   // Play / Pause / Resume
   let compIsPaused = false;
-  document.getElementById('comp-pause-btn').addEventListener('click', () => {
+  document.getElementById('comp-pause-btn')?.addEventListener('click', () => {
     if (!compIsPlaying) {
       compStartPlayback(comp.id);
     } else if (compIsPaused) {
@@ -10730,6 +10762,57 @@ function compRenderDetail(comp) {
   });
   panel.querySelector('.comp-notes-input').addEventListener('input', e => {
     compUpdate(comp.id, { text: e.target.value });
+  });
+  compDistributePanels();
+}
+
+function compDistributePanels() {
+  const transport  = document.getElementById('comp-transport');
+  const stylePanel = document.getElementById('comp-style-panel');
+  const wasOpen    = stylePanel?.classList.contains('open') ?? false;
+
+  // Always clear stale content to prevent duplicate IDs across viewport changes
+  if (transport)  transport.innerHTML  = '';
+  if (stylePanel) stylePanel.innerHTML = '';
+
+  if (window.innerWidth <= 600) return;
+
+  const settingsEl  = document.getElementById('comp-settings-section');
+  const detailPanel = document.getElementById('comp-detail-panel');
+  if (!settingsEl || !transport || !stylePanel) return;
+
+  // Flatten play-row children into transport
+  const playRow = settingsEl.querySelector('.comp-play-row');
+  if (playRow) {
+    [...playRow.children].forEach(c => transport.appendChild(c));
+    playRow.remove();
+  }
+
+  // Spacer + Style toggle
+  const spacer = document.createElement('div');
+  spacer.style.flex = '1';
+  transport.appendChild(spacer);
+  const styleToggle = document.createElement('button');
+  styleToggle.className = 'comp-style-toggle' + (wasOpen ? ' open' : '');
+  styleToggle.id = 'comp-style-toggle';
+  styleToggle.textContent = wasOpen ? 'Style ▴' : 'Style ▾';
+  transport.appendChild(styleToggle);
+
+  // Move style controls (all but Notes div) into style panel
+  const notesDiv = settingsEl.querySelector('.comp-notes-input')?.parentElement;
+  [...settingsEl.children].forEach(child => {
+    if (child !== notesDiv) stylePanel.appendChild(child);
+  });
+  if (wasOpen) stylePanel.classList.add('open');
+
+  // Move notes div directly into detail panel (visible outside scroll lock)
+  if (notesDiv) detailPanel.appendChild(notesDiv);
+
+  // Wire style toggle
+  styleToggle.addEventListener('click', () => {
+    const isOpen = stylePanel.classList.toggle('open');
+    styleToggle.textContent = isOpen ? 'Style ▴' : 'Style ▾';
+    styleToggle.classList.toggle('open', isOpen);
   });
 }
 
