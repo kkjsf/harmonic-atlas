@@ -1899,6 +1899,42 @@
   .mob-bar-btn.primary { border-color:var(--accent); background:rgba(124,111,160,.15); color:var(--accent2); }
   .mob-bar-btn:hover { border-color:var(--accent2); color:var(--accent2); }
 
+  /* Chip bar — replaces sidebar for composition selection */
+  #comp-chip-bar { display:flex; align-items:center; gap:6px; padding:8px 14px; border-bottom:1px solid var(--border2); overflow-x:auto; flex-shrink:0; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  #comp-chip-bar::-webkit-scrollbar { display:none; }
+  .comp-chip { display:flex; align-items:center; gap:5px; padding:5px 13px; border-radius:16px; border:1px solid var(--border2); background:none; font-size:11px; color:var(--muted); cursor:pointer; white-space:nowrap; font-family:'IBM Plex Mono',monospace; transition:all .12s; flex-shrink:0; }
+  .comp-chip.active { border-color:var(--accent); background:rgba(124,111,160,.14); color:var(--accent2); }
+  .comp-chip .comp-chip-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+  .comp-chip-new { display:flex; align-items:center; gap:4px; padding:5px 12px; border-radius:16px; border:1px dashed var(--border2); background:none; font-size:11px; color:var(--dim); cursor:pointer; font-family:'IBM Plex Mono',monospace; transition:all .12s; flex-shrink:0; }
+  .comp-chip-new:hover { border-color:var(--accent); color:var(--accent2); }
+  #comp-list-panel { display:none !important; }
+
+  /* Mobile play pane — scale switcher + fretboard strip */
+  #mob-scale-switcher { display:none; gap:6px; padding:6px 12px; flex-shrink:0; overflow-x:auto; align-items:center; border-bottom:1px solid var(--border2); scrollbar-width:none; }
+  #mob-scale-switcher::-webkit-scrollbar { display:none; }
+  .mob-scale-sw-label { font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); font-family:'IBM Plex Mono',monospace; flex-shrink:0; }
+  .mob-scale-sw-btn { padding:3px 10px; border-radius:12px; border:1px solid var(--border2); background:none; color:var(--muted); font-size:11px; font-family:'IBM Plex Mono',monospace; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .12s; }
+  .mob-scale-sw-btn.active { border-color:var(--accent); background:rgba(124,111,160,.15); color:var(--accent2); }
+  #mob-fret-wrap { display:none; flex:1; overflow-x:auto; overflow-y:hidden; padding:6px 10px; align-items:center; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; min-height:80px; }
+  #mob-scale-fret-col { display:none; flex-direction:column; min-width:0; overflow:hidden; }
+
+  /* Landscape play layout — triggered by orientation media query + play tab class */
+  @media (orientation:landscape) and (max-height:560px) {
+    #comp-modal.mob-tab-play { position:fixed; inset:0; border-radius:0; max-height:100vh; flex-direction:column; }
+    #comp-modal.mob-tab-play #comp-mob-play-pane { flex-direction:row; flex-wrap:wrap; align-items:stretch; }
+    #comp-modal.mob-tab-play #mob-stage { width:150px; flex:0 0 150px; border-right:1px solid var(--border2); border-bottom:none; padding:8px 10px; justify-content:center; flex-shrink:0; }
+    #comp-modal.mob-tab-play #mob-stage-name { font-size:36px; }
+    #comp-modal.mob-tab-play #mob-stage-scales { display:none; }
+    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex; flex:1; min-width:0; }
+    #comp-modal.mob-tab-play #mob-scale-switcher { display:flex; }
+    #comp-modal.mob-tab-play #mob-fret-wrap { display:flex; }
+    #comp-modal.mob-tab-play #mob-prog-bar { width:100%; flex-basis:100%; margin:0; }
+    #comp-modal.mob-tab-play #mob-transport { flex-basis:100%; padding:3px 20px 4px; gap:14px; }
+    #comp-modal.mob-tab-play #mob-transport .mob-tbtn.play-main { width:44px; height:44px; }
+    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; padding:3px 0 6px; }
+    #comp-modal.mob-tab-play #mob-strip-lbl { display:none; }
+  }
+
   @media (max-width:600px) {
     #comp-mob-tabbar { display:flex; }
     #comp-list-panel { display:none !important; }
@@ -9111,7 +9147,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v15 &nbsp;·&nbsp; deployed 2026-04-30</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v16 &nbsp;·&nbsp; deployed 2026-04-30</span></div>
     </div>
 
     <div class="tech-section">
@@ -9210,6 +9246,8 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <button id="comp-new-btn">+ New</button>
       <button id="comp-close-btn">×</button>
     </div>
+    <!-- Chip bar — composition selector (replaces sidebar) -->
+    <div id="comp-chip-bar"></div>
     <!-- Mobile tab bar (hidden on desktop) -->
     <div id="comp-mob-tabbar">
       <button class="cmob-tab active" data-tab="edit">✏ Edit</button>
@@ -9222,6 +9260,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <div id="mob-stage-name">—</div>
         <div id="mob-stage-notes"></div>
         <div id="mob-stage-scales"></div>
+      </div>
+      <!-- Scale switcher + fretboard (landscape only) -->
+      <div id="mob-scale-fret-col">
+        <div id="mob-scale-switcher"></div>
+        <div id="mob-fret-wrap"></div>
       </div>
       <div id="mob-prog-bar"><div id="mob-prog-fill"></div></div>
       <div id="mob-transport">
@@ -10176,18 +10219,41 @@ function compSelectId(id) {
 function compRenderList() {
   const comps = compLoad();
   const panel = document.getElementById('comp-list-panel');
-  panel.innerHTML = '';
-  if (!comps.length) {
-    panel.innerHTML = '<div class="comp-list-empty">No compositions yet.</div>';
-    return;
+  if (panel) {
+    panel.innerHTML = '';
+    if (!comps.length) {
+      panel.innerHTML = '<div class="comp-list-empty">No compositions yet.</div>';
+    } else {
+      comps.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'comp-list-item' + (c.id === compActiveId ? ' active' : '');
+        item.innerHTML = `<span class="comp-list-title">${_escHtml(c.title || 'Untitled')}</span><span class="comp-list-count">${c.chords.length} chord${c.chords.length !== 1 ? 's' : ''}</span>`;
+        item.addEventListener('click', () => compSelectId(c.id));
+        panel.appendChild(item);
+      });
+    }
   }
+  compRenderChipBar(comps);
+}
+
+function compRenderChipBar(comps) {
+  const bar = document.getElementById('comp-chip-bar');
+  if (!bar) return;
+  comps = comps || compLoad();
+  bar.innerHTML = '';
   comps.forEach(c => {
-    const item = document.createElement('div');
-    item.className = 'comp-list-item' + (c.id === compActiveId ? ' active' : '');
-    item.innerHTML = `<span class="comp-list-title">${_escHtml(c.title || 'Untitled')}</span><span class="comp-list-count">${c.chords.length} chord${c.chords.length !== 1 ? 's' : ''}</span>`;
-    item.addEventListener('click', () => compSelectId(c.id));
-    panel.appendChild(item);
+    const chip = document.createElement('button');
+    chip.className = 'comp-chip' + (c.id === compActiveId ? ' active' : '');
+    const dot = c.id === compActiveId ? '<span class="comp-chip-dot"></span>' : '';
+    chip.innerHTML = `${dot}${_escHtml(c.title || 'Untitled')}`;
+    chip.addEventListener('click', () => compSelectId(c.id));
+    bar.appendChild(chip);
   });
+  const newChip = document.createElement('button');
+  newChip.className = 'comp-chip-new';
+  newChip.textContent = '+ New';
+  newChip.addEventListener('click', () => document.getElementById('comp-new-btn')?.click());
+  bar.appendChild(newChip);
 }
 
 function buildCompChordPool() {
@@ -10274,6 +10340,63 @@ function compMobSetTab(tab) {
   modal.classList.remove('mob-tab-edit','mob-tab-play','mob-tab-settings');
   modal.classList.add('mob-tab-' + tab);
   document.querySelectorAll('.cmob-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  if (tab === 'play') {
+    if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {});
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  } else {
+    if (screen.orientation?.unlock) screen.orientation.unlock();
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+}
+
+const _IMPROV_SCALE_IVLS = {
+  'Ionian':[0,2,4,5,7,9,11],'Dorian':[0,2,3,5,7,9,10],'Phrygian':[0,1,3,5,7,8,10],
+  'Lydian':[0,2,4,6,7,9,11],'Mixolydian':[0,2,4,5,7,9,10],'Aeolian':[0,2,3,5,7,8,10],
+  'Locrian':[0,1,3,5,6,8,10],'Locrian ♯2':[0,2,3,5,6,8,10],
+  'Melodic Minor':[0,2,3,5,7,9,11],'Harmonic Minor':[0,2,3,5,7,8,11],
+  'Lydian Dominant':[0,2,4,6,7,9,10],'Lydian Augmented':[0,2,4,6,8,9,11],
+  'Altered scale':[0,1,3,4,6,8,10],'Whole Tone':[0,2,4,6,8,10],
+  'Phrygian Dominant':[0,1,4,5,7,8,10],
+  'Major Pentatonic':[0,2,4,7,9],'Minor Pentatonic':[0,3,5,7,10],
+  'Blues scale':[0,3,5,6,7,10],'Diminished (H-W)':[0,1,3,4,6,7,9,10],'Diminished (W-H)':[0,2,3,5,6,8,9,11],
+};
+const _NOTE_PC_LUT = {'C':0,'C#':1,'Db':1,'D':2,'D#':3,'Eb':3,'E':4,'F':5,'F#':6,'Gb':6,'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11};
+function _parseImprovScale(s) {
+  const m = s.match(/^([A-G][#b♯♭]?)\s+(.+)$/);
+  if (!m) return null;
+  const rootPc = _NOTE_PC_LUT[m[1].replace('♯','#').replace('♭','b')];
+  const ivls = _IMPROV_SCALE_IVLS[m[2]];
+  return (rootPc !== undefined && ivls) ? { rootPc, ivls } : null;
+}
+let _mobScaleIdx = 0;
+let _mobScaleSuggs = [];
+
+function compMobRenderFretboard(rootPc, intervals) {
+  const wrap = document.getElementById('mob-fret-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 15, 820, true);
+}
+
+function compMobRenderScaleSwitcher(suggs, activeIdx) {
+  const sw = document.getElementById('mob-scale-switcher');
+  if (!sw) return;
+  sw.innerHTML = '<span class="mob-scale-sw-label">Scale</span>';
+  suggs.slice(0, 3).forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'mob-scale-sw-btn' + (i === activeIdx ? ' active' : '');
+    btn.textContent = s.scale.replace(/^[A-G][#b♯♭]?\s/, '');
+    btn.addEventListener('click', () => {
+      _mobScaleIdx = i;
+      compMobRenderScaleSwitcher(_mobScaleSuggs, i);
+      const p = _parseImprovScale(s.scale);
+      if (p) compMobRenderFretboard(p.rootPc, p.ivls);
+    });
+    sw.appendChild(btn);
+  });
+  const firstParsed = _parseImprovScale(suggs[activeIdx]?.scale || '');
+  if (firstParsed) compMobRenderFretboard(firstParsed.rootPc, firstParsed.ivls);
 }
 
 function compMobRenderStrip(comp) {
@@ -10312,6 +10435,9 @@ function compMobUpdateStage(chord, idx) {
   notesEl.textContent = notes.join(' · ');
   const suggs = getImprovSuggestions(chord);
   scalesEl.innerHTML = suggs.slice(0,4).map(s => `<span class="mob-scale-pill">${_escHtml(s.scale.replace(/^[A-G][#b♯♭]?\s/,''))}</span>`).join('');
+  _mobScaleSuggs = suggs;
+  _mobScaleIdx = 0;
+  compMobRenderScaleSwitcher(suggs, 0);
   // Highlight active strip card
   document.querySelectorAll('.mob-sc').forEach((el, j) => el.classList.toggle('active', j === idx));
   const activeCard = document.querySelector('.mob-sc.active');
