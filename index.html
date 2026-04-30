@@ -1935,7 +1935,7 @@
   .comp-sound-select { background:var(--surface); border:1px solid var(--border2); color:var(--muted); border-radius:2px; padding:2px 4px; font-size:8px; font-family:'IBM Plex Mono',monospace; cursor:pointer; outline:none; }
   .comp-sound-select:focus { border-color:var(--accent); }
   /* Improvisation mode button */
-  .comp-improv-btn { background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; border-radius:3px; padding:4px 10px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .15s; margin-left:auto; }
+  .comp-improv-btn { background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; border-radius:3px; padding:4px 10px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .15s; }
   .comp-improv-btn:hover, .comp-improv-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(124,111,160,.08); }
   /* Improvisation overlay */
   #comp-improv-overlay { position:fixed; inset:0; z-index:9000; background:rgba(8,8,16,.94); display:none; flex-direction:column; align-items:center; justify-content:center; padding:24px 20px; overflow-y:auto; }
@@ -5759,7 +5759,7 @@ function renderMandolinChop(scaleNotes, scaleData) {
 
   const desc = document.createElement('div');
   desc.style.cssText = 'font-size:9px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:560px;font-family:"IBM Plex Mono",monospace;letter-spacing:.03em;border-left:2px solid var(--border2);padding-left:10px';
-  desc.textContent = 'Chop chords use compact low-position shapes. Strike and immediately release finger pressure for the classic backbeat chop on beats 2 & 4.';
+  desc.textContent = 'Monroe-style chop: fret all 4 strings (no open strings — shapes are fully moveable), then strike and instantly release pressure to produce a percussive muted snap. Chops land on beats 2 & 4, mimicking a snare drum. Span ≤ 5 frets; lowest playable position per root.';
   container.appendChild(desc);
 
   const rootPc  = parseInt(state.key);
@@ -9142,7 +9142,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v13 &nbsp;·&nbsp; deployed 2026-04-29</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v14 &nbsp;·&nbsp; deployed 2026-04-30</span></div>
     </div>
 
     <div class="tech-section">
@@ -9237,7 +9237,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 <div id="comp-overlay">
   <div id="comp-modal">
     <div id="comp-modal-header">
-      <span id="comp-modal-title">Composition / Improvisation</span>
+      <span id="comp-modal-title">Compositions</span>
       <button id="comp-new-btn">+ New</button>
       <button id="comp-close-btn">×</button>
     </div>
@@ -9266,6 +9266,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <button class="mob-tbtn" id="mob-stop-btn2" title="Stop">
           <svg viewBox="0 0 12 12" width="14" height="14" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="1.5"/></svg>
         </button>
+        <button class="comp-improv-btn" id="mob-improv-btn" title="Improvisation overlay">♪</button>
       </div>
       <div id="mob-strip-wrap">
         <div id="mob-strip-lbl">Sequence</div>
@@ -9281,7 +9282,6 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <button class="mob-bar-btn primary" id="mob-edit-play-btn">
         <svg viewBox="0 0 10 12" width="10" height="10" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:5px"><polygon points="0,0 10,6 0,12"/></svg>Play
       </button>
-      <button class="mob-bar-btn" id="mob-settings-btn">⚙ Settings</button>
     </div>
   </div>
 </div>
@@ -10445,7 +10445,9 @@ function compRenderDetail(comp) {
         <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 3.5Q1 1 4 1h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M7 0l2 1.5L7 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11 6.5Q11 9 8 9H3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M5 10.5l-2-1.5 2-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
         Loop
       </button>
-      <button class="comp-improv-btn" id="comp-improv-btn" title="Improvisation mode — see chord notes + scale suggestions">♪ Improvise</button>
+    </div>
+    <div style="margin-bottom:6px">
+      <button class="comp-improv-btn" id="comp-improv-btn" title="Improvisation mode — see chord notes + scale suggestions" style="width:100%;margin:0;padding:6px 12px;text-align:left">♪ Improvisation overlay — chord tones &amp; scale suggestions</button>
     </div>
     <div class="strum-row" style="margin-bottom:4px;flex-wrap:wrap;gap:4px">
       <span class="strum-label">All</span>
@@ -11216,7 +11218,13 @@ document.getElementById('mob-stop-btn2').addEventListener('click', compStopPlayb
 document.getElementById('mob-edit-play-btn').addEventListener('click', () => {
   if (compActiveId) { compStartPlayback(compActiveId); compMobSetTab('play'); }
 });
-document.getElementById('mob-settings-btn').addEventListener('click', () => compMobSetTab('settings'));
+document.getElementById('mob-improv-btn').addEventListener('click', () => {
+  const io = document.getElementById('comp-improv-overlay');
+  if (!io) return;
+  io.classList.add('open');
+  const cur = compLoad().find(c => c.id === compActiveId);
+  if (cur?.chords?.length) { updateImprovOverlay(cur, 0); buildImprovTimeline(cur); _startImprovRaf(cur); }
+});
 
 // Wire compositions UI
 document.getElementById('comp-btn').addEventListener('click', openCompositions);
