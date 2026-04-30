@@ -1909,12 +1909,11 @@
     #comp-settings-section { display:none; }
     /* Edit tab */
     #comp-modal.mob-tab-edit #comp-chord-section { display:block; }
+    #comp-modal.mob-tab-edit #comp-settings-section { display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--border2); padding-top:10px; margin-top:4px; }
     #comp-modal.mob-tab-edit #comp-mob-edit-bar { display:flex; }
     /* Play tab */
     #comp-modal.mob-tab-play #comp-layout { display:none !important; }
     #comp-modal.mob-tab-play #comp-mob-play-pane { display:flex !important; }
-    /* Settings tab */
-    #comp-modal.mob-tab-settings #comp-settings-section { display:block; }
     /* Accordion-style chord cards on mobile */
     #comp-chord-section .comp-chord-row { display:flex !important; flex-direction:column; gap:5px; align-items:stretch; }
     #comp-chord-section .comp-chord-card { width:100%; min-width:unset; border-radius:5px; }
@@ -1934,36 +1933,6 @@
   /* Sound selector */
   .comp-sound-select { background:var(--surface); border:1px solid var(--border2); color:var(--muted); border-radius:2px; padding:2px 4px; font-size:8px; font-family:'IBM Plex Mono',monospace; cursor:pointer; outline:none; }
   .comp-sound-select:focus { border-color:var(--accent); }
-  /* Improvisation mode button */
-  .comp-improv-btn { background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; border-radius:3px; padding:4px 10px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .15s; }
-  .comp-improv-btn:hover, .comp-improv-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(124,111,160,.08); }
-  /* Improvisation overlay */
-  #comp-improv-overlay { position:fixed; inset:0; z-index:9000; background:rgba(8,8,16,.94); display:none; flex-direction:column; align-items:center; justify-content:center; padding:24px 20px; overflow-y:auto; }
-  #comp-improv-overlay.open { display:flex; }
-  .improv-chord-name { font-size:52px; font-weight:700; color:var(--accent2); font-family:'IBM Plex Mono',monospace; text-align:center; letter-spacing:-.02em; line-height:1; }
-  .improv-chord-roman { font-size:14px; color:var(--muted); font-family:'IBM Plex Mono',monospace; letter-spacing:.25em; text-align:center; margin-top:6px; margin-bottom:18px; }
-  .improv-notes { display:flex; gap:8px; justify-content:center; margin-bottom:18px; flex-wrap:wrap; }
-  .improv-note { width:34px; height:34px; border-radius:50%; background:rgba(124,111,160,.18); border:1px solid var(--accent); color:var(--accent2); font-size:10px; font-family:'IBM Plex Mono',monospace; display:flex; align-items:center; justify-content:center; }
-  .improv-suggestions { width:100%; max-width:440px; }
-  .improv-sugg-label { font-size:8px; letter-spacing:.18em; color:var(--muted); margin-bottom:7px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; }
-  .improv-sugg-item { padding:8px 12px; margin-bottom:4px; background:var(--surface2); border-radius:3px; border-left:2px solid var(--accent); }
-  .improv-sugg-name { font-size:12px; color:var(--text); font-family:'IBM Plex Mono',monospace; }
-  .improv-sugg-tip { font-size:9px; color:var(--muted); margin-top:3px; }
-  .improv-close-btn { position:fixed; top:14px; right:14px; background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; padding:5px 12px; border-radius:3px; font-size:9px; font-family:'IBM Plex Mono',monospace; letter-spacing:.1em; }
-  .improv-close-btn:hover { border-color:var(--accent); color:var(--accent2); }
-  .improv-pos { font-size:9px; color:var(--muted); font-family:'IBM Plex Mono',monospace; margin-top:14px; letter-spacing:.12em; }
-  /* Next chord display */
-  .improv-next { width:100%; max-width:440px; margin-top:12px; padding:8px 12px; background:var(--surface2); border-radius:3px; border-left:2px solid var(--border2); display:flex; align-items:center; gap:10px; }
-  .improv-next-label { font-size:7px; letter-spacing:.18em; color:var(--muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; white-space:nowrap; }
-  .improv-next-name { font-size:16px; color:var(--text); font-family:'IBM Plex Mono',monospace; }
-  .improv-next-notes { display:flex; gap:4px; flex-wrap:wrap; }
-  .improv-next-note { width:22px; height:22px; border-radius:50%; background:rgba(108,100,130,.2); border:1px solid var(--border2); color:var(--muted); font-size:8px; font-family:'IBM Plex Mono',monospace; display:flex; align-items:center; justify-content:center; }
-  /* Timeline bar */
-  .improv-timeline-wrap { width:100%; max-width:440px; margin-top:4px; position:relative; height:10px; }
-  .improv-timeline-bar { width:100%; height:100%; display:flex; border-radius:5px; overflow:hidden; gap:2px; }
-  .improv-seg { height:100%; border-radius:2px; background:var(--border2); transition:background .15s; }
-  .improv-seg.active { background:var(--accent); }
-  .improv-playhead { position:absolute; top:-3px; width:2px; height:16px; background:white; border-radius:1px; transform:translateX(-50%); transition:left .08s linear; pointer-events:none; }
   /* Play/Pause button — centred below note bubbles in improv overlay */
   #comp-pause-btn {
     width:64px; height:64px; border-radius:50%;
@@ -9142,7 +9111,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v14 &nbsp;·&nbsp; deployed 2026-04-30</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v15 &nbsp;·&nbsp; deployed 2026-04-30</span></div>
     </div>
 
     <div class="tech-section">
@@ -9245,7 +9214,6 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div id="comp-mob-tabbar">
       <button class="cmob-tab active" data-tab="edit">✏ Edit</button>
       <button class="cmob-tab" data-tab="play">▶ Play</button>
-      <button class="cmob-tab" data-tab="settings">⚙ Settings</button>
     </div>
     <!-- Mobile play pane (hidden on desktop) -->
     <div id="comp-mob-play-pane">
@@ -9266,7 +9234,6 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <button class="mob-tbtn" id="mob-stop-btn2" title="Stop">
           <svg viewBox="0 0 12 12" width="14" height="14" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="1.5"/></svg>
         </button>
-        <button class="comp-improv-btn" id="mob-improv-btn" title="Improvisation overlay">♪</button>
       </div>
       <div id="mob-strip-wrap">
         <div id="mob-strip-lbl">Sequence</div>
@@ -10446,9 +10413,6 @@ function compRenderDetail(comp) {
         Loop
       </button>
     </div>
-    <div style="margin-bottom:6px">
-      <button class="comp-improv-btn" id="comp-improv-btn" title="Improvisation mode — see chord notes + scale suggestions" style="width:100%;margin:0;padding:6px 12px;text-align:left">♪ Improvisation overlay — chord tones &amp; scale suggestions</button>
-    </div>
     <div class="strum-row" style="margin-bottom:4px;flex-wrap:wrap;gap:4px">
       <span class="strum-label">All</span>
       <button class="comp-global-mode-btn" id="comp-global-full">Full</button>
@@ -10637,19 +10601,6 @@ function compRenderDetail(comp) {
     c.chords.forEach(ch => { ch.noteVal = nv; });
     compSave(comps); compRenderChordRow(c);
     if (compIsPlaying) compPendingRestart = true;
-  });
-  // Improvisation mode
-  document.getElementById('comp-improv-btn').addEventListener('click', () => {
-    const io = document.getElementById('comp-improv-overlay');
-    if (!io) return;
-    io.classList.add('open');
-    document.getElementById('comp-improv-btn').classList.add('active');
-    const cur = compLoad().find(c => c.id === comp.id);
-    if (cur?.chords?.length) {
-      updateImprovOverlay(cur, 0);
-      buildImprovTimeline(cur);
-      _startImprovRaf(cur);
-    }
   });
   panel.querySelector('.comp-notes-input').addEventListener('input', e => {
     compUpdate(comp.id, { text: e.target.value });
@@ -10920,70 +10871,6 @@ function getImprovSuggestions(chord) {
   return sugg.slice(0, 4);
 }
 
-function updateImprovOverlay(comp, idx) {
-  const chords = comp.chords || [];
-  const chord  = chords[idx];
-  if (!chord) return;
-  const nameEl = document.getElementById('improv-chord-name');
-  const romanEl = document.getElementById('improv-chord-roman');
-  const notesEl = document.getElementById('improv-notes');
-  const suggEl  = document.getElementById('improv-sugg-list');
-  const posEl   = document.getElementById('improv-pos');
-  if (!nameEl) return;
-  nameEl.textContent = (chord.name || '') + (chord.sym || '');
-  romanEl.textContent = chord.roman || '';
-  notesEl.innerHTML = (chord.notes || []).map(n => `<div class="improv-note">${n}</div>`).join('');
-  const suggs = getImprovSuggestions(chord);
-  suggEl.innerHTML = suggs.map(s =>
-    `<div class="improv-sugg-item"><div class="improv-sugg-name">${s.scale}</div><div class="improv-sugg-tip">${s.tip}</div></div>`
-  ).join('');
-  if (posEl) posEl.textContent = `${idx + 1} / ${chords.length}`;
-  // Next chord
-  const nextChord = chords[(idx + 1) % chords.length];
-  const nextNameEl  = document.getElementById('improv-next-name');
-  const nextNotesEl = document.getElementById('improv-next-notes');
-  if (nextNameEl) nextNameEl.textContent = nextChord ? (nextChord.name || '') + (nextChord.sym || '') : '—';
-  if (nextNotesEl) nextNotesEl.innerHTML = (nextChord?.notes || []).map(n => `<div class="improv-next-note">${n}</div>`).join('');
-}
-
-let _improvRaf = null;
-
-function buildImprovTimeline(comp) {
-  const bar = document.getElementById('improv-timeline-bar');
-  if (!bar) return;
-  const total = (comp.chords || []).reduce((s, ch) => s + (ch.beats || 4), 0);
-  bar.innerHTML = (comp.chords || []).map((ch, i) => {
-    const w = ((ch.beats || 4) / total * 100).toFixed(2);
-    return `<div class="improv-seg" data-idx="${i}" style="width:${w}%"></div>`;
-  }).join('');
-}
-
-function _startImprovRaf(comp) {
-  if (_improvRaf) cancelAnimationFrame(_improvRaf);
-  const bpm = comp.bpm || 90;
-  const beatDur = 60 / bpm;
-  const totalDur = (comp.chords || []).reduce((s, ch) => s + (ch.beats || 4), 0) * beatDur;
-  function tick() {
-    const io = document.getElementById('comp-improv-overlay');
-    if (!io?.classList.contains('open') || !compIsPlaying) { _improvRaf = null; return; }
-    const pos = Tone.Transport.seconds % totalDur;
-    // Move playhead
-    const ph = document.getElementById('improv-playhead');
-    if (ph) ph.style.left = ((pos / totalDur) * 100).toFixed(2) + '%';
-    // Highlight active segment
-    const bar = document.getElementById('improv-timeline-bar');
-    if (bar) {
-      let elapsed = 0;
-      (comp.chords || []).forEach((ch, i) => {
-        const dur = (ch.beats || 4) * beatDur;
-        bar.children[i]?.classList.toggle('active', pos >= elapsed && pos < elapsed + dur);
-        elapsed += dur;
-      });
-    }
-    _improvRaf = requestAnimationFrame(tick);
-  }
-  tick();
-}
 
 let _compPlayGen = 0;
 let compPendingRestart = false;
@@ -11027,8 +10914,6 @@ function compStartPlayback(id) {
             document.querySelectorAll('.comp-chord-card').forEach((el, j) => {
               el.classList.toggle('playing', j === chordIdx);
             });
-            const io = document.getElementById('comp-improv-overlay');
-            if (io?.classList.contains('open')) updateImprovOverlay(srcComp, chordIdx);
             compMobUpdateStage(srcComp.chords[chordIdx], chordIdx);
           });
         }, tOffset);
@@ -11151,9 +11036,6 @@ function compStartPlayback(id) {
     if (stopBtn) stopBtn.disabled = false;
     if (pauseBtn) { pauseBtn.disabled = false; pauseBtn.innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>'; }
     compMobUpdatePlayIcon(true);
-    // Restart improv RAF if overlay is open
-    const io = document.getElementById('comp-improv-overlay');
-    if (io?.classList.contains('open')) { buildImprovTimeline(comp); _startImprovRaf(comp); }
 
     // Live loop update: watch for pending changes and apply at next cycle boundary
     if (comp.loop) {
@@ -11218,13 +11100,6 @@ document.getElementById('mob-stop-btn2').addEventListener('click', compStopPlayb
 document.getElementById('mob-edit-play-btn').addEventListener('click', () => {
   if (compActiveId) { compStartPlayback(compActiveId); compMobSetTab('play'); }
 });
-document.getElementById('mob-improv-btn').addEventListener('click', () => {
-  const io = document.getElementById('comp-improv-overlay');
-  if (!io) return;
-  io.classList.add('open');
-  const cur = compLoad().find(c => c.id === compActiveId);
-  if (cur?.chords?.length) { updateImprovOverlay(cur, 0); buildImprovTimeline(cur); _startImprovRaf(cur); }
-});
 
 // Wire compositions UI
 document.getElementById('comp-btn').addEventListener('click', openCompositions);
@@ -11284,34 +11159,6 @@ if ('serviceWorker' in navigator) {
     });
   }).catch(()=>{});
 }
-</script>
-<div id="comp-improv-overlay">
-  <button class="improv-close-btn" id="improv-close-btn">✕ Close</button>
-  <div class="improv-chord-name" id="improv-chord-name">—</div>
-  <div class="improv-chord-roman" id="improv-chord-roman"></div>
-  <div class="improv-notes" id="improv-notes"></div>
-  <button id="comp-pause-btn" title="Play / Pause" aria-label="Play or pause playback"><svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg></button>
-  <div class="improv-suggestions">
-    <div class="improv-sugg-label">What to play</div>
-    <div id="improv-sugg-list"></div>
-  </div>
-  <div class="improv-next">
-    <span class="improv-next-label">Next →</span>
-    <span class="improv-next-name" id="improv-next-name">—</span>
-    <span class="improv-next-notes" id="improv-next-notes"></span>
-  </div>
-  <div class="improv-timeline-wrap" style="max-width:440px;width:100%">
-    <div class="improv-timeline-bar" id="improv-timeline-bar"></div>
-    <div class="improv-playhead" id="improv-playhead" style="left:0%"></div>
-  </div>
-  <div class="improv-pos" id="improv-pos"></div>
-</div>
-<script>
-document.getElementById('improv-close-btn').addEventListener('click', () => {
-  document.getElementById('comp-improv-overlay').classList.remove('open');
-  const ib = document.getElementById('comp-improv-btn');
-  if (ib) ib.classList.remove('active');
-});
 </script>
 <div id="rotate-hint">↺ Rotate to landscape for best view</div>
 </body>
