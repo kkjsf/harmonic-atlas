@@ -1935,6 +1935,20 @@
     #comp-modal.mob-tab-play #mob-strip-lbl { display:none; }
   }
 
+  /* Desktop: show improv/play column when playback is active */
+  @media (min-width:601px) {
+    #comp-modal.comp-playing #comp-mob-play-pane {
+      display:flex; flex-direction:column; width:260px; flex-shrink:0;
+      border-left:1px solid var(--border2); overflow:hidden;
+    }
+    #comp-modal.comp-playing #mob-scale-fret-col { display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
+    #comp-modal.comp-playing #mob-scale-switcher { display:flex; flex-shrink:0; }
+    #comp-modal.comp-playing #mob-fret-wrap { display:flex; flex:1; min-height:0; }
+    #comp-modal.comp-playing #mob-transport { display:none; }
+    #comp-modal.comp-playing #mob-strip-wrap { flex-shrink:0; border-top:1px solid var(--border2); padding:4px 0 6px; }
+    #comp-modal.comp-playing #mob-prog-bar { flex-shrink:0; }
+  }
+
   @media (max-width:600px) {
     #comp-mob-tabbar { display:flex; }
     #comp-list-panel { display:none !important; }
@@ -1947,9 +1961,9 @@
     #comp-modal.mob-tab-edit #comp-chord-section { display:block; }
     #comp-modal.mob-tab-edit #comp-settings-section { display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--border2); padding-top:10px; margin-top:4px; }
     #comp-modal.mob-tab-edit #comp-mob-edit-bar { display:flex; }
-    /* Play tab */
-    #comp-modal.mob-tab-play #comp-layout { display:none !important; }
-    #comp-modal.mob-tab-play #comp-mob-play-pane { display:flex !important; }
+    /* Play tab — keep layout visible, hide detail, show play pane */
+    #comp-modal.mob-tab-play #comp-detail-panel { display:none !important; }
+    #comp-modal.mob-tab-play #comp-mob-play-pane { display:flex !important; flex:1; flex-direction:column; }
     /* Accordion-style chord cards on mobile */
     #comp-chord-section .comp-chord-row { display:flex !important; flex-direction:column; gap:5px; align-items:stretch; }
     #comp-chord-section .comp-chord-card { width:100%; min-width:unset; border-radius:5px; }
@@ -9281,39 +9295,38 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <button class="cmob-tab active" data-tab="edit">✏ Edit</button>
       <button class="cmob-tab" data-tab="play">▶ Play</button>
     </div>
-    <!-- Mobile play pane (hidden on desktop) -->
-    <div id="comp-mob-play-pane">
-      <div id="mob-stage">
-        <div id="mob-stage-roman"></div>
-        <div id="mob-stage-name">—</div>
-        <div id="mob-stage-notes"></div>
-        <div id="mob-stage-scales"></div>
-      </div>
-      <!-- Scale switcher + fretboard (landscape only) -->
-      <div id="mob-scale-fret-col">
-        <div id="mob-scale-switcher"></div>
-        <div id="mob-fret-wrap"></div>
-      </div>
-      <div id="mob-prog-bar"><div id="mob-prog-fill"></div></div>
-      <div id="mob-transport">
-        <button class="mob-tbtn" id="mob-back-btn" title="Restart">
-          <svg viewBox="0 0 14 14" width="15" height="15" fill="currentColor"><polygon points="13,1 4,7 13,13"/><rect x="1" y="1" width="2.5" height="12" rx="1"/></svg>
-        </button>
-        <button class="mob-tbtn play-main" id="mob-play-btn" title="Play / Pause">
-          <svg id="mob-play-icon" viewBox="0 0 10 12" width="20" height="20" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>
-        </button>
-        <button class="mob-tbtn" id="mob-stop-btn2" title="Stop">
-          <svg viewBox="0 0 12 12" width="14" height="14" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="1.5"/></svg>
-        </button>
-      </div>
-      <div id="mob-strip-wrap">
-        <div id="mob-strip-lbl">Sequence</div>
-        <div id="mob-strip"></div>
-      </div>
-    </div>
     <div id="comp-layout">
       <div id="comp-list-panel"></div>
       <div id="comp-detail-panel"><div class="comp-empty-state">No compositions yet.<br>Click + New to create one.</div></div>
+      <!-- Play pane: mobile Play tab + desktop playing right column -->
+      <div id="comp-mob-play-pane">
+        <div id="mob-stage">
+          <div id="mob-stage-roman"></div>
+          <div id="mob-stage-name">—</div>
+          <div id="mob-stage-notes"></div>
+          <div id="mob-stage-scales"></div>
+        </div>
+        <div id="mob-scale-fret-col">
+          <div id="mob-scale-switcher"></div>
+          <div id="mob-fret-wrap"></div>
+        </div>
+        <div id="mob-prog-bar"><div id="mob-prog-fill"></div></div>
+        <div id="mob-transport">
+          <button class="mob-tbtn" id="mob-back-btn" title="Restart">
+            <svg viewBox="0 0 14 14" width="15" height="15" fill="currentColor"><polygon points="13,1 4,7 13,13"/><rect x="1" y="1" width="2.5" height="12" rx="1"/></svg>
+          </button>
+          <button class="mob-tbtn play-main" id="mob-play-btn" title="Play / Pause">
+            <svg id="mob-play-icon" viewBox="0 0 10 12" width="20" height="20" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>
+          </button>
+          <button class="mob-tbtn" id="mob-stop-btn2" title="Stop">
+            <svg viewBox="0 0 12 12" width="14" height="14" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="1.5"/></svg>
+          </button>
+        </div>
+        <div id="mob-strip-wrap">
+          <div id="mob-strip-lbl">Sequence</div>
+          <div id="mob-strip"></div>
+        </div>
+      </div>
     </div>
     <!-- Desktop style panel (fixed, collapsible — hidden on mobile) -->
     <div id="comp-style-panel"></div>
@@ -10223,6 +10236,7 @@ function compDelete(id) {
 function openCompositions() {
   document.getElementById('comp-overlay').classList.add('open');
   document.getElementById('comp-btn').classList.add('active');
+  document.body.style.overflow = 'hidden';
   compRenderList();
   const comps = compLoad();
   if (compActiveId && comps.find(c => c.id === compActiveId)) {
@@ -10238,6 +10252,7 @@ function openCompositions() {
 function closeCompositions() {
   document.getElementById('comp-overlay').classList.remove('open');
   document.getElementById('comp-btn').classList.remove('active');
+  document.body.style.overflow = '';
   compStopPlayback();
 }
 
@@ -10372,12 +10387,12 @@ function compMobSetTab(tab) {
   modal.classList.remove('mob-tab-edit','mob-tab-play','mob-tab-settings');
   modal.classList.add('mob-tab-' + tab);
   document.querySelectorAll('.cmob-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  if (tab === 'play') {
+  if (tab === 'play' && window.innerWidth <= 600) {
     if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {});
     if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
     }
-  } else {
+  } else if (tab !== 'play' && window.innerWidth <= 600) {
     if (screen.orientation?.unlock) screen.orientation.unlock();
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
@@ -11237,6 +11252,7 @@ function compStartPlayback(id) {
 
     Tone.Transport.start('+0.05');
     compIsPlaying = true;
+    document.getElementById('comp-modal')?.classList.add('comp-playing');
 
     const playBtn = document.getElementById('comp-play-btn');
     const stopBtn = document.getElementById('comp-stop-btn');
@@ -11277,6 +11293,7 @@ function compStopPlayback() {
   if (sampler) sampler.releaseAll();
   if (guitarSampler) guitarSampler.releaseAll();
   compIsPlaying = false;
+  document.getElementById('comp-modal')?.classList.remove('comp-playing');
   document.querySelectorAll('.comp-chord-card.playing').forEach(el => el.classList.remove('playing'));
   if (_improvRaf) { cancelAnimationFrame(_improvRaf); _improvRaf = null; }
   const playBtn  = document.getElementById('comp-play-btn');
