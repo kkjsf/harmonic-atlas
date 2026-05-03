@@ -1935,18 +1935,18 @@
     #comp-modal.mob-tab-play #mob-strip-lbl { display:none; }
   }
 
-  /* Desktop: show improv/play column when playback is active */
+  /* Desktop: always show improv/scale panel as right column */
   @media (min-width:601px) {
-    #comp-modal.comp-playing #comp-mob-play-pane {
-      display:flex; flex-direction:column; width:260px; flex-shrink:0;
+    #comp-mob-play-pane {
+      display:flex !important; flex-direction:column; width:280px; flex-shrink:0;
       border-left:1px solid var(--border2); overflow:hidden;
     }
-    #comp-modal.comp-playing #mob-scale-fret-col { display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
-    #comp-modal.comp-playing #mob-scale-switcher { display:flex; flex-shrink:0; }
-    #comp-modal.comp-playing #mob-fret-wrap { display:flex; flex:1; min-height:0; }
-    #comp-modal.comp-playing #mob-transport { display:none; }
-    #comp-modal.comp-playing #mob-strip-wrap { flex-shrink:0; border-top:1px solid var(--border2); padding:4px 0 6px; }
-    #comp-modal.comp-playing #mob-prog-bar { flex-shrink:0; }
+    #mob-scale-fret-col { display:flex !important; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
+    #mob-scale-switcher { display:flex !important; }
+    #mob-fret-wrap { display:flex !important; flex:1; min-height:0; }
+    #mob-transport { display:none !important; }
+    #mob-strip-wrap { flex-shrink:0; border-top:1px solid var(--border2); padding:4px 0 6px; }
+    #mob-prog-bar { flex-shrink:0; }
   }
 
   @media (max-width:600px) {
@@ -10573,15 +10573,15 @@ function compRenderDetail(comp) {
       <div class="comp-chord-row" id="comp-chord-row"></div>
     </div>
     <div id="comp-settings-section"><div class="comp-play-row">
-      <button class="comp-play-btn" id="comp-play-btn">
+      <button class="comp-play-btn">
         <svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play
       </button>
-      <button class="comp-stop-btn" id="comp-stop-btn" disabled>
+      <button class="comp-stop-btn" disabled>
         <svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="1" width="6" height="6" rx=".5" fill="currentColor"/></svg>Stop
       </button>
-      <input class="comp-bpm-input" id="comp-bpm-input" type="number" min="40" max="240" value="${comp.bpm || 90}">
+      <input class="comp-bpm-input" type="number" min="40" max="240" value="${comp.bpm || 90}">
       <span style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace">BPM</span>
-      <button class="comp-loop-btn${comp.loop?' active':''}" id="comp-loop-btn" title="Loop playback">
+      <button class="comp-loop-btn${comp.loop?' active':''}" title="Loop playback">
         <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 3.5Q1 1 4 1h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M7 0l2 1.5L7 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11 6.5Q11 9 8 9H3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M5 10.5l-2-1.5 2-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
         Loop
       </button>
@@ -10655,17 +10655,20 @@ function compRenderDetail(comp) {
       else panel.innerHTML = '<div class="comp-empty-state">No compositions yet.<br>Click + New to start.</div>';
     });
   });
-  document.getElementById('comp-play-btn').addEventListener('click', () => compStartPlayback(comp.id));
-  document.getElementById('comp-stop-btn').addEventListener('click', compStopPlayback);
-  document.getElementById('comp-bpm-input').addEventListener('change', e => {
+  // Mobile settings play-row (no IDs — desktop transport renders its own fresh buttons)
+  panel.querySelector('.comp-play-btn')?.addEventListener('click', () => compStartPlayback(comp.id));
+  panel.querySelector('.comp-stop-btn')?.addEventListener('click', compStopPlayback);
+  panel.querySelector('.comp-bpm-input')?.addEventListener('change', e => {
     compUpdate(comp.id, { bpm: parseInt(e.target.value) || 90 });
     if (compIsPlaying) compPendingRestart = true;
   });
-  document.getElementById('comp-loop-btn').addEventListener('click', () => {
+  const mobLoopBtn = panel.querySelector('.comp-loop-btn');
+  mobLoopBtn?.addEventListener('click', () => {
     const cur = compLoad().find(c => c.id === comp.id);
     const next = !(cur?.loop);
     compUpdate(comp.id, { loop: next });
-    document.getElementById('comp-loop-btn').classList.toggle('active', next);
+    mobLoopBtn.classList.toggle('active', next);
+    document.getElementById('comp-loop-btn')?.classList.toggle('active', next);
   });
 
   // Chord search
@@ -10778,57 +10781,74 @@ function compRenderDetail(comp) {
   panel.querySelector('.comp-notes-input').addEventListener('input', e => {
     compUpdate(comp.id, { text: e.target.value });
   });
-  compDistributePanels();
+  compRenderTransport(comp);
 }
 
-function compDistributePanels() {
-  const transport  = document.getElementById('comp-transport');
-  const stylePanel = document.getElementById('comp-style-panel');
-  const wasOpen    = stylePanel?.classList.contains('open') ?? false;
-
-  // Always clear stale content to prevent duplicate IDs across viewport changes
-  if (transport)  transport.innerHTML  = '';
-  if (stylePanel) stylePanel.innerHTML = '';
+function compRenderTransport(comp) {
+  const t  = document.getElementById('comp-transport');
+  const sp = document.getElementById('comp-style-panel');
+  const dp = document.getElementById('comp-detail-panel');
+  const wasOpen = sp?.classList.contains('open') ?? false;
+  if (t)  t.innerHTML  = '';
+  if (sp) sp.innerHTML = '';
 
   if (window.innerWidth <= 600) return;
 
-  const settingsEl  = document.getElementById('comp-settings-section');
-  const detailPanel = document.getElementById('comp-detail-panel');
-  if (!settingsEl || !transport || !stylePanel) return;
+  const settingsEl = document.getElementById('comp-settings-section');
+  if (!t || !settingsEl) return;
 
-  // Flatten play-row children into transport
-  const playRow = settingsEl.querySelector('.comp-play-row');
-  if (playRow) {
-    [...playRow.children].forEach(c => transport.appendChild(c));
-    playRow.remove();
-  }
+  // Render transport controls fresh (no element-moving — avoids ID conflicts)
+  const mk = (tag, props, html) => {
+    const el = Object.assign(document.createElement(tag), props);
+    if (html !== undefined) el.innerHTML = html;
+    return el;
+  };
+  const play = mk('button', { className:'comp-play-btn', id:'comp-play-btn' },
+    '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play');
+  play.addEventListener('click', () => compStartPlayback(comp.id));
 
-  // Spacer + Style toggle
-  const spacer = document.createElement('div');
+  const stop = mk('button', { className:'comp-stop-btn', id:'comp-stop-btn', disabled:true },
+    '<svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="1" width="6" height="6" rx=".5" fill="currentColor"/></svg>Stop');
+  stop.addEventListener('click', compStopPlayback);
+
+  const bpmInp = mk('input', { className:'comp-bpm-input', id:'comp-bpm-input', type:'number', min:'40', max:'240', value:comp.bpm||90 });
+  bpmInp.addEventListener('change', e => {
+    compUpdate(comp.id, { bpm: parseInt(e.target.value)||90 });
+    if (compIsPlaying) compPendingRestart = true;
+  });
+  const bpmLbl = mk('span', {});
+  bpmLbl.style.cssText = "font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace";
+  bpmLbl.textContent = 'BPM';
+
+  const loop = mk('button', { className:'comp-loop-btn'+(comp.loop?' active':''), id:'comp-loop-btn', title:'Loop playback' },
+    `<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 3.5Q1 1 4 1h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M7 0l2 1.5L7 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11 6.5Q11 9 8 9H3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M5 10.5l-2-1.5 2-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>Loop`);
+  loop.addEventListener('click', () => {
+    const cur = compLoad().find(c => c.id === comp.id);
+    const next = !(cur?.loop);
+    compUpdate(comp.id, { loop: next });
+    loop.classList.toggle('active', next);
+  });
+
+  const spacer = mk('div', {});
   spacer.style.flex = '1';
-  transport.appendChild(spacer);
-  const styleToggle = document.createElement('button');
-  styleToggle.className = 'comp-style-toggle' + (wasOpen ? ' open' : '');
-  styleToggle.id = 'comp-style-toggle';
-  styleToggle.textContent = wasOpen ? 'Style ▴' : 'Style ▾';
-  transport.appendChild(styleToggle);
+  const stToggle = mk('button', { className:'comp-style-toggle'+(wasOpen?' open':''), id:'comp-style-toggle' });
+  stToggle.textContent = wasOpen ? 'Style ▴' : 'Style ▾';
+  t.append(play, stop, bpmInp, bpmLbl, loop, spacer, stToggle);
 
-  // Move style controls (all but Notes div) into style panel
-  const notesDiv = settingsEl.querySelector('.comp-notes-input')?.parentElement;
-  [...settingsEl.children].forEach(child => {
-    if (child !== notesDiv) stylePanel.appendChild(child);
-  });
-  if (wasOpen) stylePanel.classList.add('open');
-
-  // Move notes div directly into detail panel (visible outside scroll lock)
-  if (notesDiv) detailPanel.appendChild(notesDiv);
-
-  // Wire style toggle
-  styleToggle.addEventListener('click', () => {
-    const isOpen = stylePanel.classList.toggle('open');
-    styleToggle.textContent = isOpen ? 'Style ▴' : 'Style ▾';
-    styleToggle.classList.toggle('open', isOpen);
-  });
+  // Move style controls from settings section to style panel (element-move is fine here
+  // since these elements don't share IDs with anything compStartPlayback references)
+  if (sp) {
+    settingsEl.querySelector('.comp-play-row')?.remove();
+    const notesDiv = settingsEl.querySelector('.comp-notes-input')?.parentElement;
+    [...settingsEl.children].forEach(ch => { if (ch !== notesDiv) sp.appendChild(ch); });
+    if (wasOpen) sp.classList.add('open');
+    if (notesDiv && dp) dp.appendChild(notesDiv);
+    stToggle.addEventListener('click', () => {
+      const isOpen = sp.classList.toggle('open');
+      stToggle.textContent = isOpen ? 'Style ▴' : 'Style ▾';
+      stToggle.classList.toggle('open', isOpen);
+    });
+  }
 }
 
 function _renderCompStrumBtns(compId) {
@@ -11252,7 +11272,6 @@ function compStartPlayback(id) {
 
     Tone.Transport.start('+0.05');
     compIsPlaying = true;
-    document.getElementById('comp-modal')?.classList.add('comp-playing');
 
     const playBtn = document.getElementById('comp-play-btn');
     const stopBtn = document.getElementById('comp-stop-btn');
@@ -11293,7 +11312,6 @@ function compStopPlayback() {
   if (sampler) sampler.releaseAll();
   if (guitarSampler) guitarSampler.releaseAll();
   compIsPlaying = false;
-  document.getElementById('comp-modal')?.classList.remove('comp-playing');
   document.querySelectorAll('.comp-chord-card.playing').forEach(el => el.classList.remove('playing'));
   if (_improvRaf) { cancelAnimationFrame(_improvRaf); _improvRaf = null; }
   const playBtn  = document.getElementById('comp-play-btn');
