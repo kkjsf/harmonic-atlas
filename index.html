@@ -1922,50 +1922,54 @@
   #mob-fret-wrap { display:none; flex:1; overflow-x:auto; overflow-y:hidden; padding:6px 10px; align-items:center; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; min-height:80px; }
   #mob-scale-fret-col { display:none; flex-direction:column; min-width:0; overflow:hidden; }
 
-  /* Landscape play layout — touch mobile in landscape (hover:none targets touch-only devices) */
-  @media (orientation:landscape) and (hover:none) and (pointer:coarse) {
-    #comp-modal.mob-tab-play { position:fixed; inset:0; border-radius:0; max-height:100vh; flex-direction:column; }
-    /* Compact header in landscape play */
-    #comp-modal.mob-tab-play #comp-modal-header { padding:5px 10px; gap:6px; }
-    #comp-modal.mob-tab-play #comp-modal-title { font-size:9px; }
-    #comp-modal.mob-tab-play #comp-new-btn { display:none; }
-    #comp-modal.mob-tab-play #comp-mob-edit-btn { display:flex; }
-    #comp-modal.mob-tab-play #comp-close-btn { width:22px; height:22px; font-size:11px; }
-    /* Hide chip bar — reclaim 30px of vertical space */
-    #comp-modal.mob-tab-play #comp-chip-bar { display:none !important; }
-    #comp-modal.mob-tab-play #comp-mob-tabbar { display:none !important; }
-    /* Two-column play pane; strip + transport wrap below as full-width rows */
-    #comp-modal.mob-tab-play #comp-mob-play-pane { flex-direction:row !important; flex-wrap:wrap; align-items:stretch; }
-    #comp-modal.mob-tab-play #mob-stage { width:110px !important; flex:0 0 110px !important; border-right:1px solid var(--border2); border-bottom:none; padding:6px 8px; justify-content:center; flex-shrink:0; }
-    #comp-modal.mob-tab-play #mob-stage-name { font-size:28px !important; }
-    #comp-modal.mob-tab-play #mob-stage-roman { font-size:10px !important; }
-    #comp-modal.mob-tab-play #mob-stage-notes { font-size:9px !important; }
-    #comp-modal.mob-tab-play #mob-stage-scales { display:none !important; }
-    #comp-modal.mob-tab-play #comp-pause-btn { display:none !important; }
-    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; }
-    #comp-modal.mob-tab-play #mob-scale-switcher { display:flex !important; padding:4px 8px; }
-    /* Fretboard fills right column */
-    #comp-modal.mob-tab-play #mob-fret-wrap { display:flex !important; flex:1; overflow-x:auto; overflow-y:hidden; min-height:0; }
-    #comp-modal.mob-tab-play #mob-fret-toggle-btn { display:none !important; }
-    /* Strip + progress below as thin full-width rows */
-    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; padding:3px 10px 4px; border-top:1px solid var(--border2); }
-    #comp-modal.mob-tab-play #mob-strip-lbl { display:none !important; }
-    #comp-modal.mob-tab-play #mob-strip { gap:5px; }
-    #comp-modal.mob-tab-play .mob-sc { width:50px; padding:4px 3px 3px; }
-    #comp-modal.mob-tab-play .mob-sc-name { font-size:10px; }
-    #comp-modal.mob-tab-play .mob-sc-roman { font-size:6px; }
-    #comp-modal.mob-tab-play .mob-sc-beats { display:none; }
-    #comp-modal.mob-tab-play #mob-prog-bar { width:100%; flex-basis:100%; margin:0; }
-    /* Transport — compact single row */
-    #comp-overlay #comp-modal.mob-tab-play #mob-transport { display:flex !important; flex-basis:100%; padding:4px 12px; gap:6px; justify-content:center; align-items:center; border-top:1px solid var(--border2); }
-    #comp-modal.mob-tab-play #mob-transport .mob-tbtn { width:32px; height:32px; border-radius:4px; }
-    #comp-modal.mob-tab-play #mob-transport .mob-tbtn.play-main { width:auto !important; height:32px !important; border-radius:4px; flex:1; padding:4px 14px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; gap:5px; }
-    #comp-modal.mob-tab-play .mob-play-label { display:inline; }
-    #comp-modal.mob-tab-play #mob-bpm-wrap { display:flex !important; align-items:center; gap:3px; }
-    #comp-modal.mob-tab-play .mob-bpm-input { width:40px; font-size:11px; padding:3px; }
-    #comp-modal.mob-tab-play #mob-loop-btn { display:flex !important; width:32px; height:32px; border-radius:4px; }
-    #comp-modal.mob-tab-play #mob-loop-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(124,111,160,.1); }
+  /* ══ LANDSCAPE PLAY — mobile touch only (class mob-ls set by JS) ══
+     Double class mob-ls+mob-tab-play beats desktop min-width:601px rules regardless of source order */
+  #comp-modal.mob-ls.mob-tab-play { position:fixed !important; inset:0 !important; border-radius:0 !important; display:flex !important; flex-direction:column !important; max-height:100vh !important; overflow:hidden !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-modal-header { padding:4px 10px !important; flex-shrink:0; }
+  #comp-modal.mob-ls.mob-tab-play #comp-modal-title { font-size:9px !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-new-btn { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-mob-edit-btn { display:flex !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-close-btn { width:22px !important; height:22px !important; font-size:11px !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-chip-bar { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-mob-tabbar { display:none !important; }
+  /* Grid layout: row 1 fills space, rows 2-4 fixed height — transport always visible */
+  #comp-modal.mob-ls.mob-tab-play #comp-mob-play-pane {
+    display:grid !important;
+    grid-template-rows:1fr auto auto auto;
+    grid-template-columns:100px 1fr;
+    flex:1 !important; min-height:0 !important; overflow:hidden !important;
   }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage {
+    grid-row:1; grid-column:1;
+    display:flex !important; flex-direction:column !important;
+    align-items:center !important; justify-content:center !important;
+    border-right:1px solid var(--border2); padding:6px 6px !important; overflow:hidden;
+  }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-name  { font-size:26px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-roman { font-size:9px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-notes { font-size:8px !important; letter-spacing:.04em !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-scales { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-pause-btn   { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-scale-fret-col { grid-row:1; grid-column:2; display:flex !important; flex-direction:column !important; min-width:0 !important; overflow:hidden !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-scale-switcher { display:flex !important; padding:3px 8px !important; flex-shrink:0; overflow-x:auto; }
+  #comp-modal.mob-ls.mob-tab-play #mob-fret-wrap { display:flex !important; flex:1 !important; overflow-x:auto !important; overflow-y:hidden !important; -webkit-overflow-scrolling:touch !important; min-height:0 !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-fret-toggle-btn { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-prog-bar { grid-row:2; grid-column:1/-1; margin:0 !important; height:2px; }
+  #comp-modal.mob-ls.mob-tab-play #mob-strip-wrap { grid-row:3; grid-column:1/-1; padding:2px 8px 3px !important; border-top:1px solid var(--border2); overflow:hidden; }
+  #comp-modal.mob-ls.mob-tab-play #mob-strip-lbl { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-strip { gap:4px !important; }
+  #comp-modal.mob-ls.mob-tab-play .mob-sc { width:46px !important; padding:3px 2px 2px !important; }
+  #comp-modal.mob-ls.mob-tab-play .mob-sc-name { font-size:9px !important; }
+  #comp-modal.mob-ls.mob-tab-play .mob-sc-roman { font-size:6px !important; }
+  #comp-modal.mob-ls.mob-tab-play .mob-sc-beats { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-transport { grid-row:4; grid-column:1/-1; display:flex !important; padding:4px 10px !important; gap:6px; justify-content:center; align-items:center; border-top:1px solid var(--border2); }
+  #comp-modal.mob-ls.mob-tab-play #mob-transport .mob-tbtn { width:30px !important; height:30px !important; border-radius:4px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-transport .mob-tbtn.play-main { width:auto !important; height:30px !important; border-radius:4px !important; flex:1; padding:4px 12px !important; font-family:'IBM Plex Mono',monospace; font-size:11px !important; letter-spacing:.06em; gap:5px; }
+  #comp-modal.mob-ls.mob-tab-play .mob-play-label { display:inline !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-bpm-wrap { display:flex !important; align-items:center; gap:3px; }
+  #comp-modal.mob-ls.mob-tab-play .mob-bpm-input { width:38px !important; font-size:11px !important; padding:3px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-loop-btn { display:flex !important; width:30px !important; height:30px !important; border-radius:4px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-loop-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(124,111,160,.1); }
 
   /* ══ Desktop tab system ══ */
   @media (min-width:601px) {
@@ -1999,7 +2003,7 @@
     /* Right column: scale switcher + fretboard */
     #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; }
     #comp-modal.mob-tab-play #mob-scale-switcher  { display:flex !important; }
-    #comp-modal.mob-tab-play #mob-fret-wrap       { display:flex !important; flex:1; overflow-x:auto; overflow-y:hidden; min-height:0; }
+    #comp-modal.mob-tab-play #mob-fret-wrap       { display:flex !important; flex:1; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; min-height:0; }
     /* Bottom: progress bar + sequence strip spanning full width */
     #comp-modal.mob-tab-play #mob-prog-bar   { flex-basis:100%; margin:0; }
     #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; }
@@ -2615,10 +2619,10 @@ const SCALES = {
     desc:`Minor pentatonic with an added ♭5 (the "blue note" — tritone from root). That passing semitone between 4 and 5 is the defining color of blues, soul, and jazz — a chromatic smear that defies functional harmony.`},
 
   // Symmetric diminished
-  'Half-Whole Diminished':       {intervals:[0,1,3,4,6,7,9,10],family:'Symmetric',      formula:'H W H W H W H W',
+  'Half-Whole Diminished':       {intervals:[0,1,3,4,6,7,9,10],family:'Symmetric',      formula:'H W H W H W H W', specialChords:'halfwhole',
     degreeMap:[0,1,2,3,4,5,6,7],
     desc:`Eight-note symmetric scale alternating half and whole steps. Every note fits over a dominant 7♭9 chord. Repeats at every minor 3rd — four starting points produce the same set of pitches — giving it a closed, cyclic feel exploited in bebop and modern jazz.`},
-  'Whole-Half Diminished':       {intervals:[0,2,3,5,6,8,9,11],family:'Symmetric',      formula:'W H W H W H W H',
+  'Whole-Half Diminished':       {intervals:[0,2,3,5,6,8,9,11],family:'Symmetric',      formula:'W H W H W H W H', specialChords:'wholehalf',
     degreeMap:[0,1,2,3,4,5,6,7],
     desc:`Eight-note symmetric scale alternating whole and half steps. Every note fits over a diminished 7th chord. The inversion of the half-whole scale — same pitch-class set, different starting position. Ideal over fully-diminished chords and as a passing scale between keys.`},
 
@@ -3950,6 +3954,49 @@ function renderChords(scaleNotes, scaleData){
       });
       sec.appendChild(grid);
       const dv=document.createElement('div');dv.className='section-divider';sec.appendChild(dv);
+      container.appendChild(sec);
+    });
+    return;
+  }
+
+  // ── Special scales: Half-Whole (one dom7b9) and Whole-Half (dim7 per degree) ──
+  if (scaleData.specialChords === 'halfwhole') {
+    // Dominant Diminished: only propose root dom7♭9
+    const root = scaleNotes[0];
+    const dom7b9Notes = [root, scaleNotes[4], scaleNotes[6], scaleNotes[10 % scaleLen] || scaleNotes[6], scaleNotes[1]];
+    // Build as R 3 5 b7 b9 from scale tones: intervals 0,4,6,10,1
+    const noteIdxs = [0, 4, 6, 10, 1].map(iv => {
+      const pc = (rootPc + iv) % 12;
+      return scaleNotes.find(n => noteNameToPc(n) === pc) || null;
+    }).filter(Boolean);
+    const{sym,quality}=getChordSymbol(noteIdxs[0],[0,4,7,10,13]);
+    const sec=document.createElement('div'); sec.className='degree-section'; sec.id='deg-0';
+    const hdr=document.createElement('div'); hdr.className='degree-header';
+    hdr.innerHTML=`<span class="degree-num">I</span><span class="degree-name-label" style="font-size:9px;opacity:.6">Dominant Diminished — one chord only</span>`;
+    sec.appendChild(hdr);
+    const grid=document.createElement('div'); grid.className='chords-grid';
+    const card=document.createElement('div'); card.className='chord-card';
+    card.innerHTML=`<div class="chord-root">${root}<sup>7♭9</sup></div><div class="chord-quality">Dominant 7♭9</div><div class="chord-notes-row">${makeNotePills(noteIdxs)}</div><div class="chord-intervals">Intervals: 1 · 3 · 5 · ♭7 · ♭9</div>`;
+    addCardStaff(card, noteIdxs); addCardPlayBtn(card, noteIdxs); addCardAddBtn(card, root, '7♭9', 'I', noteIdxs, 'Dominant 7♭9');
+    grid.appendChild(card); sec.appendChild(grid); container.appendChild(sec);
+    return;
+  }
+  if (scaleData.specialChords === 'wholehalf') {
+    // Diminished Scale: dim7 chord per degree (stacking minor thirds)
+    scaleNotes.forEach((_,di) => {
+      const chordNotes = [scaleNotes[di], scaleNotes[(di+2)%scaleLen], scaleNotes[(di+4)%scaleLen], scaleNotes[(di+6)%scaleLen]];
+      const iv = [0,3,6,9];
+      const{sym,quality}=getChordSymbol(chordNotes[0],iv);
+      const sec=document.createElement('div'); sec.className='degree-section'; sec.id=`deg-${di}`;
+      const hdr=document.createElement('div'); hdr.className='degree-header';
+      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span>`;
+      sec.appendChild(hdr);
+      const grid=document.createElement('div'); grid.className='chords-grid';
+      const card=document.createElement('div'); card.className='chord-card'; card.style.animationDelay=`${di*.04}s`;
+      card.innerHTML=`<div class="chord-root">${chordNotes[0]}<sup>${sym}</sup></div><div class="chord-quality">${quality}</div><div class="chord-notes-row">${makeNotePills(chordNotes)}</div><div class="chord-intervals">Intervals: 1 · ♭3 · ♭5 · ♭♭7</div>`;
+      addCardStaff(card, chordNotes); addCardPlayBtn(card, chordNotes); addCardAddBtn(card, chordNotes[0], sym, romans[di], chordNotes, quality);
+      grid.appendChild(card); sec.appendChild(grid);
+      const dv=document.createElement('div'); dv.className='section-divider'; sec.appendChild(dv);
       container.appendChild(sec);
     });
     return;
@@ -9368,7 +9415,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v23 &nbsp;·&nbsp; deployed 2026-05-04 22:00</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v24 &nbsp;·&nbsp; deployed 2026-05-04 23:00</span></div>
     </div>
 
     <div class="tech-section">
@@ -10583,12 +10630,14 @@ function compMobSetTab(tab) {
   modal.classList.remove('mob-tab-edit','mob-tab-play','mob-tab-settings');
   modal.classList.add('mob-tab-' + tab);
   document.querySelectorAll('.cmob-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  if (tab === 'play' && window.innerWidth <= 600) {
+  const isTouchDevice = window.matchMedia('(hover:none) and (pointer:coarse)').matches;
+  modal.classList.toggle('mob-ls', tab === 'play' && isTouchDevice);
+  if (tab === 'play' && isTouchDevice) {
     if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {});
     if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
     }
-  } else if (tab !== 'play' && window.innerWidth <= 600) {
+  } else if (tab !== 'play' && isTouchDevice) {
     if (screen.orientation?.unlock) screen.orientation.unlock();
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
