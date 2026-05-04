@@ -10418,6 +10418,8 @@ function closeCompositions() {
   document.getElementById('comp-btn').classList.remove('active');
   document.body.style.overflow = '';
   compStopPlayback();
+  if (screen.orientation?.unlock) screen.orientation.unlock();
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
 }
 
 function compSelectId(id) {
