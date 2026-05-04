@@ -1952,7 +1952,7 @@
   #comp-modal.mob-ls.mob-tab-play #comp-pause-btn   { display:none !important; }
   #comp-modal.mob-ls.mob-tab-play #mob-scale-fret-col { grid-row:1; grid-column:2; display:flex !important; flex-direction:column !important; min-width:0 !important; overflow:hidden !important; }
   #comp-modal.mob-ls.mob-tab-play #mob-scale-switcher { display:flex !important; padding:3px 8px !important; flex-shrink:0; overflow-x:auto; }
-  #comp-modal.mob-ls.mob-tab-play #mob-fret-wrap { display:flex !important; flex:1 !important; overflow-x:auto !important; overflow-y:hidden !important; -webkit-overflow-scrolling:touch !important; min-height:0 !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-fret-wrap { display:block !important; flex:1 !important; overflow-x:auto !important; overflow-y:hidden !important; -webkit-overflow-scrolling:touch !important; min-height:0 !important; }
   #comp-modal.mob-ls.mob-tab-play #mob-fret-toggle-btn { display:none !important; }
   #comp-modal.mob-ls.mob-tab-play #mob-prog-bar { grid-row:2; grid-column:1/-1; margin:0 !important; height:2px; }
   #comp-modal.mob-ls.mob-tab-play #mob-strip-wrap { grid-row:3; grid-column:1/-1; padding:2px 8px 3px !important; border-top:1px solid var(--border2); overflow:hidden; }
@@ -2003,7 +2003,7 @@
     /* Right column: scale switcher + fretboard */
     #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; }
     #comp-modal.mob-tab-play #mob-scale-switcher  { display:flex !important; }
-    #comp-modal.mob-tab-play #mob-fret-wrap       { display:flex !important; flex:1; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; min-height:0; }
+    #comp-modal.mob-tab-play #mob-fret-wrap       { display:block !important; flex:1; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; min-height:0; }
     /* Bottom: progress bar + sequence strip spanning full width */
     #comp-modal.mob-tab-play #mob-prog-bar   { flex-basis:100%; margin:0; }
     #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; }
@@ -2504,7 +2504,7 @@ function spellScale(rootPc, intervals, scaleData) {
       const cands = PITCH_CANDIDATES[pc];
       if (cands.length === 1) return cands[0];
       if (preferSharps) return cands[0];
-      if (preferFlats && cands.length > 1) return cands[1]; // force flat spelling
+      if (preferFlats && cands.length > 1 && [1,3,6,8,10].includes(pc)) return cands[1]; // force flat spelling (skip naturals like C=PC0)
       return PREFER_FLAT_PC.has(pc) ? cands[1] : cands[0];
     });
   }
@@ -3964,8 +3964,8 @@ function renderChords(scaleNotes, scaleData){
     // Dominant Diminished: only propose root dom7♭9
     const root = scaleNotes[0];
     const dom7b9Notes = [root, scaleNotes[4], scaleNotes[6], scaleNotes[10 % scaleLen] || scaleNotes[6], scaleNotes[1]];
-    // Build as R 3 5 b7 b9 from scale tones: intervals 0,4,6,10,1
-    const noteIdxs = [0, 4, 6, 10, 1].map(iv => {
+    // Build as R 3 5 b7 b9 from scale tones: intervals 0,4,7,10,1
+    const noteIdxs = [0, 4, 7, 10, 1].map(iv => {
       const pc = (rootPc + iv) % 12;
       return scaleNotes.find(n => noteNameToPc(n) === pc) || null;
     }).filter(Boolean);
@@ -6145,9 +6145,15 @@ function makeScaleStaffSVG(noteNames, w, bright, playBtn) {
       if (i === 0) { octs.push(4); return; }
       const prev = octs[i-1];
       const {diaStep: pDS} = _parseNote(names[i-1]);
-      const prevSteps = prev * 7 + pDS;
       let oct = prev;
-      if (oct * 7 + diaStep <= prevSteps) oct++;
+      if (diaStep === pDS) {
+        // Same letter (e.g., Ab→A): use PC to decide whether to bump
+        const curPc = noteNameToPc(name);
+        const prevPc = noteNameToPc(names[i-1]);
+        if (curPc <= prevPc) oct++;
+      } else if (oct * 7 + diaStep <= prev * 7 + pDS) {
+        oct++;
+      }
       octs.push(oct);
     });
     return octs;
@@ -6283,9 +6289,16 @@ function makeChordStaffSVG(noteNames) {
     names.forEach((name, i) => {
       const {diaStep} = _parseNote(name);
       if(i===0){ octs.push(4); return; }
+      const prev = octs[i-1];
       const {diaStep:pDS} = _parseNote(names[i-1]);
-      let oct = octs[i-1];
-      if(oct*7+diaStep <= octs[i-1]*7+pDS) oct++;
+      let oct = prev;
+      if (diaStep === pDS) {
+        const curPc = noteNameToPc(name);
+        const prevPc = noteNameToPc(names[i-1]);
+        if (curPc <= prevPc) oct++;
+      } else if (oct*7+diaStep <= prev*7+pDS) {
+        oct++;
+      }
       octs.push(oct);
     });
     return octs;
@@ -9415,7 +9428,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v24 &nbsp;·&nbsp; deployed 2026-05-04 23:00</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v25 &nbsp;·&nbsp; deployed 2026-05-04 23:30</span></div>
     </div>
 
     <div class="tech-section">
@@ -10630,7 +10643,7 @@ function compMobSetTab(tab) {
   modal.classList.remove('mob-tab-edit','mob-tab-play','mob-tab-settings');
   modal.classList.add('mob-tab-' + tab);
   document.querySelectorAll('.cmob-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  const isTouchDevice = window.matchMedia('(hover:none) and (pointer:coarse)').matches;
+  const isTouchDevice = navigator.maxTouchPoints > 0;
   modal.classList.toggle('mob-ls', tab === 'play' && isTouchDevice);
   if (tab === 'play' && isTouchDevice) {
     if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {});
