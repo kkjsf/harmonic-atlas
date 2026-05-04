@@ -1087,7 +1087,7 @@
   #comp-overlay.open { display: flex; }
   #comp-modal {
     background: var(--surface); border: 1px solid var(--border2); border-top: 2px solid var(--accent); border-radius: 8px;
-    width: 100%; max-width: 860px; max-height: 88vh;
+    width: 100%; max-width: 1100px; max-height: 92vh;
     display: flex; flex-direction: column;
     box-shadow: 0 8px 40px rgba(124,111,160,.25), 0 8px 40px rgba(0,0,0,.5);
   }
@@ -1151,15 +1151,15 @@
     font-family: 'IBM Plex Mono', monospace; font-size: 8px;
     letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
   }
-  .comp-chord-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; min-height: 40px; }
+  .comp-chord-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; align-items: start; min-height: 40px; }
   .comp-chord-card {
     position: relative; background: var(--surface2);
     border: 1px solid var(--border2); border-radius: 4px;
-    padding: 6px 8px 4px; display: flex; flex-direction: column;
-    align-items: center; gap: 2px; min-width: 80px;
+    padding: 8px 10px 6px; display: flex; flex-direction: column;
+    align-items: center; gap: 3px; width: 100%;
   }
-  .comp-chord-name { font-size: 11px; font-weight: 600; color: var(--text); }
-  .comp-chord-roman { font-size: 8px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  .comp-chord-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .comp-chord-roman { font-size: 9px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
   .comp-chord-del {
     position: absolute; top: -7px; right: -7px;
     width: 15px; height: 15px; border-radius: 50%;
@@ -1240,7 +1240,7 @@
   .comp-card-toggle { font-size:8px; color:var(--muted); margin-left:auto; flex-shrink:0; }
   .comp-card-body { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
   /* Comp card notes line */
-  .comp-chord-notes { font-family:'IBM Plex Mono',monospace; font-size:8px; color:var(--dim); letter-spacing:.03em; margin-top:2px; text-align:center; line-height:1.4; }
+  .comp-chord-notes { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--dim); letter-spacing:.03em; margin-top:3px; text-align:center; line-height:1.4; }
   /* Note value + arp pattern dropdowns */
   .comp-nv-select, .comp-arp-select {
     background:var(--surface); border:1px solid var(--border2); color:var(--muted);
@@ -1264,17 +1264,8 @@
     .comp-card-toggle { display:none; }
     .comp-card-header { cursor:default; }
   }
-  /* Desktop wide: 2-column chord grid (not in compact mode) */
-  @media (min-width: 700px) {
-    .comp-chord-row:not(.compact-mode) {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: start;
-    }
-    .comp-chord-row:not(.compact-mode) .comp-chord-card {
-      width: 100%;
-    }
-  }
+  /* Compact mode overrides grid to single-column chip strip */
+  .comp-chord-row.compact-mode { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
   /* Chord reorder arrows */
   .comp-card-mv {
     background:none; border:none; color:var(--muted); cursor:pointer;
@@ -1915,6 +1906,7 @@
   .mob-scale-sw-label { font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); font-family:'IBM Plex Mono',monospace; flex-shrink:0; }
   .mob-scale-sw-btn { padding:3px 10px; border-radius:12px; border:1px solid var(--border2); background:none; color:var(--muted); font-size:11px; font-family:'IBM Plex Mono',monospace; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .12s; }
   .mob-scale-sw-btn.active { border-color:var(--accent); background:rgba(124,111,160,.15); color:var(--accent2); }
+  #mob-fret-toggle-btn { display:none; }
   #mob-fret-wrap { display:none; flex:1; overflow-x:auto; overflow-y:hidden; padding:6px 10px; align-items:center; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; min-height:80px; }
   #mob-scale-fret-col { display:none; flex-direction:column; min-width:0; overflow:hidden; }
 
@@ -1927,7 +1919,8 @@
     #comp-modal.mob-tab-play #mob-stage-scales { display:none; }
     #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex; flex:1; min-width:0; }
     #comp-modal.mob-tab-play #mob-scale-switcher { display:flex; }
-    #comp-modal.mob-tab-play #mob-fret-wrap { display:flex; }
+    #comp-modal.mob-tab-play #mob-fret-wrap { display:none !important; }
+    #comp-modal.mob-tab-play #mob-fret-wrap.mob-fret-open { display:flex !important; }
     #comp-modal.mob-tab-play #mob-prog-bar { width:100%; flex-basis:100%; margin:0; }
     #comp-modal.mob-tab-play #mob-transport { flex-basis:100%; padding:3px 20px 4px; gap:14px; }
     #comp-modal.mob-tab-play #mob-transport .mob-tbtn.play-main { width:44px; height:44px; }
@@ -1935,18 +1928,43 @@
     #comp-modal.mob-tab-play #mob-strip-lbl { display:none; }
   }
 
-  /* Desktop: always show improv/scale panel as right column */
+  /* ══ Desktop tab system ══ */
   @media (min-width:601px) {
-    #comp-mob-play-pane {
-      display:flex !important; flex-direction:column; width:280px; flex-shrink:0;
-      border-left:1px solid var(--border2); overflow:hidden;
+    /* Tab bar visible on desktop as top navigation */
+    #comp-mob-tabbar {
+      display:flex; flex-shrink:0; border-bottom:1px solid var(--border2);
+      padding:0 18px; gap:0;
     }
-    #mob-scale-fret-col { display:flex !important; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
-    #mob-scale-switcher { display:flex !important; }
-    #mob-fret-wrap { display:flex !important; flex:1; min-height:0; }
-    #mob-transport { display:none !important; }
-    #mob-strip-wrap { flex-shrink:0; border-top:1px solid var(--border2); padding:4px 0 6px; }
-    #mob-prog-bar { flex-shrink:0; }
+    .cmob-tab { flex:unset; padding:9px 22px; font-size:10px; }
+
+    /* Default (edit tab): play pane hidden */
+    #comp-mob-play-pane { display:none; }
+
+    /* ── Play tab: full-screen impro ── */
+    #comp-modal.mob-tab-play #comp-list-panel  { display:none !important; }
+    #comp-modal.mob-tab-play #comp-detail-panel { display:none !important; }
+    #comp-modal.mob-tab-play #comp-transport   { display:none !important; }
+    #comp-modal.mob-tab-play #comp-style-panel { display:none !important; }
+    #comp-modal.mob-tab-play #comp-mob-play-pane {
+      display:flex !important; width:100%;
+      flex-direction:row; flex-wrap:wrap; align-items:stretch;
+    }
+    /* Left column: chord info + pause btn */
+    #comp-modal.mob-tab-play #mob-stage {
+      width:300px; flex:0 0 300px; flex-shrink:0;
+      border-right:1px solid var(--border2); border-bottom:none;
+      padding:28px 22px; justify-content:center;
+    }
+    #comp-modal.mob-tab-play #mob-stage-name  { font-size:72px; }
+    #comp-modal.mob-tab-play #mob-stage-scales { display:none; }
+    /* Right column: scale switcher + fretboard */
+    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; }
+    #comp-modal.mob-tab-play #mob-scale-switcher  { display:flex !important; }
+    #comp-modal.mob-tab-play #mob-fret-wrap       { display:flex !important; flex:1; overflow-x:auto; overflow-y:hidden; min-height:0; }
+    /* Bottom: progress bar + sequence strip spanning full width */
+    #comp-modal.mob-tab-play #mob-prog-bar   { flex-basis:100%; margin:0; }
+    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; }
+    #comp-modal.mob-tab-play #mob-transport  { display:none !important; }
   }
 
   @media (max-width:600px) {
@@ -1973,6 +1991,10 @@
     #comp-compact-btn { display:none; }
     /* Settings section */
     #comp-settings-section { display:flex; flex-direction:column; gap:10px; }
+    /* Mobile fretboard toggle — hidden until toggled on */
+    #mob-fret-wrap { display:none !important; }
+    #mob-fret-wrap.mob-fret-open { display:flex !important; }
+    #mob-fret-toggle-btn { display:flex; }
   }
 
   /* Chord playing highlight */
@@ -5421,7 +5443,7 @@ const SC_NOTE_COL = '#6a5f90';
 // showNotes: true = note names (C, D#…), false = interval labels (R, ♭3…)
 // openPCs / strNamesTop: override for non-guitar instruments (e.g. mandolin)
 function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endFret, w,
-                                showNotes=false, openPCs=null, strNamesTop=null) {
+                                showNotes=false, openPCs=null, strNamesTop=null, strGap=16, dotR=7) {
   openPCs     = openPCs     || SC_OPEN_PC;
   strNamesTop = strNamesTop || ['e','B','G','D','A','E'];
   const numStr   = openPCs.length;
@@ -5431,9 +5453,8 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
   const numFrets = endFret - startFret;
   const padL = 24, padR = 12, padT = 18, padB = 22;
   const fretW = (w - padL - padR) / numFrets;
-  const strGap = 16;
   const h = padT + strGap * (numStr - 1) + padB;
-  const DOT_R = 7;
+  const DOT_R = dotR;
   const lc = 'rgba(255,255,255,0.14)';
 
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">`;
@@ -5491,7 +5512,7 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
         const lbl    = showNotes ? pcToName((openPc + 12) % 12) : (INTERVAL_LABEL[sem] || '?');
         const cx     = padL - DOT_R - 2;
         svg += `<circle cx="${cx}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="0.85"/>`;
-        svg += `<text x="${cx}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? 6 : 8}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${lbl}</text>`;
+        svg += `<text x="${cx}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? Math.round(DOT_R*0.85) : Math.round(DOT_R*1.1)}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${lbl}</text>`;
       }
     }
 
@@ -5507,7 +5528,7 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
       const slot   = f - startFret;
       const cx     = padL + (slot - 0.5) * fretW;
       svg += `<circle cx="${cx.toFixed(1)}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="0.85"/>`;
-      svg += `<text x="${cx.toFixed(1)}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? 6 : 8}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${lbl}</text>`;
+      svg += `<text x="${cx.toFixed(1)}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? Math.round(DOT_R*0.85) : Math.round(DOT_R*1.1)}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${lbl}</text>`;
     }
   }
 
@@ -6537,6 +6558,7 @@ let progScheduler = null;
 let progAudioCtx  = null;
 let sampler       = null;
 let samplerReady  = false;
+let _samplerReadyCbs = [];
 let progCurrentIdx = -1;
 let progDragIdx    = null;
 
@@ -6565,6 +6587,8 @@ function initSampler() {
       samplerReady = true;
       if (loading) loading.style.display = 'none';
       progAudioCtx = Tone.getContext().rawContext;
+      _samplerReadyCbs.forEach(f => f());
+      _samplerReadyCbs = [];
     }
   }).toDestination();
 }
@@ -9305,9 +9329,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div id="mob-stage-name">—</div>
           <div id="mob-stage-notes"></div>
           <div id="mob-stage-scales"></div>
+          <button id="comp-pause-btn"><svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg></button>
         </div>
         <div id="mob-scale-fret-col">
-          <div id="mob-scale-switcher"></div>
+          <div id="mob-scale-switcher">
+          </div>
           <div id="mob-fret-wrap"></div>
         </div>
         <div id="mob-prog-bar"><div id="mob-prog-fill"></div></div>
@@ -10423,7 +10449,13 @@ let _mobScaleSuggs = [];
 function compMobRenderFretboard(rootPc, intervals) {
   const wrap = document.getElementById('mob-fret-wrap');
   if (!wrap) return;
-  wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 15, 820, true);
+  const _render = () => {
+    // On desktop impro (wide container) fill the full width; minimum 900px so mobile can scroll
+    const w = wrap.offsetWidth > 200 ? Math.max(900, wrap.offsetWidth) : 900;
+    wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 12, w, true, null, null, 22, 10);
+  };
+  if (wrap.offsetWidth > 0) _render();
+  else requestAnimationFrame(_render);
 }
 
 function compMobRenderScaleSwitcher(suggs, activeIdx) {
@@ -10442,6 +10474,24 @@ function compMobRenderScaleSwitcher(suggs, activeIdx) {
     });
     sw.appendChild(btn);
   });
+  // Fret toggle button (mobile-only, re-appended each render since innerHTML is reset)
+  const fretBtn = document.createElement('button');
+  fretBtn.id = 'mob-fret-toggle-btn';
+  fretBtn.style.cssText = "padding:3px 10px;border-radius:12px;border:1px solid var(--border2);background:none;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;cursor:pointer;flex-shrink:0;transition:all .12s";
+  fretBtn.title = 'Toggle fretboard';
+  fretBtn.textContent = '⬛ fretboard';
+  fretBtn.addEventListener('click', () => {
+    const wrap = document.getElementById('mob-fret-wrap');
+    const open = wrap.classList.toggle('mob-fret-open');
+    fretBtn.textContent = open ? '✕ fretboard' : '⬛ fretboard';
+    fretBtn.style.color = open ? 'var(--accent2)' : '';
+    fretBtn.style.borderColor = open ? 'var(--accent)' : '';
+    if (open && !wrap.querySelector('svg')) {
+      const p = _parseImprovScale(_mobScaleSuggs[_mobScaleIdx]?.scale || '');
+      if (p) compMobRenderFretboard(p.rootPc, p.ivls);
+    }
+  });
+  sw.appendChild(fretBtn);
   const firstParsed = _parseImprovScale(suggs[activeIdx]?.scale || '');
   if (firstParsed) compMobRenderFretboard(firstParsed.rootPc, firstParsed.ivls);
 }
@@ -10740,21 +10790,7 @@ function compRenderDetail(comp) {
     if (e.target.value === 'guitar') initGuitarSampler();
     if (compIsPlaying) compPendingRestart = true;
   });
-  // Play / Pause / Resume
-  let compIsPaused = false;
-  document.getElementById('comp-pause-btn')?.addEventListener('click', () => {
-    if (!compIsPlaying) {
-      compStartPlayback(comp.id);
-    } else if (compIsPaused) {
-      Tone.Transport.start();
-      compIsPaused = false;
-      document.getElementById('comp-pause-btn').innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>';
-    } else {
-      Tone.Transport.pause();
-      compIsPaused = true;
-      document.getElementById('comp-pause-btn').innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>';
-    }
-  });
+  // Play / Pause / Resume — handled by static listener below
   // Global mode buttons (use noteVal select)
   [['comp-global-full','full','up'],['comp-global-arp-up','arp','up'],
    ['comp-global-arp-dn','arp','down'],['comp-global-arp-ud','arp','updown']].forEach(([btnId, mode, arpPat]) => {
@@ -11119,12 +11155,33 @@ function getImprovSuggestions(chord) {
 let _compPlayGen = 0;
 let compPendingRestart = false;
 let _compTickRaf = null;
+let _improvRaf = null;
+let compIsPaused = false;
 
 function compStartPlayback(id) {
   compStopPlayback();
   compPendingRestart = false;
+  compIsPaused = false;
   const comp = compLoad().find(c => c.id === id);
-  if (!comp || !comp.chords.length || !samplerReady) return;
+  if (!comp || !comp.chords.length) return;
+  if (!samplerReady) {
+    const playBtn = document.getElementById('comp-play-btn');
+    const pauseBtn = document.getElementById('comp-pause-btn');
+    if (playBtn && !playBtn.dataset.waiting) {
+      playBtn.dataset.waiting = '1';
+      playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Loading…';
+    }
+    if (pauseBtn && !pauseBtn.dataset.waiting) {
+      pauseBtn.dataset.waiting = '1';
+      pauseBtn.title = 'Loading samples…';
+    }
+    _samplerReadyCbs.push(() => {
+      if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; }
+      if (pauseBtn) { delete pauseBtn.dataset.waiting; pauseBtn.title = ''; }
+      compStartPlayback(id);
+    });
+    return;
+  }
   const gen = ++_compPlayGen;
 
   // Sync strum/swing from this composition
@@ -11272,6 +11329,8 @@ function compStartPlayback(id) {
 
     Tone.Transport.start('+0.05');
     compIsPlaying = true;
+    document.getElementById('comp-modal')?.classList.add('comp-playing');
+    compMobSetTab('play');
 
     const playBtn = document.getElementById('comp-play-btn');
     const stopBtn = document.getElementById('comp-stop-btn');
@@ -11307,11 +11366,13 @@ function compStartPlayback(id) {
 function compStopPlayback() {
   _compPlayGen++;
   compPendingRestart = false;
+  compIsPaused = false;
   if (_compTickRaf) { cancelAnimationFrame(_compTickRaf); _compTickRaf = null; }
   try { Tone.Transport.stop(); Tone.Transport.cancel(0); } catch(e) {}
   if (sampler) sampler.releaseAll();
   if (guitarSampler) guitarSampler.releaseAll();
   compIsPlaying = false;
+  compMobSetTab('edit');
   document.querySelectorAll('.comp-chord-card.playing').forEach(el => el.classList.remove('playing'));
   if (_improvRaf) { cancelAnimationFrame(_improvRaf); _improvRaf = null; }
   const playBtn  = document.getElementById('comp-play-btn');
@@ -11322,6 +11383,7 @@ function compStopPlayback() {
   if (pauseBtn) { pauseBtn.innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>'; }
   compMobUpdatePlayIcon(false);
   compMobUpdateStage(null, -1);
+  document.getElementById('comp-modal')?.classList.remove('comp-playing');
 }
 
 // Mobile comp transport + tabs (static listeners, use compActiveId at call time)
@@ -11343,6 +11405,19 @@ document.getElementById('mob-back-btn').addEventListener('click', () => {
 document.getElementById('mob-stop-btn2').addEventListener('click', compStopPlayback);
 document.getElementById('mob-edit-play-btn').addEventListener('click', () => {
   if (compActiveId) { compStartPlayback(compActiveId); compMobSetTab('play'); }
+});
+document.getElementById('comp-pause-btn').addEventListener('click', () => {
+  if (!compIsPlaying) {
+    if (compActiveId) compStartPlayback(compActiveId);
+  } else if (compIsPaused) {
+    Tone.Transport.start();
+    compIsPaused = false;
+    document.getElementById('comp-pause-btn').innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>';
+  } else {
+    Tone.Transport.pause();
+    compIsPaused = true;
+    document.getElementById('comp-pause-btn').innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>';
+  }
 });
 
 // Wire compositions UI
