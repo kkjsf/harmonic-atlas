@@ -1895,10 +1895,6 @@
   .mob-sc-roman { font-size:7px; color:var(--muted); }
   .mob-sc-beats { font-size:7px; color:var(--dim); }
   .mob-sc.active .mob-sc-beats { color:var(--accent); }
-  #comp-mob-edit-bar { display:none; flex-shrink:0; border-top:1px solid var(--border); background:var(--surface); padding:8px 12px 14px; gap:8px; }
-  .mob-bar-btn { flex:1; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.08em; padding:10px 0; border-radius:4px; border:1px solid var(--border2); background:none; color:var(--muted); cursor:pointer; text-align:center; transition:all .15s; }
-  .mob-bar-btn.primary { border-color:var(--accent); background:rgba(124,111,160,.15); color:var(--accent2); }
-  .mob-bar-btn:hover { border-color:var(--accent2); color:var(--accent2); }
 
   /* Chip bar — replaces sidebar for composition selection */
   #comp-chip-bar { display:flex; align-items:center; gap:6px; padding:8px 14px; border-bottom:1px solid var(--border2); overflow-x:auto; flex-shrink:0; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
@@ -1916,6 +1912,12 @@
   .mob-scale-sw-label { font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); font-family:'IBM Plex Mono',monospace; flex-shrink:0; }
   .mob-scale-sw-btn { padding:3px 10px; border-radius:12px; border:1px solid var(--border2); background:none; color:var(--muted); font-size:11px; font-family:'IBM Plex Mono',monospace; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .12s; }
   .mob-scale-sw-btn.active { border-color:var(--accent); background:rgba(124,111,160,.15); color:var(--accent2); }
+  .mob-scale-dropdown { appearance:none; background:var(--surface2); border:1px solid var(--border2); color:var(--cream); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:3px 22px 3px 8px; border-radius:12px; cursor:pointer; flex-shrink:0; outline:none; transition:border-color .12s; max-width:130px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%23c9a84c' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 7px center; }
+  #mob-scale-root-sel { max-width:52px; }
+  .mob-scale-dropdown:focus { border-color:var(--accent); }
+  .mob-scale-dropdown option { background:#1e2228; }
   #mob-fret-toggle-btn { display:none; }
   #mob-fret-wrap { display:none; flex:1; overflow-x:auto; overflow-y:hidden; padding:6px 10px; align-items:center; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; min-height:80px; }
   #mob-scale-fret-col { display:none; flex-direction:column; min-width:0; overflow:hidden; }
@@ -2009,7 +2011,6 @@
     /* Edit tab */
     #comp-modal.mob-tab-edit #comp-chord-section { display:block; }
     #comp-modal.mob-tab-edit #comp-settings-section { display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--border2); padding-top:10px; margin-top:4px; }
-    #comp-modal.mob-tab-edit #comp-mob-edit-bar { display:flex; }
     /* Play tab — keep layout visible, hide detail, show play pane */
     #comp-modal.mob-tab-play #comp-detail-panel { display:none !important; }
     #comp-modal.mob-tab-play #comp-mob-play-pane { display:flex !important; flex:1; flex-direction:column; }
@@ -9500,12 +9501,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div id="comp-style-panel"></div>
     <!-- Desktop transport footer (hidden on mobile) -->
     <div id="comp-transport"></div>
-    <!-- Mobile edit bottom bar (hidden on desktop) -->
-    <div id="comp-mob-edit-bar">
-      <button class="mob-bar-btn primary" id="mob-edit-play-btn">
-        <svg viewBox="0 0 10 12" width="10" height="10" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:5px"><polygon points="0,0 10,6 0,12"/></svg>Play
-      </button>
-    </div>
+    <!-- Mobile edit bottom bar removed — Play tab in tab bar handles landscape+fretboard -->
   </div>
 </div>
 
@@ -10613,6 +10609,21 @@ function compMobRenderFretboard(rootPc, intervals) {
   else requestAnimationFrame(_render);
 }
 
+let _mobManualScale = null;
+const _MOB_ROOT_NAMES = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+
+function _mobApplyScaleFromDropdowns() {
+  const rootSel = document.getElementById('mob-scale-root-sel');
+  const scaleSel = document.getElementById('mob-scale-type-sel');
+  if (!rootSel || !scaleSel) return;
+  const rootPc = parseInt(rootSel.value);
+  const ivls = _IMPROV_SCALE_IVLS[scaleSel.value];
+  if (isNaN(rootPc) || !ivls) return;
+  _mobManualScale = { rootPc, ivls };
+  document.querySelectorAll('.mob-scale-sw-btn').forEach(b => b.classList.remove('active'));
+  compMobRenderFretboard(rootPc, ivls);
+}
+
 function compMobRenderScaleSwitcher(suggs, activeIdx) {
   const sw = document.getElementById('mob-scale-switcher');
   if (!sw) return;
@@ -10623,12 +10634,53 @@ function compMobRenderScaleSwitcher(suggs, activeIdx) {
     btn.textContent = s.scale.replace(/^[A-G][#b♯♭]?\s/, '');
     btn.addEventListener('click', () => {
       _mobScaleIdx = i;
+      _mobManualScale = null;
       compMobRenderScaleSwitcher(_mobScaleSuggs, i);
       const p = _parseImprovScale(s.scale);
       if (p) compMobRenderFretboard(p.rootPc, p.ivls);
     });
     sw.appendChild(btn);
   });
+
+  const sep = document.createElement('span');
+  sep.style.cssText = 'width:1px;height:16px;background:var(--border2);flex-shrink:0;margin:0 2px';
+  sw.appendChild(sep);
+
+  const activeSugg = suggs[activeIdx];
+  const parsed = _mobManualScale || _parseImprovScale(activeSugg?.scale || '');
+  const curRoot = parsed?.rootPc ?? 0;
+  const curIvls = parsed?.ivls;
+  const curScaleName = curIvls ? Object.keys(_IMPROV_SCALE_IVLS).find(k => {
+    const v = _IMPROV_SCALE_IVLS[k];
+    return v.length === curIvls.length && v.every((n,i) => n === curIvls[i]);
+  }) || '' : '';
+
+  const rootSel = document.createElement('select');
+  rootSel.id = 'mob-scale-root-sel';
+  rootSel.className = 'mob-scale-dropdown';
+  _MOB_ROOT_NAMES.forEach((name, pc) => {
+    const opt = document.createElement('option');
+    opt.value = pc;
+    opt.textContent = name;
+    if (pc === curRoot) opt.selected = true;
+    rootSel.appendChild(opt);
+  });
+  rootSel.addEventListener('change', _mobApplyScaleFromDropdowns);
+  sw.appendChild(rootSel);
+
+  const scaleSel = document.createElement('select');
+  scaleSel.id = 'mob-scale-type-sel';
+  scaleSel.className = 'mob-scale-dropdown';
+  Object.keys(_IMPROV_SCALE_IVLS).forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    if (name === curScaleName) opt.selected = true;
+    scaleSel.appendChild(opt);
+  });
+  scaleSel.addEventListener('change', _mobApplyScaleFromDropdowns);
+  sw.appendChild(scaleSel);
+
   // Fret toggle button (mobile-only, re-appended each render since innerHTML is reset)
   const fretBtn = document.createElement('button');
   fretBtn.id = 'mob-fret-toggle-btn';
@@ -10642,12 +10694,12 @@ function compMobRenderScaleSwitcher(suggs, activeIdx) {
     fretBtn.style.color = open ? 'var(--accent2)' : '';
     fretBtn.style.borderColor = open ? 'var(--accent)' : '';
     if (open && !wrap.querySelector('svg')) {
-      const p = _parseImprovScale(_mobScaleSuggs[_mobScaleIdx]?.scale || '');
-      if (p) compMobRenderFretboard(p.rootPc, p.ivls);
+      const sc = _mobManualScale || _parseImprovScale(_mobScaleSuggs[_mobScaleIdx]?.scale || '');
+      if (sc) compMobRenderFretboard(sc.rootPc, sc.ivls);
     }
   });
   sw.appendChild(fretBtn);
-  const firstParsed = _parseImprovScale(suggs[activeIdx]?.scale || '');
+  const firstParsed = _mobManualScale || _parseImprovScale(suggs[activeIdx]?.scale || '');
   if (firstParsed) compMobRenderFretboard(firstParsed.rootPc, firstParsed.ivls);
 }
 
@@ -11594,9 +11646,6 @@ document.getElementById('mob-back-btn').addEventListener('click', () => {
   if (compActiveId) { compStopPlayback(); compStartPlayback(compActiveId); compMobSetTab('play'); }
 });
 document.getElementById('mob-stop-btn2').addEventListener('click', compStopPlayback);
-document.getElementById('mob-edit-play-btn').addEventListener('click', () => {
-  if (compActiveId) { compStartPlayback(compActiveId); compMobSetTab('play'); }
-});
 document.getElementById('comp-mob-edit-btn').addEventListener('click', () => compMobSetTab('edit'));
 document.getElementById('mob-bpm-input').addEventListener('change', e => {
   if (!compActiveId) return;
