@@ -1931,33 +1931,39 @@
     #comp-modal.mob-tab-play #comp-new-btn { display:none; }
     #comp-modal.mob-tab-play #comp-mob-edit-btn { display:flex; }
     #comp-modal.mob-tab-play #comp-close-btn { width:22px; height:22px; font-size:11px; }
-    /* Compact chip bar in landscape play */
-    #comp-modal.mob-tab-play #comp-chip-bar { padding:3px 10px; }
-    #comp-modal.mob-tab-play .comp-chip { padding:2px 9px; font-size:10px; }
-    #comp-modal.mob-tab-play .comp-chip-new { padding:2px 9px; font-size:10px; }
+    /* Hide chip bar — reclaim 30px of vertical space */
+    #comp-modal.mob-tab-play #comp-chip-bar { display:none !important; }
     #comp-modal.mob-tab-play #comp-mob-tabbar { display:none !important; }
-    /* Two-column play pane */
+    /* Two-column play pane; strip + transport wrap below as full-width rows */
     #comp-modal.mob-tab-play #comp-mob-play-pane { flex-direction:row !important; flex-wrap:wrap; align-items:stretch; }
-    #comp-modal.mob-tab-play #mob-stage { width:150px !important; flex:0 0 150px !important; border-right:1px solid var(--border2); border-bottom:none; padding:8px 10px; justify-content:center; flex-shrink:0; }
-    #comp-modal.mob-tab-play #mob-stage-name { font-size:36px !important; }
+    #comp-modal.mob-tab-play #mob-stage { width:110px !important; flex:0 0 110px !important; border-right:1px solid var(--border2); border-bottom:none; padding:6px 8px; justify-content:center; flex-shrink:0; }
+    #comp-modal.mob-tab-play #mob-stage-name { font-size:28px !important; }
+    #comp-modal.mob-tab-play #mob-stage-roman { font-size:10px !important; }
+    #comp-modal.mob-tab-play #mob-stage-notes { font-size:9px !important; }
     #comp-modal.mob-tab-play #mob-stage-scales { display:none !important; }
     #comp-modal.mob-tab-play #comp-pause-btn { display:none !important; }
     #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; }
-    #comp-modal.mob-tab-play #mob-scale-switcher { display:flex !important; }
-    /* Fretboard always visible in landscape */
+    #comp-modal.mob-tab-play #mob-scale-switcher { display:flex !important; padding:4px 8px; }
+    /* Fretboard fills right column */
     #comp-modal.mob-tab-play #mob-fret-wrap { display:flex !important; flex:1; overflow-x:auto; overflow-y:hidden; min-height:0; }
     #comp-modal.mob-tab-play #mob-fret-toggle-btn { display:none !important; }
-    /* Chord strip inside right column */
-    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; padding:4px 12px 6px; border-top:1px solid var(--border2); }
+    /* Strip + progress below as thin full-width rows */
+    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; padding:3px 10px 4px; border-top:1px solid var(--border2); }
     #comp-modal.mob-tab-play #mob-strip-lbl { display:none !important; }
+    #comp-modal.mob-tab-play #mob-strip { gap:5px; }
+    #comp-modal.mob-tab-play .mob-sc { width:50px; padding:4px 3px 3px; }
+    #comp-modal.mob-tab-play .mob-sc-name { font-size:10px; }
+    #comp-modal.mob-tab-play .mob-sc-roman { font-size:6px; }
+    #comp-modal.mob-tab-play .mob-sc-beats { display:none; }
     #comp-modal.mob-tab-play #mob-prog-bar { width:100%; flex-basis:100%; margin:0; }
-    /* Transport footer — landscape style matching mockup */
-    #comp-overlay #comp-modal.mob-tab-play #mob-transport { display:flex !important; flex-basis:100%; padding:6px 14px; gap:8px; justify-content:center; align-items:center; border-top:1px solid var(--border2); }
-    #comp-modal.mob-tab-play #mob-transport .mob-tbtn { width:36px; height:36px; border-radius:4px; }
-    #comp-modal.mob-tab-play #mob-transport .mob-tbtn.play-main { width:auto !important; height:auto !important; border-radius:4px; flex:1; padding:7px 16px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.06em; gap:6px; }
+    /* Transport — compact single row */
+    #comp-overlay #comp-modal.mob-tab-play #mob-transport { display:flex !important; flex-basis:100%; padding:4px 12px; gap:6px; justify-content:center; align-items:center; border-top:1px solid var(--border2); }
+    #comp-modal.mob-tab-play #mob-transport .mob-tbtn { width:32px; height:32px; border-radius:4px; }
+    #comp-modal.mob-tab-play #mob-transport .mob-tbtn.play-main { width:auto !important; height:32px !important; border-radius:4px; flex:1; padding:4px 14px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; gap:5px; }
     #comp-modal.mob-tab-play .mob-play-label { display:inline; }
-    #comp-modal.mob-tab-play #mob-bpm-wrap { display:flex !important; align-items:center; gap:4px; }
-    #comp-modal.mob-tab-play #mob-loop-btn { display:flex !important; width:36px; height:36px; border-radius:4px; }
+    #comp-modal.mob-tab-play #mob-bpm-wrap { display:flex !important; align-items:center; gap:3px; }
+    #comp-modal.mob-tab-play .mob-bpm-input { width:40px; font-size:11px; padding:3px; }
+    #comp-modal.mob-tab-play #mob-loop-btn { display:flex !important; width:32px; height:32px; border-radius:4px; }
     #comp-modal.mob-tab-play #mob-loop-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(124,111,160,.1); }
   }
 
@@ -9349,7 +9355,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v21 &nbsp;·&nbsp; deployed 2026-05-04 21:00</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v22 &nbsp;·&nbsp; deployed 2026-05-04 21:30</span></div>
     </div>
 
     <div class="tech-section">
@@ -10604,7 +10610,7 @@ function compMobRenderFretboard(rootPc, intervals) {
   if (!wrap) return;
   const _render = () => {
     // Fixed 900px width — frets 0-7 zoomed in, container scrolls laterally
-    wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 7, 900, true, null, null, 28, 13);
+    wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 7, 900, true, null, null, 24, 11);
   };
   if (wrap.offsetWidth > 0) _render();
   else requestAnimationFrame(_render);
