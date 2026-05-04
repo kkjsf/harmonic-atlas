@@ -1922,8 +1922,8 @@
   #mob-fret-wrap { display:none; flex:1; overflow-x:auto; overflow-y:hidden; padding:6px 10px; align-items:center; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; min-height:80px; }
   #mob-scale-fret-col { display:none; flex-direction:column; min-width:0; overflow:hidden; }
 
-  /* Landscape play layout — triggered by orientation media query + play tab class */
-  @media (orientation:landscape) and (max-height:560px) {
+  /* Landscape play layout — touch mobile in landscape (hover:none targets touch-only devices) */
+  @media (orientation:landscape) and (hover:none) and (pointer:coarse) {
     #comp-modal.mob-tab-play { position:fixed; inset:0; border-radius:0; max-height:100vh; flex-direction:column; }
     /* Compact header in landscape play */
     #comp-modal.mob-tab-play #comp-modal-header { padding:5px 10px; gap:6px; }
@@ -2475,9 +2475,9 @@ function spellScale(rootPc, intervals, scaleData) {
   let rootName = rootCandidates[0];
   if(!preferSharps && PREFER_FLAT_PC.has(rootPc%12) && rootCandidates.length > 1) rootName = rootCandidates[1];
 
-  // Hexatonic (6-note, e.g. whole-tone): use ascending-letter spelling like heptatonic
-  // so C whole-tone = C D E F# G# A# (not C D E Gb Ab Bb)
-  if (n === 6) {
+  // Hexatonic (6-note): ascending-letter only for sharp-preferring scales (e.g. Whole Tone)
+  // Flat-based scales (e.g. Blues) use the simple enharmonic path below
+  if (n === 6 && preferSharps) {
     const result6 = [rootName];
     const rootLi = letterIndex(rootName);
     for (let i = 1; i < 6; i++) {
@@ -2494,11 +2494,13 @@ function spellScale(rootPc, intervals, scaleData) {
 
   // For pentatonic / short scales AND octatonic scales: use simple enharmonic spelling
   if (n !== 7) {
+    const preferFlats = scaleData && scaleData.preferFlats;
     return intervals.map(iv => {
       const pc = (rootPc + iv) % 12;
       const cands = PITCH_CANDIDATES[pc];
       if (cands.length === 1) return cands[0];
-      if (preferSharps) return cands[0]; // always sharp
+      if (preferSharps) return cands[0];
+      if (preferFlats && cands.length > 1) return cands[1]; // force flat spelling
       return PREFER_FLAT_PC.has(pc) ? cands[1] : cands[0];
     });
   }
@@ -2608,7 +2610,7 @@ const SCALES = {
   'Minor Pentatonic':            {intervals:[0,3,5,7,10],      family:'Pentatonic',     formula:'m3 W W m3 W', pentatonic:true,
     degreeMap:[0,2,3,4,6],
     desc:`Five notes — 1 ♭3 4 5 ♭7. The backbone of blues, rock, and R&B soloing. The absence of the 2nd and 6th removes harmonic tension, leaving only the most expressive blue-note-adjacent tones.`},
-  'Blues':                       {intervals:[0,3,5,6,7,10],    family:'Pentatonic',     formula:'m3 W H H m3 W', pentatonic:true,
+  'Blues':                       {intervals:[0,3,5,6,7,10],    family:'Pentatonic',     formula:'m3 W H H m3 W', pentatonic:true, preferFlats:true,
     degreeMap:[0,2,3,3,4,6],
     desc:`Minor pentatonic with an added ♭5 (the "blue note" — tritone from root). That passing semitone between 4 and 5 is the defining color of blues, soul, and jazz — a chromatic smear that defies functional harmony.`},
 
@@ -2695,16 +2697,27 @@ function romanNumeral(scaleIntervals, degIdx, iv3, iv5, scaleData) {
 function buildChord(scaleNotes, degree, numNotes) {
   const n = scaleNotes.length;
   const c = [];
-  for(let i=0;i<numNotes;i++) c.push(scaleNotes[(degree+i*2)%n]);
+  const usedIdx = new Set();
+  for(let i=0;i<numNotes;i++) {
+    const idx = (degree+i*2)%n;
+    if (usedIdx.has(idx)) break;
+    usedIdx.add(idx);
+    c.push(scaleNotes[idx]);
+  }
   return c;
 }
 
 function chordIntervals(scaleIntervals, degree, numNotes) {
   const n = scaleIntervals.length;
   const r = [0]; let acc = 0;
+  const usedIdx = new Set([(degree)%n]);
   for(let i=1;i<numNotes;i++){
-    const prev = scaleIntervals[(degree+(i-1)*2)%n];
-    const cur  = scaleIntervals[(degree+i*2)%n];
+    const prevIdx = (degree+(i-1)*2)%n;
+    const curIdx  = (degree+i*2)%n;
+    if (usedIdx.has(curIdx)) break;
+    usedIdx.add(curIdx);
+    const prev = scaleIntervals[prevIdx];
+    const cur  = scaleIntervals[curIdx];
     let step = (cur-prev+12)%12;
     if(step===0) step=12;
     acc+=step; r.push(acc);
@@ -9355,7 +9368,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v22 &nbsp;·&nbsp; deployed 2026-05-04 21:30</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v23 &nbsp;·&nbsp; deployed 2026-05-04 22:00</span></div>
     </div>
 
     <div class="tech-section">
