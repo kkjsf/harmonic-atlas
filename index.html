@@ -11632,7 +11632,9 @@ function compStopPlayback() {
 // Mobile comp transport + tabs (static listeners, use compActiveId at call time)
 document.getElementById('comp-mob-tabbar').addEventListener('click', e => {
   const tab = e.target.closest('.cmob-tab')?.dataset.tab;
-  if (tab) compMobSetTab(tab);
+  if (!tab) return;
+  if (tab === 'play' && compActiveId && !compIsPlaying) compStartPlayback(compActiveId);
+  compMobSetTab(tab);
 });
 document.getElementById('mob-play-btn').addEventListener('click', () => {
   if (!compIsPlaying) {
