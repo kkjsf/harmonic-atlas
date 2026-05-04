@@ -9349,7 +9349,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v20 &nbsp;·&nbsp; deployed 2026-05-04</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v21 &nbsp;·&nbsp; deployed 2026-05-04 21:00</span></div>
     </div>
 
     <div class="tech-section">
@@ -10603,9 +10603,8 @@ function compMobRenderFretboard(rootPc, intervals) {
   const wrap = document.getElementById('mob-fret-wrap');
   if (!wrap) return;
   const _render = () => {
-    // On desktop impro (wide container) fill the full width; minimum 900px so mobile can scroll
-    const w = wrap.offsetWidth > 200 ? Math.max(900, wrap.offsetWidth) : 900;
-    wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 12, w, true, null, null, 22, 10);
+    // Fixed 900px width — frets 0-7 zoomed in, container scrolls laterally
+    wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 7, 900, true, null, null, 28, 13);
   };
   if (wrap.offsetWidth > 0) _render();
   else requestAnimationFrame(_render);
@@ -10747,7 +10746,10 @@ function compMobUpdateStage(chord, idx) {
   // Highlight active strip card
   document.querySelectorAll('.mob-sc').forEach((el, j) => el.classList.toggle('active', j === idx));
   const activeCard = document.querySelector('.mob-sc.active');
-  activeCard?.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+  if (activeCard) {
+    const strip = document.getElementById('mob-strip');
+    if (strip) strip.scrollLeft = activeCard.offsetLeft - strip.offsetWidth / 2 + activeCard.offsetWidth / 2;
+  }
 }
 
 function compMobUpdatePlayIcon(playing) {
