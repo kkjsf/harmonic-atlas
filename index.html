@@ -1105,6 +1105,11 @@
     font-size: 10px; font-family: 'IBM Plex Mono', monospace; transition: all .15s;
   }
   #comp-new-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  #comp-mob-edit-btn {
+    display:none; background:none; border:1px solid var(--border2); color:var(--muted);
+    cursor:pointer; border-radius:3px; padding:3px 8px; font-size:10px; transition:all .15s; flex-shrink:0;
+  }
+  #comp-mob-edit-btn:hover { border-color:var(--accent2); color:var(--accent2); }
   #comp-close-btn {
     background: none; border: 1px solid var(--border2); color: var(--muted);
     cursor: pointer; border-radius: 50%; width: 26px; height: 26px;
@@ -1874,6 +1879,11 @@
   .mob-tbtn { width:44px; height:44px; border-radius:50%; border:1px solid var(--border2); background:none; color:var(--muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .15s; }
   .mob-tbtn.play-main { width:58px; height:58px; border-color:var(--accent); background:rgba(124,111,160,.18); color:var(--accent2); }
   .mob-tbtn:hover { border-color:var(--accent2); color:var(--accent2); }
+  .mob-play-label { display:none; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.06em; }
+  #mob-bpm-wrap { display:none; align-items:center; gap:4px; }
+  .mob-bpm-input { width:48px; background:var(--surface2); border:1px solid var(--border2); color:var(--text); border-radius:3px; padding:5px 4px; font-size:13px; font-family:'IBM Plex Mono',monospace; text-align:center; outline:none; }
+  .mob-bpm-label { font-size:10px; color:var(--muted); font-family:'IBM Plex Mono',monospace; letter-spacing:.1em; }
+  #mob-loop-btn { display:none; }
   #mob-strip-wrap { flex-shrink:0; border-top:1px solid var(--border); background:var(--surface); padding:8px 0 16px; }
   #mob-strip-lbl { font-size:7px; letter-spacing:.14em; color:var(--dim); text-transform:uppercase; padding:0 14px 6px; }
   #mob-strip { display:flex; gap:7px; padding:0 14px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
@@ -1913,19 +1923,40 @@
   /* Landscape play layout — triggered by orientation media query + play tab class */
   @media (orientation:landscape) and (max-height:560px) {
     #comp-modal.mob-tab-play { position:fixed; inset:0; border-radius:0; max-height:100vh; flex-direction:column; }
-    #comp-modal.mob-tab-play #comp-mob-play-pane { flex-direction:row; flex-wrap:wrap; align-items:stretch; }
-    #comp-modal.mob-tab-play #mob-stage { width:150px; flex:0 0 150px; border-right:1px solid var(--border2); border-bottom:none; padding:8px 10px; justify-content:center; flex-shrink:0; }
-    #comp-modal.mob-tab-play #mob-stage-name { font-size:36px; }
-    #comp-modal.mob-tab-play #mob-stage-scales { display:none; }
-    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex; flex:1; min-width:0; }
-    #comp-modal.mob-tab-play #mob-scale-switcher { display:flex; }
-    #comp-modal.mob-tab-play #mob-fret-wrap { display:none !important; }
-    #comp-modal.mob-tab-play #mob-fret-wrap.mob-fret-open { display:flex !important; }
+    /* Compact header in landscape play */
+    #comp-modal.mob-tab-play #comp-modal-header { padding:5px 10px; gap:6px; }
+    #comp-modal.mob-tab-play #comp-modal-title { font-size:9px; }
+    #comp-modal.mob-tab-play #comp-new-btn { display:none; }
+    #comp-modal.mob-tab-play #comp-mob-edit-btn { display:flex; }
+    #comp-modal.mob-tab-play #comp-close-btn { width:22px; height:22px; font-size:11px; }
+    /* Compact chip bar in landscape play */
+    #comp-modal.mob-tab-play #comp-chip-bar { padding:3px 10px; }
+    #comp-modal.mob-tab-play .comp-chip { padding:2px 9px; font-size:10px; }
+    #comp-modal.mob-tab-play .comp-chip-new { padding:2px 9px; font-size:10px; }
+    #comp-modal.mob-tab-play #comp-mob-tabbar { display:none !important; }
+    /* Two-column play pane */
+    #comp-modal.mob-tab-play #comp-mob-play-pane { flex-direction:row !important; flex-wrap:wrap; align-items:stretch; }
+    #comp-modal.mob-tab-play #mob-stage { width:150px !important; flex:0 0 150px !important; border-right:1px solid var(--border2); border-bottom:none; padding:8px 10px; justify-content:center; flex-shrink:0; }
+    #comp-modal.mob-tab-play #mob-stage-name { font-size:36px !important; }
+    #comp-modal.mob-tab-play #mob-stage-scales { display:none !important; }
+    #comp-modal.mob-tab-play #comp-pause-btn { display:none !important; }
+    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; }
+    #comp-modal.mob-tab-play #mob-scale-switcher { display:flex !important; }
+    /* Fretboard always visible in landscape */
+    #comp-modal.mob-tab-play #mob-fret-wrap { display:flex !important; flex:1; overflow-x:auto; overflow-y:hidden; min-height:0; }
+    #comp-modal.mob-tab-play #mob-fret-toggle-btn { display:none !important; }
+    /* Chord strip inside right column */
+    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; padding:4px 12px 6px; border-top:1px solid var(--border2); }
+    #comp-modal.mob-tab-play #mob-strip-lbl { display:none !important; }
     #comp-modal.mob-tab-play #mob-prog-bar { width:100%; flex-basis:100%; margin:0; }
-    #comp-modal.mob-tab-play #mob-transport { flex-basis:100%; padding:3px 20px 4px; gap:14px; }
-    #comp-modal.mob-tab-play #mob-transport .mob-tbtn.play-main { width:44px; height:44px; }
-    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; padding:3px 0 6px; }
-    #comp-modal.mob-tab-play #mob-strip-lbl { display:none; }
+    /* Transport footer — landscape style matching mockup */
+    #comp-overlay #comp-modal.mob-tab-play #mob-transport { display:flex !important; flex-basis:100%; padding:6px 14px; gap:8px; justify-content:center; align-items:center; border-top:1px solid var(--border2); }
+    #comp-modal.mob-tab-play #mob-transport .mob-tbtn { width:36px; height:36px; border-radius:4px; }
+    #comp-modal.mob-tab-play #mob-transport .mob-tbtn.play-main { width:auto !important; height:auto !important; border-radius:4px; flex:1; padding:7px 16px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.06em; gap:6px; }
+    #comp-modal.mob-tab-play .mob-play-label { display:inline; }
+    #comp-modal.mob-tab-play #mob-bpm-wrap { display:flex !important; align-items:center; gap:4px; }
+    #comp-modal.mob-tab-play #mob-loop-btn { display:flex !important; width:36px; height:36px; border-radius:4px; }
+    #comp-modal.mob-tab-play #mob-loop-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(124,111,160,.1); }
   }
 
   /* ══ Desktop tab system ══ */
@@ -1982,6 +2013,8 @@
     /* Play tab — keep layout visible, hide detail, show play pane */
     #comp-modal.mob-tab-play #comp-detail-panel { display:none !important; }
     #comp-modal.mob-tab-play #comp-mob-play-pane { display:flex !important; flex:1; flex-direction:column; }
+    #comp-modal.mob-tab-play #mob-bpm-wrap { display:flex; }
+    #comp-modal.mob-tab-play #mob-loop-btn { display:flex; }
     /* Accordion-style chord cards on mobile */
     #comp-chord-section .comp-chord-row { display:flex !important; flex-direction:column; gap:5px; align-items:stretch; }
     #comp-chord-section .comp-chord-card { width:100%; min-width:unset; border-radius:5px; }
@@ -2560,9 +2593,33 @@ const SCALES = {
 
   'Arabian':                     {intervals:[0,2,4,5,6,8,10],  family:'Exotic Scales',  formula:'W W H H W W W',
     desc:`A symmetrical scale combining a Lydian tetrachord (♯4) with a Phrygian upper tetrachord (♭6, ♭7). The ♯4 and ♭5 in close proximity give it an exotic, unstable, Middle-Eastern flavour unlike any European mode.`},
+
+  // Pentatonic / blues
+  'Major Pentatonic':            {intervals:[0,2,4,7,9],       family:'Pentatonic',     formula:'W W m3 W m3', pentatonic:true,
+    degreeMap:[0,1,2,4,5],
+    desc:`Five notes, zero avoid notes — 1 2 3 5 6. The most universally consonant scale: no half-steps, no tritone. Works over major chords in any style and is the foundation of country, pop, and gospel melody.`},
+  'Minor Pentatonic':            {intervals:[0,3,5,7,10],      family:'Pentatonic',     formula:'m3 W W m3 W', pentatonic:true,
+    degreeMap:[0,2,3,4,6],
+    desc:`Five notes — 1 ♭3 4 5 ♭7. The backbone of blues, rock, and R&B soloing. The absence of the 2nd and 6th removes harmonic tension, leaving only the most expressive blue-note-adjacent tones.`},
+  'Blues':                       {intervals:[0,3,5,6,7,10],    family:'Pentatonic',     formula:'m3 W H H m3 W', pentatonic:true,
+    degreeMap:[0,2,3,3,4,6],
+    desc:`Minor pentatonic with an added ♭5 (the "blue note" — tritone from root). That passing semitone between 4 and 5 is the defining color of blues, soul, and jazz — a chromatic smear that defies functional harmony.`},
+
+  // Symmetric diminished
+  'Half-Whole Diminished':       {intervals:[0,1,3,4,6,7,9,10],family:'Symmetric',      formula:'H W H W H W H W',
+    degreeMap:[0,1,2,3,4,5,6,7],
+    desc:`Eight-note symmetric scale alternating half and whole steps. Every note fits over a dominant 7♭9 chord. Repeats at every minor 3rd — four starting points produce the same set of pitches — giving it a closed, cyclic feel exploited in bebop and modern jazz.`},
+  'Whole-Half Diminished':       {intervals:[0,2,3,5,6,8,9,11],family:'Symmetric',      formula:'W H W H W H W H',
+    degreeMap:[0,1,2,3,4,5,6,7],
+    desc:`Eight-note symmetric scale alternating whole and half steps. Every note fits over a diminished 7th chord. The inversion of the half-whole scale — same pitch-class set, different starting position. Ideal over fully-diminished chords and as a passing scale between keys.`},
+
+  // Bebop
+  'Bebop Dominant':              {intervals:[0,2,4,5,7,9,10,11],family:'Exotic Scales',  formula:'W W H W W H H H',
+    degreeMap:[0,1,2,3,4,5,6,7],
+    desc:`Mixolydian with an added major 7th chromatic passing tone. The extra note places chord tones (1 3 5 ♭7) on every downbeat when descending eighth notes start on the beat — the bebop language in a nutshell. Identical to Mixolydian in pitch content; the chromatic 7th is the voice-leading glue.`},
 };
 
-const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Exotic Scales'];
+const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Exotic Scales','Pentatonic','Symmetric'];
 
 const DEGREE_NAMES_7 = ['Tonic','Supertonic','Mediant','Subdominant','Dominant','Submediant','Leading Tone'];
 const DEGREE_NAMES_5 = ['Tonic','II','III','IV','V'];
@@ -2664,6 +2721,7 @@ function iName(s){
 // When perfect 5th (7) is present, semitone 8 is ♭6 not ♯5
 function iNameCtx(s, iv) {
   if (s === 8 && iv.includes(7)) return '♭6';
+  if (s === 6 && iv.includes(7)) return '♯11';
   return iName(s);
 }
 
@@ -3713,17 +3771,23 @@ function addCardAddBtn(card, name, sym, roman, notes, quality) {
 
 // ── Jazz impro scale suggestions ──
 const IMPRO_MAP = [
-  { match: q => q.includes('Aug Dominant') || (q.includes('7') && q.includes('♯5') && !q.includes('Δ')), scales: ['Whole Tone', 'Lydian Augmented'] },
+  { match: q => q.includes('Aug Dominant') || (q.includes('7') && q.includes('♯5') && !q.includes('Δ')), scales: ['Altered (Super Locrian)', 'Whole Tone'] },
   { match: q => q.includes('Dom') && q.includes('♭9') && q.includes('♯11'), scales: ['Altered (Super Locrian)'] },
-  { match: q => q.includes('Dom') && q.includes('♭9'),  scales: ['Phrygian Dominant', 'Altered (Super Locrian)'] },
-  { match: q => q.includes('Dom') && q.includes('♯9'),  scales: ['Altered (Super Locrian)', 'Lydian Dominant'] },
-  { match: q => q.includes('Dom') && q.includes('♯11'), scales: ['Lydian Dominant', 'Whole Tone'] },
+  { match: q => q.includes('Dom') && q.includes('♭9'),  scales: ['Half-Whole Diminished', 'Phrygian Dominant'] },
+  { match: q => q.includes('Dom') && q.includes('♯9'),  scales: ['Altered (Super Locrian)', 'Half-Whole Diminished'] },
+  { match: q => q.includes('Dom') && q.includes('♯11'), scales: ['Lydian Dominant'] },
+  { match: q => q.includes('Dom') && q.includes('♭13'), scales: ['Mixolydian ♭6', 'Altered (Super Locrian)'] },
+  { match: q => /alt/i.test(q),                          scales: ['Altered (Super Locrian)'] },
   { match: q => (q.includes('Dom') || q.includes('Dominant')) && !q.includes('sus'), scales: ['Mixolydian', 'Lydian Dominant'] },
-  { match: q => q.includes('Minor-Major') || q.includes('mΔ'), scales: ['Harmonic Minor', 'Melodic Minor (Ascending)'] },
-  { match: q => q.includes('Half-Dim') || q.includes('ø'),    scales: ['Locrian ♮2 (Half-Diminished)', 'Locrian'] },
-  { match: q => q.includes('Diminished 7th'),                 scales: ['Altered (Super Locrian)'] },
+  { match: q => q.includes('Minor-Major') || q.includes('mΔ'), scales: ['Melodic Minor'] },
+  { match: q => q.includes('Minor 6'),                        scales: ['Melodic Minor', 'Dorian'] },
+  { match: q => q.includes('Half-Dim') || q.includes('ø'),    scales: ['Half-Diminished (Locrian ♮2)', 'Locrian'] },
+  { match: q => q.includes('Diminished 7th'),                 scales: ['Whole-Half Diminished'] },
   { match: q => q.includes('Augmented Δ'),                    scales: ['Lydian Augmented'] },
-  { match: q => q.includes('Major 7') || q.includes('Δ'),     scales: ['Lydian', 'Major (Ionian)'] },
+  { match: q => q.includes('Augmented'),                      scales: ['Whole Tone', 'Lydian Augmented'] },
+  { match: q => q.includes('Major 7') && q.includes('♯11'),   scales: ['Lydian'] },
+  { match: q => q.includes('Major 7') || q.includes('Δ'),     scales: ['Major (Ionian)', 'Lydian'] },
+  { match: q => q.includes('Major 6'),                        scales: ['Major (Ionian)', 'Major Pentatonic'] },
   { match: q => q.includes('Minor'),                          scales: ['Dorian', 'Aeolian (Natural Minor)'] },
   { match: q => q.includes('Major'),                          scales: ['Major (Ionian)', 'Lydian'] },
 ];
@@ -4025,6 +4089,27 @@ function renderChords(scaleNotes, scaleData){
           if (improDiv) card.appendChild(improDiv);
         }
         grid.appendChild(card);
+        // Δ7♯11 alt: shown when base is plain Maj7 and ♯11 is diatonic
+        if (n >= 4 && sym === 'Δ7' && rPc >= 0) {
+          const scPcs = new Set(scaleData.intervals.map(i => (rootPc + i) % 12));
+          if (scPcs.has((rPc + 6) % 12)) {
+            const altIv = [0,4,7,11,6];
+            const altNotes = spellChordFromRoot(rPc, chordNotes[0], altIv);
+            const altCard = document.createElement('div');
+            altCard.className = 'chord-card';
+            altCard.style.cssText = `animation-delay:${di*.04+.06}s;border-color:rgba(124,111,160,.3)`;
+            altCard.innerHTML = `
+              <div style="font-size:7px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;font-family:'IBM Plex Mono',monospace">alt voicing</div>
+              <div class="chord-root">${altNotes[0]}<sup>Δ7♯11</sup></div>
+              <div class="chord-quality">Major 7♯11 (Lydian chord)</div>
+              <div class="chord-notes-row">${makeNotePills(altNotes)}</div>
+              <div class="chord-intervals">Intervals: 1 · ${altIv.slice(1).map(s => iNameCtx(s, altIv)).join(' · ')}</div>`;
+            addCardStaff(altCard, altNotes);
+            addCardPlayBtn(altCard, altNotes);
+            addCardAddBtn(altCard, altNotes[0], 'Δ7♯11', romans[di], altNotes, 'Major 7♯11');
+            grid.appendChild(altCard);
+          }
+        }
       }
       sec.appendChild(grid);
     }
@@ -5003,6 +5088,21 @@ function renderDiagrams(scaleNotes, scaleData) {
         grid.appendChild(wrap);
       } else {
         grid.appendChild(mainCard);
+        // Δ7♯11 alt diagram: plain Maj7 + ♯11 diatonic
+        if (!isOthers && n >= 4 && ch.sym === 'Δ7' && chRootPc >= 0) {
+          const scPcs = new Set(scaleData.intervals.map(i => (parseInt(state.key) + i) % 12));
+          if (scPcs.has((chRootPc + 6) % 12)) {
+            const altIv = [0,4,7,11,6];
+            const altNotes = spellChordFromRoot(chRootPc, ch.notes[0], altIv);
+            const altCard = makeDiagCard(chRootPc, altNotes, 'Δ7♯11', 'Major 7♯11', altIv, ci*.05+.06);
+            const tag = document.createElement('div');
+            tag.style.cssText = 'font-size:7px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;font-family:"IBM Plex Mono",monospace;';
+            tag.textContent = 'alt voicing';
+            altCard.insertBefore(tag, altCard.firstChild);
+            altCard.style.borderColor = 'rgba(124,111,160,.3)';
+            grid.appendChild(altCard);
+          }
+        }
       }
     });
 
@@ -6496,6 +6596,41 @@ function renderMandolin(scaleNotes, scaleData) {
       notesDiv.textContent = displayNotes.join(' · ');
       card.appendChild(notesDiv);
       grid.appendChild(card);
+      // Δ7♯11 alt voicing
+      if (!isOthers && !isChromatic && n >= 4 && ch.sym === 'Δ7' && chRootPc >= 0) {
+        const scPcs = new Set(scaleData.intervals.map(i => (rootPc + i) % 12));
+        if (scPcs.has((chRootPc + 6) % 12)) {
+          const altIv = [0,4,7,11,6];
+          const altNotes = spellChordFromRoot(chRootPc, ch.notes[0], altIv);
+          const altVoicing = getMandolinVoicing(chRootPc, altIv);
+          const altCard = document.createElement('div');
+          altCard.className = 'diag-card';
+          altCard.style.cssText = `animation-delay:${ci*0.05+0.06}s;border-color:rgba(124,111,160,.3)`;
+          const altTag = document.createElement('div');
+          altTag.style.cssText = 'font-size:7px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;font-family:"IBM Plex Mono",monospace;';
+          altTag.textContent = 'alt voicing';
+          altCard.appendChild(altTag);
+          let altDiagHTML = `<div style="color:var(--muted);font-size:10px;padding:20px 0;text-align:center">-</div>`;
+          let altDisplayNotes = altNotes;
+          if (altVoicing) {
+            altDiagHTML = makeMandoDiagram(altVoicing.frets4, altVoicing.pcs4, chRootPc, 116);
+            const voicedPcs = new Set(altVoicing.pcs4.filter(p=>p!==-1).map(p=>((p%12)+12)%12));
+            const filtered = altNotes.filter(n => voicedPcs.has(((noteNameToPc(n))%12+12)%12));
+            if (filtered.length) altDisplayNotes = filtered;
+          }
+          const altName = document.createElement('div'); altName.className = 'diag-chord-name';
+          altName.innerHTML = `${altNotes[0]}<sup>Δ7♯11</sup>`;
+          altCard.appendChild(altName);
+          const altQual = document.createElement('div'); altQual.className = 'diag-quality';
+          altQual.textContent = 'Major 7♯11';
+          altCard.appendChild(altQual);
+          altCard.insertAdjacentHTML('beforeend', altDiagHTML);
+          const altNotesDiv = document.createElement('div'); altNotesDiv.className = 'diag-notes';
+          altNotesDiv.textContent = altDisplayNotes.join(' · ');
+          altCard.appendChild(altNotesDiv);
+          grid.appendChild(altCard);
+        }
+      }
     });
 
     sec.appendChild(grid);
@@ -9226,7 +9361,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
     <div class="tech-section">
       <div class="tech-section-title">Chord Theory Engine</div>
-      <div class="tech-row"><span class="tech-key">Scale data</span><span class="tech-val">29 scales encoded as interval arrays. Families: Major modes (7), Harmonic Minor (7), Melodic Minor (7), Exotic (8 inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop). 5–8 note scales supported.</span></div>
+      <div class="tech-row"><span class="tech-key">Scale data</span><span class="tech-val">35 scales encoded as interval arrays. Families: Major modes (7), Harmonic Minor (7), Melodic Minor (7), Exotic (9 inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop, Bebop Dominant), Pentatonic (3: Major, Minor, Blues), Symmetric (2: Half-Whole, Whole-Half dim). 5–8 note scales supported.</span></div>
       <div class="tech-row"><span class="tech-key">Chord stacking</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">chordIntervals()</code> - iterative stacking of thirds by scale degree; handles wrap-around octave context</span></div>
       <div class="tech-row"><span class="tech-key">Chord naming</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> - recursive classifier; N=3 triads → N=7 full 13th chords. Lead-sheet standard: maj7/m7/7/ø7/dim7; cumulative extensions; alterations suffix.</span></div>
       <div class="tech-row"><span class="tech-key">Enharmonic spelling</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spellScale()</code> - sequential letter assignment for heptatonic; PREFER_FLAT_PC set for pentatonic</span></div>
@@ -9310,6 +9445,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div id="comp-modal-header">
       <span id="comp-modal-title">Compositions</span>
       <button id="comp-new-btn">+ New</button>
+      <button id="comp-mob-edit-btn" title="Back to edit">✏</button>
       <button id="comp-close-btn">×</button>
     </div>
     <!-- Chip bar — composition selector (replaces sidebar) -->
@@ -9343,10 +9479,16 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           </button>
           <button class="mob-tbtn play-main" id="mob-play-btn" title="Play / Pause">
             <svg id="mob-play-icon" viewBox="0 0 10 12" width="20" height="20" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>
+            <span class="mob-play-label">Play</span>
           </button>
           <button class="mob-tbtn" id="mob-stop-btn2" title="Stop">
             <svg viewBox="0 0 12 12" width="14" height="14" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="1.5"/></svg>
           </button>
+          <div id="mob-bpm-wrap">
+            <input class="mob-bpm-input" id="mob-bpm-input" type="number" min="40" max="240" value="110">
+            <span class="mob-bpm-label">BPM</span>
+          </div>
+          <button class="mob-tbtn" id="mob-loop-btn" title="Loop">↺</button>
         </div>
         <div id="mob-strip-wrap">
           <div id="mob-strip-lbl">Sequence</div>
@@ -9551,7 +9693,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         </div>
       </div>
       <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar voicings, a circle of fifths, scale relationships, a cadence suggester, and a playable chord progression builder.</p>
-      <p class="guide-p">The tool covers <strong>29 scales</strong> across four families: Major Modes, Harmonic Minor, Melodic Minor, and Exotic Scales (inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop). Every scale is presented in all 12 keys. Chord tones are always spelled with correct enharmonic names (e.g. B♭ not A♯ in F major).</p>
+      <p class="guide-p">The tool covers <strong>35 scales</strong> across six families: Major Modes, Harmonic Minor, Melodic Minor, Exotic Scales (inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop, Bebop Dominant), Pentatonic (Major, Minor, Blues) and Symmetric diminished (Half-Whole, Whole-Half). Every scale is presented in all 12 keys. Chord tones are always spelled with correct enharmonic names (e.g. B♭ not A♯ in F major). Where a diatonic Maj7 chord has a ♯11 available in the scale, a Δ7♯11 (Lydian chord) is shown as an alternative voicing.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">💡</span>
         <span class="guide-tip-text">The left column holds reference tools (CoF, scale relationships, cadences, progression builder). The right column always shows the chord view. Both scroll independently.</span>
@@ -9574,7 +9716,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-key">Root Key</span>
         <span class="guide-kv-val">Sets the tonic of the scale. All note names and chord roots adjust automatically with correct spelling.</span>
         <span class="guide-kv-key">Scale / Mode</span>
-        <span class="guide-kv-val">Selects from 29 scales across 4 families. Each scale is described in the Scale Hero banner with its characteristic colours and degrees. Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
+        <span class="guide-kv-val">Selects from 35 scales across 6 families. Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
@@ -10346,6 +10488,17 @@ function buildCompChordPool() {
     const {sym, quality} = getChordSymbol(notes[0], iv);
     pool.push({ category:'Diatonic', name:notes[0], sym, roman:romans[di], notes, pcs:_pcs(notes), quality });
   }
+  // Diatonic Maj7♯11 — only where ♯11 (tritone from chord root) exists in scale
+  const scaleSetPcs = new Set(scaleData.intervals.map(i => (rootPc + i) % 12));
+  for (let di = 0; di < n; di++) {
+    const notes4 = buildChord(scaleNotes, di, 4);
+    const iv4 = chordIntervals(scaleData.intervals, di, 4);
+    if (iv4[1] !== 4 || iv4[2] !== 7 || iv4[3] !== 11) continue;
+    const crPc = noteNameToPc(notes4[0]);
+    if (crPc < 0 || !scaleSetPcs.has((crPc + 6) % 12)) continue;
+    const notesS11 = spellChordFromRoot(crPc, notes4[0], [0, 4, 7, 11, 6]);
+    pool.push({ category:'Diatonic', name:notes4[0], sym:'Δ7♯11', roman:romans[di], notes:notesS11, pcs:_pcs(notesS11), quality:'Major 7♯11' });
+  }
   // Secondary dominants
   buildSecondaryDominants(rootPc, scaleData.intervals, romans).forEach(({label, chord}) => {
     pool.push({ category:'Sec.Dom', name:chord.root, sym:chord.sym, roman:label, notes:chord.notes, pcs:_pcs(chord.notes), quality:chord.qual });
@@ -10425,15 +10578,17 @@ function compMobSetTab(tab) {
 }
 
 const _IMPROV_SCALE_IVLS = {
-  'Ionian':[0,2,4,5,7,9,11],'Dorian':[0,2,3,5,7,9,10],'Phrygian':[0,1,3,5,7,8,10],
-  'Lydian':[0,2,4,6,7,9,11],'Mixolydian':[0,2,4,5,7,9,10],'Aeolian':[0,2,3,5,7,8,10],
-  'Locrian':[0,1,3,5,6,8,10],'Locrian ♯2':[0,2,3,5,6,8,10],
+  'Major (Ionian)':[0,2,4,5,7,9,11],'Dorian':[0,2,3,5,7,9,10],'Phrygian':[0,1,3,5,7,8,10],
+  'Lydian':[0,2,4,6,7,9,11],'Mixolydian':[0,2,4,5,7,9,10],'Aeolian (Natural Minor)':[0,2,3,5,7,8,10],
+  'Locrian':[0,1,3,5,6,8,10],'Half-Diminished (Locrian ♮2)':[0,2,3,5,6,8,10],
   'Melodic Minor':[0,2,3,5,7,9,11],'Harmonic Minor':[0,2,3,5,7,8,11],
   'Lydian Dominant':[0,2,4,6,7,9,10],'Lydian Augmented':[0,2,4,6,8,9,11],
-  'Altered scale':[0,1,3,4,6,8,10],'Whole Tone':[0,2,4,6,8,10],
+  'Altered (Super Locrian)':[0,1,3,4,6,8,10],'Whole Tone':[0,2,4,6,8,10],
   'Phrygian Dominant':[0,1,4,5,7,8,10],
+  'Mixolydian ♭6':[0,2,4,5,7,8,10],
   'Major Pentatonic':[0,2,4,7,9],'Minor Pentatonic':[0,3,5,7,10],
-  'Blues scale':[0,3,5,6,7,10],'Diminished (H-W)':[0,1,3,4,6,7,9,10],'Diminished (W-H)':[0,2,3,5,6,8,9,11],
+  'Blues':[0,3,5,6,7,10],'Half-Whole Diminished':[0,1,3,4,6,7,9,10],'Whole-Half Diminished':[0,2,3,5,6,8,9,11],
+  'Bebop Dominant':[0,2,4,5,7,9,10,11],
 };
 const _NOTE_PC_LUT = {'C':0,'C#':1,'Db':1,'D':2,'D#':3,'Eb':3,'E':4,'F':5,'F#':6,'Gb':6,'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11};
 function _parseImprovScale(s) {
@@ -10562,6 +10717,10 @@ function compMobInit(comp) {
   compMobUpdateStage(comp.chords?.[0] || null, 0);
   compMobSetTab(_mobActiveTab);
   compMobUpdatePlayIcon(false);
+  const mobBpm = document.getElementById('mob-bpm-input');
+  if (mobBpm) mobBpm.value = comp.bpm || 90;
+  const mobLoop = document.getElementById('mob-loop-btn');
+  if (mobLoop) mobLoop.classList.toggle('active', !!comp.loop);
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -11082,67 +11241,99 @@ function compRenderChordRow(comp) {
 
 function getImprovSuggestions(chord) {
   const q    = (chord.quality || '').trim();
+  const sym  = (chord.sym || '').trim();
   const rootPc = chord.pcs?.[0] ?? -1;
   const root   = rootPc >= 0 ? pcToName(rootPc) : '';
   const sugg   = [];
-  const add    = (scale, tip) => sugg.push({ scale: `${root} ${scale}`, tip });
+  const add    = (scale, tip) => sugg.push({ scale: root ? `${root} ${scale}` : scale, tip });
 
-  // Detect chord category from the quality strings produced by classifyChord()
   const isDom     = /^(Dominant|Dom |Aug Dom|Altered Dom|Aug Dominant)/.test(q);
   const isMaj7    = /^(Major 7|Maj 7|Major 9|Augmented Δ)/.test(q);
   const isMinMaj  = /^Minor-Ma/.test(q);
   const isMin7    = /^Minor (7|9|1)/.test(q) && !isMinMaj;
+  const isMin6    = q === 'Minor 6th';
   const isHalf    = /^Half-Dim/.test(q);
   const isDim     = /^(Dim|Diminished)/.test(q) && !isHalf;
   const isAug     = q === 'Augmented' || /^Aug Maj/.test(q);
+  const isMaj6    = q === 'Major 6th' || /^Major.*6/.test(q);
   const isMajor   = q === 'Major' || q === 'Major ♭5' || q === '';
-  const isMinor   = q === 'Minor' || q === 'Minor 6th' || q === 'Minor ♯5';
+  const isMinor   = q === 'Minor' || q === 'Minor ♯5';
+  const isSus     = /sus/i.test(sym);
 
   if (isDom) {
-    const hasAlt = /Alt|♭9|♯9|♯5/.test(q);
-    add('Mixolydian', 'b7 creates pull toward tonic — essential dominant sound');
-    if (hasAlt) {
-      const altRootName = rootPc >= 0 ? pcToName((rootPc + 1) % 12) : '♭II';
-      add('Altered scale', `Mode 7 of melodic minor — play ${altRootName} mel. minor over ${root}7alt · all tensions: ♭9 ♯9 ♯11 ♭13`);
+    // Use sym for specific altered tension detection (quality strings often say "Altered Dominant" generically)
+    const hasB9  = /[♭b]9/.test(sym);
+    const hasS9  = /[♯#]9/.test(sym);
+    const hasS11 = /[♯#]11/.test(sym);
+    const hasB13 = /[♭b]13/.test(sym);
+    const hasB5  = /[♭b]5/.test(sym);
+    const hasS5  = /[♯#]5/.test(sym);
+    const isAltSym = /alt/i.test(sym); // only true "7alt", not 7b9 etc.
+
+    if (isSus) {
+      add('Mixolydian', 'No 3rd — open harmony, Mixolydian fits naturally');
+      add('Dorian', 'Sus context often implies ii feel — Dorian works well');
+    } else if (isAltSym) {
+      const altRoot = rootPc >= 0 ? pcToName((rootPc + 1) % 12) : '♭II';
+      add('Altered (Super Locrian)', `Mode 7 of ${altRoot} melodic minor — all tensions: ♭9 ♯9 ♯11 ♭13`);
+    } else if (hasB9 && !hasS9 && !hasS11 && !hasB5 && !hasS5) {
+      add('Half-Whole Diminished', 'Half-whole diminished — most idiomatic over 7♭9');
+      add('Phrygian Dominant', '♭2 ♭6 give a Spanish/Middle-Eastern flavor');
+    } else if (hasS9 && !hasS11) {
+      add('Altered (Super Locrian)', 'Bebop approach — all altered tensions available');
+      add('Half-Whole Diminished', 'Diminished works equally well over ♯9');
+      add('Blues', 'Blues language — ♯9 is the blue note');
+    } else if (hasS11 && !hasB9 && !hasS9) {
+      add('Lydian Dominant', '♯11 without altered 5th — modern non-resolving dominant');
+    } else if (hasB5 || hasS5 || (hasB9 && hasS9)) {
+      add('Altered (Super Locrian)', 'Covers ♭5/♯5/multi-altered — full altered dominant palette');
+      if (hasS5) add('Whole Tone', 'All whole steps — ambiguous, impressionistic ♯5 color');
+      if (hasB5) add('Lydian Dominant', '♯11 = ♭5 enharmonic — modern jazz sound');
+    } else if (hasB13) {
+      add('Mixolydian ♭6', 'Mixolydian with ♭6 — darker dominant, mode 5 of melodic minor');
+      add('Altered (Super Locrian)', 'When resolution is strong, altered adds more tension');
     } else {
-      add('Lydian Dominant', '#11 adds tritone color without harsh alterations');
+      add('Mixolydian', 'Default dominant — ♭7 creates pull toward tonic');
+      add('Bebop Dominant', 'Chromatic passing 7th keeps chord tones on downbeats');
+      add('Lydian Dominant', '♯11 adds tritone color without harsh alterations');
+      add('Blues', '♭3 ♭5 ♭7 — gritty and expressive over any dominant');
     }
-    add('Diminished (H-W)', 'Works over dom7b9 — chromatic tension, resolves strongly');
-    add('Blues scale', 'b3 b5 b7 — gritty and expressive over any dominant');
   } else if (isMaj7) {
-    add('Ionian', 'Tonic — bright, resolved, home base');
-    add('Lydian', '#4 gives a floating, ethereal quality — ideal over IVΔ7');
+    if (/♯11|#11/.test(q) || /♯11|#11/.test(sym)) {
+      add('Lydian', '♯11 defines the chord — Lydian is the strong default');
+    } else {
+      add('Major (Ionian)', 'Tonic — bright, resolved, home base');
+      add('Lydian', '♯4 gives a floating, ethereal quality — avoid natural 4 clashing with maj7');
+    }
+  } else if (isMaj6) {
+    add('Major (Ionian)', 'Major scale — melodic, natural fit for major 6th chords');
     add('Major Pentatonic', 'Safe and bright — 5 notes, zero tension');
-    add('Lydian Augmented', '#4 and #5 — modern jazz over Δ7♯5');
   } else if (isMinMaj) {
-    add('Melodic Minor', '1 2 b3 4 5 6 7 — defines the chord exactly');
-    add('Harmonic Minor', 'Raised 7th creates leading tone — classical and tango feel');
-    add('Minor Pentatonic', 'Simpler option — omits the characteristic tension');
+    add('Melodic Minor', '1 2 ♭3 4 5 6 7 — defines the chord exactly');
+  } else if (isMin6) {
+    add('Melodic Minor', 'The idiomatic sound for minor 6th — natural 6 + ♭3');
+    add('Dorian', 'Natural 6th in a minor context — jazz standard approach');
   } else if (isMin7) {
-    add('Dorian', 'Natural minor + raised 6th — jazz and soul standard');
-    add('Aeolian', 'Dark and melancholic — classical minor feel');
+    add('Dorian', 'Natural minor + raised 6th — the real default in jazz');
+    add('Aeolian (Natural Minor)', 'Dark and melancholic — classical minor feel');
     add('Minor Pentatonic', 'Universal — blues, rock, jazz, works everywhere');
-    add('Phrygian', 'Flat 2nd — dark, Spanish / flamenco flavor');
   } else if (isHalf) {
-    add('Locrian', 'Parent-key mode — b2 and b5 match the chord tones');
-    add('Locrian ♯2', 'Raised 2nd gives a smoother, less dissonant sound');
-    add('Diminished (H-W)', 'b3 and b5 of the scale fit ø7 chord tones');
+    add('Half-Diminished (Locrian ♮2)', 'Raised 2nd (melodic minor mode) — standard in ii–V–i');
+    add('Locrian', 'Parent-key mode — ♭2 and ♭5 match the chord tones');
   } else if (isDim) {
-    add('Diminished (H-W)', 'Symmetric 8-note scale — every note fits dim7 perfectly');
-    add('Diminished (W-H)', 'Inverted symmetric scale — equally valid, different color');
-    add('Altered', 'Over dim7 functioning as 7b9 — resolves to major');
+    add('Whole-Half Diminished', 'Whole-half diminished — symmetric, every note fits dim7');
+    add('Half-Whole Diminished', 'Half-whole variant — equally valid, different color');
   } else if (isAug) {
-    add('Whole Tone', 'All whole steps — ambiguous and impressionistic, matches #5');
-    add('Lydian Augmented', '#4 and #5 — Coltrane / Wayne Shorter territory');
-    add('Altered', 'b13 = #5 — when aug functions as a dominant');
-  } else if (isMajor) {
-    add('Ionian', 'Follow the key — bright and resolved');
-    add('Lydian', '#4 gives a floating quality — works over I and IV');
-    add('Major Pentatonic', 'Safe and bright — 5 notes, no clashes');
+    add('Whole Tone', 'All whole steps — ambiguous and impressionistic, matches ♯5');
+    add('Lydian Augmented', '♯4 and ♯5 — Coltrane / Wayne Shorter territory');
   } else if (isMinor) {
     add('Dorian', 'Raised 6th — bright minor, jazz standard');
-    add('Aeolian', 'Classic natural minor — dark, melancholic');
+    add('Aeolian (Natural Minor)', 'Classic natural minor — dark, melancholic');
     add('Minor Pentatonic', 'Universal — blues, rock, jazz');
+  } else if (isMajor) {
+    add('Major (Ionian)', 'Follow the key — bright and resolved');
+    add('Lydian', '♯4 gives a floating quality — works over I and IV');
+    add('Major Pentatonic', 'Safe and bright — 5 notes, no clashes');
   } else {
     add('Major Pentatonic', 'Safe starting point over any major-flavored chord');
     add('Minor Pentatonic', 'Universal — bluesy, works over most chords');
@@ -11405,6 +11596,23 @@ document.getElementById('mob-back-btn').addEventListener('click', () => {
 document.getElementById('mob-stop-btn2').addEventListener('click', compStopPlayback);
 document.getElementById('mob-edit-play-btn').addEventListener('click', () => {
   if (compActiveId) { compStartPlayback(compActiveId); compMobSetTab('play'); }
+});
+document.getElementById('comp-mob-edit-btn').addEventListener('click', () => compMobSetTab('edit'));
+document.getElementById('mob-bpm-input').addEventListener('change', e => {
+  if (!compActiveId) return;
+  const bpm = parseInt(e.target.value) || 90;
+  compUpdate(compActiveId, { bpm });
+  if (compIsPlaying) compPendingRestart = true;
+  const deskBpm = document.querySelector('.comp-bpm-input');
+  if (deskBpm) deskBpm.value = bpm;
+});
+document.getElementById('mob-loop-btn').addEventListener('click', () => {
+  if (!compActiveId) return;
+  const cur = compLoad().find(c => c.id === compActiveId);
+  const next = !(cur?.loop);
+  compUpdate(compActiveId, { loop: next });
+  document.getElementById('mob-loop-btn').classList.toggle('active', next);
+  document.getElementById('comp-loop-btn')?.classList.toggle('active', next);
 });
 document.getElementById('comp-pause-btn').addEventListener('click', () => {
   if (!compIsPlaying) {
