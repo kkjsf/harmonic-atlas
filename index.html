@@ -577,6 +577,10 @@
   .drop-chord-name sup { font-size:8px; font-family:'IBM Plex Mono',monospace; color:var(--gold2); }
 
   @keyframes fadeIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
+  @keyframes viewEnter { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .view-enter { animation: viewEnter .22s ease both; }
+  .scale-hero { transition: opacity .18s ease; }
+  #cof-svg { transition: opacity .2s ease; }
   #diag-modal .inner { animation:fadeIn .15s ease both; }
   .diag-card, .drop-card { transition: transform .15s, border-color .15s, box-shadow .15s; }
   .diag-card:hover, .drop-card:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.5); }
@@ -2306,6 +2310,7 @@
   <!-- hint: hover chord cards and click + to add to the active composition -->
   <div style="padding:8px 0 4px">
     <span id="sampler-loading" style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;display:none">⟳ loading samples…</span>
+    <span id="guitar-sampler-loading" style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;display:none;margin-left:8px">⟳ loading guitar…</span>
   </div>
 
 </div><!-- end left-panel -->
@@ -2381,15 +2386,22 @@ const PREFER_FLAT_PC = new Set([1,3,8,10]); // Db Eb Ab Bb - preferred over C# D
 
 
 // ── Scale playback ──────────────────────────────
+let _activeScaleBtn = null;
+function _stopActiveScale() {
+  if (_activeScaleBtn && _activeScaleBtn._scaleTimer) {
+    clearTimeout(_activeScaleBtn._scaleTimer);
+    _activeScaleBtn._scaleTimer = null;
+    _activeScaleBtn.classList.remove('playing');
+    _activeScaleBtn.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M1 1l7 4-7 4V1z" fill="currentColor"/></svg>';
+  }
+  _activeScaleBtn = null;
+}
 function playScale(noteNames, btnEl) {
   if (btnEl && btnEl._scaleTimer) {
-    // Already playing — stop
-    clearTimeout(btnEl._scaleTimer);
-    btnEl._scaleTimer = null;
-    btnEl.classList.remove('playing');
-    btnEl.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M1 1l7 4-7 4V1z" fill="currentColor"/></svg>';
+    _stopActiveScale();
     return;
   }
+  _stopActiveScale();
   if (!noteNames || !noteNames.length) return;
 
   // PC-to-MIDI: root in octave 4, ascending
@@ -2430,9 +2442,11 @@ function playScale(noteNames, btnEl) {
   if (btnEl) {
     btnEl.classList.add('playing');
     btnEl.innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><rect x="1" y="1" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="5" y="1" width="3" height="7" rx="0.5" fill="currentColor"/></svg>';
+    _activeScaleBtn = btnEl;
   }
 
   const ctx      = getAudioCtx();
+  if (!ctx) return;
   const BPM_SCALE = 120;
   const noteMs   = (60000 / BPM_SCALE) * 0.7;  // ~350ms step interval
   const stepSecs = noteMs / 1000;
@@ -2463,6 +2477,7 @@ function playScale(noteNames, btnEl) {
       btnEl.classList.remove('playing');
       btnEl.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M1 1l7 4-7 4V1z" fill="currentColor"/></svg>';
       btnEl._scaleTimer = null;
+      if (_activeScaleBtn === btnEl) _activeScaleBtn = null;
     }, totalMs);
   }
 }
@@ -3074,8 +3089,12 @@ function computeCofHighlights(rootPc, scaleIntervals){
   return{majSet,minSet,dimSet};
 }
 
+let _cofCacheKey = '';
 function drawCoF(rootPc, scaleIntervals){
+  const cacheKey = rootPc + ':' + scaleIntervals.join(',') + ':' + negHarmonyActive;
   const svg=document.getElementById('cof-svg');
+  if (cacheKey === _cofCacheKey && svg.childElementCount > 0) return;
+  _cofCacheKey = cacheKey;
   svg.innerHTML='';
   const ns='http://www.w3.org/2000/svg';
   const mk=t=>document.createElementNS(ns,t);
@@ -3263,8 +3282,12 @@ function drawCoF(rootPc, scaleIntervals){
   });
 
   svg.addEventListener('mousemove', e=>{
-    tooltip.style.left = (e.clientX+14)+'px';
-    tooltip.style.top  = (e.clientY-28)+'px';
+    const tx = e.clientX + 14;
+    const ty = e.clientY - 28;
+    const tw = tooltip.offsetWidth || 120;
+    const th = tooltip.offsetHeight || 30;
+    tooltip.style.left = Math.min(tx, window.innerWidth - tw - 8) + 'px';
+    tooltip.style.top  = Math.max(4, Math.min(ty, window.innerHeight - th - 4)) + 'px';
   });
 
   svg.addEventListener('mouseleave', ()=>{
@@ -3452,6 +3475,7 @@ function renderScaleInfo(scaleNotes, scaleData){
         // Switch to pause icon
         const px = parseFloat(playG.dataset.px), py = parseFloat(playG.dataset.pymid);
         const ctx = getAudioCtx();
+        if (!ctx) return;
         const noteMs = 380;  // step interval
         const KEYS_PC = {C:0,'C#':1,'Db':1,'C♯':1,'D♭':1,D:2,'D#':3,'Eb':3,'D♯':3,'E♭':3,
           E:4,F:5,'F#':6,'Gb':6,'F♯':6,'G♭':6,G:7,'G#':8,'Ab':8,'G♯':8,'A♭':8,
@@ -4234,11 +4258,15 @@ function render(){
   document.getElementById('guitar-sub-tabs').style.display   = isGuitar   ? 'flex' : 'none';
   document.getElementById('mandolin-sub-tabs').style.display = isMandolin ? 'flex' : 'none';
 
-  // Debounce the heavy DOM rebuild with a fade
+  // Debounce the heavy DOM rebuild with a smooth fade+slide transition
   if (_renderTimer) clearTimeout(_renderTimer);
   const container = document.getElementById('all-degrees');
-  container.style.opacity = '0.4';
-  container.style.transition = 'opacity 0.1s';
+  container.style.opacity = '0';
+  container.style.transition = 'opacity .12s ease';
+  const hero = document.querySelector('.scale-hero');
+  if (hero) hero.style.opacity = '0.5';
+  const cofSvg = document.getElementById('cof-svg');
+  if (cofSvg) cofSvg.style.opacity = '0.3';
   _renderTimer = setTimeout(() => {
     renderView(scaleNotes,scaleData);
     renderScaleRelationships();
@@ -4247,8 +4275,13 @@ function render(){
     renderPivotChords();
     renderStrumSelector();
     renderSwingSelector();
-    container.style.opacity = '1';
-  }, 60);
+    container.classList.remove('view-enter');
+    void container.offsetWidth;
+    container.classList.add('view-enter');
+    container.style.opacity = '';
+    if (hero) hero.style.opacity = '';
+    if (cofSvg) cofSvg.style.opacity = '';
+  }, 80);
 }
 
 // ── Alt Dominant Tab ─────────────────────────────────────────────────────────
@@ -5188,10 +5221,10 @@ function renderDiagrams(scaleNotes, scaleData) {
 // ══════════════════════════════════════════════
 
 const DROP_INV_COLORS = [
-  { bg:'rgba(201,168,76,.07)',  border:'rgba(201,168,76,.28)',  label:'#c9a84c', name:'Root position',  bass:'1' },
-  { bg:'rgba(124,111,160,.10)', border:'rgba(124,111,160,.32)', label:'#9080c0', name:'1st inversion',   bass:'3' },
-  { bg:'rgba(70,160,130,.07)',  border:'rgba(70,160,130,.28)',  label:'#46a882', name:'2nd inversion',   bass:'5' },
-  { bg:'rgba(200,100,80,.08)',  border:'rgba(200,100,80,.30)',  label:'#c86450', name:'3rd inversion',   bass:'7' },
+  { bg:'rgba(201,168,76,.07)',  border:'rgba(201,168,76,.28)',  label:'#c9a84c', name:'Root position',  bass:'1', tag:'R' },
+  { bg:'rgba(124,111,160,.10)', border:'rgba(124,111,160,.32)', label:'#9080c0', name:'1st inversion',   bass:'3', tag:'1st' },
+  { bg:'rgba(70,160,130,.07)',  border:'rgba(70,160,130,.28)',  label:'#46a882', name:'2nd inversion',   bass:'5', tag:'2nd' },
+  { bg:'rgba(200,100,80,.08)',  border:'rgba(200,100,80,.30)',  label:'#c86450', name:'3rd inversion',   bass:'7', tag:'3rd' },
 ];
 
 function renderDropVoicings(scaleNotes, scaleData, dropNum) {
@@ -5291,7 +5324,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
       groupHdr.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap;';
       groupHdr.innerHTML = `
         <span style="font-family:'EB Garamond',serif;font-size:14px;font-weight:600;color:${col.label}">${inv}</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:${col.label};opacity:.85;background:${col.border};padding:2px 6px;border-radius:2px">${slashName || ''} · ${bassNoteName} IN BASS</span>`;
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:${col.label};opacity:.85;background:${col.border};padding:2px 6px;border-radius:2px">${col.tag} · ${slashName || ''} · ${bassNoteName} IN BASS</span>`;
       group.appendChild(groupHdr);
 
       if (shapes.length === 0) {
@@ -5707,8 +5740,10 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
   return svg;
 }
 
-// Returns up to 5 CAGED-style positions, sorted ascending by fret window.
+const _scalePosCache = new Map();
 function computeScalePositions(intervals, rootPc) {
+  const key = rootPc + ':' + intervals.join(',');
+  if (_scalePosCache.has(key)) return _scalePosCache.get(key);
   const rootPcN  = ((rootPc % 12) + 12) % 12;
   const intNorm  = intervals.map(i => ((i % 12) + 12) % 12);
   const LABELS   = ['E shape','A shape','D shape','G shape','C shape'];
@@ -5745,6 +5780,7 @@ function computeScalePositions(intervals, rootPc) {
   }
 
   positions.sort((a, b) => a.startFret - b.startFret);
+  _scalePosCache.set(key, positions);
   return positions;
 }
 
@@ -5764,9 +5800,16 @@ function showSvgModal(svgHtml, title, landscape = false) {
     <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);flex-shrink:0">${title}</div>
     <div style="overflow:auto;width:100%;display:flex;align-items:flex-start;justify-content:center">${svgHtml}</div>
     <div style="font-size:10px;color:#3a4556;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;flex-shrink:0">CLICK ANYWHERE TO CLOSE</div>`;
-  // Scale SVG to fill available width
   const svgEl = inner.querySelector('svg');
-  if (svgEl) { svgEl.style.width = '100%'; svgEl.style.height = 'auto'; svgEl.style.display = 'block'; }
+  if (svgEl) {
+    svgEl.style.width = '100%'; svgEl.style.height = 'auto'; svgEl.style.display = 'block';
+    svgEl.setAttribute('role', 'img');
+    if (!svgEl.querySelector('title')) {
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      t.textContent = title;
+      svgEl.prepend(t);
+    }
+  }
   modal.appendChild(inner);
   inner.addEventListener('click', e => e.stopPropagation());
   modal.addEventListener('click', () => {
@@ -5776,7 +5819,13 @@ function showSvgModal(svgHtml, title, landscape = false) {
     if (hint) hint.style.display = 'none';
     modal.remove();
   });
+  modal.setAttribute('tabindex', '-1');
   document.body.appendChild(modal);
+  modal.focus();
+  modal.addEventListener('keydown', e => {
+    if (e.key === 'Tab') { e.preventDefault(); }
+    if (e.key === 'Escape') { modal.click(); }
+  });
   // Zoom via wheel / pinch — adjusts SVG width so overflow scrolling pans the result
   const svgWrap = inner.querySelector('div');
   const zoomTarget = svgEl || inner;
@@ -6808,6 +6857,9 @@ function initSampler() {
       progAudioCtx = Tone.getContext().rawContext;
       _samplerReadyCbs.forEach(f => f());
       _samplerReadyCbs = [];
+    },
+    onerror: () => {
+      if (loading) { loading.style.display = 'inline'; loading.textContent = '⚠ samples failed to load — using synth fallback'; }
     }
   }).toDestination();
 }
@@ -6818,6 +6870,8 @@ let guitarSamplerReady = false;
 
 function initGuitarSampler() {
   if (guitarSampler) return;
+  const gLoading = document.getElementById('guitar-sampler-loading');
+  if (gLoading) gLoading.style.display = 'inline';
   guitarSampler = new Tone.Sampler({
     urls: {
       'F4':'F4.mp3','F#2':'Fs2.mp3','F#3':'Fs3.mp3','F#4':'Fs4.mp3',
@@ -6834,13 +6888,21 @@ function initGuitarSampler() {
       'F2':'F2.mp3','F3':'F3.mp3',
     },
     baseUrl: 'https://nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/',
-    onload: () => { guitarSamplerReady = true; }
+    onload: () => {
+      guitarSamplerReady = true;
+      const gl = document.getElementById('guitar-sampler-loading');
+      if (gl) gl.style.display = 'none';
+    },
+    onerror: () => {
+      const gl = document.getElementById('guitar-sampler-loading');
+      if (gl) { gl.style.display = 'inline'; gl.textContent = '⚠ guitar samples failed to load'; }
+    }
   }).toDestination();
 }
 
 // ── Audio Context ───────────────────────────────
 function getAudioCtx() {
-  return Tone.getContext().rawContext;
+  try { return Tone.getContext().rawContext; } catch(e) { return null; }
 }
 
 // PWA audio unlock — Tone.start() is required on iOS before any audio.
@@ -7415,6 +7477,7 @@ function progPlay() {
   // On mobile the AudioContext may still be suspended even after _unlockAudio.
   // We must resume it and wait before scheduling any nodes.
   const ctx = getAudioCtx();
+  if (!ctx) return;
   const doPlay = () => { try {
     const bpm     = progGetBpm();
     const sound   = progGetSound();
@@ -10349,6 +10412,7 @@ if (false) (function() {
       const bar = document.getElementById('zoom-playhead-bar');
       if (bar) {
         const ctx = getAudioCtx();
+        if (!ctx) return;
         const elapsed = ctx.currentTime - progStartTime;
         const bpm = progGetBpm();
         const beatDur = 60 / bpm;
@@ -11496,7 +11560,10 @@ function compStartPlayback(id) {
   compIsPaused = false;
   const comp = compLoad().find(c => c.id === id);
   if (!comp || !comp.chords.length) return;
-  if (!samplerReady) {
+  const needsGuitar = comp.sound === 'guitar';
+  if (needsGuitar) initGuitarSampler();
+  const waitingForSampler = !samplerReady || (needsGuitar && !guitarSamplerReady);
+  if (waitingForSampler) {
     const playBtn = document.getElementById('comp-play-btn');
     const pauseBtn = document.getElementById('comp-pause-btn');
     if (playBtn && !playBtn.dataset.waiting) {
@@ -11507,11 +11574,19 @@ function compStartPlayback(id) {
       pauseBtn.dataset.waiting = '1';
       pauseBtn.title = 'Loading samples…';
     }
-    _samplerReadyCbs.push(() => {
-      if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; }
-      if (pauseBtn) { delete pauseBtn.dataset.waiting; pauseBtn.title = ''; }
-      compStartPlayback(id);
-    });
+    const retry = () => {
+      if (samplerReady && (!needsGuitar || guitarSamplerReady)) {
+        if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; }
+        if (pauseBtn) { delete pauseBtn.dataset.waiting; pauseBtn.title = ''; }
+        compStartPlayback(id);
+      }
+    };
+    if (!samplerReady) _samplerReadyCbs.push(retry);
+    if (needsGuitar && !guitarSamplerReady) {
+      const checkGuitar = setInterval(() => {
+        if (guitarSamplerReady) { clearInterval(checkGuitar); retry(); }
+      }, 100);
+    }
     return;
   }
   const gen = ++_compPlayGen;
@@ -11519,9 +11594,6 @@ function compStartPlayback(id) {
   // Sync strum/swing from this composition
   activeStrum = comp.strum || activeStrum || 'Straight';
   progSwing   = comp.swing ?? progSwing ?? 0;
-
-  // Init guitar sampler lazily if needed
-  if (comp.sound === 'guitar') initGuitarSampler();
 
   Tone.start().then(() => {
     Tone.Transport.stop();
