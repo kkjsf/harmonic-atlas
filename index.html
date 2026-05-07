@@ -1072,6 +1072,122 @@
   }
   #tech-btn:hover { border-color: var(--accent2); color: var(--accent2); background: var(--surface2); }
 
+  #lick-lib-btn {
+    position: fixed; top: 16px; right: 154px;
+    z-index: var(--z-popover);
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--border2); background: var(--surface);
+    color: var(--gold); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; box-shadow: 0 2px 12px rgba(0,0,0,.4);
+    font-size: 18px; line-height: 1;
+  }
+  #lick-lib-btn:hover { border-color: var(--gold); background: var(--surface2); color: var(--gold2); }
+
+  /* ── Jazz Lick Library Side Panel ── */
+  #lick-overlay {
+    display: none; position: fixed; inset: 0; z-index: var(--z-overlay);
+    background: rgba(0,0,0,.55); backdrop-filter: blur(3px);
+  }
+  #lick-overlay.open { display: block; }
+  #lick-panel {
+    position: fixed; top: 0; right: -580px; width: min(560px, 92vw); height: 100vh;
+    background: var(--surface); z-index: calc(var(--z-overlay) + 1);
+    overflow-y: auto; box-shadow: -8px 0 40px rgba(0,0,0,.5);
+    border-left: 1px solid var(--border); transition: right .28s cubic-bezier(.4,0,.2,1);
+  }
+  #lick-overlay.open + #lick-panel, #lick-panel.open { right: 0; }
+  .lick-panel-header {
+    position: sticky; top: 0; background: var(--surface); z-index: 2;
+    padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+  }
+  .lick-panel-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .lick-panel-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); }
+  .lick-panel-title em { font-style: italic; color: var(--gold); }
+  .lick-close-btn {
+    width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 3px;
+    background: transparent; color: var(--muted); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+  }
+  .lick-close-btn:hover { color: var(--cream); border-color: var(--gold); }
+  .lick-panel-subtitle { font-size: 10px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+  .lick-prog-filter {
+    display: flex; gap: 6px; flex-wrap: wrap; padding: 14px 24px;
+    border-bottom: 1px solid var(--border); background: rgba(0,0,0,.15);
+  }
+  .lick-prog-pill {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .04em;
+    padding: 5px 12px; border: 1px solid var(--border); border-radius: 20px;
+    background: transparent; color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .lick-prog-pill:hover { border-color: rgba(201,168,76,.3); color: var(--cream); }
+  .lick-prog-pill.active { background: rgba(201,168,76,.15); border-color: rgba(201,168,76,.4); color: var(--gold); font-weight: 500; }
+  .lick-panel-body { padding: 20px 24px 40px; }
+  .lick-section-label {
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--gold); margin: 24px 0 14px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .lick-section-label:first-child { margin-top: 0; }
+  .lick-card {
+    background: rgba(255,255,255,.03); border: 1px solid var(--border);
+    border-radius: 5px; padding: 16px 18px; margin-bottom: 14px; transition: border-color .15s;
+  }
+  .lick-card:hover { border-color: rgba(201,168,76,.3); }
+  .lick-card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+  .lick-card-title { font-size: 13px; font-weight: 600; color: var(--cream); }
+  .lick-card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .lick-tag { font-size: 9px; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; }
+  .lick-tag.beg { background: rgba(106,144,95,.25); color: rgba(180,220,170,.8); }
+  .lick-tag.int { background: rgba(144,130,95,.25); color: rgba(220,200,160,.8); }
+  .lick-tag.adv { background: rgba(144,95,95,.25); color: rgba(220,160,160,.8); }
+  .lick-tag.concept { background: rgba(106,95,144,.2); color: rgba(180,170,210,.7); }
+  .lick-prog-bar { display: flex; gap: 2px; margin-bottom: 10px; }
+  .lick-prog-slot {
+    flex: 1; text-align: center; font-size: 11px; font-weight: 600;
+    padding: 4px 0; border-radius: 2px; background: rgba(255,255,255,.04); color: var(--muted);
+  }
+  .lick-prog-slot.m7 { background: rgba(106,95,144,.15); color: #a99cc8; }
+  .lick-prog-slot.dom { background: rgba(180,120,80,.15); color: #d4a870; }
+  .lick-prog-slot.maj { background: rgba(201,168,76,.12); color: var(--gold); }
+  .lick-prog-slot.hdim { background: rgba(112,144,192,.15); color: #7090c0; }
+  .lick-prog-slot.dim { background: rgba(160,100,100,.15); color: #c09090; }
+  .lick-prog-slot.trisub { background: rgba(180,80,80,.15); color: #d09080; }
+  .lick-tab-wrap {
+    background: rgba(0,0,0,.3); border-radius: 3px; padding: 10px 14px; overflow-x: auto; margin-bottom: 2px;
+  }
+  .lick-tab {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.5;
+    color: rgba(255,255,255,.7); white-space: pre;
+  }
+  .lick-tab .r { color: var(--gold); font-weight: 600; }
+  .lick-tab .a { color: #7090c0; }
+  .lick-tab .s { color: var(--muted); }
+  .lick-tab .bar { color: rgba(255,255,255,.2); }
+  .lick-controls {
+    display: flex; align-items: center; gap: 10px; margin-top: 10px;
+  }
+  .lick-play-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .05em;
+    text-transform: uppercase; padding: 5px 12px;
+    border: 1px solid rgba(201,168,76,.3); border-radius: 3px;
+    background: transparent; color: var(--gold); cursor: pointer; transition: all .15s;
+  }
+  .lick-play-btn:hover { background: rgba(201,168,76,.1); }
+  .lick-play-btn.playing { background: rgba(201,168,76,.18); border-color: var(--gold); }
+  .lick-tempo { font-size: 10px; color: var(--muted); }
+  .lick-concept {
+    font-size: 10px; color: var(--muted); margin-top: 8px; line-height: 1.5;
+    padding-left: 10px; border-left: 2px solid rgba(201,168,76,.2);
+  }
+  .lick-source {
+    font-size: 9px; color: var(--muted); margin-top: 6px; letter-spacing: .03em;
+  }
+  .lick-source a { color: var(--gold); opacity: .7; text-decoration: none; transition: opacity .15s; }
+  .lick-source a:hover { opacity: 1; text-decoration: underline; }
+  .lick-card.hidden { display: none; }
+
   #comp-btn {
     position: fixed; top: 16px; right: 16px;
     z-index: var(--z-popover);
@@ -1850,6 +1966,7 @@
     #comp-btn { width:30px; height:30px; right:12px; top:12px; }
     #guide-btn { width:30px; height:30px; right:50px; top:12px; }
     #tech-btn { width:30px; height:30px; right:88px; top:12px; }
+    #lick-lib-btn { width:30px; height:30px; right:126px; top:12px; font-size:15px; }
     #comp-overlay { padding: 0; }
     #comp-modal { max-height: 100vh; border-radius: 0; }
     #comp-layout { flex-direction: column; }
@@ -2121,6 +2238,7 @@
     <path d="M14.2 3.5a3.5 3.5 0 00-4.7 4.7L3.8 14a1 1 0 001.4 1.4l5.8-5.7a3.5 3.5 0 004.7-4.7l-2.2 2.2-1.5-1.5 2.2-2.2z" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 </button>
+<button id="lick-lib-btn" title="Jazz Lick Library" aria-label="Open jazz lick library">&#9835;</button>
 <div class="grain"></div>
 <div class="wrap">
   <header id="page-top">
@@ -9499,7 +9617,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-section">
       <div class="tech-section-title">Stack &amp; Platform</div>
       <div class="tech-row"><span class="tech-key">Language</span><span class="tech-val">Vanilla HTML5 / CSS3 / ES2022 JavaScript - zero build tools, zero frameworks</span></div>
-      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~9 100 lines); no server, no network requests at runtime beyond Tone.js CDN and piano samples</span></div>
+      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~12 500 lines); no server, no network requests at runtime beyond Tone.js CDN and piano samples</span></div>
       <div class="tech-row"><span class="tech-key">Fonts (CDN)</span><span class="tech-val"><span class="tech-chip">Playfair Display</span><span class="tech-chip">IBM Plex Mono</span><span class="tech-chip">Cormorant Garamond</span><span class="tech-chip">EB Garamond</span> via Google Fonts</span></div>
       <div class="tech-row"><span class="tech-key">No frameworks</span><span class="tech-val">No React, Vue, jQuery, D3 — all UI and SVG written from scratch. <span class="tech-chip">Tone.js 14.8.49</span> used for Salamander Grand Piano sample playback only.</span></div>
     </div>
@@ -9816,6 +9934,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <li><a class="guide-toc-link" href="#g-neg">Negative Harmony</a></li>
         <li><a class="guide-toc-link" href="#g-compare">Scale Comparison</a></li>
         <li><a class="guide-toc-link" href="#g-tips">Pro Tips</a></li>
+        <li><a class="guide-toc-link" href="#g-licks">Jazz Lick Library</a></li>
         <li><a class="guide-toc-link" href="#g-sources">Sources</a></li>
         <li><a class="guide-toc-link" href="#g-sources">Sources &amp; References</a></li>
       </ol>
@@ -10231,6 +10350,42 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="guide-tip"><span class="guide-tip-icon">⚡</span><span class="guide-tip-text"><strong>Quick progressions:</strong> click a Cadence Suggester row chord-by-chord to assemble a full cadence in the builder, then hit Play to audition it instantly.</span></div>
     </section>
 
+    <!-- JAZZ LICK LIBRARY -->
+    <section class="guide-section" id="g-licks">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><ellipse cx="6" cy="14" rx="3" ry="2" transform="rotate(-15 6 14)" stroke="currentColor" stroke-width="1.4"/><rect x="8.6" y="3" width="1.4" height="10" rx=".7" fill="currentColor"/><circle cx="13" cy="5" r="1.2" fill="currentColor"/><circle cx="13" cy="8" r="1.2" fill="currentColor"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num" style="color:var(--gold)">13</div>
+          <div class="guide-section-title">Jazz Lick Library</div>
+        </div>
+      </div>
+      <p class="guide-p">The <strong>&#9835; Jazz Licks</strong> button (top-left in the header toolbar row) opens a slide-in side panel containing a curated library of 18 classic jazz guitar licks over common progressions.</p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Progressions</span>
+        <span class="guide-kv-val">Filter by progression type: ii-V-I (Major), ii-V-i (Minor), I-vi-ii-V (Turnaround), Blues, or show All.</span>
+        <span class="guide-kv-key">Difficulty</span>
+        <span class="guide-kv-val">Licks are grouped into three tiers: <strong>Beginner</strong> (arpeggio foundations), <strong>Intermediate</strong> (bebop vocabulary), and <strong>Advanced</strong> (substitutions &amp; chromaticism).</span>
+        <span class="guide-kv-key">Tab notation</span>
+        <span class="guide-kv-val">Each lick shows guitar tablature with colour-coded notes: <strong style="color:var(--gold)">gold = root notes</strong>, <strong style="color:#7090c0">blue = approach/chromatic tones</strong>, white = other chord tones.</span>
+        <span class="guide-kv-key">Chord bar</span>
+        <span class="guide-kv-val">Colour-coded progression bar above each tab: purple = m7, orange = dom7, gold = maj7, blue = half-dim, red = tritone sub.</span>
+        <span class="guide-kv-key">Play / Slow</span>
+        <span class="guide-kv-val">Hear each lick at written tempo or at 60% speed using the Salamander Grand Piano sampler. Notes are mapped from guitar tab positions to MIDI.</span>
+        <span class="guide-kv-key">Concept note</span>
+        <span class="guide-kv-val">A short theory explanation below each tab describing the harmonic idea behind the lick.</span>
+        <span class="guide-kv-key">Source links</span>
+        <span class="guide-kv-val">Each lick links to an external jazz guitar education site (jazzguitar.be, jazzadvice.com, learnjazzstandards.com, mattwarnockguitar.com, YouTube) for further study.</span>
+        <span class="guide-kv-key">Standalone</span>
+        <span class="guide-kv-val">Licks stay in their original key — they are <em>not</em> tied to the current scale/key selection. This is a reference library, not a transposing tool.</span>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">🎸</span>
+        <span class="guide-tip-text">Close the panel with the <strong>✕</strong> button, by clicking the dimmed overlay, or by pressing <strong>Escape</strong>.</span>
+      </div>
+    </section>
+
     <section class="guide-section" id="g-sources">
       <div class="guide-section-hdr">
         <div class="guide-section-icon">
@@ -10274,6 +10429,21 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
   </div>
 </div>
+
+<!-- ══════ JAZZ LICK LIBRARY PANEL ══════ -->
+<div id="lick-overlay"></div>
+<div id="lick-panel">
+  <div class="lick-panel-header">
+    <div class="lick-panel-title-row">
+      <div class="lick-panel-title">Jazz <em>Lick Library</em></div>
+      <button class="lick-close-btn" id="lick-close">&#x2715;</button>
+    </div>
+    <div class="lick-panel-subtitle">Classic patterns over common progressions</div>
+  </div>
+  <div class="lick-prog-filter" id="lick-filter"></div>
+  <div class="lick-panel-body" id="lick-body"></div>
+</div>
+
 <script>
 // ── Scroll-lock helpers (compensate for scrollbar width to prevent layout shift) ──
 function lockScroll() {
@@ -11874,6 +12044,442 @@ window.addEventListener('resize', () => {
   const hint = document.getElementById('rotate-hint');
   if (hint && window.innerWidth > window.innerHeight) hint.style.display = 'none';
 });
+
+// ══════════════════════════════════════════════════════════════════════════
+// ── JAZZ LICK LIBRARY ──────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+(function() {
+  const GUITAR_OPEN = [40,45,50,55,59,64]; // E2 A2 D3 G3 B3 E4
+  const STR_LABELS = ['E','A','D','G','B','e'];
+
+  const LICKS = [
+    // ═══ ii-V-I MAJOR ═══
+    { id:'maj-arp-asc', title:'Straight Arpeggio ii-V-I', prog:'ii-V-I', diff:'beg', concepts:['Arpeggios'],
+      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:120, feel:'Swing',
+      tab:[ // {s:string 0-5(E-e), f:fret, beat:float, type:'r'|'a'|'n'}
+        {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:1,beat:1,type:'r'},{s:2,f:2,beat:1.5,type:'n'},
+        {s:1,f:1,beat:2,type:'n'},{s:0,f:1,beat:2.5,type:'r'},
+        {s:3,f:0,beat:4,type:'r'},{s:3,f:2,beat:4.5,type:'n'},{s:2,f:0,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
+        {s:1,f:0,beat:6,type:'r'},{s:1,f:1,beat:6.5,type:'n'},
+        {s:4,f:3,beat:8,type:'r'},{s:3,f:0,beat:8.5,type:'n'},{s:3,f:2,beat:9,type:'n'},{s:2,f:0,beat:9.5,type:'n'},
+        {s:2,f:1,beat:10,type:'r'},{s:1,f:0,beat:10.5,type:'n'}
+      ],
+      concept:'Pure chord tones ascending through each change. The foundation — learn where the arpeggios connect before adding embellishments.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/jazz-guitar-licks/'}
+    },
+    { id:'maj-arp-desc', title:'Descending Arpeggio Resolution', prog:'ii-V-I', diff:'beg', concepts:['Voice leading'],
+      key:'G', chords:[{name:'Am7',q:'m7'},{name:'D7',q:'dom'},{name:'GΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:100, feel:'Swing',
+      tab:[
+        {s:0,f:8,beat:0,type:'n'},{s:0,f:5,beat:0.5,type:'r'},{s:1,f:5,beat:1.5,type:'n'},{s:1,f:8,beat:2,type:'n'},
+        {s:1,f:6,beat:4,type:'n'},{s:1,f:3,beat:4.5,type:'r'},{s:2,f:4,beat:5.5,type:'n'},{s:2,f:2,beat:6,type:'n'},
+        {s:2,f:4,beat:8,type:'r'}
+      ],
+      concept:'Smooth voice leading — each chord change moves to the nearest chord tone. The V→I resolution lands on the 3rd (B) of Gmaj7.',
+      source:{name:'learnjazzstandards.com', url:'https://www.learnjazzstandards.com/blog/the-ultimate-guide-to-jazz-guitar-licks/'}
+    },
+    { id:'maj-bebop-dom', title:'Bebop Dominant Approach', prog:'ii-V-I', diff:'int', concepts:['Bebop scale'],
+      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:140, feel:'Swing',
+      tab:[
+        {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:2,beat:1,type:'r'},{s:2,f:3,beat:1.5,type:'n'},
+        {s:2,f:2,beat:2,type:'n'},{s:3,f:3,beat:2.5,type:'n'},
+        {s:2,f:2,beat:4,type:'n'},{s:1,f:1,beat:5,type:'n'},{s:1,f:0,beat:5.5,type:'a'},{s:1,f:3,beat:6,type:'n'},
+        {s:1,f:1,beat:6.5,type:'n'},
+        {s:1,f:1,beat:8,type:'r'},{s:0,f:0,beat:9,type:'n'}
+      ],
+      concept:'The bebop dominant scale adds a chromatic passing tone (natural 7) between b7 and root, keeping chord tones on strong beats.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/bebop-scale/'}
+    },
+    { id:'maj-enclosure', title:'Enclosure Patterns', prog:'ii-V-I', diff:'int', concepts:['Enclosures'],
+      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:130, feel:'Swing',
+      tab:[
+        {s:2,f:3,beat:0,type:'a'},{s:2,f:1,beat:0.5,type:'a'},{s:2,f:2,beat:1,type:'r'},
+        {s:3,f:4,beat:1.5,type:'a'},{s:3,f:2,beat:2,type:'a'},{s:3,f:3,beat:2.5,type:'n'},
+        {s:2,f:3,beat:4,type:'a'},{s:2,f:1,beat:4.5,type:'a'},{s:2,f:2,beat:5,type:'n'},
+        {s:1,f:2,beat:5.5,type:'a'},{s:1,f:0,beat:6,type:'a'},{s:1,f:1,beat:6.5,type:'n'},
+        {s:1,f:1,beat:8,type:'r'}
+      ],
+      concept:'Enclosures surround each target chord tone from above and below (chromatic or diatonic). Creates the signature bebop "curling" sound.',
+      source:{name:'mattwarnockguitar.com', url:'https://mattwarnockguitar.com/enclosures/'}
+    },
+    { id:'maj-approach', title:'Chromatic Approach Notes', prog:'ii-V-I', diff:'int', concepts:['Approach tones'],
+      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:120, feel:'Swing',
+      tab:[
+        {s:3,f:0,beat:0,type:'n'},{s:3,f:2,beat:0.5,type:'n'},{s:2,f:1,beat:1,type:'a'},{s:2,f:2,beat:1.5,type:'r'},
+        {s:2,f:3,beat:2,type:'n'},{s:2,f:2,beat:2.5,type:'n'},
+        {s:3,f:5,beat:4,type:'r'},{s:3,f:4,beat:4.5,type:'a'},{s:2,f:3,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
+        {s:1,f:2,beat:6,type:'a'},{s:1,f:1,beat:6.5,type:'n'},
+        {s:1,f:1,beat:8,type:'r'},{s:1,f:0,beat:8.5,type:'n'}
+      ],
+      concept:'Approach notes (usually chromatic, a half step below) lead into each chord tone, creating forward motion and harmonic clarity.',
+      source:{name:'jazzadvice.com', url:'https://www.jazzadvice.com/lessons/how-to-use-approach-notes-in-a-jazz-solo/'}
+    },
+    { id:'maj-dim7sub', title:'Dim7 Substitution over V', prog:'ii-V-I', diff:'adv', concepts:['Dim sub','3-to-b9'],
+      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7b9',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:140, feel:'Swing',
+      tab:[
+        {s:3,f:3,beat:0,type:'n'},{s:3,f:5,beat:0.5,type:'n'},{s:2,f:2,beat:1,type:'r'},{s:2,f:3,beat:1.5,type:'n'},
+        {s:2,f:5,beat:2,type:'n'},{s:3,f:3,beat:2.5,type:'n'},
+        {s:2,f:2,beat:4,type:'n'},{s:2,f:4,beat:4.5,type:'n'},{s:1,f:4,beat:5,type:'n'},{s:1,f:3,beat:5.5,type:'a'},
+        {s:1,f:1,beat:6,type:'n'},
+        {s:1,f:1,beat:8,type:'r'}
+      ],
+      concept:'Over G7, play B dim7 arpeggio (B D F Ab) — outlines the 3, 5, b7, b9. The "3 to b9" substitution creates a dominant b9 sound without playing the root.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/diminished-scale-guitar/'}
+    },
+    { id:'maj-tritone', title:'Tritone Sub Chromatic Line', prog:'ii-V-I', diff:'adv', concepts:['Tritone sub'],
+      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'Db7',q:'trisub'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:120, feel:'Swing',
+      tab:[
+        {s:2,f:2,beat:0,type:'r'},{s:2,f:3,beat:0.5,type:'n'},{s:2,f:2,beat:1,type:'n'},{s:1,f:1,beat:1.5,type:'n'},
+        {s:1,f:4,beat:4,type:'a'},{s:1,f:3,beat:4.5,type:'n'},{s:1,f:2,beat:5,type:'a'},{s:1,f:1,beat:5.5,type:'n'},
+        {s:1,f:1,beat:8,type:'r'}
+      ],
+      concept:'Replace G7 with Db7 (tritone sub) — creates a smooth chromatic descent into the I chord. The b7 of Db7 resolves down by half step to the 3rd of Cmaj7.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/tritone-substitution/'}
+    },
+    { id:'maj-altered', title:'Altered Scale over V7', prog:'ii-V-I', diff:'adv', concepts:['Altered scale'],
+      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7alt',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:130, feel:'Swing',
+      tab:[
+        {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:2,beat:1,type:'r'},{s:2,f:3,beat:1.5,type:'n'},
+        {s:2,f:1,beat:4,type:'n'},{s:2,f:2,beat:4.5,type:'a'},{s:2,f:4,beat:5,type:'a'},{s:1,f:2,beat:5.5,type:'n'},
+        {s:1,f:3,beat:6,type:'a'},{s:1,f:1,beat:6.5,type:'n'},
+        {s:1,f:1,beat:8,type:'r'},{s:1,f:0,beat:9,type:'n'}
+      ],
+      concept:'The altered scale (7th mode of melodic minor) provides b9, #9, b5, #5 — maximum tension before resolving to the I chord.',
+      source:{name:'jazzadvice.com', url:'https://www.jazzadvice.com/lessons/the-altered-scale/'}
+    },
+
+    // ═══ ii-V-i MINOR ═══
+    { id:'min-harm-arp', title:'Harmonic Minor Arpeggio Line', prog:'ii-V-i', diff:'beg', concepts:['Harmonic minor'],
+      key:'A', chords:[{name:'Bm7b5',q:'hdim'},{name:'E7',q:'dom'},{name:'Am7',q:'m7'},{name:'%',q:''}],
+      bpm:110, feel:'Swing',
+      tab:[
+        {s:4,f:1,beat:0,type:'n'},{s:4,f:3,beat:0.5,type:'r'},{s:3,f:0,beat:1,type:'n'},{s:3,f:2,beat:1.5,type:'n'},
+        {s:3,f:0,beat:4,type:'r'},{s:3,f:1,beat:4.5,type:'n'},{s:2,f:0,beat:5,type:'n'},{s:2,f:1,beat:5.5,type:'n'},
+        {s:2,f:2,beat:8,type:'r'},{s:2,f:0,beat:8.5,type:'n'},{s:3,f:2,beat:9,type:'n'}
+      ],
+      concept:'Arpeggiate through the minor ii-V-i using harmonic minor. The raised 7th (G#) over E7 provides the leading tone resolution to Am.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/minor-ii-v-i-licks/'}
+    },
+    { id:'min-melmin', title:'Melodic Minor over V7alt', prog:'ii-V-i', diff:'int', concepts:['Melodic minor','V7alt'],
+      key:'A', chords:[{name:'Bm7b5',q:'hdim'},{name:'E7alt',q:'dom'},{name:'Am6',q:'m7'},{name:'%',q:''}],
+      bpm:120, feel:'Swing',
+      tab:[
+        {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:2,beat:1,type:'r'},{s:2,f:3,beat:1.5,type:'n'},
+        {s:2,f:1,beat:4,type:'n'},{s:2,f:3,beat:4.5,type:'a'},{s:1,f:0,beat:5,type:'n'},{s:1,f:2,beat:5.5,type:'a'},
+        {s:1,f:1,beat:6,type:'n'},
+        {s:2,f:2,beat:8,type:'r'},{s:2,f:0,beat:8.5,type:'n'}
+      ],
+      concept:'Play F melodic minor (Ab melodic minor enharmonic) over E7alt — the altered scale is the 7th mode of melodic minor a half step above the root.',
+      source:{name:'mattwarnockguitar.com', url:'https://mattwarnockguitar.com/melodic-minor-scale/'}
+    },
+    { id:'min-hdim-dim', title:'m7b5 to Dim7 Pattern', prog:'ii-V-i', diff:'int', concepts:['Half-dim','Dim7 link'],
+      key:'D', chords:[{name:'Em7b5',q:'hdim'},{name:'A7b9',q:'dom'},{name:'Dm7',q:'m7'},{name:'%',q:''}],
+      bpm:120, feel:'Swing',
+      tab:[
+        {s:3,f:2,beat:0,type:'r'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:2,beat:1,type:'n'},{s:2,f:3,beat:1.5,type:'n'},
+        {s:2,f:2,beat:4,type:'n'},{s:2,f:4,beat:4.5,type:'r'},{s:1,f:2,beat:5,type:'n'},{s:1,f:4,beat:5.5,type:'a'},
+        {s:1,f:3,beat:6,type:'n'},
+        {s:1,f:1,beat:8,type:'r'}
+      ],
+      concept:'Em7b5 (E G Bb D) and Gdim7 (G Bb Db E) share three notes. This overlap lets you pivot seamlessly between the ii and V sounds.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/half-diminished-chords/'}
+    },
+    { id:'min-dimscale', title:'Diminished Scale over V7b9', prog:'ii-V-i', diff:'adv', concepts:['Dim scale','V7b9'],
+      key:'A', chords:[{name:'Bm7b5',q:'hdim'},{name:'E7b9',q:'dom'},{name:'Am7',q:'m7'},{name:'%',q:''}],
+      bpm:130, feel:'Swing',
+      tab:[
+        {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:1,beat:1,type:'r'},{s:2,f:3,beat:1.5,type:'n'},
+        {s:2,f:1,beat:4,type:'n'},{s:2,f:2,beat:4.5,type:'a'},{s:2,f:4,beat:5,type:'n'},{s:1,f:1,beat:5.5,type:'n'},
+        {s:1,f:3,beat:6,type:'a'},{s:1,f:2,beat:6.5,type:'n'},{s:1,f:0,beat:7,type:'n'},
+        {s:2,f:2,beat:8,type:'r'}
+      ],
+      concept:'The half-whole diminished scale (H-W-H-W...) over E7 gives you the b9, #9, #11, and 13 — a symmetrical pattern that repeats every minor 3rd.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/diminished-scale-guitar/'}
+    },
+
+    // ═══ TURNAROUND I-vi-ii-V ═══
+    { id:'turn-arp', title:'Arpeggio Through Changes', prog:'I-vi-ii-V', diff:'beg', concepts:['Arpeggios','Turnaround'],
+      key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'Am7',q:'m7'},{name:'Dm7',q:'m7'},{name:'G7',q:'dom'}],
+      bpm:120, feel:'Swing',
+      tab:[
+        {s:4,f:3,beat:0,type:'r'},{s:3,f:2,beat:0.5,type:'n'},{s:2,f:0,beat:1,type:'n'},{s:2,f:1,beat:1.5,type:'n'},
+        {s:2,f:2,beat:2,type:'r'},{s:2,f:0,beat:2.5,type:'n'},{s:3,f:2,beat:3,type:'n'},{s:3,f:1,beat:3.5,type:'n'},
+        {s:3,f:0,beat:4,type:'n'},{s:3,f:3,beat:4.5,type:'r'},{s:2,f:1,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
+        {s:3,f:0,beat:6,type:'r'},{s:3,f:2,beat:6.5,type:'n'},{s:2,f:0,beat:7,type:'n'},{s:2,f:2,beat:7.5,type:'n'}
+      ],
+      concept:'One arpeggio per chord, two beats each. The simplest way to outline a turnaround — hear each chord change clearly.',
+      source:{name:'learnjazzstandards.com', url:'https://www.learnjazzstandards.com/blog/learning-jazz/jazz-theory/rhythm-changes/'}
+    },
+    { id:'turn-chromatic', title:'Chromatic Voice Leading', prog:'I-vi-ii-V', diff:'int', concepts:['Chromaticism','Voice leading'],
+      key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'Am7',q:'m7'},{name:'Dm7',q:'m7'},{name:'G7',q:'dom'}],
+      bpm:130, feel:'Swing',
+      tab:[
+        {s:2,f:0,beat:0,type:'n'},{s:2,f:1,beat:0.5,type:'r'},{s:1,f:1,beat:1,type:'n'},{s:1,f:0,beat:1.5,type:'a'},
+        {s:2,f:2,beat:2,type:'r'},{s:2,f:1,beat:2.5,type:'a'},{s:2,f:0,beat:3,type:'n'},{s:1,f:1,beat:3.5,type:'n'},
+        {s:2,f:1,beat:4,type:'n'},{s:2,f:2,beat:4.5,type:'r'},{s:1,f:2,beat:5,type:'a'},{s:1,f:1,beat:5.5,type:'n'},
+        {s:2,f:0,beat:6,type:'r'},{s:2,f:2,beat:6.5,type:'n'},{s:1,f:0,beat:7,type:'a'},{s:1,f:1,beat:7.5,type:'n'}
+      ],
+      concept:'Guide tones (3rds and 7ths) connected by chromatic half steps. The 7th of one chord resolves down to the 3rd of the next — classic bebop voice leading.',
+      source:{name:'jazzadvice.com', url:'https://www.jazzadvice.com/lessons/voice-leading-for-jazz-musicians/'}
+    },
+    { id:'turn-coltrane', title:'Coltrane Substitution Pattern', prog:'I-vi-ii-V', diff:'adv', concepts:['Coltrane changes'],
+      key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'EbΔ7',q:'maj'},{name:'GbΔ7',q:'maj'},{name:'AΔ7',q:'maj'}],
+      bpm:140, feel:'Swing',
+      tab:[
+        {s:2,f:0,beat:0,type:'n'},{s:2,f:1,beat:0.5,type:'r'},{s:1,f:0,beat:1,type:'n'},{s:1,f:1,beat:1.5,type:'n'},
+        {s:2,f:3,beat:2,type:'n'},{s:2,f:4,beat:2.5,type:'r'},{s:1,f:3,beat:3,type:'n'},{s:1,f:4,beat:3.5,type:'n'},
+        {s:2,f:2,beat:4,type:'n'},{s:2,f:4,beat:4.5,type:'r'},{s:1,f:2,beat:5,type:'n'},{s:1,f:4,beat:5.5,type:'n'},
+        {s:2,f:1,beat:6,type:'r'},{s:2,f:2,beat:6.5,type:'n'},{s:1,f:1,beat:7,type:'n'},{s:1,f:2,beat:7.5,type:'n'}
+      ],
+      concept:'Coltrane\'s "Giant Steps" concept: divide the octave into major 3rds (C-Eb-Gb-A), playing a major arpeggio fragment on each. Maximum harmonic motion.',
+      source:{name:'Jens Larsen (YouTube)', url:'https://www.youtube.com/watch?v=M6sLaR2jDmA'}
+    },
+
+    // ═══ BLUES ═══
+    { id:'blues-basic', title:'Blues Scale + Chord Tones', prog:'Blues', diff:'beg', concepts:['Blues scale'],
+      key:'A', chords:[{name:'A7',q:'dom'},{name:'D7',q:'dom'},{name:'A7',q:'dom'},{name:'E7',q:'dom'}],
+      bpm:100, feel:'Shuffle',
+      tab:[
+        {s:3,f:2,beat:0,type:'r'},{s:3,f:0,beat:0.5,type:'n'},{s:4,f:3,beat:1,type:'n'},{s:4,f:2,beat:1.5,type:'n'},
+        {s:4,f:0,beat:2,type:'r'},{s:3,f:0,beat:3,type:'n'},{s:3,f:2,beat:3.5,type:'n'},
+        {s:3,f:0,beat:4,type:'n'},{s:4,f:3,beat:4.5,type:'a'},{s:4,f:2,beat:5,type:'r'},{s:4,f:0,beat:5.5,type:'n'},
+        {s:3,f:2,beat:6,type:'n'},{s:3,f:0,beat:6.5,type:'r'}
+      ],
+      concept:'The minor pentatonic/blues scale over dominant 7th chords — the clash between minor 3rd (C) and major 3rd (C#) is the heart of the blues sound.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/jazz-blues-guitar/'}
+    },
+    { id:'blues-passing', title:'Jazz Blues with Passing Tones', prog:'Blues', diff:'int', concepts:['Passing tones','Jazz blues'],
+      key:'Bb', chords:[{name:'Bb7',q:'dom'},{name:'Eb7',q:'dom'},{name:'Bb7',q:'dom'},{name:'F7',q:'dom'}],
+      bpm:120, feel:'Swing',
+      tab:[
+        {s:3,f:3,beat:0,type:'r'},{s:3,f:2,beat:0.5,type:'n'},{s:3,f:1,beat:1,type:'a'},{s:3,f:0,beat:1.5,type:'n'},
+        {s:4,f:3,beat:2,type:'n'},{s:4,f:1,beat:2.5,type:'r'},{s:3,f:0,beat:3,type:'n'},{s:3,f:3,beat:3.5,type:'n'},
+        {s:3,f:1,beat:4,type:'r'},{s:3,f:3,beat:4.5,type:'n'},{s:2,f:0,beat:5,type:'n'},{s:2,f:1,beat:5.5,type:'a'},
+        {s:2,f:3,beat:6,type:'n'},{s:1,f:1,beat:6.5,type:'n'},
+        {s:1,f:3,beat:8,type:'r'}
+      ],
+      concept:'Chromatic passing tones between chord tones add sophistication to a blues line. Targeting the 3rd and 7th of each dominant chord keeps the harmony clear.',
+      source:{name:'mattwarnockguitar.com', url:'https://mattwarnockguitar.com/jazz-blues/'}
+    },
+    { id:'blues-bird', title:'Bird Blues Chromatic Line', prog:'Blues', diff:'adv', concepts:['Bird blues','Chromaticism'],
+      key:'F', chords:[{name:'FΔ7',q:'maj'},{name:'Em7',q:'m7'},{name:'A7',q:'dom'},{name:'Dm7',q:'m7'}],
+      bpm:140, feel:'Swing',
+      tab:[
+        {s:2,f:2,beat:0,type:'r'},{s:2,f:1,beat:0.5,type:'n'},{s:2,f:0,beat:1,type:'n'},{s:3,f:3,beat:1.5,type:'n'},
+        {s:3,f:2,beat:2,type:'n'},{s:3,f:0,beat:2.5,type:'r'},{s:2,f:0,beat:3,type:'a'},{s:2,f:1,beat:3.5,type:'n'},
+        {s:2,f:2,beat:4,type:'r'},{s:2,f:3,beat:4.5,type:'a'},{s:2,f:4,beat:5,type:'n'},{s:1,f:1,beat:5.5,type:'n'},
+        {s:1,f:3,beat:6,type:'a'},{s:1,f:2,beat:6.5,type:'n'},
+        {s:1,f:1,beat:8,type:'r'}
+      ],
+      concept:'Parker\'s "Blues for Alice" reimagines the 12-bar blues with a descending chromatic bass line and ii-V chains. This line follows that moving harmony.',
+      source:{name:'learnjazzstandards.com', url:'https://www.learnjazzstandards.com/blog/learning-jazz/jazz-theory/blues-for-alice/'}
+    }
+  ];
+
+  const PROG_FILTERS = [
+    {label:'ii — V — I (Major)', value:'ii-V-I'},
+    {label:'ii — V — i (Minor)', value:'ii-V-i'},
+    {label:'I — vi — ii — V', value:'I-vi-ii-V'},
+    {label:'Blues', value:'Blues'},
+    {label:'All', value:'all'}
+  ];
+  const DIFF_ORDER = ['beg','int','adv'];
+  const DIFF_LABELS = {beg:'Beginner — Arpeggio Foundations', int:'Intermediate — Bebop Vocabulary', adv:'Advanced — Substitutions & Chromaticism'};
+
+  let activeFilter = 'all';
+  let playingLickId = null;
+  let playingTimeouts = [];
+
+  // ── Build filter pills ──
+  const filterEl = document.getElementById('lick-filter');
+  PROG_FILTERS.forEach(pf => {
+    const pill = document.createElement('button');
+    pill.className = 'lick-prog-pill' + (pf.value === 'all' ? ' active' : '');
+    pill.textContent = pf.label;
+    pill.dataset.filter = pf.value;
+    pill.addEventListener('click', () => {
+      filterEl.querySelectorAll('.lick-prog-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeFilter = pf.value;
+      renderLicks();
+    });
+    filterEl.appendChild(pill);
+  });
+
+  // ── Tab rendering ──
+  function renderTab(tab) {
+    const maxBeat = Math.max(...tab.map(n => n.beat)) + 1;
+    const cols = Math.ceil(maxBeat * 4) + 2;
+    const grid = [];
+    for (let s = 5; s >= 0; s--) {
+      const row = new Array(cols).fill(null);
+      grid.push({str: s, row});
+    }
+    tab.forEach(note => {
+      const col = Math.round(note.beat * 4) + 1;
+      const gridIdx = 5 - note.s;
+      if (gridIdx >= 0 && gridIdx < 6 && col < cols) {
+        grid[gridIdx].row[col] = {fret: note.f, type: note.type};
+      }
+    });
+
+    let html = '';
+    grid.forEach(g => {
+      const label = STR_LABELS[g.str];
+      let line = '<span class="s">' + label + '</span><span class="bar">|</span>';
+      for (let c = 1; c < cols; c++) {
+        const n = g.row[c];
+        if (n) {
+          const cls = n.type === 'r' ? 'r' : n.type === 'a' ? 'a' : '';
+          line += cls ? '<span class="' + cls + '">' + n.fret + '</span>' : n.fret;
+          if (n.fret >= 10) c++;
+        } else {
+          line += '—';
+        }
+      }
+      line += '<span class="bar">|</span>';
+      html += line + '\n';
+    });
+    return html.trimEnd();
+  }
+
+  // ── Playback ──
+  function stopLickPlayback() {
+    playingTimeouts.forEach(t => clearTimeout(t));
+    playingTimeouts = [];
+    if (playingLickId) {
+      const btn = document.querySelector('[data-lick-play="' + playingLickId + '"]');
+      if (btn) { btn.classList.remove('playing'); btn.innerHTML = '&#9654; Play'; }
+      const btnSlow = document.querySelector('[data-lick-slow="' + playingLickId + '"]');
+      if (btnSlow) { btnSlow.classList.remove('playing'); btnSlow.innerHTML = '&#9654; Slow'; }
+    }
+    playingLickId = null;
+  }
+
+  function playLick(lick, slow) {
+    stopLickPlayback();
+    const useSampler = typeof samplerReady !== 'undefined' && samplerReady && typeof sampler !== 'undefined';
+    if (!useSampler) return;
+
+    Tone.start();
+    const bpm = slow ? Math.round(lick.bpm * 0.6) : lick.bpm;
+    const beatSec = 60 / bpm;
+    const now = Tone.now() + 0.05;
+
+    playingLickId = lick.id;
+    const btnSel = slow ? '[data-lick-slow="' + lick.id + '"]' : '[data-lick-play="' + lick.id + '"]';
+    const btn = document.querySelector(btnSel);
+    if (btn) { btn.classList.add('playing'); btn.innerHTML = '&#9632; Stop'; }
+
+    let maxTime = 0;
+    lick.tab.forEach(note => {
+      const midi = GUITAR_OPEN[note.s] + note.f;
+      const t = now + note.beat * beatSec;
+      const dur = beatSec * 0.9;
+      sampler.triggerAttackRelease(midiToNoteName(midi), dur, t);
+      if (note.beat * beatSec + dur > maxTime) maxTime = note.beat * beatSec + dur;
+    });
+
+    const tid = setTimeout(() => stopLickPlayback(), (maxTime + 0.3) * 1000);
+    playingTimeouts.push(tid);
+  }
+
+  // ── Render all cards ──
+  function renderLicks() {
+    const body = document.getElementById('lick-body');
+    body.innerHTML = '';
+    const filtered = activeFilter === 'all' ? LICKS : LICKS.filter(l => l.prog === activeFilter);
+
+    DIFF_ORDER.forEach(diff => {
+      const group = filtered.filter(l => l.diff === diff);
+      if (!group.length) return;
+
+      const label = document.createElement('div');
+      label.className = 'lick-section-label';
+      label.textContent = DIFF_LABELS[diff];
+      body.appendChild(label);
+
+      group.forEach(lick => {
+        const card = document.createElement('div');
+        card.className = 'lick-card';
+        card.dataset.prog = lick.prog;
+
+        // Meta row
+        let tagsHtml = '<span class="lick-tag ' + lick.diff + '">' +
+          {beg:'Beginner',int:'Intermediate',adv:'Advanced'}[lick.diff] + '</span>';
+        lick.concepts.forEach(c => { tagsHtml += '<span class="lick-tag concept">' + c + '</span>'; });
+
+        // Progression bar
+        let progHtml = '';
+        lick.chords.forEach(ch => {
+          progHtml += '<div class="lick-prog-slot ' + ch.q + '">' + ch.name + '</div>';
+        });
+
+        // Key badge
+        const keyBadge = '<span style="display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:2px;background:rgba(255,255,255,.06);color:var(--cream);margin-left:6px">Key of ' + lick.key + '</span>';
+
+        card.innerHTML =
+          '<div class="lick-card-meta">' +
+            '<span class="lick-card-title">' + lick.title + keyBadge + '</span>' +
+            '<div class="lick-card-tags">' + tagsHtml + '</div>' +
+          '</div>' +
+          '<div class="lick-prog-bar">' + progHtml + '</div>' +
+          '<div class="lick-tab-wrap"><div class="lick-tab">' + renderTab(lick.tab) + '</div></div>' +
+          '<div class="lick-concept">' + lick.concept + '</div>' +
+          '<div class="lick-controls">' +
+            '<button class="lick-play-btn" data-lick-play="' + lick.id + '">&#9654; Play</button>' +
+            '<button class="lick-play-btn" data-lick-slow="' + lick.id + '">&#9654; Slow</button>' +
+            '<span class="lick-tempo">&#9833; = ' + lick.bpm + ' · ' + lick.feel + '</span>' +
+          '</div>' +
+          '<div class="lick-source">Source: <a href="' + lick.source.url + '" target="_blank" rel="noopener">' + lick.source.name + '</a></div>';
+
+        // Play button events
+        card.querySelector('[data-lick-play]').addEventListener('click', () => {
+          if (playingLickId === lick.id) { stopLickPlayback(); return; }
+          playLick(lick, false);
+        });
+        card.querySelector('[data-lick-slow]').addEventListener('click', () => {
+          if (playingLickId === lick.id) { stopLickPlayback(); return; }
+          playLick(lick, true);
+        });
+
+        body.appendChild(card);
+      });
+    });
+  }
+
+  // ── Panel open/close ──
+  function openLickPanel() {
+    document.getElementById('lick-overlay').classList.add('open');
+    document.getElementById('lick-panel').classList.add('open');
+    lockScroll();
+    if (!document.getElementById('lick-body').children.length) renderLicks();
+  }
+  function closeLickPanel() {
+    stopLickPlayback();
+    document.getElementById('lick-overlay').classList.remove('open');
+    document.getElementById('lick-panel').classList.remove('open');
+    unlockScroll();
+  }
+
+  document.getElementById('lick-lib-btn').addEventListener('click', openLickPanel);
+  document.getElementById('lick-close').addEventListener('click', closeLickPanel);
+  document.getElementById('lick-overlay').addEventListener('click', closeLickPanel);
+
+  // Escape key — hook into existing handler
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('lick-overlay').classList.contains('open')) {
+      closeLickPanel();
+    }
+  });
+})();
 
 // ── Sampler init ───────────────────────────────────────────────────────────
 initSampler();
