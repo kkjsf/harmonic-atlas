@@ -1154,16 +1154,10 @@
   .lick-prog-slot.dim { background: rgba(160,100,100,.15); color: #c09090; }
   .lick-prog-slot.trisub { background: rgba(180,80,80,.15); color: #d09080; }
   .lick-tab-wrap {
-    background: rgba(0,0,0,.3); border-radius: 3px; padding: 10px 14px; overflow-x: auto; margin-bottom: 2px;
+    background: rgba(0,0,0,.25); border-radius: 4px; padding: 12px 16px;
+    overflow-x: auto; margin-bottom: 2px; -webkit-overflow-scrolling: touch;
   }
-  .lick-tab {
-    font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.5;
-    color: rgba(255,255,255,.7); white-space: pre;
-  }
-  .lick-tab .r { color: var(--gold); font-weight: 600; }
-  .lick-tab .a { color: #7090c0; }
-  .lick-tab .s { color: var(--muted); }
-  .lick-tab .bar { color: rgba(255,255,255,.2); }
+  .lick-tab-wrap svg { display: block; min-width: max-content; }
   .lick-controls {
     display: flex; align-items: center; gap: 10px; margin-top: 10px;
   }
@@ -12313,41 +12307,106 @@ window.addEventListener('resize', () => {
     filterEl.appendChild(pill);
   });
 
-  // ── Tab rendering ──
-  function renderTab(tab) {
-    const maxBeat = Math.max(...tab.map(n => n.beat)) + 1;
-    const cols = Math.ceil(maxBeat * 4) + 2;
-    const grid = [];
-    for (let s = 5; s >= 0; s--) {
-      const row = new Array(cols).fill(null);
-      grid.push({str: s, row});
+  // ── SVG Tab rendering ──
+  const NS = 'http://www.w3.org/2000/svg';
+  const TAB_STRING_SP = 14;
+  const TAB_LEFT = 22;
+  const TAB_RIGHT = 14;
+  const TAB_TOP = 26;
+  const TAB_BOT = 6;
+  const TAB_BEAT_W = 38;
+  const TAB_NOTE_R = 9;
+
+  function svgEl(tag, attrs) {
+    const el = document.createElementNS(NS, tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function renderTabSVG(tab, lick) {
+    const maxBeat = Math.max(...tab.map(n => n.beat));
+    const barBeats = 4;
+    const totalBeats = Math.ceil((maxBeat + 1) / barBeats) * barBeats;
+    const w = TAB_LEFT + totalBeats * TAB_BEAT_W + TAB_RIGHT;
+    const tabH = 5 * TAB_STRING_SP;
+    const h = TAB_TOP + tabH + TAB_BOT;
+
+    const svg = svgEl('svg', {width: w, height: h, viewBox: '0 0 ' + w + ' ' + h});
+
+    // String lines + labels
+    for (let i = 0; i < 6; i++) {
+      const y = TAB_TOP + (5 - i) * TAB_STRING_SP;
+      svg.appendChild(svgEl('line', {x1:TAB_LEFT, y1:y, x2:w-TAB_RIGHT, y2:y,
+        stroke:'rgba(255,255,255,0.1)', 'stroke-width':'1'}));
+      const lbl = svgEl('text', {x:TAB_LEFT-10, y:y+4, 'text-anchor':'middle',
+        fill:'rgba(255,255,255,0.3)', 'font-family':'IBM Plex Mono,monospace', 'font-size':'10'});
+      lbl.textContent = STR_LABELS[i];
+      svg.appendChild(lbl);
     }
+
+    // Bar lines
+    const numBars = totalBeats / barBeats;
+    for (let b = 0; b <= numBars; b++) {
+      const x = TAB_LEFT + b * barBeats * TAB_BEAT_W;
+      svg.appendChild(svgEl('line', {x1:x, y1:TAB_TOP-4, x2:x, y2:TAB_TOP+tabH+4,
+        stroke:'rgba(255,255,255,0.15)', 'stroke-width': b===0||b===numBars ? '2' : '1'}));
+    }
+
+    // Chord labels above bars
+    if (lick.chords) {
+      const chordBeats = totalBeats / lick.chords.length;
+      lick.chords.forEach((ch, ci) => {
+        if (ch.name === '%') return;
+        const x = TAB_LEFT + ci * chordBeats * TAB_BEAT_W + 4;
+        const lbl = svgEl('text', {x:x, y:TAB_TOP-10,
+          fill:'rgba(255,255,255,0.35)', 'font-family':'IBM Plex Mono,monospace',
+          'font-size':'9', 'letter-spacing':'0.04em'});
+        lbl.textContent = ch.name;
+        svg.appendChild(lbl);
+      });
+    }
+
+    // Connectors between consecutive notes
+    const sorted = [...tab].sort((a,b) => a.beat - b.beat);
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const c = sorted[i], n = sorted[i+1];
+      svg.appendChild(svgEl('line', {
+        x1: TAB_LEFT + c.beat * TAB_BEAT_W, y1: TAB_TOP + (5-c.s) * TAB_STRING_SP,
+        x2: TAB_LEFT + n.beat * TAB_BEAT_W, y2: TAB_TOP + (5-n.s) * TAB_STRING_SP,
+        stroke:'rgba(201,168,76,0.08)', 'stroke-width':'1', 'stroke-dasharray':'3,3'
+      }));
+    }
+
+    // Notes
     tab.forEach(note => {
-      const col = Math.round(note.beat * 4) + 1;
-      const gridIdx = 5 - note.s;
-      if (gridIdx >= 0 && gridIdx < 6 && col < cols) {
-        grid[gridIdx].row[col] = {fret: note.f, type: note.type};
+      const x = TAB_LEFT + note.beat * TAB_BEAT_W;
+      const y = TAB_TOP + (5 - note.s) * TAB_STRING_SP;
+
+      // Background to clear string line
+      svg.appendChild(svgEl('circle', {cx:x, cy:y, r:TAB_NOTE_R+1, fill:'#222228'}));
+
+      // Note circle
+      const cAttrs = {cx:x, cy:y, r:TAB_NOTE_R};
+      if (note.type === 'r') {
+        cAttrs.fill = 'rgba(201,168,76,0.2)'; cAttrs.stroke = '#c9a84c'; cAttrs['stroke-width'] = '1.5';
+      } else if (note.type === 'a') {
+        cAttrs.fill = 'rgba(112,144,192,0.15)'; cAttrs.stroke = '#7090c0'; cAttrs['stroke-width'] = '1.5';
+      } else {
+        cAttrs.fill = 'rgba(255,255,255,0.06)'; cAttrs.stroke = 'rgba(255,255,255,0.3)'; cAttrs['stroke-width'] = '1';
       }
+      svg.appendChild(svgEl('circle', cAttrs));
+
+      // Fret number
+      const tAttrs = {x:x, y:y+3.5, 'text-anchor':'middle',
+        'font-family':'IBM Plex Mono,monospace', 'font-size':'10',
+        'font-weight': note.type === 'r' ? '700' : '500'};
+      tAttrs.fill = note.type === 'r' ? '#c9a84c' : note.type === 'a' ? '#7090c0' : 'rgba(255,255,255,0.8)';
+      const txt = svgEl('text', tAttrs);
+      txt.textContent = note.f;
+      svg.appendChild(txt);
     });
 
-    let html = '';
-    grid.forEach(g => {
-      const label = STR_LABELS[g.str];
-      let line = '<span class="s">' + label + '</span><span class="bar">|</span>';
-      for (let c = 1; c < cols; c++) {
-        const n = g.row[c];
-        if (n) {
-          const cls = n.type === 'r' ? 'r' : n.type === 'a' ? 'a' : '';
-          line += cls ? '<span class="' + cls + '">' + n.fret + '</span>' : n.fret;
-          if (n.fret >= 10) c++;
-        } else {
-          line += '—';
-        }
-      }
-      line += '<span class="bar">|</span>';
-      html += line + '\n';
-    });
-    return html.trimEnd();
+    return svg;
   }
 
   // ── Playback ──
@@ -12431,7 +12490,7 @@ window.addEventListener('resize', () => {
             '<div class="lick-card-tags">' + tagsHtml + '</div>' +
           '</div>' +
           '<div class="lick-prog-bar">' + progHtml + '</div>' +
-          '<div class="lick-tab-wrap"><div class="lick-tab">' + renderTab(lick.tab) + '</div></div>' +
+          '<div class="lick-tab-wrap"></div>' +
           '<div class="lick-concept">' + lick.concept + '</div>' +
           '<div class="lick-controls">' +
             '<button class="lick-play-btn" data-lick-play="' + lick.id + '">&#9654; Play</button>' +
@@ -12439,6 +12498,8 @@ window.addEventListener('resize', () => {
             '<span class="lick-tempo">&#9833; = ' + lick.bpm + ' · ' + lick.feel + '</span>' +
           '</div>' +
           '<div class="lick-source">Source: <a href="' + lick.source.url + '" target="_blank" rel="noopener">' + lick.source.name + '</a></div>';
+
+        card.querySelector('.lick-tab-wrap').appendChild(renderTabSVG(lick.tab, lick));
 
         // Play button events
         card.querySelector('[data-lick-play]').addEventListener('click', () => {
