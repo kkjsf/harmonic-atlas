@@ -5395,30 +5395,28 @@ function buildArpeggioShape(chordPcs, rootPc, anchorStr) {
   const rootPcN = ((rootPc%12)+12)%12;
   const pcsNorm = chordPcs.map(pc => ((pc%12)+12)%12);
 
-  // Find lowest root fret on anchor string
   let anchorFret = -1;
   for (let f = 0; f <= 12; f++) {
     if ((ARP_OPEN_PC[anchorStr] + f) % 12 === rootPcN) { anchorFret = f; break; }
   }
   if (anchorFret < 0) return null;
 
-  const startPitch = ARP_TUNING_ST[anchorStr] + anchorFret;
-  const fretLo = Math.max(0, anchorFret - 2);
-  const fretHi = anchorFret + 2; // max 5-fret span
+  if (anchorFret <= 1) anchorFret += 12;
 
-  // Collect all chord tones on ALL strings within the compact fret window
+  const fretLo = Math.max(0, anchorFret - 2);
+  const fretHi = anchorFret + 2;
+
   const candidates = [];
   for (let s = 0; s < 6; s++) {
     for (let f = fretLo; f <= Math.min(17, fretHi); f++) {
       const pc = (ARP_OPEN_PC[s] + f) % 12;
       if (!pcsNorm.includes(pc)) continue;
       const pitch = ARP_TUNING_ST[s] + f;
-      if (pitch >= startPitch) candidates.push({ str: s, fret: f, pc, pitch });
+      candidates.push({ str: s, fret: f, pc, pitch });
     }
   }
   candidates.sort((a, b) => a.pitch - b.pitch || a.str - b.str);
 
-  // Select notes: ascending pitch, max 2 per string
   const notes = [];
   const strCount = {};
   let prevPitch = -1;
