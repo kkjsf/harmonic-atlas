@@ -2450,6 +2450,7 @@
     <button class="guitar-sub-tab active" data-view="diagrams" id="tab-diagrams">Basic</button>
     <button class="guitar-sub-tab" data-view="arpeggio" id="tab-arpeggio">Arpeggios</button>
     <button class="guitar-sub-tab" data-view="scale" id="tab-scale">Scale</button>
+    <button class="guitar-sub-tab" data-view="shell" id="tab-shell">Shell</button>
     <button class="guitar-sub-tab" data-view="drop2" id="tab-drop2">Drop 2</button>
     <button class="guitar-sub-tab" data-view="drop3" id="tab-drop3">Drop 3</button>
   </div>
@@ -4355,16 +4356,17 @@ function render(){
 
   const isDiatonic7ths = state.mode==='4';
   const has7thChords = isDiatonic7ths || state.mode==='secdom' || state.mode==='secdim' || state.mode==='secsub';
+  document.getElementById('tab-shell').classList.toggle('disabled', !has7thChords);
   document.getElementById('tab-drop2').classList.toggle('disabled', !has7thChords);
   document.getElementById('tab-drop3').classList.toggle('disabled', !has7thChords);
-  if ((state.view==='drop2'||state.view==='drop3') && !has7thChords) {
+  if ((state.view==='shell'||state.view==='drop2'||state.view==='drop3') && !has7thChords) {
     state.view='diagrams'; state.lastGuitarView='diagrams';
   }
   document.getElementById('tab-arpeggio').classList.toggle('disabled', !has7thChords);
   if (state.view==='arpeggio' && !has7thChords) {
     state.view='diagrams'; state.lastGuitarView='diagrams';
   }
-  const isGuitar   = ['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
+  const isGuitar   = ['diagrams','arpeggio','scale','shell','drop2','drop3'].includes(state.view);
   const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
 
   document.querySelectorAll('.view-tab').forEach(t => {
@@ -4627,6 +4629,7 @@ function renderView(scaleNotes,scaleData){
   else if(state.view==='diagrams')  renderDiagrams(scaleNotes,scaleData);
   else if(state.view==='arpeggio')  renderArpeggios(scaleNotes,scaleData);
   else if(state.view==='scale')     renderScaleTab(scaleNotes,scaleData);
+  else if(state.view==='shell')      renderShellVoicings(scaleNotes,scaleData);
   else if(state.view==='drop2')     renderDropVoicings(scaleNotes,scaleData,2);
   else if(state.view==='drop3')     renderDropVoicings(scaleNotes,scaleData,3);
   else if(state.view==='mandolin')        renderMandolin(scaleNotes,scaleData);
@@ -5330,6 +5333,151 @@ function renderDiagrams(scaleNotes, scaleData) {
 
     sec.appendChild(grid);
     if (di < scaleLen-1) { const dv=document.createElement('div'); dv.className='section-divider'; sec.appendChild(dv); }
+    container.appendChild(sec);
+  });
+}
+
+// ══════════════════════════════════════════════
+// RENDER: SHELL VOICINGS VIEW
+// ══════════════════════════════════════════════
+
+function renderShellVoicings(scaleNotes, scaleData) {
+  const container = document.getElementById('all-degrees');
+  container.innerHTML = '';
+  const rootPc  = parseInt(state.key);
+  const isSecDom = state.mode === 'secdom';
+  const isSecDim = state.mode === 'secdim';
+
+  let chordEntries = [];
+
+  if (isSecDom) {
+    const romans = computeAllRomans(scaleData.intervals, scaleData);
+    const items  = buildSecondaryDominants(rootPc, scaleData.intervals, romans);
+    items.forEach(({degIdx, label, chord}) => {
+      const chRootPc = noteNameToPc(chord.root);
+      const chord4pcs = chord.notes.map(n=>noteNameToPc(n));
+      chordEntries.push({
+        degIdx, sectionId: `deg-secdom-${degIdx}-${chRootPc}`,
+        headerHtml: `<span class="degree-num" style="font-size:18px;color:#e07070">${label}</span>`,
+        chordNotes: chord.notes,
+        sym: chord.sym, chRootPc, chord4pcs,
+        labelBadge: `<span style="font-size:9px;font-family:IBM Plex Mono,monospace;color:#e07070;letter-spacing:.1em;text-transform:uppercase;margin-left:8px">${label}</span>`
+      });
+    });
+  } else if (isSecDim) {
+    const romans = computeAllRomans(scaleData.intervals, scaleData);
+    const items  = buildSecondaryDiminished(rootPc, scaleData.intervals, romans, scaleNotes);
+    items.forEach(({degIdx, label, chord}) => {
+      const chRootPc = noteNameToPc(chord.root);
+      const chord4pcs = chord.notes.map(n => noteNameToPc(n));
+      chordEntries.push({
+        degIdx, sectionId: `deg-secdim-${degIdx}-${chRootPc}`,
+        headerHtml: `<span class="degree-num" style="font-size:18px;color:#7090c0">${label}</span>`,
+        chordNotes: chord.notes,
+        sym: chord.sym, chRootPc, chord4pcs,
+        labelBadge: `<span style="font-size:9px;font-family:IBM Plex Mono,monospace;color:#7090c0;letter-spacing:.1em;text-transform:uppercase;margin-left:8px">${label}</span>`
+      });
+    });
+  } else {
+    const scaleLen = scaleNotes.length;
+    const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+    const romans   = computeAllRomans(scaleData.intervals, scaleData);
+    scaleNotes.forEach((_, di) => {
+      const chordNotes = buildChord(scaleNotes, di, 4);
+      const iv4        = chordIntervals(scaleData.intervals, di, 4);
+      const {sym}      = getChordSymbol(chordNotes[0], iv4);
+      const chRootPc   = noteNameToPc(chordNotes[0]);
+      const chord4pcs  = chordNotes.map(n => noteNameToPc(n));
+      chordEntries.push({
+        degIdx: di, sectionId: `deg-${di}`,
+        headerHtml: `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`,
+        chordNotes, sym, chRootPc, chord4pcs, labelBadge: ''
+      });
+    });
+  }
+
+  chordEntries.forEach(({degIdx, sectionId, headerHtml, chordNotes, sym, chRootPc, chord4pcs, labelBadge}) => {
+    const sec = document.createElement('div');
+    sec.className = 'degree-section'; sec.id = sectionId;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'degree-header';
+    hdr.innerHTML = headerHtml;
+    sec.appendChild(hdr);
+
+    const chordLbl = document.createElement('div');
+    chordLbl.style.cssText = 'font-family:Playfair Display,serif;font-size:16px;font-weight:700;color:var(--cream);margin-bottom:14px;';
+    chordLbl.innerHTML = `${chordNotes[0]}<sup style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--gold2);vertical-align:super">${sym}</sup>
+      <span style="font-size:10px;font-family:IBM Plex Mono,monospace;color:var(--muted);font-weight:400;margin-left:8px">Shell (1 – 3 – 7)</span>${labelBadge}`;
+    sec.appendChild(chordLbl);
+
+    const shellGroups = getShellVoicings(chord4pcs);
+    let totalCards = 0;
+    const cols = {
+      '1 – 3 – 7': { bg:'rgba(201,168,76,.07)', border:'rgba(201,168,76,.28)', label:'#c9a84c' },
+      '1 – 7 – 3': { bg:'rgba(124,111,160,.10)', border:'rgba(124,111,160,.32)', label:'#9080c0' },
+    };
+
+    const outerGrid = document.createElement('div');
+    outerGrid.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+    shellGroups.forEach(({rootStr, label: grpLabel, voicings}) => {
+      const grpCards = [];
+      voicings.forEach(({type, notes, ss}) => {
+        const frets = computeGuitarVoicing(notes, ss, true);
+        if (!frets) return;
+        const col = cols[type];
+        grpCards.push({frets, notes, ss, type, col});
+      });
+      if (grpCards.length === 0) return;
+
+      const group = document.createElement('div');
+      group.style.cssText = 'background:rgba(201,168,76,.04);border:1px solid var(--border2);border-radius:4px;padding:10px 12px 12px;';
+
+      const groupHdr = document.createElement('div');
+      groupHdr.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:9px;';
+      groupHdr.innerHTML = `<span style="font-family:'EB Garamond',serif;font-size:14px;font-weight:600;color:var(--gold)">${grpLabel}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:var(--muted);background:var(--surface2);padding:2px 6px;border-radius:2px">${STR_NAMES[rootStr]} string</span>`;
+      group.appendChild(groupHdr);
+
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
+      grpCards.forEach(({frets, notes, ss, type, col}) => {
+        const {frets6, pcs6} = voicingTo6Strings(ss, frets, notes);
+        const title = `${chordNotes[0]}${sym} (Shell ${type})`;
+
+        const card = document.createElement('div');
+        card.className = 'drop-card shell-card';
+        card.style.cssText += `border-color:${col.border};cursor:pointer;animation-delay:${totalCards*.04}s;`;
+        card._voicing = { frets6, pcs6, rootPc: chRootPc, title };
+        card.dataset.navCard = 'shell';
+        card.addEventListener('click', () => {
+          const all = Array.from(document.querySelectorAll('.drop-card[data-nav-card="shell"]'));
+          const navList = all.map(c => c._voicing);
+          const ni = all.indexOf(card);
+          showDiagramModal(null, null, null, null, navList, ni >= 0 ? ni : 0);
+        });
+        card.innerHTML = `
+          <div class="drop-str-label" style="color:${col.label};opacity:.7">${type}</div>
+          ${makeChordDiagram(frets6, pcs6, chRootPc, 118)}
+          <div class="diag-notes" style="font-size:8px">${notes.map(p=>pcToName(((p%12)+12)%12)).join(' – ')}</div>`;
+        grid.appendChild(card);
+        totalCards++;
+      });
+      group.appendChild(grid);
+      outerGrid.appendChild(group);
+    });
+
+    sec.appendChild(outerGrid);
+
+    if (totalCards === 0) {
+      const msg = document.createElement('div');
+      msg.className = 'empty-msg';
+      msg.textContent = 'No playable Shell shapes found.';
+      sec.insertBefore(msg, outerGrid);
+    }
+
+    const dv=document.createElement('div'); dv.className='section-divider'; sec.appendChild(dv);
     container.appendChild(sec);
   });
 }
@@ -6886,6 +7034,28 @@ function renderMandolin(scaleNotes, scaleData) {
     if (degIdx < scaleLen-1) { const dv=document.createElement('div'); dv.className='section-divider'; sec.appendChild(dv); }
     container.appendChild(sec);
   });
+}
+
+// ══════════════════════════════════════════════════════
+// SHELL CHORDS — jazzguitar.be standard (guide tone chords)
+// 3-note voicings: root in bass
+// 1-3-7 uses adjacent strings, 1-7-3 uses skip-one strings
+function getShellVoicings(chord4pcs) {
+  const [p1,p3,_p5,p7] = chord4pcs;
+  return [
+    { rootStr:0, label:'Root on E', voicings:[
+      { type:'1 – 3 – 7', notes:[p1,p3,p7], ss:[0,1,2] },
+      { type:'1 – 7 – 3', notes:[p1,p7,p3], ss:[0,2,3] },
+    ]},
+    { rootStr:1, label:'Root on A', voicings:[
+      { type:'1 – 3 – 7', notes:[p1,p3,p7], ss:[1,2,3] },
+      { type:'1 – 7 – 3', notes:[p1,p7,p3], ss:[1,3,4] },
+    ]},
+    { rootStr:2, label:'Root on D', voicings:[
+      { type:'1 – 3 – 7', notes:[p1,p3,p7], ss:[2,3,4] },
+      { type:'1 – 7 – 3', notes:[p1,p7,p3], ss:[2,4,5] },
+    ]},
+  ];
 }
 
 // ══════════════════════════════════════════════════════
@@ -9269,7 +9439,7 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
-  const isGuitar2  =['diagrams','arpeggio','scale','drop2','drop3'].includes(state.view);
+  const isGuitar2  =['diagrams','arpeggio','scale','shell','drop2','drop3'].includes(state.view);
   const isMandolin2=['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
   document.querySelectorAll('.view-tab').forEach(t=>{
     const v=t.dataset.view;
