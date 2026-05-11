@@ -10,6 +10,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -1091,12 +1092,13 @@
   }
   #lick-overlay.open { display: block; }
   #lick-panel {
-    position: fixed; top: 0; right: -580px; width: min(560px, 92vw); height: 100vh;
+    display: none; position: fixed; top: 4vh; left: 50%; transform: translateX(-50%);
+    width: min(900px, 94vw); max-height: 92vh;
     background: var(--surface); z-index: calc(var(--z-overlay) + 1);
-    overflow-y: auto; box-shadow: -8px 0 40px rgba(0,0,0,.5);
-    border-left: 1px solid var(--border); transition: right .28s cubic-bezier(.4,0,.2,1);
+    overflow-y: auto; box-shadow: 0 8px 60px rgba(0,0,0,.6);
+    border: 1px solid var(--border); border-radius: 8px;
   }
-  #lick-overlay.open + #lick-panel, #lick-panel.open { right: 0; }
+  #lick-panel.open { display: block; }
   .lick-panel-header {
     position: sticky; top: 0; background: var(--surface); z-index: 2;
     padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
@@ -1154,10 +1156,14 @@
   .lick-prog-slot.dim { background: rgba(160,100,100,.15); color: #c09090; }
   .lick-prog-slot.trisub { background: rgba(180,80,80,.15); color: #d09080; }
   .lick-tab-wrap {
-    background: rgba(0,0,0,.25); border-radius: 4px; padding: 12px 16px;
+    background: var(--surface); border-radius: 4px; padding: 8px 4px 0;
     overflow-x: auto; margin-bottom: 2px; -webkit-overflow-scrolling: touch;
   }
-  .lick-tab-wrap svg { display: block; min-width: max-content; }
+  .lick-tab-wrap svg { display: block; }
+  .lick-tab-wrap .lick-loading {
+    padding: 2rem; font-family: 'IBM Plex Mono', monospace; font-size: .75rem;
+    color: var(--dim); text-align: center; letter-spacing: .1em;
+  }
   .lick-controls {
     display: flex; align-items: center; gap: 10px; margin-top: 10px;
   }
@@ -12043,21 +12049,21 @@ window.addEventListener('resize', () => {
 // ── JAZZ LICK LIBRARY ──────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
 (function() {
-  const GUITAR_OPEN = [40,45,50,55,59,64]; // E2 A2 D3 G3 B3 E4
-  const STR_LABELS = ['E','A','D','G','B','e'];
+  const GUITAR_OPEN = [64,59,55,50,45,40]; // e4 B3 G3 D3 A2 E2 (s:0=high E)
+  const STR_LABELS = ['e','B','G','D','A','E'];
 
   const LICKS = [
     // ═══ ii-V-I MAJOR ═══
     { id:'maj-arp-asc', title:'Straight Arpeggio ii-V-I', prog:'ii-V-I', diff:'beg', concepts:['Arpeggios'],
       key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
       bpm:120, feel:'Swing',
-      tab:[ // {s:string 0-5(E-e), f:fret, beat:float, type:'r'|'a'|'n'}
-        {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:1,beat:1,type:'r'},{s:2,f:2,beat:1.5,type:'n'},
-        {s:1,f:1,beat:2,type:'n'},{s:0,f:1,beat:2.5,type:'r'},
-        {s:3,f:0,beat:4,type:'r'},{s:3,f:2,beat:4.5,type:'n'},{s:2,f:0,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
-        {s:1,f:0,beat:6,type:'r'},{s:1,f:1,beat:6.5,type:'n'},
-        {s:4,f:3,beat:8,type:'r'},{s:3,f:0,beat:8.5,type:'n'},{s:3,f:2,beat:9,type:'n'},{s:2,f:0,beat:9.5,type:'n'},
-        {s:2,f:1,beat:10,type:'r'},{s:1,f:0,beat:10.5,type:'n'}
+      tab:[ // {s:string 0=highE..5=lowE, f:fret, beat:float, type:'r'|'a'|'n'}
+        // Dm7: D F A C ascending
+        {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:2,beat:1,type:'r'},{s:1,f:1,beat:1.5,type:'n'},
+        // G7: G B D F ascending
+        {s:2,f:0,beat:4,type:'r'},{s:1,f:0,beat:4.5,type:'n'},{s:1,f:3,beat:5,type:'n'},{s:0,f:1,beat:5.5,type:'n'},
+        // CΔ7: C E G B ascending
+        {s:4,f:3,beat:8,type:'r'},{s:3,f:2,beat:8.5,type:'n'},{s:2,f:0,beat:9,type:'n'},{s:1,f:0,beat:9.5,type:'n'}
       ],
       concept:'Pure chord tones ascending through each change. The foundation — learn where the arpeggios connect before adding embellishments.',
       source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/jazz-guitar-licks/'}
@@ -12067,7 +12073,7 @@ window.addEventListener('resize', () => {
       bpm:100, feel:'Swing',
       tab:[
         {s:0,f:8,beat:0,type:'n'},{s:0,f:5,beat:0.5,type:'r'},{s:1,f:5,beat:1.5,type:'n'},{s:1,f:8,beat:2,type:'n'},
-        {s:1,f:6,beat:4,type:'n'},{s:1,f:3,beat:4.5,type:'r'},{s:2,f:4,beat:5.5,type:'n'},{s:2,f:2,beat:6,type:'n'},
+        {s:1,f:7,beat:4,type:'n'},{s:1,f:3,beat:4.5,type:'r'},{s:2,f:4,beat:5.5,type:'n'},{s:2,f:2,beat:6,type:'n'},
         {s:2,f:4,beat:8,type:'r'}
       ],
       concept:'Smooth voice leading — each chord change moves to the nearest chord tone. The V→I resolution lands on the 3rd (B) of Gmaj7.',
@@ -12154,8 +12160,11 @@ window.addEventListener('resize', () => {
       key:'A', chords:[{name:'Bm7b5',q:'hdim'},{name:'E7',q:'dom'},{name:'Am7',q:'m7'},{name:'%',q:''}],
       bpm:110, feel:'Swing',
       tab:[
-        {s:4,f:1,beat:0,type:'n'},{s:4,f:3,beat:0.5,type:'r'},{s:3,f:0,beat:1,type:'n'},{s:3,f:2,beat:1.5,type:'n'},
-        {s:3,f:0,beat:4,type:'r'},{s:3,f:1,beat:4.5,type:'n'},{s:2,f:0,beat:5,type:'n'},{s:2,f:1,beat:5.5,type:'n'},
+        // Bm7b5: B D F A ascending
+        {s:4,f:2,beat:0,type:'n'},{s:3,f:0,beat:0.5,type:'r'},{s:3,f:3,beat:1,type:'n'},{s:2,f:2,beat:1.5,type:'n'},
+        // E7: E G# B D ascending
+        {s:3,f:2,beat:4,type:'r'},{s:2,f:1,beat:4.5,type:'n'},{s:1,f:0,beat:5,type:'n'},{s:1,f:3,beat:5.5,type:'n'},
+        // Am: A G E (descending resolution)
         {s:2,f:2,beat:8,type:'r'},{s:2,f:0,beat:8.5,type:'n'},{s:3,f:2,beat:9,type:'n'}
       ],
       concept:'Arpeggiate through the minor ii-V-i using harmonic minor. The raised 7th (G#) over E7 provides the leading tone resolution to Am.',
@@ -12190,7 +12199,7 @@ window.addEventListener('resize', () => {
       bpm:130, feel:'Swing',
       tab:[
         {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:1,beat:1,type:'r'},{s:2,f:3,beat:1.5,type:'n'},
-        {s:2,f:1,beat:4,type:'n'},{s:2,f:2,beat:4.5,type:'a'},{s:2,f:4,beat:5,type:'n'},{s:1,f:1,beat:5.5,type:'n'},
+        {s:2,f:1,beat:4,type:'n'},{s:2,f:2,beat:4.5,type:'a'},{s:2,f:4,beat:5,type:'n'},{s:1,f:2,beat:5.5,type:'n'},
         {s:1,f:3,beat:6,type:'a'},{s:1,f:2,beat:6.5,type:'n'},{s:1,f:0,beat:7,type:'n'},
         {s:2,f:2,beat:8,type:'r'}
       ],
@@ -12203,10 +12212,14 @@ window.addEventListener('resize', () => {
       key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'Am7',q:'m7'},{name:'Dm7',q:'m7'},{name:'G7',q:'dom'}],
       bpm:120, feel:'Swing',
       tab:[
-        {s:4,f:3,beat:0,type:'r'},{s:3,f:2,beat:0.5,type:'n'},{s:2,f:0,beat:1,type:'n'},{s:2,f:1,beat:1.5,type:'n'},
-        {s:2,f:2,beat:2,type:'r'},{s:2,f:0,beat:2.5,type:'n'},{s:3,f:2,beat:3,type:'n'},{s:3,f:1,beat:3.5,type:'n'},
-        {s:3,f:0,beat:4,type:'n'},{s:3,f:3,beat:4.5,type:'r'},{s:2,f:1,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
-        {s:3,f:0,beat:6,type:'r'},{s:3,f:2,beat:6.5,type:'n'},{s:2,f:0,beat:7,type:'n'},{s:2,f:2,beat:7.5,type:'n'}
+        // CΔ7: C E G B ascending
+        {s:4,f:3,beat:0,type:'r'},{s:3,f:2,beat:0.5,type:'n'},{s:2,f:0,beat:1,type:'n'},{s:1,f:0,beat:1.5,type:'n'},
+        // Am7: A G E C descending
+        {s:2,f:2,beat:2,type:'r'},{s:2,f:0,beat:2.5,type:'n'},{s:3,f:2,beat:3,type:'n'},{s:1,f:1,beat:3.5,type:'n'},
+        // Dm7: D F A C ascending
+        {s:3,f:0,beat:4,type:'r'},{s:3,f:3,beat:4.5,type:'n'},{s:2,f:2,beat:5,type:'n'},{s:1,f:1,beat:5.5,type:'n'},
+        // G7: G B D F ascending
+        {s:2,f:0,beat:6,type:'r'},{s:1,f:0,beat:6.5,type:'n'},{s:1,f:3,beat:7,type:'n'},{s:0,f:1,beat:7.5,type:'n'}
       ],
       concept:'One arpeggio per chord, two beats each. The simplest way to outline a turnaround — hear each chord change clearly.',
       source:{name:'learnjazzstandards.com', url:'https://www.learnjazzstandards.com/blog/learning-jazz/jazz-theory/rhythm-changes/'}
@@ -12307,106 +12320,195 @@ window.addEventListener('resize', () => {
     filterEl.appendChild(pill);
   });
 
-  // ── SVG Tab rendering ──
-  const NS = 'http://www.w3.org/2000/svg';
-  const TAB_STRING_SP = 14;
-  const TAB_LEFT = 22;
-  const TAB_RIGHT = 14;
-  const TAB_TOP = 26;
-  const TAB_BOT = 6;
-  const TAB_BEAT_W = 38;
-  const TAB_NOTE_R = 9;
+  // ── VexFlow staff + tab rendering ──
+  const VEXFLOW_MIDI = [64,59,55,50,45,40];
+  const MIDI_TO_VEX = ['c','c#','d','eb','e','f','f#','g','ab','a','bb','b'];
+  const Q_TO_CHORD_TYPE = {m7:'m',dom:'d',maj:'M',hdim:'m',dim:'r',trisub:'d'};
+  const VEX_CHORD_COLORS = {m:'#8b7cf8', d:'#c9a84c', M:'#4caf82', r:'#6b6760'};
 
-  function svgEl(tag, attrs) {
-    const el = document.createElementNS(NS, tag);
-    for (const k in attrs) el.setAttribute(k, attrs[k]);
-    return el;
+  function midiToVexKey(midi) {
+    // Guitar sounds an octave lower than written — add 1 to octave for standard notation
+    return MIDI_TO_VEX[midi % 12] + '/' + Math.floor(midi / 12);
   }
 
-  function renderTabSVG(tab, lick) {
-    const maxBeat = Math.max(...tab.map(n => n.beat));
-    const barBeats = 4;
-    const totalBeats = Math.ceil((maxBeat + 1) / barBeats) * barBeats;
-    const w = TAB_LEFT + totalBeats * TAB_BEAT_W + TAB_RIGHT;
-    const tabH = 5 * TAB_STRING_SP;
-    const h = TAB_TOP + tabH + TAB_BOT;
+  function vexKeyNeedsAcc(key) {
+    var n = key.split('/')[0];
+    if (n.includes('#')) return '#';
+    if (n === 'eb' || n === 'ab' || n === 'bb') return 'b';
+    return null;
+  }
 
-    const svg = svgEl('svg', {width: w, height: h, viewBox: '0 0 ' + w + ' ' + h});
-
-    // String lines + labels
-    for (let i = 0; i < 6; i++) {
-      const y = TAB_TOP + (5 - i) * TAB_STRING_SP;
-      svg.appendChild(svgEl('line', {x1:TAB_LEFT, y1:y, x2:w-TAB_RIGHT, y2:y,
-        stroke:'rgba(255,255,255,0.1)', 'stroke-width':'1'}));
-      const lbl = svgEl('text', {x:TAB_LEFT-10, y:y+4, 'text-anchor':'middle',
-        fill:'rgba(255,255,255,0.3)', 'font-family':'IBM Plex Mono,monospace', 'font-size':'10'});
-      lbl.textContent = STR_LABELS[i];
-      svg.appendChild(lbl);
+  function getLickKeySig(lick) {
+    if (lick.prog === 'ii-V-i') {
+      return {A:'C',D:'F',E:'G',B:'D'}[lick.key] || 'C';
     }
+    return lick.key;
+  }
 
-    // Bar lines
-    const numBars = totalBeats / barBeats;
-    for (let b = 0; b <= numBars; b++) {
-      const x = TAB_LEFT + b * barBeats * TAB_BEAT_W;
-      svg.appendChild(svgEl('line', {x1:x, y1:TAB_TOP-4, x2:x, y2:TAB_TOP+tabH+4,
-        stroke:'rgba(255,255,255,0.15)', 'stroke-width': b===0||b===numBars ? '2' : '1'}));
-    }
+  function applyLickTheme(svgEl) {
+    var existing = svgEl.querySelector('style.lick-theme');
+    if (existing) existing.remove();
+    var style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.setAttribute('class', 'lick-theme');
+    style.textContent = [
+      '.vf-lick path { fill: #c8c2b0; stroke: #c8c2b0; }',
+      '.vf-lick rect { fill: #c8c2b0; }',
+      '.vf-lick polygon { fill: #c8c2b0; }',
+      '.vf-lick .vf-stave line { stroke: #3a3835 !important; }',
+      '.vf-lick .vf-stave path { stroke: #4a4845 !important; fill: #4a4845 !important; }',
+      '.vf-lick .vf-tabstave line { stroke: #3a3835 !important; }',
+      '.vf-lick .vf-tabstave path { stroke: #4a4845 !important; fill: #4a4845 !important; }',
+      '.vf-lick text { fill: #c8c2b0 !important; }',
+      '.vf-lick .vf-tabnote rect { fill: #111417 !important; stroke: none !important; }'
+    ].join('\n');
+    svgEl.classList.add('vf-lick');
+    svgEl.insertBefore(style, svgEl.firstChild);
+    svgEl.style.background = 'transparent';
+  }
 
-    // Chord labels above bars
-    if (lick.chords) {
-      const chordBeats = totalBeats / lick.chords.length;
-      lick.chords.forEach((ch, ci) => {
-        if (ch.name === '%') return;
-        const x = TAB_LEFT + ci * chordBeats * TAB_BEAT_W + 4;
-        const lbl = svgEl('text', {x:x, y:TAB_TOP-10,
-          fill:'rgba(255,255,255,0.35)', 'font-family':'IBM Plex Mono,monospace',
-          'font-size':'9', 'letter-spacing':'0.04em'});
-        lbl.textContent = ch.name;
-        svg.appendChild(lbl);
-      });
-    }
+  function drawLickChordLabels(svgEl, staveNotes, lick, sortedTab, labelH, notationY) {
+    if (!lick.chords) return;
+    var ns = 'http://www.w3.org/2000/svg';
+    var svgRect = svgEl.getBoundingClientRect();
+    var realChords = lick.chords.filter(function(ch) { return ch.name !== '%' && ch.q; });
+    if (!realChords.length) return;
+    var maxBeat = Math.max.apply(null, sortedTab.map(function(n) { return n.beat; }));
+    var totalBeats = Math.ceil((maxBeat + 1) / 4) * 4;
+    var beatsPerChord = totalBeats / realChords.length;
 
-    // Connectors between consecutive notes
-    const sorted = [...tab].sort((a,b) => a.beat - b.beat);
-    for (let i = 0; i < sorted.length - 1; i++) {
-      const c = sorted[i], n = sorted[i+1];
-      svg.appendChild(svgEl('line', {
-        x1: TAB_LEFT + c.beat * TAB_BEAT_W, y1: TAB_TOP + (5-c.s) * TAB_STRING_SP,
-        x2: TAB_LEFT + n.beat * TAB_BEAT_W, y2: TAB_TOP + (5-n.s) * TAB_STRING_SP,
-        stroke:'rgba(201,168,76,0.08)', 'stroke-width':'1', 'stroke-dasharray':'3,3'
-      }));
-    }
-
-    // Notes
-    tab.forEach(note => {
-      const x = TAB_LEFT + note.beat * TAB_BEAT_W;
-      const y = TAB_TOP + (5 - note.s) * TAB_STRING_SP;
-
-      // Background to clear string line
-      svg.appendChild(svgEl('circle', {cx:x, cy:y, r:TAB_NOTE_R+1, fill:'#222228'}));
-
-      // Note circle
-      const cAttrs = {cx:x, cy:y, r:TAB_NOTE_R};
-      if (note.type === 'r') {
-        cAttrs.fill = 'rgba(201,168,76,0.2)'; cAttrs.stroke = '#c9a84c'; cAttrs['stroke-width'] = '1.5';
-      } else if (note.type === 'a') {
-        cAttrs.fill = 'rgba(112,144,192,0.15)'; cAttrs.stroke = '#7090c0'; cAttrs['stroke-width'] = '1.5';
-      } else {
-        cAttrs.fill = 'rgba(255,255,255,0.06)'; cAttrs.stroke = 'rgba(255,255,255,0.3)'; cAttrs['stroke-width'] = '1';
+    realChords.forEach(function(ch, ci) {
+      var chordBeat = ci * beatsPerChord;
+      var noteIdx = -1;
+      for (var i = 0; i < sortedTab.length; i++) {
+        if (sortedTab[i].beat >= chordBeat - 0.01) { noteIdx = i; break; }
       }
-      svg.appendChild(svgEl('circle', cAttrs));
+      if (noteIdx < 0 || noteIdx >= staveNotes.length) return;
+      var noteEl = svgEl.querySelectorAll('.vf-stavenote')[noteIdx];
+      if (!noteEl) return;
+      var noteRect = noteEl.getBoundingClientRect();
+      var noteX = noteRect.left + noteRect.width / 2 - svgRect.left;
+      var type = Q_TO_CHORD_TYPE[ch.q] || 'r';
+      var color = VEX_CHORD_COLORS[type] || '#c8c2b0';
 
-      // Fret number
-      const tAttrs = {x:x, y:y+3.5, 'text-anchor':'middle',
-        'font-family':'IBM Plex Mono,monospace', 'font-size':'10',
-        'font-weight': note.type === 'r' ? '700' : '500'};
-      tAttrs.fill = note.type === 'r' ? '#c9a84c' : note.type === 'a' ? '#7090c0' : 'rgba(255,255,255,0.8)';
-      const txt = svgEl('text', tAttrs);
-      txt.textContent = note.f;
-      svg.appendChild(txt);
+      var tick = document.createElementNS(ns, 'line');
+      tick.setAttribute('x1', noteX); tick.setAttribute('x2', noteX);
+      tick.setAttribute('y1', labelH - 6); tick.setAttribute('y2', notationY + 1);
+      tick.setAttribute('stroke', color); tick.setAttribute('stroke-width', '1');
+      tick.setAttribute('stroke-dasharray', '2,4'); tick.setAttribute('opacity', '0.4');
+      svgEl.appendChild(tick);
+
+      var label = document.createElementNS(ns, 'text');
+      label.setAttribute('x', noteX);
+      label.setAttribute('y', labelH - 10);
+      label.setAttribute('fill', color);
+      label.setAttribute('font-size', '13');
+      label.setAttribute('font-family', 'IBM Plex Mono, monospace');
+      label.setAttribute('font-weight', '700');
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('dominant-baseline', 'auto');
+      label.textContent = ch.name;
+      svgEl.appendChild(label);
+    });
+  }
+
+  function renderVexLick(lick, wrapEl) {
+    if (typeof Vex === 'undefined') {
+      wrapEl.innerHTML = '<div class="lick-loading">Loading notation…</div>';
+      return;
+    }
+    wrapEl.innerHTML = '';
+
+    var VF = Vex.Flow;
+    var sorted = lick.tab.slice().sort(function(a, b) { return a.beat - b.beat; });
+
+    var noteData = sorted.map(function(n, i) {
+      var midi = VEXFLOW_MIDI[n.s] + n.f;
+      var vexKey = midiToVexKey(midi);
+      var acc = vexKeyNeedsAcc(vexKey);
+      var vfStr = n.s + 1;
+      return {vexKey: vexKey, dur: '8', acc: acc, vfStr: vfStr, fret: n.f};
     });
 
-    return svg;
+    var W = Math.max(wrapEl.offsetWidth || 480, 480);
+    var LABEL_H = 42;
+    var H = LABEL_H + 240;
+
+    var renderer = new VF.Renderer(wrapEl, VF.Renderer.Backends.SVG);
+    renderer.resize(W, H);
+    var ctx = renderer.getContext();
+
+    var staveX = 15, staveW = W - 30;
+    var notationY = LABEL_H, tabY = LABEL_H + 130;
+
+    var staff = new VF.Stave(staveX, notationY, staveW);
+    staff.addClef('treble');
+    var ks = getLickKeySig(lick);
+    if (ks && ks !== 'C') staff.addKeySignature(ks);
+    staff.addTimeSignature('4/4');
+    staff.setContext(ctx).draw();
+
+    var tabStave = new VF.TabStave(staveX, tabY, staveW);
+    tabStave.addClef('tab');
+    tabStave.setContext(ctx).draw();
+
+    new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.BRACKET).setContext(ctx).draw();
+    new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
+
+    var staveNotes = noteData.map(function(n) {
+      var sn = new VF.StaveNote({keys: [n.vexKey], duration: n.dur, stem_direction: -1});
+      if (n.acc) sn.addModifier(new VF.Accidental(n.acc), 0);
+      return sn;
+    });
+
+    var tabNotes = noteData.map(function(n) {
+      return new VF.TabNote({positions: [{str: n.vfStr, fret: n.fret}], duration: n.dur});
+    });
+
+    var maxBeat = Math.max.apply(null, sorted.map(function(n) { return n.beat; }));
+    var totalBeats = Math.ceil((maxBeat + 1) / 4) * 4;
+
+    var voice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
+    voice.addTickables(staveNotes);
+
+    var tabVoice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
+    tabVoice.addTickables(tabNotes);
+
+    var formatter = new VF.Formatter();
+    formatter.joinVoices([voice]);
+    formatter.joinVoices([tabVoice]);
+    formatter.format([voice, tabVoice], staveW - 80);
+
+    var beams = VF.Beam.generateBeams(staveNotes, {stem_direction: -1});
+    voice.draw(ctx, staff);
+    beams.forEach(function(b) { b.setContext(ctx).draw(); });
+    tabVoice.draw(ctx, tabStave);
+
+    // Alignment fix — read bounding boxes and shift tab notes to match staff note centers
+    var svgEl = wrapEl.querySelector('svg');
+    if (svgEl) {
+      requestAnimationFrame(function() {
+        var staffEls = svgEl.querySelectorAll('.vf-stavenote');
+        var tabEls = svgEl.querySelectorAll('.vf-tabnote');
+        staffEls.forEach(function(se, i) {
+          if (!tabEls[i]) return;
+          var sr = se.getBoundingClientRect();
+          var tr = tabEls[i].getBoundingClientRect();
+          var svgR = svgEl.getBoundingClientRect();
+          var sCx = sr.left + sr.width / 2 - svgR.left;
+          var tCx = tr.left + tr.width / 2 - svgR.left;
+          var delta = sCx - tCx;
+          if (Math.abs(delta) > 0.5) {
+            var cur = tabEls[i].getAttribute('transform') || 'translate(0,0)';
+            var m = cur.match(/translate\(([^,]+),([^)]+)\)/);
+            if (m) {
+              tabEls[i].setAttribute('transform', 'translate(' + (parseFloat(m[1]) + delta) + ',' + m[2] + ')');
+            }
+          }
+        });
+        applyLickTheme(svgEl);
+        drawLickChordLabels(svgEl, staveNotes, lick, sorted, LABEL_H, notationY);
+      });
+    }
   }
 
   // ── Playback ──
@@ -12499,8 +12601,6 @@ window.addEventListener('resize', () => {
           '</div>' +
           '<div class="lick-source">Source: <a href="' + lick.source.url + '" target="_blank" rel="noopener">' + lick.source.name + '</a></div>';
 
-        card.querySelector('.lick-tab-wrap').appendChild(renderTabSVG(lick.tab, lick));
-
         // Play button events
         card.querySelector('[data-lick-play]').addEventListener('click', () => {
           if (playingLickId === lick.id) { stopLickPlayback(); return; }
@@ -12512,6 +12612,7 @@ window.addEventListener('resize', () => {
         });
 
         body.appendChild(card);
+        renderVexLick(lick, card.querySelector('.lick-tab-wrap'));
       });
     });
   }
