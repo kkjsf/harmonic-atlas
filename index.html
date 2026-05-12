@@ -12602,6 +12602,66 @@ window.addEventListener('resize', () => {
     });
   }
 
+  function beatToDur(beats) {
+    if (beats >= 3.9) return 'w';
+    if (beats >= 1.9) return 'h';
+    if (beats >= 0.9) return 'q';
+    if (beats >= 0.45) return '8';
+    return '16';
+  }
+  function durToBeats(d) {
+    return {w:4, h:2, q:1, '8':0.5, '16':0.25}[d] || 0.5;
+  }
+
+  function buildRhythmEvents(sorted, totalBeats) {
+    var events = [];
+    for (var i = 0; i < sorted.length; i++) {
+      var cur = sorted[i];
+      var nextBeat = (i + 1 < sorted.length) ? sorted[i + 1].beat : totalBeats;
+      var gap = nextBeat - cur.beat;
+      var dur = beatToDur(gap);
+      events.push({type: 'note', beat: cur.beat, dur: dur, tab: cur});
+    }
+    // Insert rests for gaps at start or between notes
+    var filled = [];
+    var cursor = 0;
+    for (var j = 0; j < events.length; j++) {
+      var ev = events[j];
+      while (ev.beat - cursor > 0.12) {
+        var restGap = ev.beat - cursor;
+        var restDur = beatToDur(restGap);
+        var restBeats = durToBeats(restDur);
+        if (restBeats > restGap + 0.12) {
+          if (restDur === 'w') restDur = 'h';
+          else if (restDur === 'h') restDur = 'q';
+          else if (restDur === 'q') restDur = '8';
+          else restDur = '16';
+          restBeats = durToBeats(restDur);
+        }
+        filled.push({type: 'rest', beat: cursor, dur: restDur});
+        cursor += restBeats;
+      }
+      filled.push(ev);
+      cursor = ev.beat + durToBeats(ev.dur);
+    }
+    // Fill remaining beats with rests
+    while (totalBeats - cursor > 0.12) {
+      var rem = totalBeats - cursor;
+      var rd = beatToDur(rem);
+      var rb = durToBeats(rd);
+      if (rb > rem + 0.12) {
+        if (rd === 'w') rd = 'h';
+        else if (rd === 'h') rd = 'q';
+        else if (rd === 'q') rd = '8';
+        else rd = '16';
+        rb = durToBeats(rd);
+      }
+      filled.push({type: 'rest', beat: cursor, dur: rd});
+      cursor += rb;
+    }
+    return filled;
+  }
+
   function renderVexLick(lick, wrapEl) {
     if (typeof Vex === 'undefined') {
       wrapEl.innerHTML = '<div class="lick-loading">Loading notation…</div>';
@@ -12611,93 +12671,99 @@ window.addEventListener('resize', () => {
 
     var VF = Vex.Flow;
     var sorted = lick.tab.slice().sort(function(a, b) { return a.beat - b.beat; });
+    var maxBeat = Math.max.apply(null, sorted.map(function(n) { return n.beat; }));
+    var totalBeats = Math.ceil((maxBeat + 1) / 4) * 4;
+    var numBars = totalBeats / 4;
 
-    var noteData = sorted.map(function(n, i) {
-      var midi = VEXFLOW_MIDI[n.s] + n.f;
-      var vexKey = midiToVexKey(midi);
-      var acc = vexKeyNeedsAcc(vexKey);
-      var vfStr = n.s + 1;
-      return {vexKey: vexKey, dur: '8', acc: acc, vfStr: vfStr, fret: n.f};
-    });
+    var events = buildRhythmEvents(sorted, totalBeats);
+
+    // Split events into bars
+    var bars = [];
+    for (var b = 0; b < numBars; b++) {
+      var barStart = b * 4, barEnd = (b + 1) * 4;
+      bars.push(events.filter(function(e) { return e.beat >= barStart - 0.01 && e.beat < barEnd - 0.01; }));
+    }
 
     var W = Math.max(wrapEl.offsetWidth || 480, 480);
     var LABEL_H = 42;
+    var barW = (W - 30) / numBars;
     var H = LABEL_H + 280;
 
     var renderer = new VF.Renderer(wrapEl, VF.Renderer.Backends.SVG);
     renderer.resize(W, H);
     var ctx = renderer.getContext();
 
-    var staveX = 15, staveW = W - 30;
     var notationY = LABEL_H, tabY = LABEL_H + 110;
+    var allStaveNotes = [];
 
-    var staff = new VF.Stave(staveX, notationY, staveW);
-    staff.addClef('treble');
-    var ks = getLickKeySig(lick);
-    if (ks && ks !== 'C') staff.addKeySignature(ks);
-    staff.addTimeSignature('4/4');
-    staff.setContext(ctx).draw();
+    for (var bi = 0; bi < numBars; bi++) {
+      var x = 15 + bi * barW;
+      var staff = new VF.Stave(x, notationY, barW);
+      var tabStave = new VF.TabStave(x, tabY, barW);
 
-    var tabStave = new VF.TabStave(staveX, tabY, staveW);
-    tabStave.addClef('tab');
-    tabStave.setContext(ctx).draw();
+      if (bi === 0) {
+        staff.addClef('treble');
+        var ks = getLickKeySig(lick);
+        if (ks && ks !== 'C') staff.addKeySignature(ks);
+        staff.addTimeSignature('4/4');
+        tabStave.addClef('tab');
+      }
+      if (bi === numBars - 1) {
+        staff.setEndBarType(VF.Barline.type.END);
+        tabStave.setEndBarType(VF.Barline.type.END);
+      }
 
-    new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.BRACKET).setContext(ctx).draw();
-    new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
+      staff.setContext(ctx).draw();
+      tabStave.setContext(ctx).draw();
 
-    var staveNotes = noteData.map(function(n) {
-      var sn = new VF.StaveNote({keys: [n.vexKey], duration: n.dur, stem_direction: -1});
-      if (n.acc) sn.addModifier(new VF.Accidental(n.acc), 0);
-      return sn;
-    });
+      if (bi === 0) {
+        new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.BRACKET).setContext(ctx).draw();
+        new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
+      }
 
-    var tabNotes = noteData.map(function(n) {
-      return new VF.TabNote({positions: [{str: n.vfStr, fret: n.fret}], duration: n.dur});
-    });
+      var barEvents = bars[bi];
+      var staveNotes = [];
+      var tabNotes = [];
 
-    var maxBeat = Math.max.apply(null, sorted.map(function(n) { return n.beat; }));
-    var totalBeats = Math.ceil((maxBeat + 1) / 4) * 4;
+      barEvents.forEach(function(ev) {
+        if (ev.type === 'rest') {
+          staveNotes.push(new VF.StaveNote({keys: ['b/4'], duration: ev.dur + 'r', stem_direction: -1}));
+          tabNotes.push(new VF.GhostNote({duration: ev.dur}));
+        } else {
+          var midi = VEXFLOW_MIDI[ev.tab.s] + ev.tab.f;
+          var vexKey = midiToVexKey(midi);
+          var acc = vexKeyNeedsAcc(vexKey);
+          var sn = new VF.StaveNote({keys: [vexKey], duration: ev.dur, stem_direction: -1});
+          if (acc) sn.addModifier(new VF.Accidental(acc), 0);
+          staveNotes.push(sn);
+          allStaveNotes.push(sn);
+          tabNotes.push(new VF.TabNote({positions: [{str: ev.tab.s + 1, fret: ev.tab.f}], duration: ev.dur}));
+        }
+      });
 
-    var voice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
-    voice.addTickables(staveNotes);
+      if (!staveNotes.length) continue;
 
-    var tabVoice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
-    tabVoice.addTickables(tabNotes);
+      var voice = new VF.Voice({num_beats: 4, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
+      voice.addTickables(staveNotes);
+      var tabVoice = new VF.Voice({num_beats: 4, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
+      tabVoice.addTickables(tabNotes);
 
-    var formatter = new VF.Formatter();
-    formatter.joinVoices([voice]);
-    formatter.joinVoices([tabVoice]);
-    formatter.format([voice, tabVoice], staveW - 80);
+      var fmt = new VF.Formatter();
+      fmt.joinVoices([voice]);
+      fmt.joinVoices([tabVoice]);
+      fmt.format([voice, tabVoice], barW - (bi === 0 ? 80 : 30));
 
-    var beams = VF.Beam.generateBeams(staveNotes, {stem_direction: -1});
-    voice.draw(ctx, staff);
-    beams.forEach(function(b) { b.setContext(ctx).draw(); });
-    tabVoice.draw(ctx, tabStave);
+      var beams = VF.Beam.generateBeams(staveNotes.filter(function(n) { return !n.isRest(); }), {stem_direction: -1});
+      voice.draw(ctx, staff);
+      beams.forEach(function(bm) { bm.setContext(ctx).draw(); });
+      tabVoice.draw(ctx, tabStave);
+    }
 
-    // Alignment fix — read bounding boxes and shift tab notes to match staff note centers
     var svgEl = wrapEl.querySelector('svg');
     if (svgEl) {
       requestAnimationFrame(function() {
-        var staffEls = svgEl.querySelectorAll('.vf-stavenote');
-        var tabEls = svgEl.querySelectorAll('.vf-tabnote');
-        staffEls.forEach(function(se, i) {
-          if (!tabEls[i]) return;
-          var sr = se.getBoundingClientRect();
-          var tr = tabEls[i].getBoundingClientRect();
-          var svgR = svgEl.getBoundingClientRect();
-          var sCx = sr.left + sr.width / 2 - svgR.left;
-          var tCx = tr.left + tr.width / 2 - svgR.left;
-          var delta = sCx - tCx;
-          if (Math.abs(delta) > 0.5) {
-            var cur = tabEls[i].getAttribute('transform') || 'translate(0,0)';
-            var m = cur.match(/translate\(([^,]+),([^)]+)\)/);
-            if (m) {
-              tabEls[i].setAttribute('transform', 'translate(' + (parseFloat(m[1]) + delta) + ',' + m[2] + ')');
-            }
-          }
-        });
         applyLickTheme(svgEl);
-        drawLickChordLabels(svgEl, staveNotes, lick, sorted, LABEL_H, notationY);
+        drawLickChordLabels(svgEl, allStaveNotes, lick, sorted, LABEL_H, notationY);
       });
     }
   }
@@ -12717,8 +12783,11 @@ window.addEventListener('resize', () => {
 
   function playLick(lick, slow) {
     stopLickPlayback();
-    const useSampler = typeof samplerReady !== 'undefined' && samplerReady && typeof sampler !== 'undefined';
-    if (!useSampler) return;
+    initGuitarSampler();
+    const useGuitar = guitarSamplerReady && guitarSampler;
+    const usePiano = typeof samplerReady !== 'undefined' && samplerReady && typeof sampler !== 'undefined';
+    const activeSampler = useGuitar ? guitarSampler : (usePiano ? sampler : null);
+    if (!activeSampler) return;
 
     Tone.start();
     const bpm = slow ? Math.round(lick.bpm * 0.6) : lick.bpm;
@@ -12735,7 +12804,7 @@ window.addEventListener('resize', () => {
       const midi = GUITAR_OPEN[note.s] + note.f;
       const t = now + note.beat * beatSec;
       const dur = beatSec * 0.9;
-      sampler.triggerAttackRelease(midiToNoteName(midi), dur, t);
+      activeSampler.triggerAttackRelease(midiToNoteName(midi), dur, t);
       if (note.beat * beatSec + dur > maxTime) maxTime = note.beat * beatSec + dur;
     });
 
