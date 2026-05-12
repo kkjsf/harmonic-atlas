@@ -12677,93 +12677,108 @@ window.addEventListener('resize', () => {
 
     var events = buildRhythmEvents(sorted, totalBeats);
 
-    // Split events into bars
-    var bars = [];
-    for (var b = 0; b < numBars; b++) {
-      var barStart = b * 4, barEnd = (b + 1) * 4;
-      bars.push(events.filter(function(e) { return e.beat >= barStart - 0.01 && e.beat < barEnd - 0.01; }));
-    }
+    // Insert BarNote at each bar boundary
+    var withBars = [];
+    var barBoundaries = [];
+    for (var bi = 1; bi < numBars; bi++) barBoundaries.push(bi * 4);
+    var barIdx = 0;
+    events.forEach(function(ev) {
+      while (barIdx < barBoundaries.length && ev.beat >= barBoundaries[barIdx] - 0.01) {
+        withBars.push({type: 'bar', beat: barBoundaries[barIdx]});
+        barIdx++;
+      }
+      withBars.push(ev);
+    });
 
-    var W = Math.max(wrapEl.offsetWidth || 480, 480);
+    var noteCount = events.filter(function(e) { return e.type === 'note'; }).length;
+    var W = Math.max(wrapEl.offsetWidth || 480, Math.max(480, noteCount * 42 + 120));
     var LABEL_H = 42;
-    var barW = (W - 30) / numBars;
     var H = LABEL_H + 280;
+    var staveX = 15, staveW = W - 30;
 
     var renderer = new VF.Renderer(wrapEl, VF.Renderer.Backends.SVG);
     renderer.resize(W, H);
     var ctx = renderer.getContext();
 
     var notationY = LABEL_H, tabY = LABEL_H + 110;
-    var allStaveNotes = [];
 
-    for (var bi = 0; bi < numBars; bi++) {
-      var x = 15 + bi * barW;
-      var staff = new VF.Stave(x, notationY, barW);
-      var tabStave = new VF.TabStave(x, tabY, barW);
+    var staff = new VF.Stave(staveX, notationY, staveW);
+    staff.addClef('treble');
+    var ks = getLickKeySig(lick);
+    if (ks && ks !== 'C') staff.addKeySignature(ks);
+    staff.addTimeSignature('4/4');
+    staff.setEndBarType(VF.Barline.type.END);
+    staff.setContext(ctx).draw();
 
-      if (bi === 0) {
-        staff.addClef('treble');
-        var ks = getLickKeySig(lick);
-        if (ks && ks !== 'C') staff.addKeySignature(ks);
-        staff.addTimeSignature('4/4');
-        tabStave.addClef('tab');
+    var tabStave = new VF.TabStave(staveX, tabY, staveW);
+    tabStave.addClef('tab');
+    tabStave.setEndBarType(VF.Barline.type.END);
+    tabStave.setContext(ctx).draw();
+
+    new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.BRACKET).setContext(ctx).draw();
+    new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
+
+    var staveNotes = [], tabNotes = [], allRealStaveNotes = [];
+
+    withBars.forEach(function(ev) {
+      if (ev.type === 'bar') {
+        staveNotes.push(new VF.BarNote());
+        tabNotes.push(new VF.BarNote());
+      } else if (ev.type === 'rest') {
+        staveNotes.push(new VF.StaveNote({keys: ['b/4'], duration: ev.dur + 'r', stem_direction: -1}));
+        tabNotes.push(new VF.GhostNote({duration: ev.dur}));
+      } else {
+        var midi = VEXFLOW_MIDI[ev.tab.s] + ev.tab.f;
+        var vexKey = midiToVexKey(midi);
+        var acc = vexKeyNeedsAcc(vexKey);
+        var sn = new VF.StaveNote({keys: [vexKey], duration: ev.dur, stem_direction: -1});
+        if (acc) sn.addModifier(new VF.Accidental(acc), 0);
+        staveNotes.push(sn);
+        allRealStaveNotes.push(sn);
+        tabNotes.push(new VF.TabNote({positions: [{str: ev.tab.s + 1, fret: ev.tab.f}], duration: ev.dur}));
       }
-      if (bi === numBars - 1) {
-        staff.setEndBarType(VF.Barline.type.END);
-        tabStave.setEndBarType(VF.Barline.type.END);
-      }
+    });
 
-      staff.setContext(ctx).draw();
-      tabStave.setContext(ctx).draw();
+    var voice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
+    voice.addTickables(staveNotes);
+    var tabVoice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
+    tabVoice.addTickables(tabNotes);
 
-      if (bi === 0) {
-        new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.BRACKET).setContext(ctx).draw();
-        new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
-      }
+    var fmt = new VF.Formatter();
+    fmt.joinVoices([voice]);
+    fmt.joinVoices([tabVoice]);
+    fmt.format([voice, tabVoice], staveW - 80);
 
-      var barEvents = bars[bi];
-      var staveNotes = [];
-      var tabNotes = [];
+    var realStaveNotes = staveNotes.filter(function(n) { return n.noteType === 'n' && !n.isRest(); });
+    var beams = VF.Beam.generateBeams(realStaveNotes, {stem_direction: -1});
+    voice.draw(ctx, staff);
+    beams.forEach(function(bm) { bm.setContext(ctx).draw(); });
+    tabVoice.draw(ctx, tabStave);
 
-      barEvents.forEach(function(ev) {
-        if (ev.type === 'rest') {
-          staveNotes.push(new VF.StaveNote({keys: ['b/4'], duration: ev.dur + 'r', stem_direction: -1}));
-          tabNotes.push(new VF.GhostNote({duration: ev.dur}));
-        } else {
-          var midi = VEXFLOW_MIDI[ev.tab.s] + ev.tab.f;
-          var vexKey = midiToVexKey(midi);
-          var acc = vexKeyNeedsAcc(vexKey);
-          var sn = new VF.StaveNote({keys: [vexKey], duration: ev.dur, stem_direction: -1});
-          if (acc) sn.addModifier(new VF.Accidental(acc), 0);
-          staveNotes.push(sn);
-          allStaveNotes.push(sn);
-          tabNotes.push(new VF.TabNote({positions: [{str: ev.tab.s + 1, fret: ev.tab.f}], duration: ev.dur}));
-        }
-      });
-
-      if (!staveNotes.length) continue;
-
-      var voice = new VF.Voice({num_beats: 4, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
-      voice.addTickables(staveNotes);
-      var tabVoice = new VF.Voice({num_beats: 4, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
-      tabVoice.addTickables(tabNotes);
-
-      var fmt = new VF.Formatter();
-      fmt.joinVoices([voice]);
-      fmt.joinVoices([tabVoice]);
-      fmt.format([voice, tabVoice], barW - (bi === 0 ? 80 : 30));
-
-      var beams = VF.Beam.generateBeams(staveNotes.filter(function(n) { return !n.isRest(); }), {stem_direction: -1});
-      voice.draw(ctx, staff);
-      beams.forEach(function(bm) { bm.setContext(ctx).draw(); });
-      tabVoice.draw(ctx, tabStave);
-    }
-
+    // Align tab notes to staff notes
     var svgEl = wrapEl.querySelector('svg');
     if (svgEl) {
       requestAnimationFrame(function() {
+        var staffEls = svgEl.querySelectorAll('.vf-stavenote');
+        var tabEls = svgEl.querySelectorAll('.vf-tabnote');
+        var svgR = svgEl.getBoundingClientRect();
+        staffEls.forEach(function(se, i) {
+          if (!tabEls[i]) return;
+          var sr = se.getBoundingClientRect();
+          var tr = tabEls[i].getBoundingClientRect();
+          var sCx = sr.left + sr.width / 2 - svgR.left;
+          var tCx = tr.left + tr.width / 2 - svgR.left;
+          var delta = sCx - tCx;
+          if (Math.abs(delta) > 0.5) {
+            var cur = tabEls[i].getAttribute('transform') || 'translate(0,0)';
+            var m = cur.match(/translate\(([^,]+),([^)]+)\)/);
+            if (m) {
+              tabEls[i].setAttribute('transform', 'translate(' + (parseFloat(m[1]) + delta) + ',' + m[2] + ')');
+            }
+          }
+        });
         applyLickTheme(svgEl);
-        drawLickChordLabels(svgEl, allStaveNotes, lick, sorted, LABEL_H, notationY);
+        drawLickChordLabels(svgEl, allRealStaveNotes, lick, sorted, LABEL_H, notationY);
       });
     }
   }
