@@ -9859,9 +9859,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
     <div class="tech-section">
       <div class="tech-section-title">Jazz Lick Library</div>
-      <div class="tech-row"><span class="tech-key">Collection</span><span class="tech-val">18 curated jazz guitar licks across 4 progression types: ii-V-I Major (8), ii-V-i Minor (4), I-vi-ii-V Turnaround (3), Blues (3). Three difficulty tiers: Beginner, Intermediate, Advanced.</span></div>
-      <div class="tech-row"><span class="tech-key">Beginner licks</span><span class="tech-val">Honeysuckle Rose motif (b3→3 slide), octave displacement, minor enclosures, guide-tone walk, chromatic double-stop blues. No straight arpeggios — every beginner lick teaches a real jazz device.</span></div>
-      <div class="tech-row"><span class="tech-key">Notation</span><span class="tech-val">VexFlow 4.x dual stave: treble staff + guitar tab (6-string). All notes rendered as 8th notes. Chord labels aligned above staff via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">drawLickChordLabels()</code>. Post-render alignment pass shifts tab notes to match staff note centres.</span></div>
+      <div class="tech-row"><span class="tech-key">Collection</span><span class="tech-val">21 curated jazz guitar licks across 5 progression types: Cmaj7 (5 — Jens Larsen concepts), ii-V-I Major (6), ii-V-i Minor (4), I-vi-ii-V Turnaround (3), Blues (3). Three difficulty tiers: Beginner, Intermediate, Advanced.</span></div>
+      <div class="tech-row"><span class="tech-key">Cmaj7 licks</span><span class="tech-val">5 licks based on Jens Larsen's "5 Jazz Licks That Turn Beginners Into Pros": triplet arpeggio (Barry Harris), enclosures into triplet, pivot arpeggio (octave displacement), chromatic pivot line, combined techniques. All use triplet notation.</span></div>
+      <div class="tech-row"><span class="tech-key">Notation</span><span class="tech-val">VexFlow 4.x dual stave: treble staff + guitar tab (6-string). Supports triplets via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">VF.Tuplet</code> (auto-detected from 0.33-beat gaps). Bar lines drawn as manual SVG for staff/tab alignment. Chord labels aligned above staff via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">drawLickChordLabels()</code>.</span></div>
       <div class="tech-row"><span class="tech-key">Data model</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">LICKS[]</code> — each lick: id, title, prog, diff, concepts[], key, chords[], bpm, feel, tab[] (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{s, f, beat, type}</code> where s:0=highE..5=lowE), concept text, source link.</span></div>
       <div class="tech-row"><span class="tech-key">Playback</span><span class="tech-val">Tab positions mapped to MIDI via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">GUITAR_OPEN[s] + fret</code>. Play at written BPM or 60% (Slow). Uses Salamander Grand Piano sampler.</span></div>
       <div class="tech-row"><span class="tech-key">Sources</span><span class="tech-val">Jens Larsen, jazzguitar.be, jazzadvice.com, mattwarnockguitar.com, learnjazzstandards.com</span></div>
@@ -12232,38 +12232,71 @@ window.addEventListener('resize', () => {
   const STR_LABELS = ['e','B','G','D','A','E'];
 
   const LICKS = [
-    // ═══ ii-V-I MAJOR ═══
-    { id:'maj-honeysuckle', title:'Honeysuckle Rose Motif', prog:'ii-V-I', diff:'beg', concepts:['Jazz motif','b3-to-3'],
-      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+    // ═══ Cmaj7 — JENS LARSEN "5 LICKS THAT TURN BEGINNERS INTO PROS" ═══
+    { id:'jl-triplet-arp', title:'Triplet Arpeggio from 3rd', prog:'Cmaj7', diff:'beg', concepts:['Triplet arpeggio','Barry Harris'],
+      key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'CΔ7',q:'maj'}],
       bpm:120, feel:'Swing',
-      tab:[ // {s:string 0=highE..5=lowE, f:fret, beat:float, type:'r'|'a'|'n'}
-        // Dm7: signature b3→3 slide motif (F→F#→G), then descend to A
-        {s:3,f:3,beat:0,type:'n'},{s:3,f:4,beat:0.5,type:'a'},{s:2,f:0,beat:1,type:'n'},{s:2,f:2,beat:2,type:'r'},
-        // G7: repeat motif up — B, chromatic approach C→B, resolve down
-        {s:1,f:0,beat:4,type:'n'},{s:1,f:1,beat:4.5,type:'a'},{s:1,f:3,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
-        {s:2,f:0,beat:6,type:'n'},
-        // CΔ7: land on E (3rd), hold
-        {s:1,f:1,beat:8,type:'r'},{s:1,f:0,beat:9,type:'n'}
-      ],
-      concept:'The classic "Honeysuckle Rose" motif — a minor 3rd sliding up to the major 3rd. One of the most quoted phrases in jazz, and the first step beyond plain arpeggios.',
-      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/bebop-licks/'}
-    },
-    { id:'maj-octave-disp', title:'Octave Displacement Line', prog:'ii-V-I', diff:'beg', concepts:['Octave displacement','Approach tones'],
-      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
-      bpm:110, feel:'Swing',
       tab:[
-        // Dm7: A up an octave (displacement), then descend F-E-D
-        {s:2,f:2,beat:0,type:'r'},{s:0,f:5,beat:0.5,type:'n'},{s:0,f:1,beat:1,type:'n'},{s:1,f:1,beat:1.5,type:'n'},
-        {s:1,f:3,beat:2,type:'n'},{s:1,f:1,beat:2.5,type:'n'},
-        // G7: chromatic below B (Bb→B), skip to D, descend
-        {s:1,f:3,beat:4,type:'a'},{s:1,f:0,beat:4.5,type:'n'},{s:1,f:3,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
-        {s:2,f:0,beat:6,type:'r'},{s:3,f:3,beat:6.5,type:'n'},
-        // CΔ7: land on E (3rd), settle on C
-        {s:3,f:2,beat:8,type:'r'},{s:4,f:3,beat:9,type:'n'}
+        {s:2,f:9,beat:0,type:'n'},{s:2,f:8,beat:0.5,type:'a'},{s:2,f:7,beat:1,type:'n'},
+        {s:3,f:9,beat:2,type:'n'},{s:3,f:10,beat:2.5,type:'n'},
+        {s:2,f:9,beat:3,type:'n'},{s:1,f:8,beat:3.33,type:'n'},{s:0,f:7,beat:3.67,type:'n'},
+        {s:0,f:8,beat:4,type:'n'},{s:0,f:7,beat:4.5,type:'n'}
       ],
-      concept:'Octave displacement jumps a note up (or down) by an octave, turning a predictable scale run into an angular, surprising melody. A key device in bebop and modern jazz.',
+      concept:'The Barry Harris bebop arpeggio recipe: approach from a half-step below, then play the arpeggio as a triplet. Start on the 3rd (E), pass chromatically through Eb to D, skip to B (approach), then C-E-G triplet. End short on the offbeat — lighter phrasing.',
       source:{name:'Jens Larsen', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'}
     },
+    { id:'jl-enclosure', title:'Enclosure into Triplet', prog:'Cmaj7', diff:'beg', concepts:['Enclosures','Triplet arpeggio'],
+      key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'CΔ7',q:'maj'}],
+      bpm:115, feel:'Swing',
+      tab:[
+        {s:1,f:8,beat:0,type:'n'},
+        {s:1,f:6,beat:0.5,type:'a'},{s:2,f:8,beat:1,type:'a'},{s:2,f:9,beat:1.5,type:'r'},
+        {s:2,f:7,beat:2,type:'a'},{s:3,f:9,beat:2.5,type:'a'},
+        {s:3,f:10,beat:3,type:'n'},{s:2,f:9,beat:3.33,type:'n'},{s:1,f:8,beat:3.67,type:'n'},
+        {s:0,f:7,beat:4.5,type:'n'}
+      ],
+      concept:'Start on G (5th), then enclosures around each descending chord tone: F and D♯ surround E, D and B surround C. Resolve into the C-E-G triplet arpeggio. The melody skips unpredictably but always lands on chord tones.',
+      source:{name:'Jens Larsen', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'}
+    },
+    { id:'jl-pivot-arp', title:'Pivot Arpeggio', prog:'Cmaj7', diff:'int', concepts:['Octave displacement','Pivot arpeggio'],
+      key:'C', chords:[{name:'CΔ7',q:'maj'}],
+      bpm:130, feel:'Swing',
+      tab:[
+        {s:2,f:9,beat:0,type:'n'},{s:1,f:8,beat:0.5,type:'n'},
+        {s:0,f:7,beat:1,type:'n'},{s:0,f:8,beat:1.5,type:'n'},
+        {s:0,f:5,beat:2,type:'n'},{s:1,f:8,beat:2.5,type:'n'},
+        {s:1,f:5,beat:3,type:'n'},{s:1,f:3,beat:3.5,type:'n'}
+      ],
+      concept:'Take a Cmaj7 arpeggio (C-E-G-B) plus a scale tone, and move the root C up an octave. The resulting E-G-B-C(high) creates a wide interval leap that opens up your lines. Much more musical than practicing inversions.',
+      source:{name:'Jens Larsen', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'}
+    },
+    { id:'jl-chromatic', title:'Chromatic Pivot Line', prog:'Cmaj7', diff:'int', concepts:['Chromaticism','Pivot arpeggio','Barry Harris'],
+      key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'CΔ7',q:'maj'}],
+      bpm:125, feel:'Swing',
+      tab:[
+        {s:2,f:9,beat:0,type:'n'},{s:1,f:8,beat:0.5,type:'n'},{s:0,f:8,beat:1,type:'n'},
+        {s:0,f:4,beat:1.5,type:'a'},{s:0,f:3,beat:2,type:'n'},
+        {s:1,f:5,beat:2.5,type:'n'},{s:1,f:4,beat:3,type:'a'},{s:1,f:3,beat:3.5,type:'n'},
+        {s:2,f:4,beat:4,type:'n'},{s:3,f:5,beat:4.5,type:'n'}
+      ],
+      concept:'Pivot arpeggio (E-G-C high) followed by Barry Harris chromatic approaches: A♭ resolves down to G, E♭ connects D to B. Half-steps between scale degrees create the signature bebop "curling" sound while keeping chord tones on strong beats.',
+      source:{name:'Jens Larsen', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'}
+    },
+    { id:'jl-combined', title:'Combined Techniques', prog:'Cmaj7', diff:'adv', concepts:['Octave displacement','Enclosures','Triplet arpeggio','Chromaticism'],
+      key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'CΔ7',q:'maj'}],
+      bpm:130, feel:'Swing',
+      tab:[
+        {s:0,f:8,beat:0,type:'n'},{s:1,f:5,beat:0.5,type:'n'},
+        {s:1,f:6,beat:1,type:'a'},{s:2,f:8,beat:1.5,type:'a'},{s:2,f:9,beat:2,type:'r'},
+        {s:3,f:9,beat:2.5,type:'n'},
+        {s:3,f:10,beat:3,type:'n'},{s:2,f:9,beat:3.33,type:'n'},{s:1,f:8,beat:3.67,type:'n'},
+        {s:0,f:4,beat:4,type:'a'},{s:0,f:3,beat:4.5,type:'n'}
+      ],
+      concept:'All five techniques in one line: octave displacement (C5 drops to E4), enclosure around E (F-D♯-E), approach note B, triplet arpeggio (C-E-G), chromatic resolution (A♭ to G). This is what makes bebop lines sound like Jazz — rhythm, phrasing, and melodic surprise working together.',
+      source:{name:'Jens Larsen', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'}
+    },
+
+    // ═══ ii-V-I MAJOR ═══
     { id:'maj-bebop-dom', title:'Bebop Dominant Approach', prog:'ii-V-I', diff:'int', concepts:['Bebop scale'],
       key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
       bpm:140, feel:'Swing',
@@ -12482,6 +12515,7 @@ window.addEventListener('resize', () => {
   ];
 
   const PROG_FILTERS = [
+    {label:'Cmaj7 (Jens Larsen)', value:'Cmaj7'},
     {label:'ii — V — I (Major)', value:'ii-V-I'},
     {label:'ii — V — i (Minor)', value:'ii-V-i'},
     {label:'I — vi — ii — V', value:'I-vi-ii-V'},
@@ -12613,16 +12647,45 @@ window.addEventListener('resize', () => {
     return {w:4, h:2, q:1, '8':0.5, '16':0.25}[d] || 0.5;
   }
 
+  function detectTriplets(sorted) {
+    var triplets = [];
+    var used = {};
+    for (var i = 0; i < sorted.length - 2; i++) {
+      if (used[i]) continue;
+      var a = sorted[i].beat, b = sorted[i+1].beat, c = sorted[i+2].beat;
+      var gap1 = b - a, gap2 = c - b;
+      if (Math.abs(gap1 - 0.333) < 0.05 && Math.abs(gap2 - 0.333) < 0.05) {
+        var beatBase = Math.round(a);
+        if (Math.abs(a - beatBase) < 0.05) {
+          triplets.push({start: i, beatBase: beatBase});
+          used[i] = used[i+1] = used[i+2] = true;
+        }
+      }
+    }
+    return triplets;
+  }
+
   function buildRhythmEvents(sorted, totalBeats) {
+    var triplets = detectTriplets(sorted);
+    var tripMap = {};
+    triplets.forEach(function(t) {
+      tripMap[t.start] = 'first';
+      tripMap[t.start + 1] = 'mid';
+      tripMap[t.start + 2] = 'last';
+    });
+
     var events = [];
     for (var i = 0; i < sorted.length; i++) {
       var cur = sorted[i];
-      var nextBeat = (i + 1 < sorted.length) ? sorted[i + 1].beat : totalBeats;
-      var gap = nextBeat - cur.beat;
-      var dur = beatToDur(gap);
-      events.push({type: 'note', beat: cur.beat, dur: dur, tab: cur});
+      if (tripMap[i]) {
+        events.push({type: 'note', beat: cur.beat, dur: '8', tab: cur, triplet: tripMap[i]});
+      } else {
+        var nextBeat = (i + 1 < sorted.length) ? sorted[i + 1].beat : totalBeats;
+        var gap = nextBeat - cur.beat;
+        var dur = beatToDur(gap);
+        events.push({type: 'note', beat: cur.beat, dur: dur, tab: cur});
+      }
     }
-    // Insert rests for gaps at start or between notes
     var filled = [];
     var cursor = 0;
     for (var j = 0; j < events.length; j++) {
@@ -12642,9 +12705,8 @@ window.addEventListener('resize', () => {
         cursor += restBeats;
       }
       filled.push(ev);
-      cursor = ev.beat + durToBeats(ev.dur);
+      cursor = ev.beat + (ev.triplet ? 1/3 : durToBeats(ev.dur));
     }
-    // Fill remaining beats with rests
     while (totalBeats - cursor > 0.12) {
       var rem = totalBeats - cursor;
       var rd = beatToDur(rem);
@@ -12677,18 +12739,8 @@ window.addEventListener('resize', () => {
 
     var events = buildRhythmEvents(sorted, totalBeats);
 
-    // Insert BarNote at each bar boundary
-    var withBars = [];
     var barBoundaries = [];
     for (var bi = 1; bi < numBars; bi++) barBoundaries.push(bi * 4);
-    var barIdx = 0;
-    events.forEach(function(ev) {
-      while (barIdx < barBoundaries.length && ev.beat >= barBoundaries[barIdx] - 0.01) {
-        withBars.push({type: 'bar', beat: barBoundaries[barIdx]});
-        barIdx++;
-      }
-      withBars.push(ev);
-    });
 
     var noteCount = events.filter(function(e) { return e.type === 'note'; }).length;
     var W = Math.max(wrapEl.offsetWidth || 480, Math.max(480, noteCount * 42 + 120));
@@ -12719,12 +12771,13 @@ window.addEventListener('resize', () => {
     new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
 
     var staveNotes = [], tabNotes = [], allRealStaveNotes = [];
+    var notePairs = [];
+    var tripletStaveGroups = [], tripletTabGroups = [];
+    var curTripStave = [], curTripTab = [];
+    var tripletNoteSet = new Set();
 
-    withBars.forEach(function(ev) {
-      if (ev.type === 'bar') {
-        staveNotes.push(new VF.BarNote());
-        tabNotes.push(new VF.BarNote());
-      } else if (ev.type === 'rest') {
+    events.forEach(function(ev) {
+      if (ev.type === 'rest') {
         staveNotes.push(new VF.StaveNote({keys: ['b/4'], duration: ev.dur + 'r', stem_direction: -1}));
         tabNotes.push(new VF.GhostNote({duration: ev.dur}));
       } else {
@@ -12735,8 +12788,27 @@ window.addEventListener('resize', () => {
         if (acc) sn.addModifier(new VF.Accidental(acc), 0);
         staveNotes.push(sn);
         allRealStaveNotes.push(sn);
-        tabNotes.push(new VF.TabNote({positions: [{str: ev.tab.s + 1, fret: ev.tab.f}], duration: ev.dur}));
+        var tn = new VF.TabNote({positions: [{str: ev.tab.s + 1, fret: ev.tab.f}], duration: ev.dur});
+        tabNotes.push(tn);
+        notePairs.push({stave: sn, tab: tn});
+
+        if (ev.triplet === 'first') { curTripStave = [sn]; curTripTab = [tn]; tripletNoteSet.add(sn); }
+        else if (ev.triplet === 'mid') { curTripStave.push(sn); curTripTab.push(tn); tripletNoteSet.add(sn); }
+        else if (ev.triplet === 'last') {
+          curTripStave.push(sn); curTripTab.push(tn); tripletNoteSet.add(sn);
+          tripletStaveGroups.push(curTripStave);
+          tripletTabGroups.push(curTripTab);
+          curTripStave = []; curTripTab = [];
+        }
       }
+    });
+
+    // Create tuplets BEFORE formatting so VexFlow adjusts tick counts
+    var staveTuplets = tripletStaveGroups.map(function(grp) {
+      return new VF.Tuplet(grp, {num_notes: 3, notes_occupied: 2});
+    });
+    var tabTuplets = tripletTabGroups.map(function(grp) {
+      return new VF.Tuplet(grp, {num_notes: 3, notes_occupied: 2});
     });
 
     var voice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
@@ -12749,34 +12821,70 @@ window.addEventListener('resize', () => {
     fmt.joinVoices([tabVoice]);
     fmt.format([voice, tabVoice], staveW - 80);
 
+    // Beam non-triplet notes normally, beam each triplet group separately
     var realStaveNotes = staveNotes.filter(function(n) { return n.noteType === 'n' && !n.isRest(); });
-    var beams = VF.Beam.generateBeams(realStaveNotes, {stem_direction: -1});
+    var nonTripletNotes = realStaveNotes.filter(function(n) { return !tripletNoteSet.has(n); });
+    var beams = VF.Beam.generateBeams(nonTripletNotes, {stem_direction: -1});
+    tripletStaveGroups.forEach(function(grp) {
+      if (grp.length > 1) beams.push(new VF.Beam(grp));
+    });
+
     voice.draw(ctx, staff);
     beams.forEach(function(bm) { bm.setContext(ctx).draw(); });
     tabVoice.draw(ctx, tabStave);
 
-    // Align tab notes to staff notes
+    staveTuplets.forEach(function(t) { t.setContext(ctx).draw(); });
+    tabTuplets.forEach(function(t) { t.setContext(ctx).draw(); });
+
+    // Align tab notes to their paired staff notes using VexFlow positions
     var svgEl = wrapEl.querySelector('svg');
     if (svgEl) {
       requestAnimationFrame(function() {
-        var staffEls = svgEl.querySelectorAll('.vf-stavenote');
-        var tabEls = svgEl.querySelectorAll('.vf-tabnote');
         var svgR = svgEl.getBoundingClientRect();
-        staffEls.forEach(function(se, i) {
-          if (!tabEls[i]) return;
-          var sr = se.getBoundingClientRect();
-          var tr = tabEls[i].getBoundingClientRect();
-          var sCx = sr.left + sr.width / 2 - svgR.left;
+        var tabEls = svgEl.querySelectorAll('.vf-tabnote');
+        notePairs.forEach(function(pair, i) {
+          var tabEl = tabEls[i];
+          if (!tabEl) return;
+          var staveX = pair.stave.getAbsoluteX();
+          var tr = tabEl.getBoundingClientRect();
           var tCx = tr.left + tr.width / 2 - svgR.left;
-          var delta = sCx - tCx;
+          var delta = staveX - tCx;
           if (Math.abs(delta) > 0.5) {
-            var cur = tabEls[i].getAttribute('transform') || 'translate(0,0)';
+            var cur = tabEl.getAttribute('transform') || 'translate(0,0)';
             var m = cur.match(/translate\(([^,]+),([^)]+)\)/);
             if (m) {
-              tabEls[i].setAttribute('transform', 'translate(' + (parseFloat(m[1]) + delta) + ',' + m[2] + ')');
+              tabEl.setAttribute('transform', 'translate(' + (parseFloat(m[1]) + delta) + ',' + m[2] + ')');
             }
           }
         });
+
+        // Draw bar lines using stave note X positions for perfect alignment
+        var ns = 'http://www.w3.org/2000/svg';
+        var staffTop = staff.getYForLine(0);
+        var staffBot = staff.getYForLine(4);
+        var tabTop = tabStave.getYForLine(0);
+        var tabBot = tabStave.getYForLine(5);
+        var noteIdx = 0;
+        barBoundaries.forEach(function(bb) {
+          while (noteIdx < events.length && (events[noteIdx].type !== 'note' || events[noteIdx].beat < bb - 0.01)) noteIdx++;
+          if (noteIdx >= events.length) return;
+          var pairIdx = 0;
+          for (var k = 0; k < noteIdx; k++) { if (events[k].type === 'note') pairIdx++; }
+          if (pairIdx >= notePairs.length) return;
+          var barX = notePairs[pairIdx].stave.getAbsoluteX() - 8;
+          if (barX > staveX + 40) {
+            var drawBar = function(x, y1, y2) {
+              var ln = document.createElementNS(ns, 'line');
+              ln.setAttribute('x1', x); ln.setAttribute('x2', x);
+              ln.setAttribute('y1', y1); ln.setAttribute('y2', y2);
+              ln.setAttribute('stroke', '#4a4845'); ln.setAttribute('stroke-width', '1');
+              svgEl.appendChild(ln);
+            };
+            drawBar(barX, staffTop, staffBot);
+            drawBar(barX, tabTop, tabBot);
+          }
+        });
+
         applyLickTheme(svgEl);
         drawLickChordLabels(svgEl, allRealStaveNotes, lick, sorted, LABEL_H, notationY);
       });
