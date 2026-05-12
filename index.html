@@ -1156,7 +1156,7 @@
   .lick-prog-slot.dim { background: rgba(160,100,100,.15); color: #c09090; }
   .lick-prog-slot.trisub { background: rgba(180,80,80,.15); color: #d09080; }
   .lick-tab-wrap {
-    background: var(--surface); border-radius: 4px; padding: 8px 4px 0;
+    background: var(--surface); border-radius: 4px; padding: 8px 4px 12px;
     overflow-x: auto; margin-bottom: 2px; -webkit-overflow-scrolling: touch;
   }
   .lick-tab-wrap svg { display: block; }
@@ -9781,7 +9781,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v27 &nbsp;·&nbsp; deployed 2026-05-07 19:37</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v28 &nbsp;·&nbsp; deployed 2026-05-12 12:11</span></div>
     </div>
 
     <div class="tech-section">
@@ -9855,6 +9855,16 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Jazz impro hints</span><span class="tech-val">IMPRO_MAP quality→scale lookup on each 7th-chord card; clicking a scale pill navigates to that scale at the chord root via state update + render()</span></div>
       <div class="tech-row"><span class="tech-key">Theme</span><span class="tech-val">Dark mode only; CSS custom properties on <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">:root</code>; CoF SVG uses hardcoded dark-palette colours</span></div>
       <div class="tech-row"><span class="tech-key">Responsive</span><span class="tech-val">Breakpoints at 1400 px / 900 px / 560 px; landscape-mobile at max-height: 500 px; zoom reset to 1 on ≤560 px; user-scalable=no viewport</span></div>
+    </div>
+
+    <div class="tech-section">
+      <div class="tech-section-title">Jazz Lick Library</div>
+      <div class="tech-row"><span class="tech-key">Collection</span><span class="tech-val">18 curated jazz guitar licks across 4 progression types: ii-V-I Major (8), ii-V-i Minor (4), I-vi-ii-V Turnaround (3), Blues (3). Three difficulty tiers: Beginner, Intermediate, Advanced.</span></div>
+      <div class="tech-row"><span class="tech-key">Beginner licks</span><span class="tech-val">Honeysuckle Rose motif (b3→3 slide), octave displacement, minor enclosures, guide-tone walk, chromatic double-stop blues. No straight arpeggios — every beginner lick teaches a real jazz device.</span></div>
+      <div class="tech-row"><span class="tech-key">Notation</span><span class="tech-val">VexFlow 4.x dual stave: treble staff + guitar tab (6-string). All notes rendered as 8th notes. Chord labels aligned above staff via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">drawLickChordLabels()</code>. Post-render alignment pass shifts tab notes to match staff note centres.</span></div>
+      <div class="tech-row"><span class="tech-key">Data model</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">LICKS[]</code> — each lick: id, title, prog, diff, concepts[], key, chords[], bpm, feel, tab[] (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{s, f, beat, type}</code> where s:0=highE..5=lowE), concept text, source link.</span></div>
+      <div class="tech-row"><span class="tech-key">Playback</span><span class="tech-val">Tab positions mapped to MIDI via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">GUITAR_OPEN[s] + fret</code>. Play at written BPM or 60% (Slow). Uses Salamander Grand Piano sampler.</span></div>
+      <div class="tech-row"><span class="tech-key">Sources</span><span class="tech-val">Jens Larsen, jazzguitar.be, jazzadvice.com, mattwarnockguitar.com, learnjazzstandards.com</span></div>
     </div>
 
     <div class="tech-section">
@@ -10105,7 +10115,6 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <li><a class="guide-toc-link" href="#g-compare">Scale Comparison</a></li>
         <li><a class="guide-toc-link" href="#g-tips">Pro Tips</a></li>
         <li><a class="guide-toc-link" href="#g-licks">Jazz Lick Library</a></li>
-        <li><a class="guide-toc-link" href="#g-sources">Sources</a></li>
         <li><a class="guide-toc-link" href="#g-sources">Sources &amp; References</a></li>
       </ol>
     </nav>
@@ -10536,7 +10545,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-key">Progressions</span>
         <span class="guide-kv-val">Filter by progression type: ii-V-I (Major), ii-V-i (Minor), I-vi-ii-V (Turnaround), Blues, or show All.</span>
         <span class="guide-kv-key">Difficulty</span>
-        <span class="guide-kv-val">Licks are grouped into three tiers: <strong>Beginner</strong> (arpeggio foundations), <strong>Intermediate</strong> (bebop vocabulary), and <strong>Advanced</strong> (substitutions &amp; chromaticism).</span>
+        <span class="guide-kv-val">Licks are grouped into three tiers: <strong>Beginner</strong> (essential jazz devices — enclosures, guide tones, octave displacement, double stops, classic motifs), <strong>Intermediate</strong> (bebop vocabulary), and <strong>Advanced</strong> (substitutions &amp; chromaticism). No straight arpeggios — every lick teaches a real melodic technique.</span>
         <span class="guide-kv-key">Tab notation</span>
         <span class="guide-kv-val">Each lick shows guitar tablature with colour-coded notes: <strong style="color:var(--gold)">gold = root notes</strong>, <strong style="color:#7090c0">blue = approach/chromatic tones</strong>, white = other chord tones.</span>
         <span class="guide-kv-key">Chord bar</span>
@@ -10562,7 +10571,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2h8l3 3v11a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M12 2v4h3M6 8h6M6 11h6M6 14h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         </div>
         <div>
-          <div class="guide-section-num">13</div>
+          <div class="guide-section-num">14</div>
           <div class="guide-section-title">Sources &amp; Further Reading</div>
         </div>
       </div>
@@ -12224,30 +12233,36 @@ window.addEventListener('resize', () => {
 
   const LICKS = [
     // ═══ ii-V-I MAJOR ═══
-    { id:'maj-arp-asc', title:'Straight Arpeggio ii-V-I', prog:'ii-V-I', diff:'beg', concepts:['Arpeggios'],
+    { id:'maj-honeysuckle', title:'Honeysuckle Rose Motif', prog:'ii-V-I', diff:'beg', concepts:['Jazz motif','b3-to-3'],
       key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
       bpm:120, feel:'Swing',
       tab:[ // {s:string 0=highE..5=lowE, f:fret, beat:float, type:'r'|'a'|'n'}
-        // Dm7: D F A C ascending
-        {s:3,f:0,beat:0,type:'n'},{s:3,f:3,beat:0.5,type:'n'},{s:2,f:2,beat:1,type:'r'},{s:1,f:1,beat:1.5,type:'n'},
-        // G7: G B D F ascending
-        {s:2,f:0,beat:4,type:'r'},{s:1,f:0,beat:4.5,type:'n'},{s:1,f:3,beat:5,type:'n'},{s:0,f:1,beat:5.5,type:'n'},
-        // CΔ7: C E G B ascending
-        {s:4,f:3,beat:8,type:'r'},{s:3,f:2,beat:8.5,type:'n'},{s:2,f:0,beat:9,type:'n'},{s:1,f:0,beat:9.5,type:'n'}
+        // Dm7: signature b3→3 slide motif (F→F#→G), then descend to A
+        {s:3,f:3,beat:0,type:'n'},{s:3,f:4,beat:0.5,type:'a'},{s:2,f:0,beat:1,type:'n'},{s:2,f:2,beat:2,type:'r'},
+        // G7: repeat motif up — B, chromatic approach C→B, resolve down
+        {s:1,f:0,beat:4,type:'n'},{s:1,f:1,beat:4.5,type:'a'},{s:1,f:3,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
+        {s:2,f:0,beat:6,type:'n'},
+        // CΔ7: land on E (3rd), hold
+        {s:1,f:1,beat:8,type:'r'},{s:1,f:0,beat:9,type:'n'}
       ],
-      concept:'Pure chord tones ascending through each change. The foundation — learn where the arpeggios connect before adding embellishments.',
-      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/jazz-guitar-licks/'}
+      concept:'The classic "Honeysuckle Rose" motif — a minor 3rd sliding up to the major 3rd. One of the most quoted phrases in jazz, and the first step beyond plain arpeggios.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/bebop-licks/'}
     },
-    { id:'maj-arp-desc', title:'Descending Arpeggio Resolution', prog:'ii-V-I', diff:'beg', concepts:['Voice leading'],
-      key:'G', chords:[{name:'Am7',q:'m7'},{name:'D7',q:'dom'},{name:'GΔ7',q:'maj'},{name:'%',q:''}],
-      bpm:100, feel:'Swing',
+    { id:'maj-octave-disp', title:'Octave Displacement Line', prog:'ii-V-I', diff:'beg', concepts:['Octave displacement','Approach tones'],
+      key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
+      bpm:110, feel:'Swing',
       tab:[
-        {s:0,f:8,beat:0,type:'n'},{s:0,f:5,beat:0.5,type:'r'},{s:1,f:5,beat:1.5,type:'n'},{s:1,f:8,beat:2,type:'n'},
-        {s:1,f:7,beat:4,type:'n'},{s:1,f:3,beat:4.5,type:'r'},{s:2,f:4,beat:5.5,type:'n'},{s:2,f:2,beat:6,type:'n'},
-        {s:2,f:4,beat:8,type:'r'}
+        // Dm7: A up an octave (displacement), then descend F-E-D
+        {s:2,f:2,beat:0,type:'r'},{s:0,f:5,beat:0.5,type:'n'},{s:0,f:1,beat:1,type:'n'},{s:1,f:1,beat:1.5,type:'n'},
+        {s:1,f:3,beat:2,type:'n'},{s:1,f:1,beat:2.5,type:'n'},
+        // G7: chromatic below B (Bb→B), skip to D, descend
+        {s:1,f:3,beat:4,type:'a'},{s:1,f:0,beat:4.5,type:'n'},{s:1,f:3,beat:5,type:'n'},{s:2,f:2,beat:5.5,type:'n'},
+        {s:2,f:0,beat:6,type:'r'},{s:3,f:3,beat:6.5,type:'n'},
+        // CΔ7: land on E (3rd), settle on C
+        {s:3,f:2,beat:8,type:'r'},{s:4,f:3,beat:9,type:'n'}
       ],
-      concept:'Smooth voice leading — each chord change moves to the nearest chord tone. The V→I resolution lands on the 3rd (B) of Gmaj7.',
-      source:{name:'learnjazzstandards.com', url:'https://www.learnjazzstandards.com/blog/the-ultimate-guide-to-jazz-guitar-licks/'}
+      concept:'Octave displacement jumps a note up (or down) by an octave, turning a predictable scale run into an angular, surprising melody. A key device in bebop and modern jazz.',
+      source:{name:'Jens Larsen', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'}
     },
     { id:'maj-bebop-dom', title:'Bebop Dominant Approach', prog:'ii-V-I', diff:'int', concepts:['Bebop scale'],
       key:'C', chords:[{name:'Dm7',q:'m7'},{name:'G7',q:'dom'},{name:'CΔ7',q:'maj'},{name:'%',q:''}],
@@ -12326,19 +12341,21 @@ window.addEventListener('resize', () => {
     },
 
     // ═══ ii-V-i MINOR ═══
-    { id:'min-harm-arp', title:'Harmonic Minor Arpeggio Line', prog:'ii-V-i', diff:'beg', concepts:['Harmonic minor'],
+    { id:'min-enclosure', title:'Minor Enclosure Line', prog:'ii-V-i', diff:'beg', concepts:['Enclosures','Harmonic minor'],
       key:'A', chords:[{name:'Bm7b5',q:'hdim'},{name:'E7',q:'dom'},{name:'Am7',q:'m7'},{name:'%',q:''}],
       bpm:110, feel:'Swing',
       tab:[
-        // Bm7b5: B D F A ascending
-        {s:4,f:2,beat:0,type:'n'},{s:3,f:0,beat:0.5,type:'r'},{s:3,f:3,beat:1,type:'n'},{s:2,f:2,beat:1.5,type:'n'},
-        // E7: E G# B D ascending
-        {s:3,f:2,beat:4,type:'r'},{s:2,f:1,beat:4.5,type:'n'},{s:1,f:0,beat:5,type:'n'},{s:1,f:3,beat:5.5,type:'n'},
-        // Am: A G E (descending resolution)
+        // Bm7b5: enclose D (b3) from above/below, then up to F
+        {s:3,f:1,beat:0,type:'a'},{s:4,f:2,beat:0.5,type:'a'},{s:3,f:0,beat:1,type:'r'},{s:3,f:3,beat:1.5,type:'n'},
+        {s:2,f:2,beat:2,type:'n'},{s:2,f:3,beat:2.5,type:'n'},
+        // E7: enclose G# from above/below (A→G→G#), then B descend
+        {s:2,f:2,beat:4,type:'a'},{s:2,f:0,beat:4.5,type:'a'},{s:2,f:1,beat:5,type:'n'},{s:1,f:0,beat:5.5,type:'n'},
+        {s:1,f:3,beat:6,type:'n'},{s:1,f:0,beat:6.5,type:'n'},
+        // Am: land on A (root), resolve down to E
         {s:2,f:2,beat:8,type:'r'},{s:2,f:0,beat:8.5,type:'n'},{s:3,f:2,beat:9,type:'n'}
       ],
-      concept:'Arpeggiate through the minor ii-V-i using harmonic minor. The raised 7th (G#) over E7 provides the leading tone resolution to Am.',
-      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/minor-ii-v-i-licks/'}
+      concept:'Enclosures (chromatic notes above and below) surround each target chord tone, creating the signature bebop "curling" motion even over a simple minor ii-V-i.',
+      source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/bebop-licks/'}
     },
     { id:'min-melmin', title:'Melodic Minor over V7alt', prog:'ii-V-i', diff:'int', concepts:['Melodic minor','V7alt'],
       key:'A', chords:[{name:'Bm7b5',q:'hdim'},{name:'E7alt',q:'dom'},{name:'Am6',q:'m7'},{name:'%',q:''}],
@@ -12378,21 +12395,21 @@ window.addEventListener('resize', () => {
     },
 
     // ═══ TURNAROUND I-vi-ii-V ═══
-    { id:'turn-arp', title:'Arpeggio Through Changes', prog:'I-vi-ii-V', diff:'beg', concepts:['Arpeggios','Turnaround'],
+    { id:'turn-guidetone', title:'Guide-Tone Walk', prog:'I-vi-ii-V', diff:'beg', concepts:['Guide tones','Voice leading'],
       key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'Am7',q:'m7'},{name:'Dm7',q:'m7'},{name:'G7',q:'dom'}],
       bpm:120, feel:'Swing',
       tab:[
-        // CΔ7: C E G B ascending
-        {s:4,f:3,beat:0,type:'r'},{s:3,f:2,beat:0.5,type:'n'},{s:2,f:0,beat:1,type:'n'},{s:1,f:0,beat:1.5,type:'n'},
-        // Am7: A G E C descending
-        {s:2,f:2,beat:2,type:'r'},{s:2,f:0,beat:2.5,type:'n'},{s:3,f:2,beat:3,type:'n'},{s:1,f:1,beat:3.5,type:'n'},
-        // Dm7: D F A C ascending
-        {s:3,f:0,beat:4,type:'r'},{s:3,f:3,beat:4.5,type:'n'},{s:2,f:2,beat:5,type:'n'},{s:1,f:1,beat:5.5,type:'n'},
-        // G7: G B D F ascending
-        {s:2,f:0,beat:6,type:'r'},{s:1,f:0,beat:6.5,type:'n'},{s:1,f:3,beat:7,type:'n'},{s:0,f:1,beat:7.5,type:'n'}
+        // CΔ7: start on 3rd (E), walk up to 7th (B) via G
+        {s:3,f:2,beat:0,type:'r'},{s:2,f:0,beat:0.5,type:'n'},{s:1,f:0,beat:1,type:'n'},{s:1,f:1,beat:1.5,type:'a'},
+        // Am7: 7th (G) drops to 3rd (C) — chromatic connector B→Bb→A
+        {s:2,f:0,beat:2,type:'n'},{s:2,f:3,beat:2.5,type:'a'},{s:2,f:2,beat:3,type:'r'},{s:1,f:1,beat:3.5,type:'n'},
+        // Dm7: 3rd (F) walks to 7th (C) via A
+        {s:3,f:3,beat:4,type:'r'},{s:2,f:2,beat:4.5,type:'n'},{s:1,f:1,beat:5,type:'n'},{s:1,f:2,beat:5.5,type:'a'},
+        // G7: 7th (F) resolves down to 3rd (B), chromatic E→Eb→D
+        {s:0,f:1,beat:6,type:'n'},{s:1,f:1,beat:6.5,type:'r'},{s:1,f:0,beat:7,type:'a'},{s:1,f:3,beat:7.5,type:'n'}
       ],
-      concept:'One arpeggio per chord, two beats each. The simplest way to outline a turnaround — hear each chord change clearly.',
-      source:{name:'learnjazzstandards.com', url:'https://www.learnjazzstandards.com/blog/learning-jazz/jazz-theory/rhythm-changes/'}
+      concept:'Guide tones (3rds and 7ths) are the skeleton of jazz harmony. Walking between them with chromatic connectors outlines every chord change with minimal notes — the opposite of brute-force arpeggios.',
+      source:{name:'jazzadvice.com', url:'https://www.jazzadvice.com/lessons/voice-leading-for-jazz-musicians/'}
     },
     { id:'turn-chromatic', title:'Chromatic Voice Leading', prog:'I-vi-ii-V', diff:'int', concepts:['Chromaticism','Voice leading'],
       key:'C', chords:[{name:'CΔ7',q:'maj'},{name:'Am7',q:'m7'},{name:'Dm7',q:'m7'},{name:'G7',q:'dom'}],
@@ -12420,16 +12437,20 @@ window.addEventListener('resize', () => {
     },
 
     // ═══ BLUES ═══
-    { id:'blues-basic', title:'Blues Scale + Chord Tones', prog:'Blues', diff:'beg', concepts:['Blues scale'],
+    { id:'blues-doublestop', title:'Chromatic Double-Stop Blues', prog:'Blues', diff:'beg', concepts:['Double stops','Chromaticism'],
       key:'A', chords:[{name:'A7',q:'dom'},{name:'D7',q:'dom'},{name:'A7',q:'dom'},{name:'E7',q:'dom'}],
       bpm:100, feel:'Shuffle',
       tab:[
-        {s:3,f:2,beat:0,type:'r'},{s:3,f:0,beat:0.5,type:'n'},{s:4,f:3,beat:1,type:'n'},{s:4,f:2,beat:1.5,type:'n'},
-        {s:4,f:0,beat:2,type:'r'},{s:3,f:0,beat:3,type:'n'},{s:3,f:2,beat:3.5,type:'n'},
-        {s:3,f:0,beat:4,type:'n'},{s:4,f:3,beat:4.5,type:'a'},{s:4,f:2,beat:5,type:'r'},{s:4,f:0,beat:5.5,type:'n'},
-        {s:3,f:2,beat:6,type:'n'},{s:3,f:0,beat:6.5,type:'r'}
+        // A7: sliding 6ths (C-A → C#-A) then walk down
+        {s:2,f:1,beat:0,type:'a'},{s:3,f:2,beat:0,type:'n'},{s:2,f:2,beat:1,type:'n'},{s:3,f:2,beat:1,type:'r'},
+        {s:2,f:0,beat:2,type:'n'},{s:3,f:0,beat:2.5,type:'n'},{s:3,f:2,beat:3,type:'r'},
+        // D7: target F# (3rd) with chromatic slide from F
+        {s:3,f:3,beat:4,type:'a'},{s:3,f:4,beat:4.5,type:'n'},{s:2,f:2,beat:5,type:'r'},{s:2,f:0,beat:5.5,type:'n'},
+        {s:3,f:2,beat:6,type:'n'},{s:3,f:0,beat:6.5,type:'n'},
+        // A7: resolve with the b7→root (G→A)
+        {s:2,f:0,beat:8,type:'a'},{s:2,f:2,beat:8.5,type:'r'}
       ],
-      concept:'The minor pentatonic/blues scale over dominant 7th chords — the clash between minor 3rd (C) and major 3rd (C#) is the heart of the blues sound.',
+      concept:'Double stops (two notes at once) in 6ths sliding chromatically — a staple of jazz-blues comping and soloing. The chromatic slide from b3 to 3 is the quintessential blues gesture.',
       source:{name:'jazzguitar.be', url:'https://www.jazzguitar.be/blog/jazz-blues-guitar/'}
     },
     { id:'blues-passing', title:'Jazz Blues with Passing Tones', prog:'Blues', diff:'int', concepts:['Passing tones','Jazz blues'],
@@ -12601,14 +12622,14 @@ window.addEventListener('resize', () => {
 
     var W = Math.max(wrapEl.offsetWidth || 480, 480);
     var LABEL_H = 42;
-    var H = LABEL_H + 240;
+    var H = LABEL_H + 280;
 
     var renderer = new VF.Renderer(wrapEl, VF.Renderer.Backends.SVG);
     renderer.resize(W, H);
     var ctx = renderer.getContext();
 
     var staveX = 15, staveW = W - 30;
-    var notationY = LABEL_H, tabY = LABEL_H + 130;
+    var notationY = LABEL_H, tabY = LABEL_H + 110;
 
     var staff = new VF.Stave(staveX, notationY, staveW);
     staff.addClef('treble');
