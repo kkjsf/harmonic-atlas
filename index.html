@@ -12591,27 +12591,25 @@ window.addEventListener('resize', () => {
     svgEl.style.background = 'transparent';
   }
 
-  function drawLickChordLabels(svgEl, staveNotes, lick, sortedTab, labelH, notationY) {
+  function drawLickChordLabels(svgEl, notePairs, lick, sortedTab, labelH, notationY) {
     if (!lick.chords) return;
     var ns = 'http://www.w3.org/2000/svg';
-    var svgRect = svgEl.getBoundingClientRect();
     var realChords = lick.chords.filter(function(ch) { return ch.name !== '%' && ch.q; });
-    if (!realChords.length) return;
+    if (!realChords.length || !notePairs.length) return;
     var maxBeat = Math.max.apply(null, sortedTab.map(function(n) { return n.beat; }));
     var totalBeats = Math.ceil((maxBeat + 1) / 4) * 4;
     var beatsPerChord = totalBeats / realChords.length;
 
+    var noteBeats = sortedTab.filter(function(n) { return n.type !== 'r'; });
+
     realChords.forEach(function(ch, ci) {
       var chordBeat = ci * beatsPerChord;
-      var noteIdx = -1;
-      for (var i = 0; i < sortedTab.length; i++) {
-        if (sortedTab[i].beat >= chordBeat - 0.01) { noteIdx = i; break; }
+      var pairIdx = -1;
+      for (var i = 0; i < noteBeats.length; i++) {
+        if (noteBeats[i].beat >= chordBeat - 0.01) { pairIdx = i; break; }
       }
-      if (noteIdx < 0 || noteIdx >= staveNotes.length) return;
-      var noteEl = svgEl.querySelectorAll('.vf-stavenote')[noteIdx];
-      if (!noteEl) return;
-      var noteRect = noteEl.getBoundingClientRect();
-      var noteX = noteRect.left + noteRect.width / 2 - svgRect.left;
+      if (pairIdx < 0 || pairIdx >= notePairs.length) return;
+      var noteX = notePairs[pairIdx].stave.getAbsoluteX();
       var type = Q_TO_CHORD_TYPE[ch.q] || 'r';
       var color = VEX_CHORD_COLORS[type] || '#c8c2b0';
 
@@ -12886,7 +12884,7 @@ window.addEventListener('resize', () => {
         });
 
         applyLickTheme(svgEl);
-        drawLickChordLabels(svgEl, allRealStaveNotes, lick, sorted, LABEL_H, notationY);
+        drawLickChordLabels(svgEl, notePairs, lick, sorted, LABEL_H, notationY);
       });
     }
   }
@@ -12974,7 +12972,6 @@ window.addEventListener('resize', () => {
             '<span class="lick-card-title">' + lick.title + keyBadge + '</span>' +
             '<div class="lick-card-tags">' + tagsHtml + '</div>' +
           '</div>' +
-          '<div class="lick-prog-bar">' + progHtml + '</div>' +
           '<div class="lick-tab-wrap"></div>' +
           '<div class="lick-concept">' + lick.concept + '</div>' +
           '<div class="lick-controls">' +
