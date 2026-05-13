@@ -9781,7 +9781,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v30 &nbsp;·&nbsp; deployed 2026-05-13 14:30</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v31 &nbsp;·&nbsp; deployed 2026-05-13 18:00</span></div>
     </div>
 
     <div class="tech-section">
@@ -12242,7 +12242,7 @@ window.addEventListener('resize', () => {
         {s:2,f:9,beat:3,type:'n'},{s:1,f:8,beat:3.33,type:'n'},{s:0,f:7,beat:3.67,type:'n'},
         {s:0,f:8,beat:4,type:'n'},{s:0,f:7,beat:4.5,type:'n'}
       ],
-      concept:'The Barry Harris bebop arpeggio recipe: approach from a half-step below, then play the arpeggio as a triplet. Start on the 3rd (E), pass chromatically through Eb to D, skip to B (approach), then C-E-G triplet. End short on the offbeat — lighter phrasing.',
+      concept:'The Barry Harris bebop arpeggio recipe: approach from a half-step below, then play the arpeggio as a triplet. Start on the 3rd (E), pass chromatically through Eb to D, skip to B then C, and play the E-G-B triplet arpeggio. End short on the offbeat — lighter phrasing.',
       source:{name:'Jens Larsen', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'}
     },
     { id:'jl-enclosure', title:'Enclosure into Triplet', prog:'Cmaj7', diff:'beg', concepts:['Enclosures','Triplet arpeggio'],
@@ -12770,8 +12770,8 @@ window.addEventListener('resize', () => {
 
     var staveNotes = [], tabNotes = [], allRealStaveNotes = [];
     var notePairs = [];
-    var tripletStaveGroups = [], tripletTabGroups = [];
-    var curTripStave = [], curTripTab = [];
+    var tripletStaveGroups = [];
+    var curTripStave = [];
     var tripletNoteSet = new Set();
 
     events.forEach(function(ev) {
@@ -12790,22 +12790,18 @@ window.addEventListener('resize', () => {
         tabNotes.push(tn);
         notePairs.push({stave: sn, tab: tn});
 
-        if (ev.triplet === 'first') { curTripStave = [sn]; curTripTab = [tn]; tripletNoteSet.add(sn); }
-        else if (ev.triplet === 'mid') { curTripStave.push(sn); curTripTab.push(tn); tripletNoteSet.add(sn); }
+        if (ev.triplet === 'first') { curTripStave = [sn]; tripletNoteSet.add(sn); }
+        else if (ev.triplet === 'mid') { curTripStave.push(sn); tripletNoteSet.add(sn); }
         else if (ev.triplet === 'last') {
-          curTripStave.push(sn); curTripTab.push(tn); tripletNoteSet.add(sn);
+          curTripStave.push(sn); tripletNoteSet.add(sn);
           tripletStaveGroups.push(curTripStave);
-          tripletTabGroups.push(curTripTab);
-          curTripStave = []; curTripTab = [];
+          curTripStave = [];
         }
       }
     });
 
     // Create tuplets BEFORE formatting so VexFlow adjusts tick counts
     var staveTuplets = tripletStaveGroups.map(function(grp) {
-      return new VF.Tuplet(grp, {num_notes: 3, notes_occupied: 2});
-    });
-    var tabTuplets = tripletTabGroups.map(function(grp) {
       return new VF.Tuplet(grp, {num_notes: 3, notes_occupied: 2});
     });
 
@@ -12832,7 +12828,6 @@ window.addEventListener('resize', () => {
     tabVoice.draw(ctx, tabStave);
 
     staveTuplets.forEach(function(t) { t.setContext(ctx).draw(); });
-    tabTuplets.forEach(function(t) { t.setContext(ctx).draw(); });
 
     // Align tab notes to their paired staff notes using VexFlow positions
     var svgEl = wrapEl.querySelector('svg');
