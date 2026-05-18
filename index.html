@@ -9781,7 +9781,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v31 &nbsp;·&nbsp; deployed 2026-05-13 18:00</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v32 &nbsp;·&nbsp; deployed 2026-05-18 16:00</span></div>
     </div>
 
     <div class="tech-section">
@@ -12231,7 +12231,92 @@ window.addEventListener('resize', () => {
   const GUITAR_OPEN = [64,59,55,50,45,40]; // e4 B3 G3 D3 A2 E2 (s:0=high E)
   const STR_LABELS = ['e','B','G','D','A','E'];
 
-  const LICKS = [];
+  const LICKS = [
+    {
+      id:'jl-1', title:'Barry Harris Triplet Approach', prog:'Cmaj7', diff:'beg',
+      key:'C', bpm:140, feel:'Swing',
+      concepts:['Triplet Arpeggio','Chromatic Approach'],
+      concept:'Half-step approach into E-G-B triplet arpeggio (Barry Harris). Start on the 3rd (E), chromatic passing tone to D, skip down to B, then ascending triplet arpeggio.',
+      chords:[{name:'Cmaj7',q:'maj7'},{name:'Cmaj7',q:'maj7'}],
+      source:{name:'Jens Larsen – 5 Jazz Licks That Turn Beginners Into Pros', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'},
+      tab:[
+        {s:2,f:9,beat:0,type:'n'},
+        {s:2,f:8,beat:0.5,type:'a'},
+        {s:2,f:7,beat:1,type:'n'},
+        {s:3,f:9,beat:4,type:'n'},
+        {s:3,f:10,beat:4.5,type:'r'},
+        {s:2,f:9,beat:5,type:'n'},
+        {s:1,f:8,beat:5.33,type:'n'},
+        {s:0,f:7,beat:5.67,type:'n'},
+        {s:0,f:10,beat:7,type:'n'}
+      ]
+    },
+    {
+      id:'jl-2', title:'Enclosure to Triplet Arpeggio', prog:'Cmaj7', diff:'int',
+      key:'C', bpm:150, feel:'Swing',
+      concepts:['Enclosure','Triplet Arpeggio'],
+      concept:'Start on the 5th (G), enclosure around E (F, D♯, E), enclosure around C (D, B, C), leading into ascending E-G-B triplet arpeggio.',
+      chords:[{name:'Cmaj7',q:'maj7'},{name:'Cmaj7',q:'maj7'}],
+      source:{name:'Jens Larsen – 5 Jazz Licks That Turn Beginners Into Pros', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'},
+      tab:[
+        {s:1,f:8,beat:0,type:'n'},
+        {s:2,f:10,beat:0.5,type:'a'},
+        {s:2,f:8,beat:1,type:'a'},
+        {s:2,f:9,beat:1.5,type:'r'},
+        {s:2,f:7,beat:2,type:'a'},
+        {s:3,f:9,beat:2.5,type:'a'},
+        {s:3,f:10,beat:3,type:'r'},
+        {s:2,f:9,beat:3.5,type:'n'},
+        {s:1,f:8,beat:3.83,type:'n'},
+        {s:0,f:7,beat:4.17,type:'n'},
+        {s:0,f:10,beat:6,type:'n'}
+      ]
+    },
+    {
+      id:'jl-3', title:'Octave-Displaced Arpeggio', prog:'Cmaj7', diff:'int',
+      key:'C', bpm:150, feel:'Swing',
+      concepts:['Octave Displacement','Interval Skip'],
+      concept:'Cmaj7 arpeggio with root displaced up an octave (C5→E4 = major 6th skip), descending through scale tones with chromatic D♯ approach to resolve on E and C.',
+      chords:[{name:'Cmaj7',q:'maj7'},{name:'Cmaj7',q:'maj7'}],
+      source:{name:'Jens Larsen – 5 Jazz Licks That Turn Beginners Into Pros', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'},
+      tab:[
+        {s:0,f:8,beat:0,type:'n'},
+        {s:2,f:9,beat:0.5,type:'n'},
+        {s:1,f:8,beat:1,type:'n'},
+        {s:0,f:7,beat:1.5,type:'n'},
+        {s:1,f:10,beat:2,type:'n'},
+        {s:1,f:8,beat:2.5,type:'n'},
+        {s:2,f:10,beat:3,type:'n'},
+        {s:2,f:8,beat:3.5,type:'a'},
+        {s:2,f:9,beat:5,type:'r'},
+        {s:3,f:10,beat:6,type:'r'}
+      ]
+    },
+    {
+      id:'jl-4', title:'Chromatic Pivot Line', prog:'Cmaj7', diff:'adv',
+      key:'C', bpm:160, feel:'Swing',
+      concepts:['Pivot Arpeggio','Chromatic Run','Enclosure'],
+      concept:'Pivot arpeggio (octave-displaced Cmaj7), chromatic A♭ passing tone between A and G, skip down to E, then chromatic descent from D through enclosure resolving on B, ending on low G.',
+      chords:[{name:'Cmaj7',q:'maj7'},{name:'Cmaj7',q:'maj7'}],
+      source:{name:'Jens Larsen – 5 Jazz Licks That Turn Beginners Into Pros', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'},
+      tab:[
+        {s:0,f:8,beat:0,type:'n'},
+        {s:2,f:9,beat:0.5,type:'n'},
+        {s:1,f:8,beat:1,type:'n'},
+        {s:0,f:7,beat:1.5,type:'n'},
+        {s:1,f:10,beat:2,type:'n'},
+        {s:1,f:9,beat:2.5,type:'a'},
+        {s:1,f:8,beat:3,type:'r'},
+        {s:2,f:9,beat:3.5,type:'n'},
+        {s:2,f:7,beat:4,type:'n'},
+        {s:3,f:11,beat:4.5,type:'a'},
+        {s:3,f:10,beat:5,type:'n'},
+        {s:3,f:7,beat:5.5,type:'a'},
+        {s:3,f:9,beat:6,type:'r'},
+        {s:4,f:10,beat:7,type:'r'}
+      ]
+    }
+  ];
 
   const PROG_FILTERS = [
     {label:'Cmaj7 (Jens Larsen)', value:'Cmaj7'},
