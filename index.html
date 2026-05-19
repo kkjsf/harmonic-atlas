@@ -10,7 +10,6 @@
 <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -1085,108 +1084,186 @@
   }
   #lick-lib-btn:hover { border-color: var(--gold); background: var(--surface2); color: var(--gold2); }
 
-  /* ── Jazz Lick Library Side Panel ── */
+  /* ── Jazz Resources Hub ── */
   #lick-overlay {
     display: none; position: fixed; inset: 0; z-index: var(--z-overlay);
     background: rgba(0,0,0,.55); backdrop-filter: blur(3px);
   }
   #lick-overlay.open { display: block; }
   #lick-panel {
-    display: none; position: fixed; top: 4vh; left: 50%; transform: translateX(-50%);
-    width: min(900px, 94vw); max-height: 92vh;
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: var(--surface); z-index: calc(var(--z-overlay) + 1);
-    overflow-y: auto; box-shadow: 0 8px 60px rgba(0,0,0,.6);
-    border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden;
   }
-  #lick-panel.open { display: block; }
-  .lick-panel-header {
-    position: sticky; top: 0; background: var(--surface); z-index: 2;
-    padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+  #lick-panel.open { display: flex; flex-direction: column; }
+  #lick-panel.browse .res-browse { display: block; }
+  #lick-panel.browse .res-embed { display: none; }
+  #lick-panel.embed .res-browse { display: none; }
+  #lick-panel.embed .res-embed { display: flex; }
+  .res-header {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--surface);
   }
-  .lick-panel-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-  .lick-panel-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); }
-  .lick-panel-title em { font-style: italic; color: var(--gold); }
+  .res-header-left { display: flex; align-items: center; gap: 14px; }
+  .res-header-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); }
+  .res-header-title em { font-style: italic; color: var(--gold); }
+  .res-back-btn {
+    display: none; align-items: center; gap: 5px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .05em;
+    text-transform: uppercase; padding: 5px 12px;
+    border: 1px solid var(--border); border-radius: 3px;
+    background: transparent; color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .res-back-btn:hover { border-color: var(--gold); color: var(--cream); }
+  #lick-panel.embed .res-back-btn { display: inline-flex; }
+  #lick-panel.embed .res-header-title { font-size: 15px; }
   .lick-close-btn {
     width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 3px;
     background: transparent; color: var(--muted); font-size: 16px; cursor: pointer;
     display: flex; align-items: center; justify-content: center; transition: all .15s;
   }
   .lick-close-btn:hover { color: var(--cream); border-color: var(--gold); }
-  .lick-panel-subtitle { font-size: 10px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
-  .lick-prog-filter {
-    display: flex; gap: 6px; flex-wrap: wrap; padding: 14px 24px;
-    border-bottom: 1px solid var(--border); background: rgba(0,0,0,.15);
+  .res-toolbar {
+    flex-shrink: 0; display: flex; flex-direction: column; gap: 12px;
+    padding: 16px 24px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,.15);
   }
-  .lick-prog-pill {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .04em;
+  .res-search-row { position: relative; }
+  .res-search {
+    width: 100%; padding: 9px 14px 9px 34px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .03em;
+    background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 5px;
+    color: var(--cream); outline: none; transition: border-color .15s;
+  }
+  .res-search::placeholder { color: var(--muted); opacity: .6; }
+  .res-search:focus { border-color: rgba(201,168,76,.4); }
+  .res-search-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    font-size: 13px; color: var(--muted); pointer-events: none;
+  }
+  .res-search-clear {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px; border: none; border-radius: 50%;
+    background: rgba(255,255,255,.08); color: var(--muted); font-size: 11px;
+    cursor: pointer; display: none; align-items: center; justify-content: center; transition: all .15s;
+  }
+  .res-search-clear:hover { background: rgba(255,255,255,.15); color: var(--cream); }
+  .res-search-clear.show { display: flex; }
+  .res-toc {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .res-toc-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .03em;
     padding: 5px 12px; border: 1px solid var(--border); border-radius: 20px;
     background: transparent; color: var(--muted); cursor: pointer; transition: all .15s;
+    white-space: nowrap;
   }
-  .lick-prog-pill:hover { border-color: rgba(201,168,76,.3); color: var(--cream); }
-  .lick-prog-pill.active { background: rgba(201,168,76,.15); border-color: rgba(201,168,76,.4); color: var(--gold); font-weight: 500; }
-  .lick-panel-body { padding: 20px 24px 40px; }
-  .lick-section-label {
-    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--gold); margin: 24px 0 14px; padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
+  .res-toc-pill:hover { border-color: rgba(201,168,76,.3); color: var(--cream); }
+  .res-toc-pill.active { background: rgba(201,168,76,.12); border-color: rgba(201,168,76,.35); color: var(--gold); }
+  .res-toc-icon { font-size: 12px; }
+  .res-toc-count {
+    font-size: 9px; padding: 1px 5px; border-radius: 8px;
+    background: rgba(255,255,255,.06); color: var(--muted); font-weight: 500;
   }
-  .lick-section-label:first-child { margin-top: 0; }
-  .lick-card {
+  .res-toc-pill.active .res-toc-count { background: rgba(201,168,76,.15); color: var(--gold); }
+  .res-result-count {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--muted); letter-spacing: .04em; padding: 0 2px;
+  }
+  .res-browse { overflow-y: auto; flex: 1; padding: 24px; }
+  .res-no-results {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .04em;
+  }
+  .res-no-results span { display: block; font-size: 28px; margin-bottom: 12px; opacity: .4; }
+  .res-category { margin-bottom: 32px; }
+  .res-cat-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .res-cat-icon { font-size: 16px; opacity: .8; }
+  .res-cat-title {
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--gold); flex: 1;
+  }
+  .res-cat-count {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    padding: 2px 8px; border-radius: 10px;
+    background: rgba(255,255,255,.05); color: var(--muted);
+  }
+  .res-cat-desc {
+    font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 16px;
+  }
+  .res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+  .res-card {
     background: rgba(255,255,255,.03); border: 1px solid var(--border);
-    border-radius: 5px; padding: 16px 18px; margin-bottom: 14px; transition: border-color .15s;
+    border-radius: 5px; padding: 16px 18px; cursor: pointer; transition: all .2s;
+    position: relative;
   }
-  .lick-card:hover { border-color: rgba(201,168,76,.3); }
-  .lick-card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
-  .lick-card-title { font-size: 13px; font-weight: 600; color: var(--cream); }
-  .lick-card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
-  .lick-tag { font-size: 9px; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; }
-  .lick-tag.beg { background: rgba(106,144,95,.25); color: rgba(180,220,170,.8); }
-  .lick-tag.int { background: rgba(144,130,95,.25); color: rgba(220,200,160,.8); }
-  .lick-tag.adv { background: rgba(144,95,95,.25); color: rgba(220,160,160,.8); }
-  .lick-tag.concept { background: rgba(106,95,144,.2); color: rgba(180,170,210,.7); }
-  .lick-prog-bar { display: flex; gap: 2px; margin-bottom: 10px; }
-  .lick-prog-slot {
-    flex: 1; text-align: center; font-size: 11px; font-weight: 600;
-    padding: 4px 0; border-radius: 2px; background: rgba(255,255,255,.04); color: var(--muted);
+  .res-card:hover { border-color: rgba(201,168,76,.35); background: rgba(255,255,255,.05); transform: translateY(-1px); }
+  .res-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .res-card-title { font-size: 13px; font-weight: 600; color: var(--cream); line-height: 1.4; }
+  .res-card-site {
+    flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    letter-spacing: .04em; padding: 2px 8px; border-radius: 10px;
+    background: rgba(201,168,76,.1); color: var(--gold); white-space: nowrap;
   }
-  .lick-prog-slot.m7 { background: rgba(106,95,144,.15); color: #a99cc8; }
-  .lick-prog-slot.dom { background: rgba(180,120,80,.15); color: #d4a870; }
-  .lick-prog-slot.maj { background: rgba(201,168,76,.12); color: var(--gold); }
-  .lick-prog-slot.hdim { background: rgba(112,144,192,.15); color: #7090c0; }
-  .lick-prog-slot.dim { background: rgba(160,100,100,.15); color: #c09090; }
-  .lick-prog-slot.trisub { background: rgba(180,80,80,.15); color: #d09080; }
-  .lick-tab-wrap {
-    background: var(--surface); border-radius: 4px; padding: 8px 4px 12px;
-    overflow-x: auto; margin-bottom: 2px; -webkit-overflow-scrolling: touch;
+  .res-card-desc { font-size: 11px; color: var(--muted); line-height: 1.55; }
+  .res-card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+  .res-card-tag {
+    font-size: 9px; letter-spacing: .04em; text-transform: uppercase; padding: 2px 7px;
+    border-radius: 2px; background: rgba(106,95,144,.15); color: rgba(180,170,210,.7);
   }
-  .lick-tab-wrap svg { display: block; }
-  .lick-tab-wrap .lick-loading {
-    padding: 2rem; font-family: 'IBM Plex Mono', monospace; font-size: .75rem;
-    color: var(--dim); text-align: center; letter-spacing: .1em;
+  .res-card-footer {
+    display: flex; align-items: center; justify-content: space-between; margin-top: 12px;
+    padding-top: 10px; border-top: 1px solid rgba(255,255,255,.04);
   }
-  .lick-controls {
-    display: flex; align-items: center; gap: 10px; margin-top: 10px;
+  .res-card-ext {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted);
+    letter-spacing: .04em; text-transform: uppercase; transition: color .15s;
   }
-  .lick-play-btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .05em;
-    text-transform: uppercase; padding: 5px 12px;
-    border: 1px solid rgba(201,168,76,.3); border-radius: 3px;
+  .res-card:hover .res-card-ext { color: var(--gold); }
+  .res-card-domain {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    color: var(--muted); opacity: .5; letter-spacing: .02em;
+  }
+  .res-card mark {
+    background: rgba(201,168,76,.25); color: var(--cream);
+    border-radius: 1px; padding: 0 1px;
+  }
+  .res-embed { flex: 1; flex-direction: column; overflow: hidden; }
+  .res-iframe-bar {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 24px; background: rgba(0,0,0,.2); border-bottom: 1px solid var(--border);
+  }
+  .res-iframe-url {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted);
+    letter-spacing: .03em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .res-iframe-open {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .05em;
+    text-transform: uppercase; padding: 4px 10px;
+    border: 1px solid var(--border); border-radius: 3px;
     background: transparent; color: var(--gold); cursor: pointer; transition: all .15s;
+    text-decoration: none;
   }
-  .lick-play-btn:hover { background: rgba(201,168,76,.1); }
-  .lick-play-btn.playing { background: rgba(201,168,76,.18); border-color: var(--gold); }
-  .lick-tempo { font-size: 10px; color: var(--muted); }
-  .lick-concept {
-    font-size: 10px; color: var(--muted); margin-top: 8px; line-height: 1.5;
-    padding-left: 10px; border-left: 2px solid rgba(201,168,76,.2);
+  .res-iframe-open:hover { border-color: var(--gold); background: rgba(201,168,76,.1); }
+  .res-iframe-wrap { flex: 1; position: relative; background: #fff; }
+  .res-iframe-wrap iframe { width: 100%; height: 100%; border: none; }
+  .res-iframe-fallback {
+    position: absolute; inset: 0; display: none; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px;
+    background: var(--surface); color: var(--muted); font-size: 13px; text-align: center; padding: 40px;
   }
-  .lick-source {
-    font-size: 9px; color: var(--muted); margin-top: 6px; letter-spacing: .03em;
+  .res-iframe-fallback.show { display: flex; }
+  .res-iframe-fallback a {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .04em;
+    padding: 8px 20px; border: 1px solid rgba(201,168,76,.4); border-radius: 4px;
+    background: rgba(201,168,76,.1); color: var(--gold); text-decoration: none; transition: all .15s;
   }
-  .lick-source a { color: var(--gold); opacity: .7; text-decoration: none; transition: opacity .15s; }
-  .lick-source a:hover { opacity: 1; text-decoration: underline; }
-  .lick-card.hidden { display: none; }
+  .res-iframe-fallback a:hover { background: rgba(201,168,76,.2); }
 
   #comp-btn {
     position: fixed; top: 16px; right: 16px;
@@ -2238,7 +2315,7 @@
     <path d="M14.2 3.5a3.5 3.5 0 00-4.7 4.7L3.8 14a1 1 0 001.4 1.4l5.8-5.7a3.5 3.5 0 004.7-4.7l-2.2 2.2-1.5-1.5 2.2-2.2z" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 </button>
-<button id="lick-lib-btn" title="Jazz Lick Library" aria-label="Open jazz lick library">&#9835;</button>
+<button id="lick-lib-btn" title="Jazz Resources" aria-label="Open jazz resources">&#9835;</button>
 <div class="grain"></div>
 <div class="wrap">
   <header id="page-top">
@@ -9781,7 +9858,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v32 &nbsp;·&nbsp; deployed 2026-05-18 16:00</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v33 &nbsp;·&nbsp; deployed 2026-05-19 18:00</span></div>
     </div>
 
     <div class="tech-section">
@@ -9858,13 +9935,10 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     </div>
 
     <div class="tech-section">
-      <div class="tech-section-title">Jazz Lick Library</div>
-      <div class="tech-row"><span class="tech-key">Collection</span><span class="tech-val">21 curated jazz guitar licks across 5 progression types: Cmaj7 (5 — Jens Larsen concepts), ii-V-I Major (6), ii-V-i Minor (4), I-vi-ii-V Turnaround (3), Blues (3). Three difficulty tiers: Beginner, Intermediate, Advanced.</span></div>
-      <div class="tech-row"><span class="tech-key">Cmaj7 licks</span><span class="tech-val">5 licks based on Jens Larsen's "5 Jazz Licks That Turn Beginners Into Pros": triplet arpeggio (Barry Harris), enclosures into triplet, pivot arpeggio (octave displacement), chromatic pivot line, combined techniques. All use triplet notation.</span></div>
-      <div class="tech-row"><span class="tech-key">Notation</span><span class="tech-val">VexFlow 4.x dual stave: treble staff + guitar tab (6-string). Supports triplets via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">VF.Tuplet</code> (auto-detected from 0.33-beat gaps). Bar lines drawn as manual SVG for staff/tab alignment. Chord labels aligned above staff via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">drawLickChordLabels()</code>.</span></div>
-      <div class="tech-row"><span class="tech-key">Data model</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">LICKS[]</code> — each lick: id, title, prog, diff, concepts[], key, chords[], bpm, feel, tab[] (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{s, f, beat, type}</code> where s:0=highE..5=lowE), concept text, source link.</span></div>
-      <div class="tech-row"><span class="tech-key">Playback</span><span class="tech-val">Tab positions mapped to MIDI via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">GUITAR_OPEN[s] + fret</code>. Play at written BPM or 60% (Slow). Uses Salamander Grand Piano sampler.</span></div>
-      <div class="tech-row"><span class="tech-key">Sources</span><span class="tech-val">Jens Larsen, jazzguitar.be, jazzadvice.com, mattwarnockguitar.com, learnjazzstandards.com</span></div>
+      <div class="tech-section-title">Jazz Resources Hub</div>
+      <div class="tech-row"><span class="tech-key">Content</span><span class="tech-val">Curated collection of jazz guitar resources across 6 categories: Jazz Licks &amp; Vocabulary, Chord Melody, Walking Bass, Improvisation Concepts, Comping, and general resource sites.</span></div>
+      <div class="tech-row"><span class="tech-key">Embed</span><span class="tech-val">Click any resource card to open it in an embedded iframe viewer within the app. Fallback to "open in new tab" if the page blocks framing (X-Frame-Options / CSP).</span></div>
+      <div class="tech-row"><span class="tech-key">Sources</span><span class="tech-val">Jens Larsen (jenslarsen.nl), Jazz Guitar BE (jazzguitar.be), Jazz Guitar Licks (jazzguitarlicks.com), Matt Warnock Guitar (mattwarnockguitar.com).</span></div>
     </div>
 
     <div class="tech-section">
@@ -10609,18 +10683,39 @@ document.getElementById('all-degrees').addEventListener('click', e => {
   </div>
 </div>
 
-<!-- ══════ JAZZ LICK LIBRARY PANEL ══════ -->
+<!-- ══════ JAZZ RESOURCES HUB ══════ -->
 <div id="lick-overlay"></div>
-<div id="lick-panel">
-  <div class="lick-panel-header">
-    <div class="lick-panel-title-row">
-      <div class="lick-panel-title">Jazz <em>Lick Library</em></div>
-      <button class="lick-close-btn" id="lick-close">&#x2715;</button>
+<div id="lick-panel" class="browse">
+  <div class="res-header">
+    <div class="res-header-left">
+      <button class="res-back-btn" id="res-back">&#8592; Back</button>
+      <div class="res-header-title">Jazz <em>Resources</em></div>
     </div>
-    <div class="lick-panel-subtitle">Classic patterns over common progressions</div>
+    <button class="lick-close-btn" id="lick-close">&#x2715;</button>
   </div>
-  <div class="lick-prog-filter" id="lick-filter"></div>
-  <div class="lick-panel-body" id="lick-body"></div>
+  <div class="res-toolbar" id="res-toolbar">
+    <div class="res-search-row">
+      <span class="res-search-icon">&#128269;</span>
+      <input class="res-search" id="res-search" type="text" placeholder="Search resources... (licks, chord melody, walking bass...)" autocomplete="off" spellcheck="false">
+      <button class="res-search-clear" id="res-search-clear">&#x2715;</button>
+    </div>
+    <div class="res-toc" id="res-toc"></div>
+    <div class="res-result-count" id="res-result-count"></div>
+  </div>
+  <div class="res-browse" id="res-browse"></div>
+  <div class="res-embed">
+    <div class="res-iframe-bar">
+      <span class="res-iframe-url" id="res-iframe-url"></span>
+      <a class="res-iframe-open" id="res-iframe-open" href="#" target="_blank" rel="noopener">Open in new tab &#8599;</a>
+    </div>
+    <div class="res-iframe-wrap">
+      <iframe id="res-iframe" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>
+      <div class="res-iframe-fallback" id="res-iframe-fallback">
+        <div>This page cannot be embedded directly.</div>
+        <a id="res-fallback-link" href="#" target="_blank" rel="noopener">Open in a new tab &#8599;</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -12228,596 +12323,459 @@ window.addEventListener('resize', () => {
 // ── JAZZ LICK LIBRARY ──────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
 (function() {
-  const GUITAR_OPEN = [64,59,55,50,45,40]; // e4 B3 G3 D3 A2 E2 (s:0=high E)
-  const STR_LABELS = ['e','B','G','D','A','E'];
+  const CAT_ICONS = {
+    'Jazz Licks & Vocabulary': '\u{1F3B5}',
+    'Chord Melody': '\u{1F3B8}',
+    'Walking Bass': '\u{1F3B6}',
+    'Improvisation Concepts': '\u{1F4A1}',
+    'Jazz Guitar Comping': '\u{1F91A}',
+    'Learning Jazz Standards': '\u{1F3BC}',
+    'More Resources': '\u{1F4DA}'
+  };
 
-  const LICKS = [
+  const RESOURCES = [
     {
-      id:'jl-1', title:'Barry Harris Triplet Approach', prog:'Cmaj7', diff:'beg',
-      key:'C', bpm:140, feel:'Swing',
-      concepts:['Triplet Arpeggio','Chromatic Approach'],
-      concept:'Half-step approach into E-G-B triplet arpeggio (Barry Harris). Start on the 3rd (E), chromatic passing tone to D, skip down to B, then ascending triplet arpeggio.',
-      chords:[{name:'Cmaj7',q:'maj7'},{name:'Cmaj7',q:'maj7'}],
-      source:{name:'Jens Larsen – 5 Jazz Licks That Turn Beginners Into Pros', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'},
-      tab:[
-        {s:2,f:9,beat:0,type:'n'},
-        {s:2,f:8,beat:0.5,type:'a'},
-        {s:2,f:7,beat:1,type:'n'},
-        {s:3,f:9,beat:4,type:'n'},
-        {s:3,f:10,beat:4.5,type:'r'},
-        {s:2,f:9,beat:5,type:'n'},
-        {s:1,f:8,beat:5.33,type:'n'},
-        {s:0,f:7,beat:5.67,type:'n'},
-        {s:0,f:10,beat:7,type:'n'}
+      category: 'Jazz Licks & Vocabulary',
+      desc: 'Essential bebop lines, enclosures, and chromatic approaches. These pages include notation, audio examples, and breakdowns you can practice directly.',
+      items: [
+        {
+          title: '5 Jazz Licks That Turn Beginners Into Pros',
+          url: 'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/',
+          site: 'Jens Larsen',
+          desc: 'Barry Harris triplet approach, enclosures into arpeggios, octave displacement, chromatic pivot lines. Five foundational licks over Cmaj7 with full analysis.',
+          tags: ['Beginner-Friendly', 'Cmaj7', 'Arpeggios']
+        },
+        {
+          title: 'Bebop Jazz Guitar Licks — Classic Sound Decoded',
+          url: 'https://jenslarsen.nl/bebop-jazz-guitar-licks-classic-bebop-sound-decoded/',
+          site: 'Jens Larsen',
+          desc: 'The DNA of bebop language: chromatic passing tones, enclosures, voice leading through ii-V-I changes. How to internalize the bebop sound rather than memorize patterns.',
+          tags: ['Bebop', 'ii-V-I', 'Intermediate']
+        },
+        {
+          title: 'Bebop Licks for Jazz Guitar',
+          url: 'https://www.jazzguitar.be/blog/bebop-licks/',
+          site: 'Jazz Guitar BE',
+          desc: 'Collection of classic bebop licks with tabs and audio over common progressions. Great for building a vocabulary of ready-to-use lines.',
+          tags: ['Bebop', 'Tab', 'Audio Examples']
+        },
+        {
+          title: 'Jazz Guitar Licks — ii-V-I Major',
+          url: 'https://www.jazzguitar.be/blog/jazz-guitar-licks/',
+          site: 'Jazz Guitar BE',
+          desc: 'Curated licks over the most common jazz progression. Each lick with notation, tab, and analysis of the melodic choices.',
+          tags: ['ii-V-I', 'Vocabulary']
+        },
+        {
+          title: 'Jazz Blues Licks for Guitar',
+          url: 'https://www.jazzguitar.be/blog/jazz-blues-licks/',
+          site: 'Jazz Guitar BE',
+          desc: 'Blues-flavored jazz vocabulary — mixing minor pentatonic, bebop scales, and chromatic approaches over blues changes.',
+          tags: ['Blues', 'Pentatonic', 'Chromatic']
+        },
+        {
+          title: '10 Easy Jazz Guitar Licks (Beginner)',
+          url: 'https://jenslarsen.nl/10-easy-jazz-guitar-licks/',
+          site: 'Jens Larsen',
+          desc: 'Accessible entry points into jazz improvisation. Simple arpeggios, scale fragments, and approach notes that sound great immediately.',
+          tags: ['Beginner', 'First Licks']
+        }
       ]
     },
     {
-      id:'jl-2', title:'Enclosure to Triplet Arpeggio', prog:'Cmaj7', diff:'int',
-      key:'C', bpm:150, feel:'Swing',
-      concepts:['Enclosure','Triplet Arpeggio'],
-      concept:'Start on the 5th (G), enclosure around E (F, D♯, E), enclosure around C (D, B, C), leading into ascending E-G-B triplet arpeggio.',
-      chords:[{name:'Cmaj7',q:'maj7'},{name:'Cmaj7',q:'maj7'}],
-      source:{name:'Jens Larsen – 5 Jazz Licks That Turn Beginners Into Pros', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'},
-      tab:[
-        {s:1,f:8,beat:0,type:'n'},
-        {s:2,f:10,beat:0.5,type:'a'},
-        {s:2,f:8,beat:1,type:'a'},
-        {s:2,f:9,beat:1.5,type:'r'},
-        {s:2,f:7,beat:2,type:'a'},
-        {s:3,f:9,beat:2.5,type:'a'},
-        {s:3,f:10,beat:3,type:'r'},
-        {s:2,f:9,beat:3.5,type:'n'},
-        {s:1,f:8,beat:3.83,type:'n'},
-        {s:0,f:7,beat:4.17,type:'n'},
-        {s:0,f:10,beat:6,type:'n'}
+      category: 'Chord Melody',
+      desc: 'Arranging melody and harmony simultaneously on the guitar. The art of making the guitar sound like a full ensemble.',
+      items: [
+        {
+          title: 'Chord Melody — How to Get Started',
+          url: 'https://jenslarsen.nl/jazz-chord-melody-how-to-get-started/',
+          site: 'Jens Larsen',
+          desc: 'Step-by-step approach to building chord melody arrangements. Harmonizing melodies, choosing voicings, and creating movement between chords.',
+          tags: ['Arrangement', 'Voicings', 'Getting Started']
+        },
+        {
+          title: 'Jazz Guitar Chord Melody Arrangements',
+          url: 'https://www.jazzguitar.be/blog/chord-melody/',
+          site: 'Jazz Guitar BE',
+          desc: 'Full chord melody arrangements of standards with notation. Study how pros voice-lead through changes while carrying the melody.',
+          tags: ['Standards', 'Full Arrangements']
+        },
+        {
+          title: 'Easy Chord Melody Guitar Arrangements',
+          url: 'https://www.jazzguitar.be/blog/easy-jazz-guitar-chord-melody-arrangements/',
+          site: 'Jazz Guitar BE',
+          desc: 'Simplified chord melody versions of well-known tunes — perfect for getting comfortable with the technique before tackling complex arrangements.',
+          tags: ['Beginner', 'Simplified']
+        }
       ]
     },
     {
-      id:'jl-3', title:'Octave-Displaced Arpeggio', prog:'Cmaj7', diff:'int',
-      key:'C', bpm:150, feel:'Swing',
-      concepts:['Octave Displacement','Interval Skip'],
-      concept:'Cmaj7 arpeggio with root displaced up an octave (C5→E4 = major 6th skip), descending through scale tones with chromatic D♯ approach to resolve on E and C.',
-      chords:[{name:'Cmaj7',q:'maj7'},{name:'Cmaj7',q:'maj7'}],
-      source:{name:'Jens Larsen – 5 Jazz Licks That Turn Beginners Into Pros', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'},
-      tab:[
-        {s:0,f:8,beat:0,type:'n'},
-        {s:2,f:9,beat:0.5,type:'n'},
-        {s:1,f:8,beat:1,type:'n'},
-        {s:0,f:7,beat:1.5,type:'n'},
-        {s:1,f:10,beat:2,type:'n'},
-        {s:1,f:8,beat:2.5,type:'n'},
-        {s:2,f:10,beat:3,type:'n'},
-        {s:2,f:8,beat:3.5,type:'a'},
-        {s:2,f:9,beat:5,type:'r'},
-        {s:3,f:10,beat:6,type:'r'}
+      category: 'Walking Bass',
+      desc: 'Comping with bass lines on guitar — an essential skill for duo and solo playing. Learn to outline changes with quarter-note motion.',
+      items: [
+        {
+          title: 'Walking Bass and Chords on Guitar',
+          url: 'https://jenslarsen.nl/walking-bass-and-chords-on-guitar/',
+          site: 'Jens Larsen',
+          desc: 'How to combine a walking bass line with chord voicings. Chromatic approaches, target notes, and the thumb/fingers independence needed.',
+          tags: ['Bass Lines', 'Comping', 'Independence']
+        },
+        {
+          title: 'Walking Bass Lines for Jazz Guitar',
+          url: 'https://www.jazzguitar.be/blog/walking-bass-lines-guitar/',
+          site: 'Jazz Guitar BE',
+          desc: 'Fundamental walking bass patterns over ii-V-I and blues changes. Root motion, chromatic connectors, and how to keep the groove solid.',
+          tags: ['ii-V-I', 'Blues', 'Fundamentals']
+        }
       ]
     },
     {
-      id:'jl-4', title:'Chromatic Pivot Line', prog:'Cmaj7', diff:'adv',
-      key:'C', bpm:160, feel:'Swing',
-      concepts:['Pivot Arpeggio','Chromatic Run','Enclosure'],
-      concept:'Pivot arpeggio (octave-displaced Cmaj7), chromatic A♭ passing tone between A and G, skip down to E, then chromatic descent from D through enclosure resolving on B, ending on low G.',
-      chords:[{name:'Cmaj7',q:'maj7'},{name:'Cmaj7',q:'maj7'}],
-      source:{name:'Jens Larsen – 5 Jazz Licks That Turn Beginners Into Pros', url:'https://jenslarsen.nl/5-jazz-licks-that-turn-beginners-into-pros/'},
-      tab:[
-        {s:0,f:8,beat:0,type:'n'},
-        {s:2,f:9,beat:0.5,type:'n'},
-        {s:1,f:8,beat:1,type:'n'},
-        {s:0,f:7,beat:1.5,type:'n'},
-        {s:1,f:10,beat:2,type:'n'},
-        {s:1,f:9,beat:2.5,type:'a'},
-        {s:1,f:8,beat:3,type:'r'},
-        {s:2,f:9,beat:3.5,type:'n'},
-        {s:2,f:7,beat:4,type:'n'},
-        {s:3,f:11,beat:4.5,type:'a'},
-        {s:3,f:10,beat:5,type:'n'},
-        {s:3,f:7,beat:5.5,type:'a'},
-        {s:3,f:9,beat:6,type:'r'},
-        {s:4,f:10,beat:7,type:'r'}
+      category: 'Improvisation Concepts',
+      desc: 'The thinking behind great solos. Melodic development, phrasing, and how to move beyond lick-based playing.',
+      items: [
+        {
+          title: 'Jazz Phrasing — How to Make Melodies That Sing',
+          url: 'https://jenslarsen.nl/jazz-phrasing-make-melodies-that-sing/',
+          site: 'Jens Larsen',
+          desc: 'Rhythmic variety, space, dynamics, and melodic contour. How to construct phrases that tell a story rather than running scales.',
+          tags: ['Phrasing', 'Melodic Development']
+        },
+        {
+          title: 'Target Notes — The Secret to Jazz Improvisation',
+          url: 'https://jenslarsen.nl/target-notes/',
+          site: 'Jens Larsen',
+          desc: 'Aiming for chord tones on strong beats and using approach patterns to get there. The foundational concept behind confident improvisation over changes.',
+          tags: ['Target Notes', 'Chord Tones']
+        },
+        {
+          title: 'How to Improvise Over Jazz Standards',
+          url: 'https://www.jazzguitar.be/blog/how-to-improvise-over-jazz-standards/',
+          site: 'Jazz Guitar BE',
+          desc: 'A practical roadmap for improvising over real tunes: analyzing the form, finding guide tones, connecting arpeggios, and building solos.',
+          tags: ['Standards', 'Roadmap']
+        },
+        {
+          title: 'Bebop Scale — The Complete Guide',
+          url: 'https://www.jazzguitar.be/blog/bebop-scale/',
+          site: 'Jazz Guitar BE',
+          desc: 'How the bebop scale works, why the passing tone matters, and how to use it to make eighth-note lines land on chord tones on downbeats.',
+          tags: ['Bebop Scale', 'Theory']
+        }
+      ]
+    },
+    {
+      category: 'Jazz Guitar Comping',
+      desc: 'Rhythmic and harmonic accompaniment. Voicings, rhythmic patterns, and how to support a soloist.',
+      items: [
+        {
+          title: 'Jazz Guitar Comping — Rhythms and Voicings',
+          url: 'https://jenslarsen.nl/jazz-guitar-comping/',
+          site: 'Jens Larsen',
+          desc: 'The Freddie Green to the modern approach: shell voicings, drop 2, quartal voicings, and rhythmic comping patterns that groove.',
+          tags: ['Voicings', 'Rhythm', 'Drop 2']
+        },
+        {
+          title: 'Jazz Guitar Chords — The Complete Guide',
+          url: 'https://www.jazzguitar.be/blog/jazz-guitar-chords/',
+          site: 'Jazz Guitar BE',
+          desc: 'Comprehensive reference of jazz chord voicings: shell, drop 2, drop 3, quartal, and altered dominant voicings with diagrams.',
+          tags: ['Chord Reference', 'Voicings']
+        }
+      ]
+    },
+    {
+      category: 'Learning Jazz Standards',
+      desc: 'How to learn, memorize, and play through the essential jazz repertoire. From your first tune to building a giggable setlist.',
+      items: [
+        {
+          title: 'How to Learn Jazz Standards',
+          url: 'https://jenslarsen.nl/how-to-learn-jazz-standards/',
+          site: 'Jens Larsen',
+          desc: 'A complete method for learning tunes: melody first, then harmony analysis, key areas, and building an arrangement. How to actually internalize a standard rather than just reading a lead sheet.',
+          tags: ['Method', 'Memorization']
+        },
+        {
+          title: 'Jazz Standards for Beginners — 10 Tunes to Start With',
+          url: 'https://jenslarsen.nl/jazz-standards-for-beginners/',
+          site: 'Jens Larsen',
+          desc: 'The best first standards to learn and why: Autumn Leaves, Blue Bossa, All of Me, and more. What makes each tune valuable for developing your jazz skills.',
+          tags: ['Beginner', 'Repertoire']
+        },
+        {
+          title: 'Autumn Leaves — Comping, Melody and Solo',
+          url: 'https://jenslarsen.nl/autumn-leaves/',
+          site: 'Jens Larsen',
+          desc: 'Deep dive into the most-taught jazz standard. Comping voicings, melody arrangement, and solo ideas over the ii-V-I / ii-V-i changes.',
+          tags: ['Autumn Leaves', 'Full Breakdown']
+        },
+        {
+          title: 'Jazz Guitar Standards — Easy Songs to Play',
+          url: 'https://www.jazzguitar.be/blog/jazz-guitar-standards/',
+          site: 'Jazz Guitar BE',
+          desc: 'List of essential jazz standards organized by difficulty with chord charts, analysis, and practice tips for each tune.',
+          tags: ['Repertoire', 'Charts']
+        },
+        {
+          title: 'How to Memorize Jazz Standards',
+          url: 'https://www.jazzguitar.be/blog/memorize-jazz-standards/',
+          site: 'Jazz Guitar BE',
+          desc: 'Practical techniques for committing tunes to memory: Roman numeral analysis, singing the melody, harmonic patterns, and the chunking method.',
+          tags: ['Memorization', 'Practice']
+        },
+        {
+          title: 'Jazz Blues — The Complete Guide',
+          url: 'https://www.jazzguitar.be/blog/jazz-blues/',
+          site: 'Jazz Guitar BE',
+          desc: 'The jazz blues form in detail: basic 12-bar blues, bird blues, minor blues, and common substitutions. The foundation of so much of the jazz repertoire.',
+          tags: ['Blues Form', 'Substitutions']
+        }
+      ]
+    },
+    {
+      category: 'More Resources',
+      desc: 'Full sites worth exploring. Bookmark these for ongoing study.',
+      items: [
+        {
+          title: 'Jens Larsen — Jazz Guitar Lessons',
+          url: 'https://jenslarsen.nl/',
+          site: 'Jens Larsen',
+          desc: 'One of the most prolific jazz guitar educators online. Deep dives into bebop vocabulary, voice leading, chord melody, and improvisation concepts. Also has an excellent YouTube channel.',
+          tags: ['Full Site', 'YouTube']
+        },
+        {
+          title: 'Jazz Guitar BE — Lessons & Licks',
+          url: 'https://www.jazzguitar.be/',
+          site: 'Jazz Guitar BE',
+          desc: 'Comprehensive jazz guitar resource with lessons, licks, chord charts, and backing tracks. Well-organized by topic and difficulty level.',
+          tags: ['Full Site', 'Backing Tracks']
+        },
+        {
+          title: 'Jazz Guitar Licks — Transcriptions & Analysis',
+          url: 'https://www.jazzguitarlicks.com/',
+          site: 'Jazz Guitar Licks',
+          desc: 'Huge library of transcribed jazz guitar licks organized by scale type, chord type, and artist. Great for targeted vocabulary building.',
+          tags: ['Transcriptions', 'Library']
+        },
+        {
+          title: 'Matt Warnock Guitar — Jazz Lessons',
+          url: 'https://mattwarnockguitar.com/',
+          site: 'Matt Warnock',
+          desc: 'In-depth jazz guitar lessons covering comping, soloing, chord melody, and practice routines. Known for clear, structured teaching.',
+          tags: ['Full Site', 'Practice Routines']
+        }
       ]
     }
   ];
 
-  const PROG_FILTERS = [
-    {label:'Cmaj7 (Jens Larsen)', value:'Cmaj7'},
-    {label:'ii — V — I (Major)', value:'ii-V-I'},
-    {label:'ii — V — i (Minor)', value:'ii-V-i'},
-    {label:'I — vi — ii — V', value:'I-vi-ii-V'},
-    {label:'Blues', value:'Blues'},
-    {label:'All', value:'all'}
-  ];
-  const DIFF_ORDER = ['beg','int','adv'];
-  const DIFF_LABELS = {beg:'Beginner — Arpeggio Foundations', int:'Intermediate — Bebop Vocabulary', adv:'Advanced — Substitutions & Chromaticism'};
+  let activeCategory = 'all';
+  let searchQuery = '';
 
-  let activeFilter = 'all';
-  let playingLickId = null;
-  let playingTimeouts = [];
+  function buildToc() {
+    const toc = document.getElementById('res-toc');
+    toc.innerHTML = '';
+    let allCount = 0;
+    RESOURCES.forEach(c => { allCount += c.items.length; });
 
-  // ── Build filter pills ──
-  const filterEl = document.getElementById('lick-filter');
-  PROG_FILTERS.forEach(pf => {
-    const pill = document.createElement('button');
-    pill.className = 'lick-prog-pill' + (pf.value === 'all' ? ' active' : '');
-    pill.textContent = pf.label;
-    pill.dataset.filter = pf.value;
-    pill.addEventListener('click', () => {
-      filterEl.querySelectorAll('.lick-prog-pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      activeFilter = pf.value;
-      renderLicks();
+    const allPill = document.createElement('button');
+    allPill.className = 'res-toc-pill active';
+    allPill.dataset.cat = 'all';
+    allPill.innerHTML = '<span class="res-toc-icon">✦</span> All <span class="res-toc-count">' + allCount + '</span>';
+    toc.appendChild(allPill);
+
+    RESOURCES.forEach(cat => {
+      const pill = document.createElement('button');
+      pill.className = 'res-toc-pill';
+      pill.dataset.cat = cat.category;
+      const icon = CAT_ICONS[cat.category] || '\u{1F4C4}';
+      pill.innerHTML = '<span class="res-toc-icon">' + icon + '</span> ' +
+        cat.category + ' <span class="res-toc-count">' + cat.items.length + '</span>';
+      toc.appendChild(pill);
     });
-    filterEl.appendChild(pill);
+
+    toc.addEventListener('click', e => {
+      const pill = e.target.closest('.res-toc-pill');
+      if (!pill) return;
+      toc.querySelectorAll('.res-toc-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeCategory = pill.dataset.cat;
+      renderBrowse();
+      document.getElementById('res-browse').scrollTop = 0;
+    });
+  }
+
+  function highlightText(text, query) {
+    if (!query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
+  }
+
+  function matchesSearch(item, q) {
+    if (!q) return true;
+    const lower = q.toLowerCase();
+    return item.title.toLowerCase().includes(lower) ||
+           item.desc.toLowerCase().includes(lower) ||
+           item.site.toLowerCase().includes(lower) ||
+           item.tags.some(t => t.toLowerCase().includes(lower));
+  }
+
+  function siteDomain(url) {
+    try { return new URL(url).hostname.replace('www.', ''); } catch { return ''; }
+  }
+
+  function renderBrowse() {
+    const el = document.getElementById('res-browse');
+    const countEl = document.getElementById('res-result-count');
+    el.innerHTML = '';
+
+    const cats = activeCategory === 'all' ? RESOURCES : RESOURCES.filter(c => c.category === activeCategory);
+    let totalShown = 0;
+
+    cats.forEach(cat => {
+      const items = cat.items.filter(item => matchesSearch(item, searchQuery));
+      if (!items.length) return;
+      totalShown += items.length;
+
+      const icon = CAT_ICONS[cat.category] || '\u{1F4C4}';
+      let html = '<div class="res-category" id="res-cat-' + cat.category.replace(/\s+/g, '-').toLowerCase() + '">';
+      html += '<div class="res-cat-header">' +
+        '<span class="res-cat-icon">' + icon + '</span>' +
+        '<div class="res-cat-title">' + cat.category + '</div>' +
+        '<span class="res-cat-count">' + items.length + ' resource' + (items.length > 1 ? 's' : '') + '</span>' +
+      '</div>';
+      html += '<div class="res-cat-desc">' + cat.desc + '</div>';
+      html += '<div class="res-grid">';
+      items.forEach(item => {
+        const q = searchQuery;
+        const title = highlightText(item.title, q);
+        const desc = highlightText(item.desc, q);
+        const tagsHtml = item.tags.map(t =>
+          '<span class="res-card-tag">' + highlightText(t, q) + '</span>'
+        ).join('');
+        const domain = siteDomain(item.url);
+        html += '<div class="res-card" data-url="' + item.url + '">' +
+          '<div class="res-card-top">' +
+            '<div class="res-card-title">' + title + '</div>' +
+            '<span class="res-card-site">' + highlightText(item.site, q) + '</span>' +
+          '</div>' +
+          '<div class="res-card-desc">' + desc + '</div>' +
+          '<div class="res-card-tags">' + tagsHtml + '</div>' +
+          '<div class="res-card-footer">' +
+            '<span class="res-card-ext">Read article &#8599;</span>' +
+            '<span class="res-card-domain">' + domain + '</span>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div></div>';
+      el.insertAdjacentHTML('beforeend', html);
+    });
+
+    if (!totalShown) {
+      el.innerHTML = '<div class="res-no-results"><span>&#128270;</span>No resources match &ldquo;' +
+        searchQuery.replace(/</g, '&lt;') + '&rdquo;</div>';
+    }
+
+    countEl.textContent = searchQuery
+      ? totalShown + ' result' + (totalShown !== 1 ? 's' : '') + ' for “' + searchQuery + '”'
+      : totalShown + ' resources';
+
+    el.querySelectorAll('.res-card').forEach(card => {
+      card.addEventListener('click', () => openEmbed(card.dataset.url));
+    });
+  }
+
+  // ── Search wiring ──
+  const searchInput = document.getElementById('res-search');
+  const clearBtn = document.getElementById('res-search-clear');
+  let searchTimer = null;
+
+  searchInput.addEventListener('input', () => {
+    clearBtn.classList.toggle('show', searchInput.value.length > 0);
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      searchQuery = searchInput.value.trim();
+      renderBrowse();
+    }, 180);
   });
 
-  // ── VexFlow staff + tab rendering ──
-  const VEXFLOW_MIDI = [64,59,55,50,45,40];
-  const MIDI_TO_VEX = ['c','c#','d','eb','e','f','f#','g','ab','a','bb','b'];
-  const Q_TO_CHORD_TYPE = {m7:'m',dom:'d',maj:'M',hdim:'m',dim:'r',trisub:'d'};
-  const VEX_CHORD_COLORS = {m:'#8b7cf8', d:'#c9a84c', M:'#4caf82', r:'#6b6760'};
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    clearBtn.classList.remove('show');
+    renderBrowse();
+    searchInput.focus();
+  });
 
-  function midiToVexKey(midi) {
-    // Guitar sounds an octave lower than written — add 1 to octave for standard notation
-    return MIDI_TO_VEX[midi % 12] + '/' + Math.floor(midi / 12);
-  }
+  function openEmbed(url) {
+    const panel = document.getElementById('lick-panel');
+    const iframe = document.getElementById('res-iframe');
+    const fallback = document.getElementById('res-iframe-fallback');
+    const urlEl = document.getElementById('res-iframe-url');
+    const openBtn = document.getElementById('res-iframe-open');
+    const fallbackLink = document.getElementById('res-fallback-link');
 
-  function vexKeyNeedsAcc(key) {
-    var n = key.split('/')[0];
-    if (n.includes('#')) return '#';
-    if (n === 'eb' || n === 'ab' || n === 'bb') return 'b';
-    return null;
-  }
+    urlEl.textContent = url;
+    openBtn.href = url;
+    fallbackLink.href = url;
+    fallback.classList.remove('show');
 
-  function getLickKeySig(lick) {
-    if (lick.prog === 'ii-V-i') {
-      return {A:'C',D:'F',E:'G',B:'D'}[lick.key] || 'C';
-    }
-    return lick.key;
-  }
-
-  function applyLickTheme(svgEl) {
-    var existing = svgEl.querySelector('style.lick-theme');
-    if (existing) existing.remove();
-    var style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-    style.setAttribute('class', 'lick-theme');
-    style.textContent = [
-      '.vf-lick path { fill: #c8c2b0; stroke: #c8c2b0; }',
-      '.vf-lick rect { fill: #c8c2b0; }',
-      '.vf-lick polygon { fill: #c8c2b0; }',
-      '.vf-lick .vf-stave line { stroke: #3a3835 !important; }',
-      '.vf-lick .vf-stave path { stroke: #4a4845 !important; fill: #4a4845 !important; }',
-      '.vf-lick .vf-tabstave line { stroke: #3a3835 !important; }',
-      '.vf-lick .vf-tabstave path { stroke: #4a4845 !important; fill: #4a4845 !important; }',
-      '.vf-lick text { fill: #c8c2b0 !important; }',
-      '.vf-lick .vf-tabnote rect { fill: #111417 !important; stroke: none !important; }'
-    ].join('\n');
-    svgEl.classList.add('vf-lick');
-    svgEl.insertBefore(style, svgEl.firstChild);
-    svgEl.style.background = 'transparent';
-  }
-
-  function drawLickChordLabels(svgEl, notePairs, lick, sortedTab, labelH, notationY) {
-    if (!lick.chords) return;
-    var ns = 'http://www.w3.org/2000/svg';
-    var realChords = lick.chords.filter(function(ch) { return ch.name !== '%' && ch.q; });
-    if (!realChords.length || !notePairs.length) return;
-    var maxBeat = Math.max.apply(null, sortedTab.map(function(n) { return n.beat; }));
-    var totalBeats = Math.ceil((maxBeat + 1) / 4) * 4;
-    var beatsPerChord = totalBeats / realChords.length;
-
-    var noteBeats = sortedTab.filter(function(n) { return n.type !== 'r'; });
-
-    realChords.forEach(function(ch, ci) {
-      var chordBeat = ci * beatsPerChord;
-      var pairIdx = -1;
-      for (var i = 0; i < noteBeats.length; i++) {
-        if (noteBeats[i].beat >= chordBeat - 0.01) { pairIdx = i; break; }
+    iframe.onload = function() {
+      try {
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || !doc.body || doc.body.innerHTML === '') throw 'empty';
+      } catch(e) {
+        fallback.classList.add('show');
       }
-      if (pairIdx < 0 || pairIdx >= notePairs.length) return;
-      var noteX = notePairs[pairIdx].stave.getAbsoluteX();
-      var type = Q_TO_CHORD_TYPE[ch.q] || 'r';
-      var color = VEX_CHORD_COLORS[type] || '#c8c2b0';
+    };
+    iframe.onerror = function() { fallback.classList.add('show'); };
 
-      var tick = document.createElementNS(ns, 'line');
-      tick.setAttribute('x1', noteX); tick.setAttribute('x2', noteX);
-      tick.setAttribute('y1', labelH - 6); tick.setAttribute('y2', notationY + 1);
-      tick.setAttribute('stroke', color); tick.setAttribute('stroke-width', '1');
-      tick.setAttribute('stroke-dasharray', '2,4'); tick.setAttribute('opacity', '0.4');
-      svgEl.appendChild(tick);
+    iframe.src = url;
+    panel.classList.remove('browse');
+    panel.classList.add('embed');
 
-      var label = document.createElementNS(ns, 'text');
-      label.setAttribute('x', noteX);
-      label.setAttribute('y', labelH - 10);
-      label.setAttribute('fill', color);
-      label.setAttribute('font-size', '13');
-      label.setAttribute('font-family', 'IBM Plex Mono, monospace');
-      label.setAttribute('font-weight', '700');
-      label.setAttribute('text-anchor', 'middle');
-      label.setAttribute('dominant-baseline', 'auto');
-      label.textContent = ch.name;
-      svgEl.appendChild(label);
-    });
-  }
-
-  function beatToDur(beats) {
-    if (beats >= 3.9) return 'w';
-    if (beats >= 1.9) return 'h';
-    if (beats >= 0.9) return 'q';
-    if (beats >= 0.45) return '8';
-    return '16';
-  }
-  function durToBeats(d) {
-    return {w:4, h:2, q:1, '8':0.5, '16':0.25}[d] || 0.5;
-  }
-
-  function detectTriplets(sorted) {
-    var triplets = [];
-    var used = {};
-    for (var i = 0; i < sorted.length - 2; i++) {
-      if (used[i]) continue;
-      var a = sorted[i].beat, b = sorted[i+1].beat, c = sorted[i+2].beat;
-      var gap1 = b - a, gap2 = c - b;
-      if (Math.abs(gap1 - 0.333) < 0.05 && Math.abs(gap2 - 0.333) < 0.05) {
-        var beatBase = Math.round(a);
-        if (Math.abs(a - beatBase) < 0.05) {
-          triplets.push({start: i, beatBase: beatBase});
-          used[i] = used[i+1] = used[i+2] = true;
-        }
+    setTimeout(function() {
+      if (!iframe.contentDocument && !iframe.contentWindow) {
+        fallback.classList.add('show');
       }
-    }
-    return triplets;
+    }, 4000);
   }
 
-  function buildRhythmEvents(sorted, totalBeats) {
-    var triplets = detectTriplets(sorted);
-    var tripMap = {};
-    triplets.forEach(function(t) {
-      tripMap[t.start] = 'first';
-      tripMap[t.start + 1] = 'mid';
-      tripMap[t.start + 2] = 'last';
-    });
-
-    var events = [];
-    for (var i = 0; i < sorted.length; i++) {
-      var cur = sorted[i];
-      if (tripMap[i]) {
-        events.push({type: 'note', beat: cur.beat, dur: '8', tab: cur, triplet: tripMap[i]});
-      } else {
-        var nextBeat = (i + 1 < sorted.length) ? sorted[i + 1].beat : totalBeats;
-        var gap = nextBeat - cur.beat;
-        var dur = beatToDur(gap);
-        events.push({type: 'note', beat: cur.beat, dur: dur, tab: cur});
-      }
-    }
-    var filled = [];
-    var cursor = 0;
-    for (var j = 0; j < events.length; j++) {
-      var ev = events[j];
-      while (ev.beat - cursor > 0.12) {
-        var restGap = ev.beat - cursor;
-        var restDur = beatToDur(restGap);
-        var restBeats = durToBeats(restDur);
-        if (restBeats > restGap + 0.12) {
-          if (restDur === 'w') restDur = 'h';
-          else if (restDur === 'h') restDur = 'q';
-          else if (restDur === 'q') restDur = '8';
-          else restDur = '16';
-          restBeats = durToBeats(restDur);
-        }
-        filled.push({type: 'rest', beat: cursor, dur: restDur});
-        cursor += restBeats;
-      }
-      filled.push(ev);
-      cursor = ev.beat + (ev.triplet ? 1/3 : durToBeats(ev.dur));
-    }
-    while (totalBeats - cursor > 0.12) {
-      var rem = totalBeats - cursor;
-      var rd = beatToDur(rem);
-      var rb = durToBeats(rd);
-      if (rb > rem + 0.12) {
-        if (rd === 'w') rd = 'h';
-        else if (rd === 'h') rd = 'q';
-        else if (rd === 'q') rd = '8';
-        else rd = '16';
-        rb = durToBeats(rd);
-      }
-      filled.push({type: 'rest', beat: cursor, dur: rd});
-      cursor += rb;
-    }
-    return filled;
+  function closeEmbed() {
+    const panel = document.getElementById('lick-panel');
+    const iframe = document.getElementById('res-iframe');
+    iframe.src = 'about:blank';
+    panel.classList.remove('embed');
+    panel.classList.add('browse');
   }
 
-  function renderVexLick(lick, wrapEl) {
-    if (typeof Vex === 'undefined') {
-      wrapEl.innerHTML = '<div class="lick-loading">Loading notation…</div>';
-      return;
-    }
-    wrapEl.innerHTML = '';
-
-    var VF = Vex.Flow;
-    var sorted = lick.tab.slice().sort(function(a, b) { return a.beat - b.beat; });
-    var maxBeat = Math.max.apply(null, sorted.map(function(n) { return n.beat; }));
-    var totalBeats = Math.ceil((maxBeat + 1) / 4) * 4;
-    var numBars = totalBeats / 4;
-
-    var events = buildRhythmEvents(sorted, totalBeats);
-
-    var barBoundaries = [];
-    for (var bi = 1; bi < numBars; bi++) barBoundaries.push(bi * 4);
-
-    var noteCount = events.filter(function(e) { return e.type === 'note'; }).length;
-    var W = Math.max(wrapEl.offsetWidth || 480, Math.max(480, noteCount * 42 + 120));
-    var LABEL_H = 42;
-    var H = LABEL_H + 280;
-    var staveX = 15, staveW = W - 30;
-
-    var renderer = new VF.Renderer(wrapEl, VF.Renderer.Backends.SVG);
-    renderer.resize(W, H);
-    var ctx = renderer.getContext();
-
-    var notationY = LABEL_H, tabY = LABEL_H + 110;
-
-    var staff = new VF.Stave(staveX, notationY, staveW);
-    staff.addClef('treble');
-    var ks = getLickKeySig(lick);
-    if (ks && ks !== 'C') staff.addKeySignature(ks);
-    staff.addTimeSignature('4/4');
-    staff.setEndBarType(VF.Barline.type.END);
-    staff.setContext(ctx).draw();
-
-    var tabStave = new VF.TabStave(staveX, tabY, staveW);
-    tabStave.addClef('tab');
-    tabStave.setEndBarType(VF.Barline.type.END);
-    tabStave.setContext(ctx).draw();
-
-    new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.BRACKET).setContext(ctx).draw();
-    new VF.StaveConnector(staff, tabStave).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
-
-    var staveNotes = [], tabNotes = [], allRealStaveNotes = [];
-    var notePairs = [];
-    var tripletStaveGroups = [];
-    var curTripStave = [];
-    var tripletNoteSet = new Set();
-
-    events.forEach(function(ev) {
-      if (ev.type === 'rest') {
-        staveNotes.push(new VF.StaveNote({keys: ['b/4'], duration: ev.dur + 'r', stem_direction: -1}));
-        tabNotes.push(new VF.GhostNote({duration: ev.dur}));
-      } else {
-        var midi = VEXFLOW_MIDI[ev.tab.s] + ev.tab.f;
-        var vexKey = midiToVexKey(midi);
-        var acc = vexKeyNeedsAcc(vexKey);
-        var sn = new VF.StaveNote({keys: [vexKey], duration: ev.dur, stem_direction: -1});
-        if (acc) sn.addModifier(new VF.Accidental(acc), 0);
-        staveNotes.push(sn);
-        allRealStaveNotes.push(sn);
-        var tn = new VF.TabNote({positions: [{str: ev.tab.s + 1, fret: ev.tab.f}], duration: ev.dur});
-        tabNotes.push(tn);
-        notePairs.push({stave: sn, tab: tn});
-
-        if (ev.triplet === 'first') { curTripStave = [sn]; tripletNoteSet.add(sn); }
-        else if (ev.triplet === 'mid') { curTripStave.push(sn); tripletNoteSet.add(sn); }
-        else if (ev.triplet === 'last') {
-          curTripStave.push(sn); tripletNoteSet.add(sn);
-          tripletStaveGroups.push(curTripStave);
-          curTripStave = [];
-        }
-      }
-    });
-
-    // Create tuplets BEFORE formatting so VexFlow adjusts tick counts
-    var staveTuplets = tripletStaveGroups.map(function(grp) {
-      return new VF.Tuplet(grp, {num_notes: 3, notes_occupied: 2});
-    });
-
-    var voice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
-    voice.addTickables(staveNotes);
-    var tabVoice = new VF.Voice({num_beats: totalBeats, beat_value: 4}).setMode(VF.Voice.Mode.SOFT);
-    tabVoice.addTickables(tabNotes);
-
-    var fmt = new VF.Formatter();
-    fmt.joinVoices([voice]);
-    fmt.joinVoices([tabVoice]);
-    fmt.format([voice, tabVoice], staveW - 80);
-
-    // Beam non-triplet notes normally, beam each triplet group separately
-    var realStaveNotes = staveNotes.filter(function(n) { return n.noteType === 'n' && !n.isRest(); });
-    var nonTripletNotes = realStaveNotes.filter(function(n) { return !tripletNoteSet.has(n); });
-    var beams = VF.Beam.generateBeams(nonTripletNotes, {stem_direction: -1});
-    tripletStaveGroups.forEach(function(grp) {
-      if (grp.length > 1) beams.push(new VF.Beam(grp));
-    });
-
-    voice.draw(ctx, staff);
-    beams.forEach(function(bm) { bm.setContext(ctx).draw(); });
-    tabVoice.draw(ctx, tabStave);
-
-    staveTuplets.forEach(function(t) { t.setContext(ctx).draw(); });
-
-    // Align tab notes to their paired staff notes using VexFlow positions
-    var svgEl = wrapEl.querySelector('svg');
-    if (svgEl) {
-      requestAnimationFrame(function() {
-        var svgR = svgEl.getBoundingClientRect();
-        var tabEls = svgEl.querySelectorAll('.vf-tabnote');
-        notePairs.forEach(function(pair, i) {
-          var tabEl = tabEls[i];
-          if (!tabEl) return;
-          var staveX = pair.stave.getAbsoluteX();
-          var tr = tabEl.getBoundingClientRect();
-          var tCx = tr.left + tr.width / 2 - svgR.left;
-          var delta = staveX - tCx;
-          if (Math.abs(delta) > 0.5) {
-            var cur = tabEl.getAttribute('transform') || 'translate(0,0)';
-            var m = cur.match(/translate\(([^,]+),([^)]+)\)/);
-            if (m) {
-              tabEl.setAttribute('transform', 'translate(' + (parseFloat(m[1]) + delta) + ',' + m[2] + ')');
-            }
-          }
-        });
-
-        // Draw bar lines using stave note X positions for perfect alignment
-        var ns = 'http://www.w3.org/2000/svg';
-        var staffTop = staff.getYForLine(0);
-        var staffBot = staff.getYForLine(4);
-        var tabTop = tabStave.getYForLine(0);
-        var tabBot = tabStave.getYForLine(5);
-        var noteIdx = 0;
-        barBoundaries.forEach(function(bb) {
-          while (noteIdx < events.length && (events[noteIdx].type !== 'note' || events[noteIdx].beat < bb - 0.01)) noteIdx++;
-          if (noteIdx >= events.length) return;
-          var pairIdx = 0;
-          for (var k = 0; k < noteIdx; k++) { if (events[k].type === 'note') pairIdx++; }
-          if (pairIdx >= notePairs.length) return;
-          var barX = notePairs[pairIdx].stave.getAbsoluteX() - 8;
-          if (barX > staveX + 40) {
-            var drawBar = function(x, y1, y2) {
-              var ln = document.createElementNS(ns, 'line');
-              ln.setAttribute('x1', x); ln.setAttribute('x2', x);
-              ln.setAttribute('y1', y1); ln.setAttribute('y2', y2);
-              ln.setAttribute('stroke', '#4a4845'); ln.setAttribute('stroke-width', '1');
-              svgEl.appendChild(ln);
-            };
-            drawBar(barX, staffTop, staffBot);
-            drawBar(barX, tabTop, tabBot);
-          }
-        });
-
-        applyLickTheme(svgEl);
-        drawLickChordLabels(svgEl, notePairs, lick, sorted, LABEL_H, notationY);
-      });
-    }
-  }
-
-  // ── Playback ──
-  function stopLickPlayback() {
-    playingTimeouts.forEach(t => clearTimeout(t));
-    playingTimeouts = [];
-    if (playingLickId) {
-      const btn = document.querySelector('[data-lick-play="' + playingLickId + '"]');
-      if (btn) { btn.classList.remove('playing'); btn.innerHTML = '&#9654; Play'; }
-      const btnSlow = document.querySelector('[data-lick-slow="' + playingLickId + '"]');
-      if (btnSlow) { btnSlow.classList.remove('playing'); btnSlow.innerHTML = '&#9654; Slow'; }
-    }
-    playingLickId = null;
-  }
-
-  function playLick(lick, slow) {
-    stopLickPlayback();
-    initGuitarSampler();
-    const useGuitar = guitarSamplerReady && guitarSampler;
-    const usePiano = typeof samplerReady !== 'undefined' && samplerReady && typeof sampler !== 'undefined';
-    const activeSampler = useGuitar ? guitarSampler : (usePiano ? sampler : null);
-    if (!activeSampler) return;
-
-    Tone.start();
-    const bpm = slow ? Math.round(lick.bpm * 0.6) : lick.bpm;
-    const beatSec = 60 / bpm;
-    const now = Tone.now() + 0.05;
-
-    playingLickId = lick.id;
-    const btnSel = slow ? '[data-lick-slow="' + lick.id + '"]' : '[data-lick-play="' + lick.id + '"]';
-    const btn = document.querySelector(btnSel);
-    if (btn) { btn.classList.add('playing'); btn.innerHTML = '&#9632; Stop'; }
-
-    let maxTime = 0;
-    lick.tab.forEach(note => {
-      const midi = GUITAR_OPEN[note.s] + note.f;
-      const t = now + note.beat * beatSec;
-      const dur = beatSec * 0.9;
-      activeSampler.triggerAttackRelease(midiToNoteName(midi), dur, t);
-      if (note.beat * beatSec + dur > maxTime) maxTime = note.beat * beatSec + dur;
-    });
-
-    const tid = setTimeout(() => stopLickPlayback(), (maxTime + 0.3) * 1000);
-    playingTimeouts.push(tid);
-  }
-
-  // ── Render all cards ──
-  function renderLicks() {
-    const body = document.getElementById('lick-body');
-    body.innerHTML = '';
-    const filtered = activeFilter === 'all' ? LICKS : LICKS.filter(l => l.prog === activeFilter);
-
-    DIFF_ORDER.forEach(diff => {
-      const group = filtered.filter(l => l.diff === diff);
-      if (!group.length) return;
-
-      const label = document.createElement('div');
-      label.className = 'lick-section-label';
-      label.textContent = DIFF_LABELS[diff];
-      body.appendChild(label);
-
-      group.forEach(lick => {
-        const card = document.createElement('div');
-        card.className = 'lick-card';
-        card.dataset.prog = lick.prog;
-
-        // Meta row
-        let tagsHtml = '<span class="lick-tag ' + lick.diff + '">' +
-          {beg:'Beginner',int:'Intermediate',adv:'Advanced'}[lick.diff] + '</span>';
-        lick.concepts.forEach(c => { tagsHtml += '<span class="lick-tag concept">' + c + '</span>'; });
-
-        // Progression bar
-        let progHtml = '';
-        lick.chords.forEach(ch => {
-          progHtml += '<div class="lick-prog-slot ' + ch.q + '">' + ch.name + '</div>';
-        });
-
-        // Key badge
-        const keyBadge = '<span style="display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:2px;background:rgba(255,255,255,.06);color:var(--cream);margin-left:6px">Key of ' + lick.key + '</span>';
-
-        card.innerHTML =
-          '<div class="lick-card-meta">' +
-            '<span class="lick-card-title">' + lick.title + keyBadge + '</span>' +
-            '<div class="lick-card-tags">' + tagsHtml + '</div>' +
-          '</div>' +
-          '<div class="lick-tab-wrap"></div>' +
-          '<div class="lick-concept">' + lick.concept + '</div>' +
-          '<div class="lick-controls">' +
-            '<button class="lick-play-btn" data-lick-play="' + lick.id + '">&#9654; Play</button>' +
-            '<button class="lick-play-btn" data-lick-slow="' + lick.id + '">&#9654; Slow</button>' +
-            '<span class="lick-tempo">&#9833; = ' + lick.bpm + ' · ' + lick.feel + '</span>' +
-          '</div>' +
-          '<div class="lick-source">Source: <a href="' + lick.source.url + '" target="_blank" rel="noopener">' + lick.source.name + '</a></div>';
-
-        // Play button events
-        card.querySelector('[data-lick-play]').addEventListener('click', () => {
-          if (playingLickId === lick.id) { stopLickPlayback(); return; }
-          playLick(lick, false);
-        });
-        card.querySelector('[data-lick-slow]').addEventListener('click', () => {
-          if (playingLickId === lick.id) { stopLickPlayback(); return; }
-          playLick(lick, true);
-        });
-
-        body.appendChild(card);
-        renderVexLick(lick, card.querySelector('.lick-tab-wrap'));
-      });
-    });
-  }
-
-  // ── Panel open/close ──
-  function openLickPanel() {
+  function openResPanel() {
     document.getElementById('lick-overlay').classList.add('open');
-    document.getElementById('lick-panel').classList.add('open');
+    const panel = document.getElementById('lick-panel');
+    panel.classList.add('open', 'browse');
+    panel.classList.remove('embed');
     lockScroll();
-    if (!document.getElementById('lick-body').children.length) renderLicks();
+    if (!document.getElementById('res-toc').children.length) buildToc();
+    if (!document.getElementById('res-browse').children.length) renderBrowse();
+    setTimeout(() => searchInput.focus(), 100);
   }
-  function closeLickPanel() {
-    stopLickPlayback();
+
+  function closeResPanel() {
+    const iframe = document.getElementById('res-iframe');
+    iframe.src = 'about:blank';
     document.getElementById('lick-overlay').classList.remove('open');
-    document.getElementById('lick-panel').classList.remove('open');
+    const panel = document.getElementById('lick-panel');
+    panel.classList.remove('open', 'browse', 'embed');
     unlockScroll();
   }
 
-  document.getElementById('lick-lib-btn').addEventListener('click', openLickPanel);
-  document.getElementById('lick-close').addEventListener('click', closeLickPanel);
-  document.getElementById('lick-overlay').addEventListener('click', closeLickPanel);
+  document.getElementById('lick-lib-btn').addEventListener('click', openResPanel);
+  document.getElementById('lick-close').addEventListener('click', closeResPanel);
+  document.getElementById('lick-overlay').addEventListener('click', closeResPanel);
+  document.getElementById('res-back').addEventListener('click', closeEmbed);
 
-  // Escape key — hook into existing handler
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && document.getElementById('lick-overlay').classList.contains('open')) {
-      closeLickPanel();
+      if (document.getElementById('lick-panel').classList.contains('embed')) closeEmbed();
+      else closeResPanel();
     }
   });
 })();
