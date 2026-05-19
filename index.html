@@ -1096,27 +1096,12 @@
     overflow: hidden;
   }
   #lick-panel.open { display: flex; flex-direction: column; }
-  #lick-panel.browse .res-browse { display: block; }
-  #lick-panel.browse .res-embed { display: none; }
-  #lick-panel.embed .res-browse { display: none; }
-  #lick-panel.embed .res-embed { display: flex; }
   .res-header {
     flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
     padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--surface);
   }
-  .res-header-left { display: flex; align-items: center; gap: 14px; }
   .res-header-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); }
   .res-header-title em { font-style: italic; color: var(--gold); }
-  .res-back-btn {
-    display: none; align-items: center; gap: 5px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .05em;
-    text-transform: uppercase; padding: 5px 12px;
-    border: 1px solid var(--border); border-radius: 3px;
-    background: transparent; color: var(--muted); cursor: pointer; transition: all .15s;
-  }
-  .res-back-btn:hover { border-color: var(--gold); color: var(--cream); }
-  #lick-panel.embed .res-back-btn { display: inline-flex; }
-  #lick-panel.embed .res-header-title { font-size: 15px; }
   .lick-close-btn {
     width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 3px;
     background: transparent; color: var(--muted); font-size: 16px; cursor: pointer;
@@ -1232,38 +1217,6 @@
     background: rgba(201,168,76,.25); color: var(--cream);
     border-radius: 1px; padding: 0 1px;
   }
-  .res-embed { flex: 1; flex-direction: column; overflow: hidden; }
-  .res-iframe-bar {
-    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 24px; background: rgba(0,0,0,.2); border-bottom: 1px solid var(--border);
-  }
-  .res-iframe-url {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted);
-    letter-spacing: .03em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .res-iframe-open {
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .05em;
-    text-transform: uppercase; padding: 4px 10px;
-    border: 1px solid var(--border); border-radius: 3px;
-    background: transparent; color: var(--gold); cursor: pointer; transition: all .15s;
-    text-decoration: none;
-  }
-  .res-iframe-open:hover { border-color: var(--gold); background: rgba(201,168,76,.1); }
-  .res-iframe-wrap { flex: 1; position: relative; background: #fff; }
-  .res-iframe-wrap iframe { width: 100%; height: 100%; border: none; }
-  .res-iframe-fallback {
-    position: absolute; inset: 0; display: none; flex-direction: column;
-    align-items: center; justify-content: center; gap: 16px;
-    background: var(--surface); color: var(--muted); font-size: 13px; text-align: center; padding: 40px;
-  }
-  .res-iframe-fallback.show { display: flex; }
-  .res-iframe-fallback a {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .04em;
-    padding: 8px 20px; border: 1px solid rgba(201,168,76,.4); border-radius: 4px;
-    background: rgba(201,168,76,.1); color: var(--gold); text-decoration: none; transition: all .15s;
-  }
-  .res-iframe-fallback a:hover { background: rgba(201,168,76,.2); }
 
   #comp-btn {
     position: fixed; top: 16px; right: 16px;
@@ -9858,7 +9811,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v34 &nbsp;·&nbsp; deployed 2026-05-19 19:00</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v35 &nbsp;·&nbsp; deployed 2026-05-19 20:00</span></div>
     </div>
 
     <div class="tech-section">
@@ -10685,12 +10638,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
 <!-- ══════ JAZZ RESOURCES HUB ══════ -->
 <div id="lick-overlay"></div>
-<div id="lick-panel" class="browse">
+<div id="lick-panel">
   <div class="res-header">
-    <div class="res-header-left">
-      <button class="res-back-btn" id="res-back">&#8592; Back</button>
-      <div class="res-header-title">Jazz <em>Resources</em></div>
-    </div>
+    <div class="res-header-title">Jazz <em>Resources</em></div>
     <button class="lick-close-btn" id="lick-close">&#x2715;</button>
   </div>
   <div class="res-toolbar" id="res-toolbar">
@@ -10703,19 +10653,6 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="res-result-count" id="res-result-count"></div>
   </div>
   <div class="res-browse" id="res-browse"></div>
-  <div class="res-embed">
-    <div class="res-iframe-bar">
-      <span class="res-iframe-url" id="res-iframe-url"></span>
-      <a class="res-iframe-open" id="res-iframe-open" href="#" target="_blank" rel="noopener">Open in new tab &#8599;</a>
-    </div>
-    <div class="res-iframe-wrap">
-      <iframe id="res-iframe" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>
-      <div class="res-iframe-fallback" id="res-iframe-fallback">
-        <div>This page cannot be embedded directly.</div>
-        <a id="res-fallback-link" href="#" target="_blank" rel="noopener">Open in a new tab &#8599;</a>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -12672,7 +12609,7 @@ window.addEventListener('resize', () => {
       : totalShown + ' resources';
 
     el.querySelectorAll('.res-card').forEach(card => {
-      card.addEventListener('click', () => openEmbed(card.dataset.url));
+      card.addEventListener('click', () => window.open(card.dataset.url, '_blank', 'noopener'));
     });
   }
 
@@ -12698,53 +12635,10 @@ window.addEventListener('resize', () => {
     searchInput.focus();
   });
 
-  function openEmbed(url) {
-    const panel = document.getElementById('lick-panel');
-    const iframe = document.getElementById('res-iframe');
-    const fallback = document.getElementById('res-iframe-fallback');
-    const urlEl = document.getElementById('res-iframe-url');
-    const openBtn = document.getElementById('res-iframe-open');
-    const fallbackLink = document.getElementById('res-fallback-link');
-
-    urlEl.textContent = url;
-    openBtn.href = url;
-    fallbackLink.href = url;
-    fallback.classList.remove('show');
-
-    iframe.onload = function() {
-      try {
-        var doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc || !doc.body || doc.body.innerHTML === '') throw 'empty';
-      } catch(e) {
-        fallback.classList.add('show');
-      }
-    };
-    iframe.onerror = function() { fallback.classList.add('show'); };
-
-    iframe.src = url;
-    panel.classList.remove('browse');
-    panel.classList.add('embed');
-
-    setTimeout(function() {
-      if (!iframe.contentDocument && !iframe.contentWindow) {
-        fallback.classList.add('show');
-      }
-    }, 4000);
-  }
-
-  function closeEmbed() {
-    const panel = document.getElementById('lick-panel');
-    const iframe = document.getElementById('res-iframe');
-    iframe.src = 'about:blank';
-    panel.classList.remove('embed');
-    panel.classList.add('browse');
-  }
-
   function openResPanel() {
     document.getElementById('lick-overlay').classList.add('open');
     const panel = document.getElementById('lick-panel');
-    panel.classList.add('open', 'browse');
-    panel.classList.remove('embed');
+    panel.classList.add('open');
     lockScroll();
     if (!document.getElementById('res-toc').children.length) buildToc();
     if (!document.getElementById('res-browse').children.length) renderBrowse();
@@ -12752,23 +12646,18 @@ window.addEventListener('resize', () => {
   }
 
   function closeResPanel() {
-    const iframe = document.getElementById('res-iframe');
-    iframe.src = 'about:blank';
     document.getElementById('lick-overlay').classList.remove('open');
-    const panel = document.getElementById('lick-panel');
-    panel.classList.remove('open', 'browse', 'embed');
+    document.getElementById('lick-panel').classList.remove('open');
     unlockScroll();
   }
 
   document.getElementById('lick-lib-btn').addEventListener('click', openResPanel);
   document.getElementById('lick-close').addEventListener('click', closeResPanel);
   document.getElementById('lick-overlay').addEventListener('click', closeResPanel);
-  document.getElementById('res-back').addEventListener('click', closeEmbed);
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && document.getElementById('lick-overlay').classList.contains('open')) {
-      if (document.getElementById('lick-panel').classList.contains('embed')) closeEmbed();
-      else closeResPanel();
+      closeResPanel();
     }
   });
 })();
