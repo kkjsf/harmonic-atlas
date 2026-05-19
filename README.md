@@ -43,22 +43,25 @@ Four sub-tabs:
 - **Scale voicings** tab — scale positions on 4 strings
 - **Chop Chords** tab — closed-position triads and 7th chords for the chop technique
 
-### Jazz Lick Library (♫ button, header)
+### Jazz Resources Hub (♫ button, header)
 
 A slide-in panel with 18 curated jazz guitar licks across four progression types:
 
-- **ii-V-I Major** (8 licks) — Honeysuckle Rose motif, octave displacement, enclosures, chromatic approaches, bebop scale, dim7 subs, tritone subs, altered scale
-- **ii-V-i Minor** (4 licks) — minor enclosures, melodic minor over V7alt, m7b5-to-dim7 pivot, diminished scale
-- **I-vi-ii-V Turnaround** (3 licks) — guide-tone walk, chromatic voice leading, Coltrane substitutions
-- **Blues** (3 licks) — chromatic double-stop blues, jazz blues passing tones, Bird blues chromatic line
+27 curated links across 8 categories, sourced from Jens Larsen, Jazz Guitar BE, Jazz Guitar Licks, and Matt Warnock Guitar:
 
-Three difficulty tiers (Beginner / Intermediate / Advanced). No straight arpeggios — every beginner lick teaches a real jazz device (enclosures, guide tones, octave displacement, double stops, classic motifs).
+- **Jazz Licks & Vocabulary** (6) — bebop lines, enclosures, chromatic approaches
+- **Chord Melody** (3) — arranging melody and harmony simultaneously
+- **Walking Bass** (2) — bass lines with chord voicings
+- **Improvisation Concepts** (4) — phrasing, target notes, bebop scale
+- **Jazz Guitar Comping** (2) — voicings and rhythmic patterns
+- **Learning Jazz Standards** (6) — memorization methods, repertoire guides, tune breakdowns
+- **More Resources** (4) — full educational sites
 
-Each lick features:
-- **Dual notation** — treble staff + guitar tab (VexFlow)
-- **Play / Slow** buttons — hear at written tempo or 60%
-- **Concept note** — theory explanation of the harmonic idea
-- **Source link** — external jazz guitar education reference
+Features:
+- **Search bar** — instant filtering with match highlighting across titles, descriptions, tags, and site names
+- **Category TOC** — icon pills with resource counts, click to filter by category
+- **Embedded viewer** — click a card to open the article in an iframe; graceful fallback with "Open in new tab" when the site blocks framing
+- **Domain badges** — each card shows source site and domain
 
 ### Composition tool (purple ♩ button, top-right)
 
@@ -213,7 +216,7 @@ git push
 | `computeClosedMandoVoicing` / `getChopMandoVoicing` | Mandolin chop chord voicings |
 | `computeVoicingFromTemplate(rootPc, template)` | Derives guitar frets/pcs from a semitone-offset template; enforces ascending pitch per string and span ≤ 4 frets |
 | `showDiagramModal(…, navList, navIdx)` | Zoom overlay with smooth in-place navigation (fade swap 80 ms, swipe, arrow keys, prev/next context labels) |
-| `renderVexLick(lick, wrapEl)` | VexFlow dual stave (treble + tab) rendering for jazz lick library |
+| `renderBrowse()` | Renders jazz resource hub cards with search filtering and category grouping |
 
 ### Composition data model
 
