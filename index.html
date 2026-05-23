@@ -18,6 +18,7 @@
     --gold:#c9a84c; --gold2:#e8c96a;
     --cream:#f0e8d8; --muted:#6b7280; --text:#d8d0c4; --dim:#9089a0;
     --accent:#7c6fa0; --accent2:#a08bc8;
+    --shadow:#1a1f27; --bg-deep:#0d1117; --text-warm:#c0b8a8;
     --z-back:0; --z-content:1; --z-tooltip:100; --z-popover:300; --z-sticky:600;
     --z-dropdown:1000; --z-diagram:4000; --z-overlay:8000; --z-modal:9000; --z-top:9999;
   }
@@ -47,7 +48,7 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat:no-repeat; background-position:right 14px center; }
   select:focus { outline:none; border-color:var(--gold); box-shadow:0 0 0 2px rgba(201,168,76,.15); }
-  select option { background:#1e2228; }
+  select option { background:var(--surface2); }
   .chord-types { display:flex; gap:6px; flex-wrap:wrap; }
 
   /* ── BUTTON ICONS ── */
@@ -623,7 +624,7 @@
   .prog-btn:hover { color: var(--cream); border-color: var(--accent); }
   .prog-btn.play-btn { border-color: var(--accent); color: var(--accent2); }
   .prog-btn.play-btn:hover, .prog-btn.play-btn.playing {
-    background: rgba(124,111,160,.15); color: #c4b0e8; border-color: var(--accent2);
+    background: rgba(124,111,160,.15); color: var(--accent2); border-color: var(--accent2);
   }
   .prog-btn.stop-btn:hover { border-color: #c86450; color: #c86450; }
   .prog-btn.clear-btn:hover { border-color: var(--muted); color: var(--text); }
@@ -648,7 +649,7 @@
     background-repeat: no-repeat; background-position: right 10px center;
   }
   .prog-select:focus { outline: none; border-color: var(--accent); }
-  .prog-select option { background: #1e2228; }
+  .prog-select option { background: var(--surface2); }
 
   /* Presets row */
   .prog-presets { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
@@ -828,7 +829,7 @@
   }
   .prog-slot-del {
     position:absolute; top:-6px; right:-6px; width:16px; height:16px;
-    background:#1a1f27; border:1px solid var(--border2); border-radius:50%;
+    background:var(--shadow); border:1px solid var(--border2); border-radius:50%;
     color:var(--muted); font-size:10px; line-height:16px; text-align:center;
     cursor:pointer; opacity:0; transition:opacity .15s;
     display:flex; align-items:center; justify-content:center;
@@ -866,7 +867,7 @@
   .tip-popup {
     display: none; position: absolute; z-index: var(--z-popover);
     bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
-    background: #1a1f27; border: 1px solid rgba(201,168,76,.4);
+    background: var(--shadow); border: 1px solid rgba(201,168,76,.4);
     color: var(--cream); font-family: 'IBM Plex Mono', monospace;
     font-size: 10px; line-height: 1.6; padding: 10px 13px;
     border-radius: 3px; width: 240px; pointer-events: none;
@@ -1007,7 +1008,7 @@
   .neg-transform-tip {
     display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
     transform: translateX(-50%); z-index: var(--z-tooltip);
-    background: #0d1117; border: 1px solid rgba(224,80,80,.4);
+    background: var(--bg-deep); border: 1px solid rgba(224,80,80,.4);
     border-radius: 4px; padding: 8px 12px; white-space: nowrap;
     box-shadow: 0 4px 20px rgba(0,0,0,.6);
     pointer-events: none;
@@ -1020,7 +1021,7 @@
   .neg-transform-row {
     display: flex; align-items: center; gap: 6px;
     font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    color: #c0b8a8; line-height: 1.7;
+    color: var(--text-warm); line-height: 1.7;
   }
   .neg-transform-row .ntr-from { color: #70b8f0; min-width: 24px; text-align: right; }
   .neg-transform-row .ntr-arrow { color: rgba(255,255,255,.45); opacity: 1; }
@@ -1261,20 +1262,6 @@
   }
   #comp-close-btn:hover { border-color: var(--text); color: var(--text); }
   #comp-layout { display: flex; flex: 1; min-height: 0; overflow: hidden; }
-  #comp-list-panel {
-    width: 190px; flex-shrink: 0; border-right: 1px solid var(--border2);
-    overflow-y: auto; padding: 8px 0;
-  }
-  .comp-list-item {
-    padding: 9px 14px; cursor: pointer;
-    border-left: 2px solid transparent; transition: background .12s, border-color .12s;
-    display: flex; flex-direction: column;
-  }
-  .comp-list-item:hover { background: rgba(255,255,255,.04); }
-  .comp-list-item.active { border-left-color: var(--accent); background: rgba(124,111,160,.1); }
-  .comp-list-title { font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .comp-list-count { font-size: 9px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
-  .comp-list-empty { padding: 16px 14px; font-size: 10px; color: var(--muted); line-height: 1.6; }
   #comp-detail-panel {
     flex: 1; overflow-y: auto; padding: 16px 18px;
     display: flex; flex-direction: column; gap: 14px;
@@ -1800,7 +1787,7 @@
     pointer-events: none;
   }
   .collapsible-body.open {
-    max-height: 2000px;
+    max-height: 800px;
     opacity: 1;
     pointer-events: auto;
   }
@@ -1934,7 +1921,7 @@
   .prog-slot-sub {
     position:absolute; top:-6px; right:12px;
     width:16px; height:16px;
-    background:#1a1f27; border:1px solid rgba(124,111,160,.35); border-radius:50%;
+    background:var(--shadow); border:1px solid rgba(124,111,160,.35); border-radius:50%;
     color:var(--accent2); font-size:9px; line-height:16px; text-align:center;
     cursor:pointer; opacity:0; transition:opacity .15s, background .15s;
     display:flex; align-items:center; justify-content:center;
@@ -1990,9 +1977,6 @@
     #comp-overlay { padding: 0; }
     #comp-modal { max-height: 100vh; border-radius: 0; }
     #comp-layout { flex-direction: column; }
-    #comp-list-panel { width: 100%; max-height: 110px; border-right: none; border-bottom: 1px solid var(--border2); display: flex; overflow-x: auto; overflow-y: hidden; padding: 6px; flex-direction: row; gap: 0; }
-    .comp-list-item { flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; padding: 6px 10px; white-space: nowrap; }
-    .comp-list-item.active { border-bottom-color: var(--gold); border-left-color: transparent; }
     .prog-slot { min-width: 70px; }
     .mode-groups { flex-direction:column; gap:6px; }
     .strum-patterns { gap:3px; }
@@ -2045,8 +2029,6 @@
   .comp-chip .comp-chip-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); flex-shrink:0; }
   .comp-chip-new { display:flex; align-items:center; gap:4px; padding:5px 12px; border-radius:16px; border:1px dashed var(--border2); background:none; font-size:11px; color:var(--dim); cursor:pointer; font-family:'IBM Plex Mono',monospace; transition:all .12s; flex-shrink:0; }
   .comp-chip-new:hover { border-color:var(--accent); color:var(--accent2); }
-  #comp-list-panel { display:none !important; }
-
   /* Mobile play pane — scale switcher + fretboard strip */
   #mob-scale-switcher { display:none; gap:6px; padding:6px 12px; flex-shrink:0; overflow-x:auto; align-items:center; border-bottom:1px solid var(--border2); scrollbar-width:none; }
   #mob-scale-switcher::-webkit-scrollbar { display:none; }
@@ -2058,7 +2040,7 @@
     background-repeat:no-repeat; background-position:right 7px center; }
   #mob-scale-root-sel { max-width:52px; }
   .mob-scale-dropdown:focus { border-color:var(--accent); }
-  .mob-scale-dropdown option { background:#1e2228; }
+  .mob-scale-dropdown option { background:var(--surface2); }
   #mob-fret-toggle-btn { display:none; }
   #mob-fret-wrap { display:none; flex:1; overflow-x:auto; overflow-y:hidden; padding:6px 10px; align-items:center; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; min-height:80px; }
   #mob-scale-fret-col { display:none; flex-direction:column; min-width:0; overflow:hidden; }
@@ -2129,7 +2111,6 @@
     #comp-mob-play-pane { display:none; }
 
     /* ── Play tab: full-screen impro ── */
-    #comp-modal.mob-tab-play #comp-list-panel  { display:none !important; }
     #comp-modal.mob-tab-play #comp-detail-panel { display:none !important; }
     #comp-modal.mob-tab-play #comp-transport   { display:none !important; }
     #comp-modal.mob-tab-play #comp-style-panel { display:none !important; }
@@ -2157,7 +2138,6 @@
 
   @media (max-width:600px) {
     #comp-mob-tabbar { display:flex; }
-    #comp-list-panel { display:none !important; }
     #comp-layout { display:flex !important; flex-direction:column; overflow:hidden; }
     #comp-detail-panel { padding:10px 12px; gap:8px; }
     /* Default: hide both section panes; tab class on modal reveals them */
@@ -2365,7 +2345,7 @@
         <span class="neg-toggle-track"></span>
         <span class="neg-toggle-thumb"></span>
       </label>
-      <span class="neg-toggle-label" onclick="document.getElementById('neg-harmony-toggle').click()">Negative Harmony</span>
+      <label class="neg-toggle-label" for="neg-harmony-toggle">Negative Harmony</label>
       <span class="neg-badge" id="neg-badge">ACTIVE</span>
       <span class="neg-lock-msg" id="neg-lock-msg">
         <svg width="9" height="10" viewBox="0 0 9 10" fill="none"><rect x="1" y="4" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.1"/><path d="M2.5 4V3a2 2 0 014 0v1" stroke="currentColor" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg>
@@ -2379,7 +2359,7 @@
   </div>
   <!-- ═══ SCALE RELATIONSHIPS ═══ -->
   <div class="rel-panel" id="rel-panel">
-    <div class="rel-panel-title collapsible-hdr" id="rel-hdr" data-target="rel-body">
+    <div class="rel-panel-title collapsible-hdr" id="rel-hdr" data-target="rel-body" tabindex="0" role="button" aria-expanded="false">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 1 Q9 6 6 11" stroke="currentColor" stroke-width="1" fill="none"/><path d="M6 1 Q3 6 6 11" stroke="currentColor" stroke-width="1" fill="none"/><line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1" opacity=".5"/></svg>
       Scale Relationships
       <span class="has-tip" style="display:inline-flex;align-items:center;margin-left:4px" onclick="event.stopPropagation()">
@@ -2395,7 +2375,7 @@
 
   <!-- ═══ CADENCE SUGGESTER ═══ -->
   <div class="cad-panel" id="cad-panel">
-    <div class="cad-panel-title collapsible-hdr" id="cad-hdr" data-target="cad-body">
+    <div class="cad-panel-title collapsible-hdr" id="cad-hdr" data-target="cad-body" tabindex="0" role="button" aria-expanded="false">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 9 L3 5 L5 7 L7 3 L9 6 L11 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       Cadence Suggester
       <span class="has-tip" style="display:inline-flex;align-items:center;margin-left:4px" onclick="event.stopPropagation()">
@@ -2411,7 +2391,7 @@
 
   <!-- ═══ CHORD SUBSTITUTION & PASSING CHORDS ═══ -->
   <div class="cad-panel" id="sub-panel">
-    <div class="cad-panel-title collapsible-hdr" id="sub-hdr" data-target="sub-body">
+    <div class="cad-panel-title collapsible-hdr" id="sub-hdr" data-target="sub-body" tabindex="0" role="button" aria-expanded="false">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4h5M2 8h5M9 2v8M9 5l2 2-2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Substitutions &amp; Passing Chords
       <span class="has-tip" style="display:inline-flex;align-items:center;margin-left:4px" onclick="event.stopPropagation()">
@@ -2427,7 +2407,7 @@
 
   <!-- ═══ PIVOT CHORD FINDER ═══ -->
   <div class="cad-panel" id="pivot-panel">
-    <div class="cad-panel-title collapsible-hdr" id="pivot-hdr" data-target="pivot-body">
+    <div class="cad-panel-title collapsible-hdr" id="pivot-hdr" data-target="pivot-body" tabindex="0" role="button" aria-expanded="false">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L6 11M1 6L11 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="6" r="2.5" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
       Pivot Chord Finder
       <span class="has-tip" style="display:inline-flex;align-items:center;margin-left:4px" onclick="event.stopPropagation()">
@@ -2543,27 +2523,14 @@ function playScale(noteNames, btnEl) {
   _stopActiveScale();
   if (!noteNames || !noteNames.length) return;
 
-  // PC-to-MIDI: root in octave 4, ascending
-  function noteToMidi(name, octave) {
-    const PC_MAP = {C:0,'C#':1,'Db':1,'C♯':1,'D♭':1,D:2,'D#':3,'Eb':3,'D♯':3,'E♭':3,
-      E:4,F:5,'F#':6,'Gb':6,'F♯':6,'G♭':6,G:7,'G#':8,'Ab':8,'G♯':8,'A♭':8,
-      A:9,'A#':10,'Bb':10,'A♯':10,'B♭':10,B:11};
-    const pc = PC_MAP[name] !== undefined ? PC_MAP[name] : 0;
-    return pc + (octave + 1) * 12;
-  }
-
   // Build ascending MIDI notes from C4
   const KEYS_PC = {C:0,'C#':1,'Db':1,'C♯':1,'D♭':1,D:2,'D#':3,'Eb':3,'D♯':3,'E♭':3,
     E:4,F:5,'F#':6,'Gb':6,'F♯':6,'G♭':6,G:7,'G#':8,'Ab':8,'G♯':8,'A♭':8,
     A:9,'A#':10,'Bb':10,'A♯':10,'B♭':10,B:11};
-  const _DIA_ORDER = {C:0,D:1,E:2,F:3,G:4,A:5,B:6};
-
   const midis = [];
   noteNames.forEach((name, i) => {
     const letter = name[0].toUpperCase();
-    const rest   = name.slice(1).replace('b','♭').replace('#','♯');
     const pc = (KEYS_PC[name] !== undefined ? KEYS_PC[name] : KEYS_PC[letter]) || 0;
-    const dia = _DIA_ORDER[letter] || 0;
     let oct = 4;
     if (i > 0) {
       const prev = midis[i-1];
@@ -7561,7 +7528,7 @@ function playChordAt(ctx, pcs, startTime, duration, sound) {
     for (const pc of sortedPcs) {
       let candidate = baseMidi + ((pc - baseMidi % 12 + 12) % 12);
       while (candidate <= prevMidi) candidate += 12;
-      const maxMidi = sound === 'guitar' ? 84 : 84;
+      const maxMidi = 84;
       if (candidate > maxMidi) candidate -= 12;
       result.push({ pc, midi: candidate });
       prevMidi = candidate;
@@ -9313,15 +9280,18 @@ function showSlotSubPopover(triggerEl, ch, slotIdx, onAdd) {
 
 function initCollapsibles() {
   document.querySelectorAll('.collapsible-hdr').forEach(hdr => {
-    hdr.addEventListener('click', e => {
-      // Don't collapse if clicking the ? badge area
+    function toggle(e) {
       if (e.target.closest('.has-tip')) return;
-      const targetId = hdr.dataset.target;
-      const body = document.getElementById(targetId);
+      const body = document.getElementById(hdr.dataset.target);
       if (!body) return;
       const isOpen = body.classList.contains('open');
       body.classList.toggle('open', !isOpen);
       hdr.classList.toggle('open', !isOpen);
+      hdr.setAttribute('aria-expanded', !isOpen);
+    }
+    hdr.addEventListener('click', toggle);
+    hdr.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); }
     });
   });
 }
@@ -9331,7 +9301,7 @@ function openSection(bodyId) {
   const body = document.getElementById(bodyId);
   const hdr  = document.querySelector(`[data-target="${bodyId}"]`);
   if (body)  body.classList.add('open');
-  if (hdr)   hdr.classList.add('open');
+  if (hdr)   { hdr.classList.add('open'); hdr.setAttribute('aria-expanded', 'true'); }
 }
 
 // ══════════════════════════════════════════════
@@ -9635,9 +9605,7 @@ function renderHistory() {
 const _origRender = render;
 render = function() {
   _origRender();
-  // Update URL hash (no page reload, no history entry)
   history.replaceState(null, '', encodeHash(state));
-  // Push to breadcrumb history
   historyPush(state.key, state.scale);
 };
 
@@ -9803,7 +9771,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v36 &nbsp;·&nbsp; deployed 2026-05-23 21:32</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v37 &nbsp;·&nbsp; deployed 2026-05-23 09:45</span></div>
     </div>
 
     <div class="tech-section">
@@ -9918,7 +9886,6 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <button class="cmob-tab" data-tab="play">▶ Play</button>
     </div>
     <div id="comp-layout">
-      <div id="comp-list-panel"></div>
       <div id="comp-detail-panel"><div class="comp-empty-state">No compositions yet.<br>Click + New to create one.</div></div>
       <!-- Play pane: mobile Play tab + desktop playing right column -->
       <div id="comp-mob-play-pane">
@@ -10705,182 +10672,6 @@ function unlockScroll() {
   });
 })();
 
-// ── (Zoom Progression Builder removed — see composition tool) ──
-if (false) (function() {
-  const overlay   = document.getElementById('prog-zoom-overlay');
-  const openBtn   = document.getElementById('prog-zoom-btn');
-  const closeBtn  = document.getElementById('prog-zoom-close');
-  const zoomPlay  = document.getElementById('zoom-play');
-  const zoomStop  = document.getElementById('zoom-stop');
-  const zoomLoop  = document.getElementById('zoom-loop');
-  const zoomClear = document.getElementById('zoom-clear');
-  const zoomBpm   = document.getElementById('zoom-bpm');
-  const zoomBeats = document.getElementById('zoom-beats');
-  const zoomSound = document.getElementById('zoom-sound');
-
-  // Keep zoom controls in sync with main controls
-  function syncZoomFromMain() {
-    zoomBpm.value   = document.getElementById('prog-bpm').value;
-    zoomBeats.value = document.getElementById('prog-beats').value;
-    zoomSound.value = document.getElementById('prog-sound').value;
-  }
-  function syncMainFromZoom() {
-    document.getElementById('prog-bpm').value   = zoomBpm.value;
-    document.getElementById('prog-beats').value = zoomBeats.value;
-    document.getElementById('prog-sound').value = zoomSound.value;
-  }
-  [zoomBpm, zoomBeats, zoomSound].forEach(el => {
-    el.addEventListener('change', () => {
-      syncMainFromZoom();
-      // If beats changed, update all slots
-      if (el === zoomBeats) {
-        const newBeats = parseInt(zoomBeats.value) || 4;
-        progression.forEach(ch => { ch.beats = newBeats; });
-        renderProgSlots();
-        renderProgZoom();
-      }
-      if (progPlaying) { progStop(); progPlay(); }
-    });
-  });
-
-  function closeZoom() {
-    overlay.classList.remove('open');
-    unlockScroll();
-  }
-
-  openBtn.addEventListener('click', () => {
-    syncZoomFromMain();
-    renderProgZoom();
-    overlay.classList.add('open');
-    lockScroll();
-    updateZoomPlayState();
-  });
-  closeBtn.addEventListener('click', closeZoom);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closeZoom(); });
-
-  // Sync zoom play state with main play state
-  function updateZoomPlayState() {
-    zoomPlay.classList.toggle('playing', progPlaying);
-    zoomStop.disabled = !progPlaying;
-    // Highlight active slot
-    document.querySelectorAll('.zoom-slot').forEach((s, i) => {
-      s.classList.toggle('playing', i === progCurrentIdx);
-    });
-  }
-
-  // Intercept progPlay/progStop to also update zoom UI
-  let _zoomTickRunning = false;
-  function startZoomTick() {
-    if (_zoomTickRunning) return;
-    _zoomTickRunning = true;
-    (function tick() {
-      if (!overlay.classList.contains('open') || !progPlaying) {
-        _zoomTickRunning = false;
-        const bar = document.getElementById('zoom-playhead-bar');
-        if (bar && !progPlaying) bar.style.width = '0';
-        return;
-      }
-      const bar = document.getElementById('zoom-playhead-bar');
-      if (bar) {
-        const ctx = getAudioCtx();
-        if (!ctx) return;
-        const elapsed = ctx.currentTime - progStartTime;
-        const bpm = progGetBpm();
-        const beatDur = 60 / bpm;
-        const total = progression.reduce((s, ch) => s + (ch.beats || progGetBeats()) * beatDur, 0);
-        bar.style.width = (Math.min(elapsed / total, 1) * 100) + '%';
-      }
-      updateZoomPlayState();
-      requestAnimationFrame(tick);
-    })();
-  }
-  const origPlay = window.progPlay;
-  window.progPlay = function() {
-    origPlay && origPlay();
-    updateZoomPlayState();
-    startZoomTick();
-  };
-
-  zoomPlay.addEventListener('click', () => { progPlay(); updateZoomPlayState(); });
-  zoomStop.addEventListener('click', () => { progStop(); updateZoomPlayState();
-    document.getElementById('zoom-playhead-bar').style.width = '0'; });
-  zoomLoop.addEventListener('click', () => {
-    progLoop = !progLoop;
-    zoomLoop.classList.toggle('active', progLoop);
-    document.getElementById('prog-loop').classList.toggle('active', progLoop);
-  });
-  zoomClear.addEventListener('click', () => {
-    progression.length = 0;
-    if (progPlaying) progStop();
-    renderProgSlots();
-    renderProgZoom();
-    document.getElementById('zoom-playhead-bar').style.width = '0';
-  });
-
-  // ── Zoom metro toggle (mirrors main metro) ──
-  const zoomMetroBtn   = document.getElementById('zoom-metro-toggle');
-  const zoomMetroSound = document.getElementById('zoom-metro-sound');
-
-  function syncZoomMetro() {
-    if (!zoomMetroBtn) return;
-    zoomMetroBtn.classList.toggle('active', metronomeEnabled);
-    if (zoomMetroSound) zoomMetroSound.style.display = metronomeEnabled ? '' : 'none';
-    // Sync sound select
-    if (zoomMetroSound) zoomMetroSound.value = metronomeSound === 'kick+snare' ? 'drums' : 'click';
-  }
-
-  zoomMetroBtn && zoomMetroBtn.addEventListener('click', function() {
-    metronomeEnabled = !metronomeEnabled;
-    this.classList.toggle('active', metronomeEnabled);
-    if (zoomMetroSound) zoomMetroSound.style.display = metronomeEnabled ? '' : 'none';
-    // Sync main metro button
-    const mainMetroBtn = document.getElementById('metro-toggle');
-    if (mainMetroBtn) {
-      mainMetroBtn.classList.toggle('active', metronomeEnabled);
-      const ms2 = document.getElementById('metro-sound'); if (ms2) ms2.style.display = metronomeEnabled ? '' : 'none';
-    }
-    if (progPlaying) { progStop(); progPlay(); }
-  });
-
-  zoomMetroSound && zoomMetroSound.addEventListener('change', function() {
-    metronomeSound = this.value === 'drums' ? 'kick+snare' : 'click';
-    const mainSel = document.getElementById('metro-sound');
-    if (mainSel) mainSel.value = this.value;
-    if (progPlaying) { progStop(); progPlay(); }
-  });
-
-  // ── Zoom strum patterns (mirrors main strum selector) ──
-  function renderZoomStrumSelector() {
-    const c = document.getElementById('zoom-strum-patterns');
-    if (!c) return;
-    c.innerHTML = '';
-    Object.keys(STRUM_PATTERNS).forEach(name => {
-      const btn = document.createElement('button');
-      btn.className = 'strum-btn' + (name === activeStrum ? ' active' : '');
-      btn.textContent = name;
-      btn.onclick = () => {
-        activeStrum = name;
-        renderStrumSelector();      // keep main in sync
-        renderZoomStrumSelector();
-        if (progPlaying) { progStop(); progPlay(); }
-      };
-      c.appendChild(btn);
-    });
-  }
-  renderZoomStrumSelector();
-  renderSwingSelector('zoom-swing-btns');
-
-  // Sync zoom metro state whenever overlay opens
-  const origOpenBtn = openBtn;
-  const _origOpenClick = openBtn.onclick;
-  openBtn.addEventListener('click', () => {
-    syncZoomMetro();
-    renderZoomStrumSelector();
-    renderSwingSelector('zoom-swing-btns');
-  });
-
-})();
-
 // ── Compositions ───────────────────────────────────────────────────────────
 const COMP_KEY = 'harmonic-compositions';
 let compActiveId = null;
@@ -10948,23 +10739,7 @@ function compSelectId(id) {
 }
 
 function compRenderList() {
-  const comps = compLoad();
-  const panel = document.getElementById('comp-list-panel');
-  if (panel) {
-    panel.innerHTML = '';
-    if (!comps.length) {
-      panel.innerHTML = '<div class="comp-list-empty">No compositions yet.</div>';
-    } else {
-      comps.forEach(c => {
-        const item = document.createElement('div');
-        item.className = 'comp-list-item' + (c.id === compActiveId ? ' active' : '');
-        item.innerHTML = `<span class="comp-list-title">${_escHtml(c.title || 'Untitled')}</span><span class="comp-list-count">${c.chords.length} chord${c.chords.length !== 1 ? 's' : ''}</span>`;
-        item.addEventListener('click', () => compSelectId(c.id));
-        panel.appendChild(item);
-      });
-    }
-  }
-  compRenderChipBar(comps);
+  compRenderChipBar(compLoad());
 }
 
 function compRenderChipBar(comps) {
