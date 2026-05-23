@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Harmonic Atlas - Scale Chord Explorer</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" id="meta-theme-color" content="#12101c">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,11 +49,6 @@
   select:focus { outline:none; border-color:var(--gold); box-shadow:0 0 0 2px rgba(201,168,76,.15); }
   select option { background:#1e2228; }
   .chord-types { display:flex; gap:6px; flex-wrap:wrap; }
-  .ct-btn { padding:8px 12px; background:var(--surface2); border:1px solid var(--border2); color:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:11px; cursor:pointer; border-radius:2px; transition:all .18s; letter-spacing:.05em; }
-  .ct-btn:hover { color:var(--cream); border-color:var(--accent); }
-  .ct-btn.active { background:rgba(201,168,76,.1); border-color:var(--gold); color:var(--gold2); }
-  .ct-btn.others-btn { border-style:dashed; }
-  .ct-btn.others-btn.active { background:rgba(160,139,200,.12); border-color:var(--accent2); color:var(--accent2); border-style:solid; }
 
   /* ── BUTTON ICONS ── */
   .ct-btn { padding:7px 11px 7px 9px; background:var(--surface2); border:1px solid var(--border2); color:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:11px; cursor:pointer; border-radius:2px; transition:all .18s; letter-spacing:.05em; display:inline-flex; align-items:center; gap:6px; }
@@ -129,7 +124,7 @@
     justify-content: center;
     transition: background .12s, border-color .12s;
   }
-  .transpose-btn:hover { background: var(--surface3); border-color: var(--accent); }
+  .transpose-btn:hover { background: var(--surface2); border-color: var(--accent); }
   .hist-chip {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 9.5px;
@@ -325,8 +320,7 @@
     line-height: 1;
   }
 
-  /* Hide the old left-panel scale-info (now in hero above tabs) */
-  .scale-info { display: none; }
+  /* scale-info styling is in the full block below */
   .ctrl-group-wide { grid-column: 1 / -1; }
   .mode-groups { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; }
   .mode-group {
@@ -348,7 +342,7 @@
   /* ── TWO-COLUMN MAIN LAYOUT ── */
   .main-layout {
     display:grid;
-    grid-template-columns: clamp(420px, 30vw, 520px) 1fr;
+    grid-template-columns: clamp(300px, 30vw, 520px) 1fr;
     gap: 32px;
     align-items: start;
   }
@@ -1230,7 +1224,7 @@
   #comp-btn.active { border-color: var(--accent); color: var(--accent2); background: rgba(124,111,160,.18); }
 
   #comp-overlay {
-    display: none; position: fixed; inset: 0; z-index: 8000;
+    display: none; position: fixed; inset: 0; z-index: var(--z-overlay);
     background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
     align-items: center; justify-content: center; padding: 20px;
   }
@@ -1605,7 +1599,6 @@
     color: var(--muted);
     margin-bottom: 6px;
   }
-  .rel-chips { display: flex; flex-wrap: wrap; gap: 5px; }
   .rel-chip {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
@@ -1906,7 +1899,7 @@
   .chord-staff-btn.active { background: rgba(201,168,76,.06); }
   /* ── Slot substitution popover ── */
   .slot-sub-popover {
-    position:fixed; z-index:8500;
+    position:fixed; z-index:calc(var(--z-overlay) + 500);
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:4px;
@@ -1984,13 +1977,10 @@
     .cof-svg-el { width:100%!important; height:auto!important; }
     .scale-hero { padding: 10px 12px; }
     .scale-hero-name { font-size: 22px; }
-    .scale-hero-layout { flex-direction: column !important; }
     .scale-hero-right { display:none; }
-    .hero-notes-row { gap:5px; }
     .hero-note-pill { font-size:14px; padding:5px 9px; }
     .chords-grid { grid-template-columns: 1fr 1fr; }
     .chord-card { padding: 10px 10px 8px; }
-    .chord-name { font-size:18px; }
     .view-tabs { gap:4px; flex-wrap:wrap; }
     .view-tab { padding: 5px 8px; font-size:9px; gap:3px; }
     #comp-btn { width:30px; height:30px; right:12px; top:12px; }
@@ -3755,7 +3745,8 @@ function diatonicQuality(scaleIntervals, degIdx){
   const iv5=iv5r<=iv3?iv5r+12:iv5r;
   if(iv3===4&&iv5===7) return'major';
   if(iv3===3&&iv5===7) return'minor';
-  if(iv5===6)          return'dim';
+  if(iv3===3&&iv5===6) return'dim';
+  if(iv3===4&&iv5===6) return'other';
   if(iv3===4&&iv5===8) return'aug';
   return'other';
 }
@@ -7199,7 +7190,7 @@ function initGuitarSampler() {
       'C3':'C3.mp3','C4':'C4.mp3','C5':'C5.mp3',
       'C#3':'Cs3.mp3','C#4':'Cs4.mp3','C#5':'Cs5.mp3',
       'D2':'D2.mp3','D3':'D3.mp3','D4':'D4.mp3','D5':'D5.mp3',
-      'D#2':'Ds2.mp3','D#3':'Ds3.mp3','D#4':'Ds3.mp3',
+      'D#2':'Ds2.mp3','D#3':'Ds3.mp3','D#4':'Ds4.mp3',
       'E2':'E2.mp3','E3':'E3.mp3','E4':'E4.mp3',
       'F2':'F2.mp3','F3':'F3.mp3',
     },
@@ -7578,7 +7569,7 @@ function playChordAt(ctx, pcs, startTime, duration, sound) {
     return result;
   }
 
-  const voiced = spreadChordOctaves(uniquePcs);
+  const voiced = spreadOctaves(uniquePcs, startMidi);
 
   const beatsForChord = Math.max(1, Math.round(duration * progGetBpm() / 60));
   const strumHits = getStrumDurations(duration, beatsForChord);
@@ -7831,9 +7822,9 @@ function progPlay() {
     const _origOsc  = ctx.createOscillator.bind(ctx);
     const _origBuf  = ctx.createBufferSource.bind(ctx);
     const _origGain = ctx.createGain.bind(ctx);
-    ctx.createOscillator  = () => { const n=_origOsc();  progNodes.push(n);     return n; };
-    ctx.createBufferSource= () => { const n=_origBuf();  progNodes.push(n);     return n; };
-    ctx.createGain        = () => { const n=_origGain(); progGainNodes.push(n); return n; };
+    ctx.createOscillator  = () => { const n=_origOsc();  if (progPlaying) progNodes.push(n);     return n; };
+    ctx.createBufferSource= () => { const n=_origBuf();  if (progPlaying) progNodes.push(n);     return n; };
+    ctx.createGain        = () => { const n=_origGain(); if (progPlaying) progGainNodes.push(n); return n; };
 
     try {
       progression.forEach((ch, i) => {
@@ -8832,7 +8823,7 @@ function renderCadenceSuggester(scaleNotes, scaleData) {
   if (n < 5) { container.innerHTML = '<span class="cad-na">Cadences require a heptatonic scale.</span>'; return; }
 
   const rootPc = parseInt(state.key);
-  const romans = computeAllRomans(ivs);
+  const romans = computeAllRomans(ivs, scaleData);
 
   // Get chord symbol for a degree (triad)
   function degChord(di) {
@@ -9010,7 +9001,7 @@ function renderPivotChords() {
       const t5 = (rootPc + ivs[(di+4)%n]) % 12;
       const iv = chordIntervals(ivs, di, 3);
       const {sym} = getChordSymbol(notes[di], iv);
-      const roman = computeAllRomans(ivs)[di];
+      const roman = computeAllRomans(ivs, scaleData)[di];
       return { root: r, third: t3, fifth: t5, key: [r,t3,t5].sort((a,b)=>a-b).join(','), sym, roman, noteName: notes[di] };
     });
   }
@@ -9352,7 +9343,7 @@ document.getElementById('metro-toggle')?.addEventListener('click', function() {
   this.innerHTML = metronomeEnabled
     ? '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/><rect x="4.3" y="1.8" width="1.4" height="4" rx=".7" fill="currentColor"/><rect x="4.3" y="1.8" width="1.4" height="2" rx=".7" fill="currentColor" transform="rotate(45 5 5)"/></svg> Metronome On'
     : '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/><rect x="4.3" y="1.8" width="1.4" height="4" rx=".7" fill="currentColor"/><rect x="4.3" y="1.8" width="1.4" height="2" rx=".7" fill="currentColor" transform="rotate(45 5 5)"/></svg> Metronome Off';
-  document.getElementById('metro-sound').style.display = metronomeEnabled ? '' : 'none';
+  const ms = document.getElementById('metro-sound'); if (ms) ms.style.display = metronomeEnabled ? '' : 'none';
 });
 
 document.getElementById('metro-sound')?.addEventListener('change', function() {
@@ -9366,6 +9357,7 @@ document.getElementById('metro-sound')?.addEventListener('change', function() {
 function syncNegToggle() {
   const isIonian = state.scale === 'Major (Ionian)';
   const toggle   = document.getElementById('neg-harmony-toggle');
+  if (!toggle) return;
   const row      = document.getElementById('neg-toggle-row');
 
   if (!isIonian) {
@@ -9811,7 +9803,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v35 &nbsp;·&nbsp; deployed 2026-05-19 20:00</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v36 &nbsp;·&nbsp; deployed 2026-05-23 21:00</span></div>
     </div>
 
     <div class="tech-section">
@@ -9916,7 +9908,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <span id="comp-modal-title">Compositions</span>
       <button id="comp-new-btn">+ New</button>
       <button id="comp-mob-edit-btn" title="Back to edit">✏</button>
-      <button id="comp-close-btn">×</button>
+      <button id="comp-close-btn" aria-label="Close">×</button>
     </div>
     <!-- Chip bar — composition selector (replaces sidebar) -->
     <div id="comp-chip-bar"></div>
@@ -9935,7 +9927,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div id="mob-stage-name">—</div>
           <div id="mob-stage-notes"></div>
           <div id="mob-stage-scales"></div>
-          <button id="comp-pause-btn"><svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg></button>
+          <button id="comp-pause-btn" aria-label="Pause"><svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg></button>
         </div>
         <div id="mob-scale-fret-col">
           <div id="mob-scale-switcher">
@@ -10641,7 +10633,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 <div id="lick-panel">
   <div class="res-header">
     <div class="res-header-title">Jazz <em>Resources</em></div>
-    <button class="lick-close-btn" id="lick-close">&#x2715;</button>
+    <button class="lick-close-btn" id="lick-close" aria-label="Close">&#x2715;</button>
   </div>
   <div class="res-toolbar" id="res-toolbar">
     <div class="res-search-row">
@@ -10845,7 +10837,7 @@ if (false) (function() {
     const mainMetroBtn = document.getElementById('metro-toggle');
     if (mainMetroBtn) {
       mainMetroBtn.classList.toggle('active', metronomeEnabled);
-      document.getElementById('metro-sound').style.display = metronomeEnabled ? '' : 'none';
+      const ms2 = document.getElementById('metro-sound'); if (ms2) ms2.style.display = metronomeEnabled ? '' : 'none';
     }
     if (progPlaying) { progStop(); progPlay(); }
   });
@@ -11679,7 +11671,7 @@ function compRenderChordRow(comp) {
     const card = document.createElement('div');
     card.className = 'comp-chord-card';
     const mode  = ch.playMode   || 'full';
-    const nv    = ch.noteVal    || 2;
+    const nv    = ch.noteVal    || 4;
     const beats = ch.beats      || 4;
     const ap    = ch.arpPattern || 'up';
     const noteList = (ch.pcs || []).map(p => pcToName(((p % 12) + 12) % 12)).join(' · ');
