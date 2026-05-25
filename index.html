@@ -2726,9 +2726,6 @@ const SCALES = {
     degreeMap:[0,1,2,3,4,5],
     desc:`Six equal whole steps with no half-step resolution — every triad built on it is augmented. The scale has no tonal gravity or leading tone, creating a dreamy, suspended ambiguity favoured by Debussy and jazz impressionists.`},
 
-  'Phrygian Bebop':              {intervals:[0,1,3,4,5,7,8,10],family:'Exotic Scales',  formula:'H W H H W H W W',
-    desc:`Phrygian Dominant with an added ♮3 passing tone (the bebop note). The clash between the ♭2 and natural 3rd creates chromatic tension ideal for bebop lines over altered dominant chords in a flamenco-jazz context.`},
-
   'Arabian':                     {intervals:[0,2,4,5,6,8,10],  family:'Exotic Scales',  formula:'W W H H W W W',
     desc:`A symmetrical scale combining a Lydian tetrachord (♯4) with a Phrygian upper tetrachord (♭6, ♭7). The ♯4 and ♭5 in close proximity give it an exotic, unstable, Middle-Eastern flavour unlike any European mode.`},
 
@@ -2752,12 +2749,20 @@ const SCALES = {
     desc:`Eight-note symmetric scale alternating whole and half steps. Every note fits over a diminished 7th chord. The inversion of the half-whole scale — same pitch-class set, different starting position. Ideal over fully-diminished chords and as a passing scale between keys.`},
 
   // Bebop
-  'Bebop Dominant':              {intervals:[0,2,4,5,7,9,10,11],family:'Exotic Scales',  formula:'W W H W W H H H',
+  'Phrygian Bebop':              {intervals:[0,1,3,4,5,7,8,10],family:'Bebop',           formula:'H W H H W H W W',
+    desc:`Phrygian Dominant with an added ♮3 passing tone (the bebop note). The clash between the ♭2 and natural 3rd creates chromatic tension ideal for bebop lines over altered dominant chords in a flamenco-jazz context.`},
+  'Bebop Dominant':              {intervals:[0,2,4,5,7,9,10,11],family:'Bebop',           formula:'W W H W W H H H',
     degreeMap:[0,1,2,3,4,5,6,7],
     desc:`Mixolydian with an added major 7th chromatic passing tone. The extra note places chord tones (1 3 5 ♭7) on every downbeat when descending eighth notes start on the beat — the bebop language in a nutshell. Identical to Mixolydian in pitch content; the chromatic 7th is the voice-leading glue.`},
+  'Bebop Major':                 {intervals:[0,2,4,5,7,8,9,11],family:'Bebop',           formula:'W W H W H H W H',
+    degreeMap:[0,1,2,3,4,5,5,6],
+    desc:`Ionian with an added ♯5/♭6 chromatic passing tone between 5 and 6. Keeps 1, 3, 5 and 7 on downbeats in descending eighth-note lines over major 7th chords. The added note creates a brief augmented colour that resolves smoothly to the 6th.`},
+  'Bebop Dorian':                {intervals:[0,2,3,4,5,7,9,10],family:'Bebop',           formula:'W H H H W W H W',
+    degreeMap:[0,1,2,2,3,4,5,6],
+    desc:`Dorian with an added major 3rd chromatic passing tone. The clash between ♭3 and ♮3 is the essence of the blues/jazz crossover — it lets chord tones land on strong beats over minor 7th chords while preserving the minor colour.`},
 };
 
-const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Exotic Scales','Pentatonic','Symmetric'];
+const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Exotic Scales','Bebop','Pentatonic','Symmetric'];
 
 const DEGREE_NAMES_7 = ['Tonic','Supertonic','Mediant','Subdominant','Dominant','Submediant','Leading Tone'];
 const DEGREE_NAMES_5 = ['Tonic','II','III','IV','V'];
@@ -9771,7 +9776,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v38 &nbsp;·&nbsp; deployed 2026-05-25 17:00</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v39 &nbsp;·&nbsp; deployed 2026-05-25 17:15</span></div>
     </div>
 
     <div class="tech-section">
@@ -9784,7 +9789,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
     <div class="tech-section">
       <div class="tech-section-title">Chord Theory Engine</div>
-      <div class="tech-row"><span class="tech-key">Scale data</span><span class="tech-val">35 scales encoded as interval arrays. Families: Major modes (7), Harmonic Minor (7), Melodic Minor (7), Exotic (9 inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop, Bebop Dominant), Pentatonic (3: Major, Minor, Blues), Symmetric (2: Half-Whole, Whole-Half dim). 5–8 note scales supported.</span></div>
+      <div class="tech-row"><span class="tech-key">Scale data</span><span class="tech-val">37 scales encoded as interval arrays. Families: Major modes (7), Harmonic Minor (7), Melodic Minor (7), Exotic (7 inc. Hirajoshi, Whole Tone, Arabian), Bebop (4: Phrygian Bebop, Bebop Dominant, Bebop Major, Bebop Dorian), Pentatonic (3: Major, Minor, Blues), Symmetric (2: Half-Whole, Whole-Half dim). 5–8 note scales supported.</span></div>
       <div class="tech-row"><span class="tech-key">Chord stacking</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">chordIntervals()</code> - iterative stacking of thirds by scale degree; handles wrap-around octave context</span></div>
       <div class="tech-row"><span class="tech-key">Chord naming</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> - recursive classifier; N=3 triads → N=7 full 13th chords. Lead-sheet standard: maj7/m7/7/ø7/dim7; cumulative extensions; alterations suffix.</span></div>
       <div class="tech-row"><span class="tech-key">Enharmonic spelling</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spellScale()</code> - sequential letter assignment for heptatonic; PREFER_FLAT_PC set for pentatonic</span></div>
@@ -11655,6 +11660,7 @@ function getImprovSuggestions(chord) {
     } else {
       add('Major (Ionian)', 'Tonic — bright, resolved, home base');
       add('Lydian', '♯4 gives a floating, ethereal quality — avoid natural 4 clashing with maj7');
+      add('Bebop Major', 'Chromatic passing tone between 5 and 6 — keeps chord tones on downbeats');
     }
   } else if (isMaj6) {
     add('Major (Ionian)', 'Major scale — melodic, natural fit for major 6th chords');
@@ -11666,6 +11672,7 @@ function getImprovSuggestions(chord) {
     add('Dorian', 'Natural 6th in a minor context — jazz standard approach');
   } else if (isMin7) {
     add('Dorian', 'Natural minor + raised 6th — the real default in jazz');
+    add('Bebop Dorian', 'Added ♮3 passing tone — chord tones land on downbeats over min7');
     add('Aeolian (Natural Minor)', 'Dark and melancholic — classical minor feel');
     add('Minor Pentatonic', 'Universal — blues, rock, jazz, works everywhere');
   } else if (isHalf) {
