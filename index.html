@@ -9771,7 +9771,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v37 &nbsp;·&nbsp; deployed 2026-05-23 09:45</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v38 &nbsp;·&nbsp; deployed 2026-05-25 17:00</span></div>
     </div>
 
     <div class="tech-section">
@@ -12034,7 +12034,8 @@ window.addEventListener('resize', () => {
     'Improvisation Concepts': '\u{1F4A1}',
     'Jazz Guitar Comping': '\u{1F91A}',
     'Learning Jazz Standards': '\u{1F3BC}',
-    'More Resources': '\u{1F4DA}'
+    'Bossa Nova': '\u{1F334}',
+    'Gypsy Jazz': '\u{1F525}'
   };
 
   const RESOURCES = [
@@ -12130,6 +12131,27 @@ window.addEventListener('resize', () => {
           site: 'Jazz Guitar BE',
           desc: 'Walking bass over a 12-bar jazz blues. Root notes on the lowest two strings, chromatic connectors, and how to add shell voicings on top.',
           tags: ['Blues', 'Fundamentals']
+        },
+        {
+          title: 'Walking Bass on Guitar — How to Get Started',
+          url: 'https://jenslarsen.nl/walking-bass-on-guitar-how-to-get-started/',
+          site: 'Jens Larsen',
+          desc: 'Building walking bass lines from scratch: chord tones on strong beats, chromatic and diatonic approach notes, and how to connect changes smoothly.',
+          tags: ['Getting Started', 'Approach Notes']
+        },
+        {
+          title: 'Jazz Guitar Walking Bass — Autumn Leaves',
+          url: 'https://www.jazzguitar.be/blog/walking-bass-guitar/',
+          site: 'Jazz Guitar BE',
+          desc: 'Walking bass applied to Autumn Leaves. How to outline the ii-V-I progression with quarter notes while adding chords on beats 2 and 4.',
+          tags: ['Autumn Leaves', 'ii-V-I', 'Intermediate']
+        },
+        {
+          title: 'Walking Bass and Comping — Joe Pass Style',
+          url: 'https://jenslarsen.nl/walking-bass-and-comping-joe-pass/',
+          site: 'Jens Larsen',
+          desc: 'The Joe Pass approach to simultaneous bass and chords. Thumb independence exercises, voice leading between shells, and building full arrangements.',
+          tags: ['Joe Pass', 'Solo Guitar', 'Advanced']
         }
       ]
     },
@@ -12236,29 +12258,84 @@ window.addEventListener('resize', () => {
       ]
     },
     {
-      category: 'More Resources',
-      desc: 'Full sites worth exploring. Bookmark these for ongoing study.',
+      category: 'Bossa Nova',
+      desc: 'The Brazilian side of jazz guitar. Syncopated rhythms, smooth chord voicings, and the art of playing bossa nova authentically.',
       items: [
         {
-          title: 'Jens Larsen — Jazz Guitar Lessons',
-          url: 'https://jenslarsen.nl/',
+          title: 'Bossa Nova Guitar — The Essential Guide',
+          url: 'https://www.jazzguitar.be/blog/bossa-nova-guitar/',
+          site: 'Jazz Guitar BE',
+          desc: 'Complete introduction to bossa nova guitar: the classic rhythmic pattern, essential chord voicings, and how to play standards like The Girl from Ipanema and Corcovado.',
+          tags: ['Rhythm', 'Beginner-Friendly', 'Voicings']
+        },
+        {
+          title: 'Bossa Nova Chord Progressions',
+          url: 'https://www.jazzguitar.be/blog/bossa-nova-chord-progressions/',
+          site: 'Jazz Guitar BE',
+          desc: 'Common bossa nova harmonic patterns and how they differ from standard jazz. Includes typical ii-V-I variations, chromatic bass movement, and Brazilian-flavored substitutions.',
+          tags: ['Chord Progressions', 'Harmony']
+        },
+        {
+          title: 'How to Play Bossa Nova — Rhythm & Comping',
+          url: 'https://jenslarsen.nl/how-to-play-bossa-nova/',
           site: 'Jens Larsen',
-          desc: 'One of the most prolific jazz guitar educators online. Deep dives into bebop vocabulary, voice leading, chord melody, and improvisation concepts. Also has an excellent YouTube channel.',
-          tags: ['Full Site', 'YouTube']
+          desc: 'Breaking down the bossa nova rhythm pattern for guitar. How to get the right feel with the thumb handling bass notes while fingers play syncopated chords on top.',
+          tags: ['Rhythm', 'Comping', 'Technique']
         },
         {
-          title: 'Jazz Guitar Online — Lessons & Licks',
-          url: 'https://www.jazzguitar.be/',
+          title: 'Blue Bossa — A Great Jazz Bossa Nova Standard',
+          url: 'https://www.jazzguitar.be/blog/blue-bossa/',
           site: 'Jazz Guitar BE',
-          desc: 'Comprehensive jazz guitar resource with lessons, licks, chord charts, and backing tracks. Well-organized by topic and difficulty level.',
-          tags: ['Full Site', 'Backing Tracks']
+          desc: 'Full lesson on Kenny Dorham\'s Blue Bossa: melody, chords, scale choices, and solo ideas. One of the best entry points into bossa nova jazz.',
+          tags: ['Blue Bossa', 'Standard', 'Soloing']
         },
         {
-          title: 'Free Jazz Guitar Lessons — Step by Step',
-          url: 'https://www.jazzguitar.be/blog/jazz-guitar-lessons/',
+          title: 'The Girl from Ipanema — Chords & Analysis',
+          url: 'https://www.jazzguitar.be/blog/the-girl-from-ipanema/',
           site: 'Jazz Guitar BE',
-          desc: 'Structured lesson index covering chords, scales, licks, comping, chord melody, and improvisation. A good starting point for navigating the site.',
-          tags: ['Lesson Index', 'Structured']
+          desc: 'Chord study and harmonic analysis of the most famous bossa nova tune. Key modulation, voicing choices, and how to comp through the form.',
+          tags: ['Ipanema', 'Analysis', 'Standard']
+        }
+      ]
+    },
+    {
+      category: 'Gypsy Jazz',
+      desc: 'The Django Reinhardt tradition. Fast arpeggios, la pompe rhythm, and the distinctive sound of jazz manouche.',
+      items: [
+        {
+          title: 'Gypsy Jazz Guitar — Getting Started',
+          url: 'https://www.jazzguitar.be/blog/gypsy-jazz-guitar/',
+          site: 'Jazz Guitar BE',
+          desc: 'Introduction to the gypsy jazz style: rest-stroke picking, arpeggios from the bottom up, la pompe rhythm, and the characteristic minor 6th sound.',
+          tags: ['Getting Started', 'Technique']
+        },
+        {
+          title: 'Django Reinhardt Licks for Jazz Guitar',
+          url: 'https://www.jazzguitar.be/blog/django-reinhardt-licks/',
+          site: 'Jazz Guitar BE',
+          desc: 'Classic Django-style licks with tab and analysis. Diminished runs, chromatic enclosures, and sweep-picked arpeggios that define the manouche vocabulary.',
+          tags: ['Django', 'Licks', 'Vocabulary']
+        },
+        {
+          title: 'Minor Swing — Chords, Melody & Solo',
+          url: 'https://www.jazzguitar.be/blog/minor-swing/',
+          site: 'Jazz Guitar BE',
+          desc: 'Complete lesson on the quintessential gypsy jazz tune. La pompe rhythm, the melody, chord voicings, and solo ideas over the Am6-Dm6 changes.',
+          tags: ['Minor Swing', 'Standard', 'Full Breakdown']
+        },
+        {
+          title: 'Gypsy Jazz Chords — Essential Voicings',
+          url: 'https://www.jazzguitar.be/blog/gypsy-jazz-chords/',
+          site: 'Jazz Guitar BE',
+          desc: 'The chord shapes that define gypsy jazz: 6th chords, diminished 7ths, and the specific voicings used for la pompe comping. Includes grip diagrams.',
+          tags: ['Chords', 'Voicings', 'La Pompe']
+        },
+        {
+          title: 'Gypsy Jazz Picking Technique',
+          url: 'https://www.jazzguitar.be/blog/gypsy-jazz-picking-technique/',
+          site: 'Jazz Guitar BE',
+          desc: 'Rest-stroke picking explained: wrist motion, pick angle, and how to get speed and volume without tension. The foundation of the manouche right-hand approach.',
+          tags: ['Technique', 'Rest Stroke', 'Picking']
         }
       ]
     }
