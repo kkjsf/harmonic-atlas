@@ -45,17 +45,17 @@ Four sub-tabs:
 
 ### Jazz Resources Hub (♫ button, header)
 
-A slide-in panel with 18 curated jazz guitar licks across four progression types:
+38 curated links across 9 categories, sourced from Jens Larsen, Jazz Guitar BE, Jazz Guitar Licks, and Matt Warnock Guitar:
 
-27 curated links across 8 categories, sourced from Jens Larsen, Jazz Guitar BE, Jazz Guitar Licks, and Matt Warnock Guitar:
-
-- **Jazz Licks & Vocabulary** (6) — bebop lines, enclosures, chromatic approaches
+- **Jazz Licks & Vocabulary** (4) — enclosures, chromatic approaches, arpeggios
+- **Bebop** (7) — bebop scales (dominant, major, minor/Dorian), classic licks, Charlie Parker vocabulary
 - **Chord Melody** (3) — arranging melody and harmony simultaneously
-- **Walking Bass** (2) — bass lines with chord voicings
-- **Improvisation Concepts** (4) — phrasing, target notes, bebop scale
-- **Jazz Guitar Comping** (2) — voicings and rhythmic patterns
-- **Learning Jazz Standards** (6) — memorization methods, repertoire guides, tune breakdowns
-- **More Resources** (4) — full educational sites
+- **Walking Bass** (5) — bass lines with chord voicings, Joe Pass style
+- **Improvisation Concepts** (3) — phrasing, target notes, jazz blues
+- **Jazz Guitar Comping** (3) — voicings and rhythmic patterns
+- **Learning Jazz Standards** (5) — memorization methods, repertoire guides, tune breakdowns
+- **Bossa Nova** (5) — rhythm patterns, chord progressions, Blue Bossa, Girl from Ipanema
+- **Gypsy Jazz** (5) — Django licks, Minor Swing, la pompe, rest-stroke picking
 
 Features:
 - **Search bar** — instant filtering with match highlighting across titles, descriptions, tags, and site names
