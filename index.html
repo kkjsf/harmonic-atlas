@@ -476,6 +476,44 @@
   .cn.root-note { background:rgba(201,168,76,.12); border-color:rgba(201,168,76,.4); color:var(--gold2); }
   .cn.ext-note { background:rgba(124,111,160,.12); border-color:rgba(124,111,160,.4); color:var(--accent2); }
   .chord-intervals { font-size:9px; color:var(--muted); letter-spacing:.1em; }
+
+  /* Harmonic function badges (T/S/D) */
+  .func-badge { display:inline-block; font-size:7.5px; font-family:'IBM Plex Mono',monospace; letter-spacing:.08em; padding:1px 5px; border-radius:2px; font-weight:600; margin-left:6px; vertical-align:middle; }
+  .func-badge.func-T { background:rgba(74,154,138,.15); color:#5ec4ab; border:1px solid rgba(74,154,138,.35); }
+  .func-badge.func-S { background:rgba(201,168,76,.12); color:var(--gold2); border:1px solid rgba(201,168,76,.35); }
+  .func-badge.func-D { background:rgba(196,90,90,.15); color:#e07070; border:1px solid rgba(196,90,90,.35); }
+  .func-badge-label { font-size:6.5px; letter-spacing:.06em; color:var(--muted); margin-left:3px; }
+
+  /* Avoid note tag */
+  .avoid-tag { display:flex; align-items:center; gap:3px; font-size:7.5px; font-family:'IBM Plex Mono',monospace; letter-spacing:.06em; color:#c07050; margin-top:5px; }
+  .avoid-tag .avoid-note { background:rgba(192,112,80,.12); border:1px solid rgba(192,112,80,.3); padding:0 4px; border-radius:2px; font-weight:500; }
+
+  /* Tritone sub guide-tone detail */
+  .trit-detail { font-size:7.5px; font-family:'IBM Plex Mono',monospace; color:var(--gold2); letter-spacing:.04em; margin-top:3px; opacity:.8; line-height:1.5; }
+  .trit-guide { color:var(--accent2); }
+
+  /* Chord-tone targeting overlay */
+  .ct-overlay-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; padding:8px 10px; background:rgba(201,168,76,.04); border:1px solid rgba(201,168,76,.15); border-radius:2px; }
+  .ct-degree-sel { background:var(--surface2); border:1px solid var(--border2); color:var(--text); border-radius:2px; padding:4px 24px 4px 8px; font-family:'IBM Plex Mono',monospace; font-size:10px; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0.5 0.5l3.5 3.5 3.5-3.5' stroke='%23c9a84c' stroke-width='1' fill='none'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 7px center; }
+  .ct-legend-item { display:inline-flex; align-items:center; gap:4px; font-size:8px; font-family:'IBM Plex Mono',monospace; color:var(--muted); }
+  .ct-legend-dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+
+  /* Ear training */
+  .ear-train-controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+  .ear-train-play { padding:6px 14px; background:rgba(201,168,76,.12); border:1px solid rgba(201,168,76,.4); color:var(--gold2); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.08em; border-radius:2px; cursor:pointer; transition:all .15s; }
+  .ear-train-play:hover { background:rgba(201,168,76,.22); }
+  .ear-train-play:disabled { opacity:.4; cursor:not-allowed; }
+  .ear-train-grid { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px; }
+  .ear-train-btn { padding:5px 10px; background:var(--surface2); border:1px solid var(--border2); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:10px; border-radius:2px; cursor:pointer; transition:all .12s; min-width:36px; text-align:center; }
+  .ear-train-btn:hover { border-color:var(--accent); color:var(--cream); }
+  .ear-train-btn.correct { background:rgba(80,200,122,.15); border-color:#50c87a; color:#50c87a; pointer-events:none; }
+  .ear-train-btn.wrong { background:rgba(196,90,90,.15); border-color:#c45a5a; color:#c45a5a; pointer-events:none; }
+  .ear-train-btn.reveal { border-color:#50c87a; color:#50c87a; pointer-events:none; }
+  .ear-train-score { font-size:9px; color:var(--muted); font-family:'IBM Plex Mono',monospace; letter-spacing:.08em; }
+  .ear-train-feedback { font-size:10px; font-family:'IBM Plex Mono',monospace; margin-top:6px; min-height:18px; }
+  .ear-train-dir { display:flex; gap:4px; }
+  .ear-train-dir-btn { padding:3px 8px; background:var(--surface2); border:1px solid var(--border2); color:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:9px; border-radius:2px; cursor:pointer; transition:all .12s; }
+  .ear-train-dir-btn.active { border-color:var(--gold); color:var(--gold2); background:rgba(201,168,76,.1); }
   .chord-impro { display:flex; flex-wrap:wrap; align-items:center; gap:3px; margin-top:7px; padding-top:6px; border-top:1px solid var(--border2); }
   .impro-label { font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); opacity:.7; margin-right:2px; font-family:'IBM Plex Mono',monospace; }
   .impro-pill { font-size:8px; padding:1px 6px; border-radius:2px; border:1px solid rgba(124,111,160,.35); background:rgba(124,111,160,.08); color:var(--accent2); font-family:'IBM Plex Mono',monospace; cursor:pointer; transition:all .12s; white-space:nowrap; }
@@ -2425,6 +2463,22 @@
     </div>
   </div>
 
+  <!-- ═══ INTERVAL EAR TRAINING ═══ -->
+  <div class="cad-panel" id="ear-panel">
+    <div class="cad-panel-title collapsible-hdr" id="ear-hdr" data-target="ear-body" tabindex="0" role="button" aria-expanded="false">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3 4v4M9 3v6M1 5v2M11 5v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Interval Ear Training
+      <span class="has-tip" style="display:inline-flex;align-items:center;margin-left:4px" onclick="event.stopPropagation()">
+        <span class="tip-badge" tabindex="0">?</span>
+        <div class="tip-popup"><span class="tip-title">Ear Training</span>Train your ear to recognize intervals. Click Play to hear two notes from the current scale, then guess the interval between them. Ascending plays low→high, descending plays high→low, harmonic plays both together.</div>
+      </span>
+      <span class="collapse-chevron"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </div>
+    <div class="collapsible-body" id="ear-body">
+      <div id="ear-content" style="padding-top:10px"></div>
+    </div>
+  </div>
+
   <!-- hint: hover chord cards and click + to add to the active composition -->
   <div style="padding:8px 0 4px">
     <span id="sampler-loading" style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;display:none">⟳ loading samples…</span>
@@ -3202,10 +3256,17 @@ function computeCofHighlights(rootPc, scaleIntervals){
 
 let _cofCacheKey = '';
 function drawCoF(rootPc, scaleIntervals){
-  const cacheKey = rootPc + ':' + scaleIntervals.join(',') + ':' + negHarmonyActive;
+  const cofShowFunc = isMajorMode(state.scale);
+  const cacheKey = rootPc + ':' + scaleIntervals.join(',') + ':' + negHarmonyActive + ':' + cofShowFunc;
   const svg=document.getElementById('cof-svg');
   if (cacheKey === _cofCacheKey && svg.childElementCount > 0) return;
   _cofCacheKey = cacheKey;
+  const COF_FUNC_FILLS = { T:'rgba(74,154,138,0.35)', S:'rgba(201,168,76,0.30)', D:'rgba(196,90,90,0.35)' };
+  const COF_FUNC_LABEL = { T:'#7eddcc', S:'#f0d878', D:'#ef8888' };
+  const COF_FUNC_MIN   = { T:'rgba(74,154,138,0.28)', S:'rgba(201,168,76,0.24)', D:'rgba(196,90,90,0.28)' };
+  const COF_FUNC_MIN_L = { T:'#6cc4b4', S:'#c8b870', D:'#d88888' };
+  const COF_FUNC_DIM_F = { T:'rgba(74,154,138,0.22)', S:'rgba(201,168,76,0.18)', D:'rgba(196,90,90,0.22)' };
+  const COF_FUNC_DIM_L = { T:'#5aaa9a', S:'#b0a060', D:'#c07878' };
   svg.innerHTML='';
   const ns='http://www.w3.org/2000/svg';
   const mk=t=>document.createElementNS(ns,t);
@@ -3244,12 +3305,17 @@ function drawCoF(rootPc, scaleIntervals){
     const minDeg = scaleIntervals.findIndex((_,di)=>(rootPc+scaleIntervals[di])%12===minPc);
     const dimDeg = scaleIntervals.findIndex((_,di)=>(rootPc+scaleIntervals[di])%12===dimPc);
 
+    const majFn = (cofShowFunc && hlMaj && majDeg >= 0) ? getHarmonicFunction(scaleIntervals, majDeg) : null;
+    const minFn = (cofShowFunc && hlMin && minDeg >= 0) ? getHarmonicFunction(scaleIntervals, minDeg) : null;
+    const dimFn = (cofShowFunc && hlDim && dimDeg >= 0) ? getHarmonicFunction(scaleIntervals, dimDeg) : null;
+
     // ── Outer ring (major) ──
     const sO=mk('path');
     sO.setAttribute('d',arcPath(R_OUT,R_MID+1,aS,aE));
     const outerFill = negColor === 'both'   ? 'rgba(240,210,60,0.55)'
                     : negColor === 'origin' ? 'rgba(60,140,240,0.55)'
                     : negColor === 'dest'   ? 'rgba(220,70,70,0.55)'
+                    : majFn                 ? COF_FUNC_FILLS[majFn]
                     : hlMaj                 ? 'rgba(201,168,76,0.3)'
                                             : '#0e1318';
     sO.setAttribute('fill', outerFill);
@@ -3265,7 +3331,7 @@ function drawCoF(rootPc, scaleIntervals){
     // ── Mid ring (minor) ──
     const sM=mk('path');
     sM.setAttribute('d',arcPath(R_MID,R_INN+1,aS,aE));
-    sM.setAttribute('fill', hlMin ? 'rgba(124,111,160,0.35)' : '#0b0f14');
+    sM.setAttribute('fill', minFn ? COF_FUNC_MIN[minFn] : hlMin ? 'rgba(124,111,160,0.35)' : '#0b0f14');
     sM.setAttribute('stroke','#1e2530'); sM.setAttribute('stroke-width','1.5');
     if(hlMin){
       sM.setAttribute('class','cof-slice');
@@ -3278,7 +3344,7 @@ function drawCoF(rootPc, scaleIntervals){
     // ── Inner ring (dim) ──
     const sI=mk('path');
     sI.setAttribute('d',arcPath(R_INN,2,aS,aE));
-    sI.setAttribute('fill', hlDim ? 'rgba(212,129,58,0.30)' : '#080c0f');
+    sI.setAttribute('fill', dimFn ? COF_FUNC_DIM_F[dimFn] : hlDim ? 'rgba(212,129,58,0.30)' : '#080c0f');
     sI.setAttribute('stroke','#1e2530'); sI.setAttribute('stroke-width','1.5');
     if(hlDim){
       sI.setAttribute('class','cof-slice');
@@ -3298,6 +3364,7 @@ function drawCoF(rootPc, scaleIntervals){
     lt.setAttribute('font-size', outerActive ? (COF_MAJ[i].includes('/')?'11':'17') : (COF_MAJ[i].includes('/')?'10':'14'));
     lt.setAttribute('font-weight', outerActive ? '700' : '400');
     const labelFill = negColor               ? '#ffffff'
+                    : majFn                 ? COF_FUNC_LABEL[majFn]
                     : hlMaj                 ? '#f0d878'
                                             : '#3a4250';
     lt.setAttribute('fill', labelFill);
@@ -3314,7 +3381,7 @@ function drawCoF(rootPc, scaleIntervals){
     mt.setAttribute('font-family','IBM Plex Mono,monospace');
     mt.setAttribute('font-size', hlMin ? '11' : '9');
     mt.setAttribute('font-weight', hlMin ? '600' : '400');
-    mt.setAttribute('fill', hlMin ? '#b89de0' : '#2a3040');
+    mt.setAttribute('fill', minFn ? COF_FUNC_MIN_L[minFn] : hlMin ? '#b89de0' : '#2a3040');
     mt.setAttribute('pointer-events','none');
     mt.textContent=COF_MIN[i];
     svg.appendChild(mt);
@@ -3327,7 +3394,7 @@ function drawCoF(rootPc, scaleIntervals){
     dt.setAttribute('font-family','IBM Plex Mono,monospace');
     dt.setAttribute('font-size', hlDim ? '9' : '7.5');
     dt.setAttribute('font-weight', hlDim ? '600' : '400');
-    dt.setAttribute('fill', hlDim ? '#e0924a' : '#212830');
+    dt.setAttribute('fill', dimFn ? COF_FUNC_DIM_L[dimFn] : hlDim ? '#e0924a' : '#212830');
     dt.setAttribute('pointer-events','none');
     dt.textContent=COF_DIM[i];
     svg.appendChild(dt);
@@ -3840,6 +3907,68 @@ function buildSecondarySubdominants(rootPc, scaleIntervals, romans){
 }
 
 
+// ══════════════════════════════════════════════
+// HARMONIC FUNCTION (T / S / D)
+// ══════════════════════════════════════════════
+const MAJOR_MODE_NAMES = ['Major (Ionian)','Dorian','Phrygian','Lydian','Mixolydian','Aeolian (Natural Minor)','Locrian'];
+
+function isMajorMode(scaleName) { return MAJOR_MODE_NAMES.includes(scaleName); }
+
+function getHarmonicFunction(scaleIntervals, degIdx) {
+  const n = scaleIntervals.length;
+  if (n !== 7) return null;
+  const pcs = d => [0,2,4].map(i => scaleIntervals[(d + i) % n] % 12);
+  const tonicSet = new Set(pcs(0));
+  const ivSet    = new Set(pcs(3));
+  const vSet     = new Set(pcs(4));
+  const deg = pcs(degIdx);
+  if (degIdx === 0) return 'T';
+  const shT = deg.filter(p => tonicSet.has(p)).length;
+  if (shT >= 2) return 'T';
+  const shD = deg.filter(p => vSet.has(p)).length;
+  if (shD >= 2) return 'D';
+  return 'S';
+}
+
+const FUNC_LABELS = { T:'Tonic', S:'Predominant', D:'Dominant' };
+
+// ══════════════════════════════════════════════
+// AVOID NOTES
+// ══════════════════════════════════════════════
+function getAvoidNotes(scaleIntervals, degIdx, numChordTones) {
+  const n = scaleIntervals.length;
+  if (n !== 7) return [];
+  const rootIv = scaleIntervals[degIdx];
+  const chordIvs = new Set();
+  for (let i = 0; i < numChordTones; i++) {
+    const idx = (degIdx + i * 2) % n;
+    chordIvs.add(((scaleIntervals[idx] - rootIv) + 12) % 12);
+  }
+  const avoids = [];
+  for (let i = 0; i < n; i++) {
+    const sem = ((scaleIntervals[i] - rootIv) + 12) % 12;
+    if (chordIvs.has(sem)) continue;
+    for (const ct of chordIvs) {
+      if (((sem - ct) + 12) % 12 === 1) {
+        avoids.push({ sem, aboveCt: ct, degreeIdx: i });
+        break;
+      }
+    }
+  }
+  return avoids;
+}
+
+// ══════════════════════════════════════════════
+// TRITONE SUB GUIDE TONES
+// ══════════════════════════════════════════════
+function tritonSubGuide(domRootPc, rootName) {
+  const tritPc = (domRootPc + 6) % 12;
+  const tritName = chromaticPcName(tritPc, PREFER_FLAT_PC.has(tritPc));
+  const third  = chromaticPcName((domRootPc + 4) % 12, PREFER_FLAT_PC.has((domRootPc + 4) % 12));
+  const seven  = chromaticPcName((domRootPc + 10) % 12, PREFER_FLAT_PC.has((domRootPc + 10) % 12));
+  return { tritName, tritPc, guide: `3rd ${third} = ♭7 of ${tritName}7 · ♭7 ${seven} = 3rd of ${tritName}7` };
+}
+
 // ─────────────────────────────────────────────
 // addCardStaff — injects staff toggle btn + panel into a chord card
 // ─────────────────────────────────────────────
@@ -4147,6 +4276,7 @@ function renderChords(scaleNotes, scaleData){
   const reqN=isOthers?3:parseInt(mode);
   const n=Math.min(reqN,scaleLen);
   const showNeg = negHarmonyActive && !isOthers;
+  const showFunc = isMajorMode(state.scale) && !isOthers;
 
   scaleNotes.forEach((_,di)=>{
     const sec=document.createElement('div');
@@ -4155,7 +4285,9 @@ function renderChords(scaleNotes, scaleData){
 
     const hdr=document.createElement('div');
     hdr.className='degree-header';
-    hdr.innerHTML=`<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`;
+    const fn = showFunc ? getHarmonicFunction(scaleData.intervals, di) : null;
+    const fnHtml = fn ? `<span class="func-badge func-${fn}">${fn}</span><span class="func-badge-label">${FUNC_LABELS[fn]}</span>` : '';
+    hdr.innerHTML=`<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>${fnHtml}`;
     sec.appendChild(hdr);
 
     if(showNeg){
@@ -4284,12 +4416,36 @@ function renderChords(scaleNotes, scaleData){
           <div class="chord-quality">${quality}</div>
           <div class="chord-notes-row">${makeNotePills(chordNotes)}</div>
           <div class="chord-intervals">Intervals: 1 · ${iv.slice(1).map(s => iNameCtx(s, iv)).join(' · ')}</div>`;
+
+        // Avoid notes (major modes only)
+        if (showFunc) {
+          const avoids = getAvoidNotes(scaleData.intervals, di, n);
+          if (avoids.length) {
+            const avDiv = document.createElement('div');
+            avDiv.className = 'avoid-tag';
+            avDiv.innerHTML = 'Avoid: ' + avoids.map(a => {
+              const pc = (rootPc + scaleData.intervals[a.degreeIdx]) % 12;
+              const name = scaleNotes[a.degreeIdx];
+              return `<span class="avoid-note" title="${INTERVAL_LABEL[a.sem]} — semitone above ${INTERVAL_LABEL[a.aboveCt]}">${name} (${INTERVAL_LABEL[a.sem]})</span>`;
+            }).join(' ');
+            card.appendChild(avDiv);
+          }
+        }
+
         addCardStaff(card, chordNotes);
         addCardPlayBtn(card, chordNotes);
         addCardAddBtn(card, chordNotes[0], sym, romans[di], chordNotes, quality);
         const rPc = noteNameToPc(chordNotes[0]);
         if (quality.includes('Dom') && !quality.includes('sus')) {
           if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
+          // Tritone sub guide tones
+          if (rPc >= 0 && showFunc) {
+            const tsg = tritonSubGuide(rPc, chordNotes[0]);
+            const tDiv = document.createElement('div');
+            tDiv.className = 'trit-detail';
+            tDiv.innerHTML = `Tritone sub: <strong>${tsg.tritName}7</strong> — <span class="trit-guide">${tsg.guide}</span>`;
+            card.appendChild(tDiv);
+          }
         }
         if (n >= 4 && rPc >= 0) {
           const improDiv = makeImproDiv(quality, rPc);
@@ -4386,6 +4542,7 @@ function render(){
     renderCadenceSuggester(scaleNotes,scaleData);
     renderSubstitutions(scaleNotes,scaleData);
     renderPivotChords();
+    renderEarTraining();
     renderStrumSelector();
     renderSwingSelector();
     container.classList.remove('view-enter');
@@ -5904,7 +6061,7 @@ const SC_NOTE_COL = '#6a5f90';
 // showNotes: true = note names (C, D#…), false = interval labels (R, ♭3…)
 // openPCs / strNamesTop: override for non-guitar instruments (e.g. mandolin)
 function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endFret, w,
-                                showNotes=false, openPCs=null, strNamesTop=null, strGap=16, dotR=7) {
+                                showNotes=false, openPCs=null, strNamesTop=null, strGap=16, dotR=7, chordOverlay=null) {
   openPCs     = openPCs     || SC_OPEN_PC;
   strNamesTop = strNamesTop || ['e','B','G','D','A','E'];
   const numStr   = openPCs.length;
@@ -5957,6 +6114,25 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
     svg += `<text x="${padL}" y="${(strBottom + 13).toFixed(1)}" text-anchor="start" font-size="9" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.38)">${startFret}fr</text>`;
   }
 
+  // Chord overlay colors
+  const CO_CHORD = '#e8c96a', CO_TENS = '#a08bc8', CO_DIM = 'rgba(106,95,144,0.35)';
+
+  function dotColor(sem) {
+    if (chordOverlay) {
+      if (sem === 0) return SC_ROOT_COL;
+      if (chordOverlay.chordSems.has(sem)) return CO_CHORD;
+      if (chordOverlay.tensionSems.has(sem)) return CO_TENS;
+      return CO_DIM;
+    }
+    if (sem === 0) return SC_ROOT_COL;
+    if (charSet.has(sem)) return SC_CHAR_COL;
+    return SC_NOTE_COL;
+  }
+  function dotOp(sem) {
+    if (chordOverlay && sem !== 0 && !chordOverlay.chordSems.has(sem) && !chordOverlay.tensionSems.has(sem)) return '0.35';
+    return '0.85';
+  }
+
   // Scale note dots — str 0 = lowest string (svgRow = numStr-1 = bottom)
   for (let s = 0; s < numStr; s++) {
     const svgRow = (numStr - 1) - s;
@@ -5967,13 +6143,12 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
       const openPc = openPCs[s];
       const sem = (openPc - rootPcN + 12) % 12;
       if (intNorm.includes(sem)) {
-        const isRoot = sem === 0;
-        const isChar = !isRoot && charSet.has(sem);
-        const col    = isRoot ? SC_ROOT_COL : isChar ? SC_CHAR_COL : SC_NOTE_COL;
+        const col    = dotColor(sem);
+        const op     = dotOp(sem);
         const lbl    = showNotes ? pcToName((openPc + 12) % 12) : (INTERVAL_LABEL[sem] || '?');
         const cx     = padL - DOT_R - 2;
-        svg += `<circle cx="${cx}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="0.85"/>`;
-        svg += `<text x="${cx}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? Math.round(DOT_R*0.85) : Math.round(DOT_R*1.1)}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${lbl}</text>`;
+        svg += `<circle cx="${cx}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="${op}"/>`;
+        svg += `<text x="${cx}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? Math.round(DOT_R*0.85) : Math.round(DOT_R*1.1)}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff" opacity="${op}">${lbl}</text>`;
       }
     }
 
@@ -5982,14 +6157,13 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
       const pc  = (openPCs[s] + f) % 12;
       const sem = (pc - rootPcN + 12) % 12;
       if (!intNorm.includes(sem)) continue;
-      const isRoot = sem === 0;
-      const isChar = !isRoot && charSet.has(sem);
-      const col    = isRoot ? SC_ROOT_COL : isChar ? SC_CHAR_COL : SC_NOTE_COL;
+      const col    = dotColor(sem);
+      const op     = dotOp(sem);
       const lbl    = showNotes ? pcToName(pc) : (INTERVAL_LABEL[sem] || '?');
       const slot   = f - startFret;
       const cx     = padL + (slot - 0.5) * fretW;
-      svg += `<circle cx="${cx.toFixed(1)}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="0.85"/>`;
-      svg += `<text x="${cx.toFixed(1)}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? Math.round(DOT_R*0.85) : Math.round(DOT_R*1.1)}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff">${lbl}</text>`;
+      svg += `<circle cx="${cx.toFixed(1)}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="${op}"/>`;
+      svg += `<text x="${cx.toFixed(1)}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? Math.round(DOT_R*0.85) : Math.round(DOT_R*1.1)}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff" opacity="${op}">${lbl}</text>`;
     }
   }
 
@@ -6176,6 +6350,78 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
   hdr.appendChild(toggle);
   container.appendChild(hdr);
 
+  // ── Chord-tone targeting overlay (major modes, heptatonic) ──
+  const canOverlay = isMajorMode(state.scale) && intervals.length === 7;
+  let activeOverlay = null;
+  let posGrid = null;
+
+  function buildOverlay(degIdx) {
+    if (degIdx < 0) return null;
+    const n = intervals.length;
+    const chordSems = new Set();
+    const tensionSems = new Set();
+    for (let i = 0; i < 4; i++) {
+      const idx = (degIdx + i * 2) % n;
+      const sem = ((intervals[idx] - intervals[degIdx]) + 12) % 12;
+      chordSems.add(sem);
+    }
+    for (let i = 0; i < n; i++) {
+      const sem = ((intervals[i] - intervals[degIdx]) + 12) % 12;
+      if (!chordSems.has(sem)) {
+        const compound = sem < 7 ? sem + 12 : sem;
+        if (compound >= 13) tensionSems.add(sem);
+      }
+    }
+    return { chordSems, tensionSems };
+  }
+
+  function reRenderBoards() {
+    fullBoard.innerHTML = makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 820, showNotes, openPCs, strNamesTop, 16, 7, activeOverlay);
+    if (posGrid) {
+      const positions = computeScalePositions(intervals, rootPcN);
+      posGrid.querySelectorAll('.scale-pos-card').forEach((card, pi) => {
+        if (positions[pi]) {
+          const pos = positions[pi];
+          const svgSmall = makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 260, showNotes, openPCs, strNamesTop, 16, 7, activeOverlay);
+          card.innerHTML = `<div class="scale-pos-label">${pos.label}</div>${svgSmall}`;
+        }
+      });
+    }
+  }
+
+  if (canOverlay) {
+    const romans = computeAllRomans(scaleData.intervals, scaleData);
+    const bar = document.createElement('div');
+    bar.className = 'ct-overlay-bar';
+    bar.innerHTML = `<span style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap">Chord-tone overlay</span>`;
+    const sel = document.createElement('select');
+    sel.className = 'ct-degree-sel';
+    sel.innerHTML = '<option value="-1">None</option>' + scaleNotes.map((note, di) => {
+      const chN = buildChord(scaleNotes, di, 4);
+      const iv2 = chordIntervals(intervals, di, 4);
+      const {sym} = getChordSymbol(chN[0], iv2);
+      return `<option value="${di}">${romans[di]} — ${note}${sym}</option>`;
+    }).join('');
+    sel.addEventListener('change', () => {
+      const di = parseInt(sel.value);
+      activeOverlay = di >= 0 ? buildOverlay(di) : null;
+      legendDiv.style.display = activeOverlay ? 'flex' : 'none';
+      defaultLegend.style.display = activeOverlay ? 'none' : '';
+      reRenderBoards();
+    });
+    bar.appendChild(sel);
+    const legendDiv = document.createElement('div');
+    legendDiv.style.cssText = 'display:none;gap:10px;align-items:center;flex-wrap:wrap;margin-left:auto';
+    legendDiv.innerHTML = `
+      <span class="ct-legend-item"><span class="ct-legend-dot" style="background:${SC_ROOT_COL}"></span>Root</span>
+      <span class="ct-legend-item"><span class="ct-legend-dot" style="background:#e8c96a"></span>Chord tone</span>
+      <span class="ct-legend-item"><span class="ct-legend-dot" style="background:#a08bc8"></span>Tension</span>
+      <span class="ct-legend-item"><span class="ct-legend-dot" style="background:rgba(106,95,144,0.35)"></span>Scale tone</span>`;
+    bar.appendChild(legendDiv);
+    container.appendChild(bar);
+    const defaultLegend = titleBlock.querySelector('.scale-legend');
+  }
+
   // ── Full fretboard ────────────────────────────────────
   const fullSec = document.createElement('div');
   fullSec.style.cssText = 'margin-bottom:26px';
@@ -6187,9 +6433,9 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
   const fullBoard = document.createElement('div');
   fullBoard.className = 'scale-full-board';
   fullBoard.title = 'Click to zoom';
-  fullBoard.innerHTML = makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 820, showNotes, openPCs, strNamesTop);
+  fullBoard.innerHTML = makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 820, showNotes, openPCs, strNamesTop, 16, 7, activeOverlay);
   fullBoard.addEventListener('click', () =>
-    showSvgModal(makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 900, showNotes, openPCs, strNamesTop),
+    showSvgModal(makeScaleFretboardSVG(intervals, rootPcN, charSems, 0, maxFret, 900, showNotes, openPCs, strNamesTop, 16, 7, activeOverlay),
       `${scaleName} — Full Fretboard`, true)
   );
   fullSec.appendChild(fullBoard);
@@ -6204,16 +6450,16 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
   container.appendChild(posLabel);
 
   const positions = computeScalePositions(intervals, rootPcN);
-  const posGrid = document.createElement('div');
+  posGrid = document.createElement('div');
   posGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;';
 
   positions.forEach(pos => {
     const card = document.createElement('div');
     card.className = 'scale-pos-card';
-    const svgSmall = makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 260, showNotes, openPCs, strNamesTop);
+    const svgSmall = makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 260, showNotes, openPCs, strNamesTop, 16, 7, activeOverlay);
     card.innerHTML = `<div class="scale-pos-label">${pos.label}</div>${svgSmall}`;
     card.addEventListener('click', () =>
-      showSvgModal(makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 560, showNotes, openPCs, strNamesTop),
+      showSvgModal(makeScaleFretboardSVG(intervals, rootPcN, charSems, pos.startFret, pos.endFret, 560, showNotes, openPCs, strNamesTop, 16, 7, activeOverlay),
         `${scaleName} — ${pos.label}`, true)
     );
     posGrid.appendChild(card);
@@ -9013,6 +9259,174 @@ function renderPivotChords() {
 }
 
 // ══════════════════════════════════════════════
+// INTERVAL EAR TRAINING
+// ══════════════════════════════════════════════
+let _earState = { score: 0, total: 0, current: null, dir: 'ascending' };
+
+function renderEarTraining() {
+  const container = document.getElementById('ear-content');
+  if (!container) return;
+  const scaleData = SCALES[state.scale];
+  if (!scaleData || scaleData.intervals.length < 5) {
+    container.innerHTML = '<span style="font-size:10px;color:var(--muted)">Ear training requires a scale with 5+ notes.</span>';
+    return;
+  }
+
+  const rootPc = parseInt(state.key);
+  const intervals = scaleData.intervals;
+  const scaleNotes = spellScale(rootPc, intervals, scaleData);
+  const n = intervals.length;
+
+  const INTERVAL_NAMES = ['Unison','m2','M2','m3','M3','P4','Tritone','P5','m6','M6','m7','M7','Octave'];
+
+  function playNote(pc, octave, time, dur) {
+    const freq = 440 * Math.pow(2, (48 + octave * 12 + pc - 69) / 12);
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    makePianoNote(ctx, freq, time, dur, 0.18);
+  }
+
+  function playInterval() {
+    const d1 = Math.floor(Math.random() * n);
+    let d2 = d1;
+    while (d2 === d1) d2 = Math.floor(Math.random() * n);
+
+    const pc1 = (rootPc + intervals[d1]) % 12;
+    const pc2 = (rootPc + intervals[d2]) % 12;
+
+    let midi1 = 60 + pc1;
+    let midi2 = 60 + pc2;
+    if (_earState.dir === 'ascending') {
+      if (midi2 <= midi1) midi2 += 12;
+    } else if (_earState.dir === 'descending') {
+      if (midi2 >= midi1) midi2 -= 12;
+    }
+    const semitones = Math.abs(midi2 - midi1) % 12;
+
+    _earState.current = { semitones, note1: scaleNotes[d1], note2: scaleNotes[d2], midi1, midi2 };
+
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    Tone.start();
+    const t = ctx.currentTime + 0.05;
+    const oct1 = Math.floor((midi1 - 48) / 12);
+    const oct2 = Math.floor((midi2 - 48) / 12);
+
+    if (_earState.dir === 'harmonic') {
+      playNote((midi1 % 12), oct1, t, 1.5);
+      playNote((midi2 % 12), oct2, t, 1.5);
+    } else {
+      playNote((midi1 % 12), oct1, t, 0.8);
+      playNote((midi2 % 12), oct2, t + 0.7, 0.8);
+    }
+
+    updateButtons(false);
+    feedbackEl.textContent = '';
+    feedbackEl.style.color = '';
+  }
+
+  function guess(sem) {
+    if (!_earState.current) return;
+    const correct = sem === _earState.current.semitones;
+    _earState.total++;
+    if (correct) _earState.score++;
+    scoreEl.textContent = `${_earState.score} / ${_earState.total}`;
+    feedbackEl.textContent = correct
+      ? `Correct! ${_earState.current.note1} → ${_earState.current.note2} = ${INTERVAL_NAMES[_earState.current.semitones]}`
+      : `${INTERVAL_NAMES[sem]} — it was ${INTERVAL_NAMES[_earState.current.semitones]} (${_earState.current.note1} → ${_earState.current.note2})`;
+    feedbackEl.style.color = correct ? '#50c87a' : '#c45a5a';
+    updateButtons(true, _earState.current.semitones, sem);
+    _earState.current = null;
+  }
+
+  function updateButtons(revealed, correctSem, guessedSem) {
+    btnEls.forEach(btn => {
+      const s = parseInt(btn.dataset.sem);
+      btn.className = 'ear-train-btn';
+      if (revealed) {
+        if (s === correctSem && s === guessedSem) btn.classList.add('correct');
+        else if (s === correctSem) btn.classList.add('reveal');
+        else if (s === guessedSem) btn.classList.add('wrong');
+      }
+    });
+  }
+
+  // Build unique intervals present in the scale
+  const possibleSems = new Set();
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const sem = ((intervals[j] - intervals[i]) + 12) % 12;
+      if (sem > 0) possibleSems.add(sem);
+    }
+  }
+  const sortedSems = [...possibleSems].sort((a, b) => a - b);
+
+  container.innerHTML = '';
+
+  // Controls row
+  const controls = document.createElement('div');
+  controls.className = 'ear-train-controls';
+  const playBtn = document.createElement('button');
+  playBtn.className = 'ear-train-play';
+  playBtn.textContent = '▶ Play Interval';
+  playBtn.addEventListener('click', playInterval);
+  controls.appendChild(playBtn);
+
+  // Direction selector
+  const dirDiv = document.createElement('div');
+  dirDiv.className = 'ear-train-dir';
+  ['ascending', 'descending', 'harmonic'].forEach(d => {
+    const b = document.createElement('button');
+    b.className = 'ear-train-dir-btn' + (_earState.dir === d ? ' active' : '');
+    b.textContent = d.charAt(0).toUpperCase() + d.slice(1);
+    b.addEventListener('click', () => {
+      _earState.dir = d;
+      dirDiv.querySelectorAll('.ear-train-dir-btn').forEach(x => x.classList.toggle('active', x.textContent.toLowerCase() === d));
+    });
+    dirDiv.appendChild(b);
+  });
+  controls.appendChild(dirDiv);
+
+  const scoreEl = document.createElement('span');
+  scoreEl.className = 'ear-train-score';
+  scoreEl.textContent = `${_earState.score} / ${_earState.total}`;
+  controls.appendChild(scoreEl);
+
+  const resetBtn = document.createElement('button');
+  resetBtn.style.cssText = 'font-size:8px;padding:3px 8px;background:none;border:1px solid var(--border2);color:var(--muted);border-radius:2px;cursor:pointer;font-family:IBM Plex Mono,monospace';
+  resetBtn.textContent = 'Reset';
+  resetBtn.addEventListener('click', () => {
+    _earState.score = 0; _earState.total = 0; _earState.current = null;
+    scoreEl.textContent = '0 / 0';
+    feedbackEl.textContent = '';
+    updateButtons(false);
+  });
+  controls.appendChild(resetBtn);
+  container.appendChild(controls);
+
+  // Interval buttons
+  const grid = document.createElement('div');
+  grid.className = 'ear-train-grid';
+  const btnEls = [];
+  sortedSems.forEach(sem => {
+    const btn = document.createElement('button');
+    btn.className = 'ear-train-btn';
+    btn.dataset.sem = sem;
+    btn.textContent = INTERVAL_NAMES[sem] || sem + 'st';
+    btn.addEventListener('click', () => guess(sem));
+    grid.appendChild(btn);
+    btnEls.push(btn);
+  });
+  container.appendChild(grid);
+
+  // Feedback
+  const feedbackEl = document.createElement('div');
+  feedbackEl.className = 'ear-train-feedback';
+  container.appendChild(feedbackEl);
+}
+
+// ══════════════════════════════════════════════
 // COMPARISON MODE
 // ══════════════════════════════════════════════
 let compareActive = false;
@@ -9776,7 +10190,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v39 &nbsp;·&nbsp; deployed 2026-05-25 17:15</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v40 &nbsp;·&nbsp; deployed 2026-05-29 22:30</span></div>
     </div>
 
     <div class="tech-section">
