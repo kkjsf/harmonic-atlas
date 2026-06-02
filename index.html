@@ -1239,6 +1239,38 @@
     background: rgba(201,168,76,.25); color: var(--cream);
     border-radius: 1px; padding: 0 1px;
   }
+  .res-card-status {
+    position: absolute; top: 8px; right: 8px; width: 22px; height: 22px;
+    border-radius: 50%; border: 1.5px solid var(--border); background: transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; line-height: 1; transition: all .15s; z-index: 1;
+    color: transparent;
+  }
+  .res-card-status:hover { border-color: rgba(201,168,76,.5); background: rgba(255,255,255,.06); }
+  .res-card-status[data-status="pending"] {
+    border-color: rgba(255,180,50,.5); background: rgba(255,180,50,.12); color: rgba(255,180,50,.9);
+  }
+  .res-card-status[data-status="done"] {
+    border-color: rgba(100,200,120,.5); background: rgba(100,200,120,.15); color: rgba(100,200,120,.9);
+  }
+  .res-status-filters {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .res-status-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .03em;
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: 14px;
+    background: transparent; color: var(--muted); cursor: pointer; transition: all .15s;
+    white-space: nowrap;
+  }
+  .res-status-pill:hover { border-color: rgba(201,168,76,.3); color: var(--cream); }
+  .res-status-pill.active { background: rgba(201,168,76,.12); border-color: rgba(201,168,76,.35); color: var(--gold); }
+  .res-status-pill .res-status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+  }
+  .res-status-pill .res-status-dot.dot-unread { border: 1.5px solid var(--muted); }
+  .res-status-pill .res-status-dot.dot-pending { background: rgba(255,180,50,.7); }
+  .res-status-pill .res-status-dot.dot-done { background: rgba(100,200,120,.7); }
 
   #comp-btn {
     position: fixed; top: 16px; right: 16px;
@@ -10100,7 +10132,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v42 &nbsp;·&nbsp; deployed 2026-06-02 22:30</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v43 &nbsp;·&nbsp; deployed 2026-06-02 23:45</span></div>
     </div>
 
     <div class="tech-section">
@@ -10938,6 +10970,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <button class="res-search-clear" id="res-search-clear">&#x2715;</button>
     </div>
     <div class="res-toc" id="res-toc"></div>
+    <div class="res-status-filters" id="res-status-filters"></div>
     <div class="res-result-count" id="res-result-count"></div>
   </div>
   <div class="res-browse" id="res-browse"></div>
@@ -12695,6 +12728,24 @@ window.addEventListener('resize', () => {
 
   let activeCategory = 'all';
   let searchQuery = '';
+  let activeStatus = 'all';
+
+  const RES_STATUS_KEY = 'ha-resource-status';
+  function loadStatuses() {
+    try { return JSON.parse(localStorage.getItem(RES_STATUS_KEY)) || {}; } catch { return {}; }
+  }
+  function saveStatuses(s) { localStorage.setItem(RES_STATUS_KEY, JSON.stringify(s)); }
+  function getStatus(url) { return loadStatuses()[url] || 'unread'; }
+  function cycleStatus(url) {
+    const order = ['unread', 'pending', 'done'];
+    const s = loadStatuses();
+    const cur = s[url] || 'unread';
+    const next = order[(order.indexOf(cur) + 1) % 3];
+    if (next === 'unread') delete s[url]; else s[url] = next;
+    saveStatuses(s);
+    return next;
+  }
+  const STATUS_ICONS = { unread: '', pending: '◐', done: '✓' };
 
   function buildToc() {
     const toc = document.getElementById('res-toc');
@@ -12757,7 +12808,8 @@ window.addEventListener('resize', () => {
     let totalShown = 0;
 
     cats.forEach(cat => {
-      const items = cat.items.filter(item => matchesSearch(item, searchQuery));
+      const items = cat.items.filter(item => matchesSearch(item, searchQuery) &&
+        (activeStatus === 'all' || getStatus(item.url) === activeStatus));
       if (!items.length) return;
       totalShown += items.length;
 
@@ -12778,7 +12830,10 @@ window.addEventListener('resize', () => {
           '<span class="res-card-tag">' + highlightText(t, q) + '</span>'
         ).join('');
         const domain = siteDomain(item.url);
+        const st = getStatus(item.url);
         html += '<div class="res-card" data-url="' + item.url + '">' +
+          '<button class="res-card-status" data-status="' + st + '" data-res-url="' + item.url + '" title="' +
+            st.charAt(0).toUpperCase() + st.slice(1) + ' — click to change">' + STATUS_ICONS[st] + '</button>' +
           '<div class="res-card-top">' +
             '<div class="res-card-title">' + title + '</div>' +
             '<span class="res-card-site">' + highlightText(item.site, q) + '</span>' +
@@ -12804,8 +12859,52 @@ window.addEventListener('resize', () => {
       ? totalShown + ' result' + (totalShown !== 1 ? 's' : '') + ' for “' + searchQuery + '”'
       : totalShown + ' resources';
 
+    el.querySelectorAll('.res-card-status').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const url = btn.dataset.resUrl;
+        const next = cycleStatus(url);
+        btn.dataset.status = next;
+        btn.textContent = STATUS_ICONS[next];
+        btn.title = next.charAt(0).toUpperCase() + next.slice(1) + ' — click to change';
+        buildStatusFilters();
+      });
+    });
     el.querySelectorAll('.res-card').forEach(card => {
       card.addEventListener('click', () => window.open(card.dataset.url, '_blank', 'noopener'));
+    });
+  }
+
+  function buildStatusFilters() {
+    const el = document.getElementById('res-status-filters');
+    const statuses = loadStatuses();
+    let pending = 0, done = 0, total = 0;
+    RESOURCES.forEach(c => c.items.forEach(item => {
+      total++;
+      const s = statuses[item.url];
+      if (s === 'pending') pending++;
+      else if (s === 'done') done++;
+    }));
+    const unread = total - pending - done;
+    const filters = [
+      { key: 'all', label: 'All', count: total, dot: '' },
+      { key: 'unread', label: 'Unread', count: unread, dot: 'dot-unread' },
+      { key: 'pending', label: 'In progress', count: pending, dot: 'dot-pending' },
+      { key: 'done', label: 'Done', count: done, dot: 'dot-done' }
+    ];
+    el.innerHTML = '';
+    filters.forEach(f => {
+      const btn = document.createElement('button');
+      btn.className = 'res-status-pill' + (activeStatus === f.key ? ' active' : '');
+      btn.dataset.status = f.key;
+      btn.innerHTML = (f.dot ? '<span class="res-status-dot ' + f.dot + '"></span>' : '') +
+        f.label + ' <span class="res-toc-count">' + f.count + '</span>';
+      btn.addEventListener('click', () => {
+        activeStatus = f.key;
+        buildStatusFilters();
+        renderBrowse();
+      });
+      el.appendChild(btn);
     });
   }
 
@@ -12837,6 +12936,7 @@ window.addEventListener('resize', () => {
     panel.classList.add('open');
     lockScroll();
     if (!document.getElementById('res-toc').children.length) buildToc();
+    buildStatusFilters();
     if (!document.getElementById('res-browse').children.length) renderBrowse();
     setTimeout(() => searchInput.focus(), 100);
   }
