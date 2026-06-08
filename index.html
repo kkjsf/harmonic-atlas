@@ -10132,7 +10132,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v45 &nbsp;·&nbsp; deployed 2026-06-08 15:10</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v46 &nbsp;·&nbsp; deployed 2026-06-08 15:45</span></div>
     </div>
 
     <div class="tech-section">
@@ -11694,7 +11694,7 @@ function compRenderDetail(comp) {
         <span class="strum-label">Presets</span>
       </div>
       <div class="comp-chord-search-wrap">
-        <input class="comp-chord-search" id="comp-chord-search" placeholder="Add any chord — search by name, note, or category (in-key & beyond)…" autocomplete="off" spellcheck="false">
+        <input class="comp-chord-search" id="comp-chord-search" placeholder="Add any chord — e.g. F#7b13, Ebm9, b9 (type b/# for flats/sharps)…" autocomplete="off" spellcheck="false">
         <div class="comp-chord-search-dropdown" id="comp-chord-search-dd"></div>
       </div>
       <div class="comp-chord-row" id="comp-chord-row"></div>
@@ -11805,18 +11805,35 @@ function compRenderDetail(comp) {
     const dd  = document.getElementById('comp-chord-search-dd');
     let pool = null, items = [];
 
+    // Treat typed 'b'/'#' as ♭/♯ so flats are findable (e.g. "F#7b13" → F#7♭13)
+    const normAcc = t => t.toLowerCase().replace(/♭/g, 'b').replace(/♯/g, '#');
+    // ordered-subsequence match so an omitted implied 7 still hits (e.g. "F#b13")
+    const subseq = (needle, hay) => {
+      let i = 0;
+      for (const c of hay) { if (c === needle[i]) i++; if (i === needle.length) return true; }
+      return needle.length === 0;
+    };
     function showDd(q) {
       if (!pool) pool = buildCompChordPool();
-      const s = (q||'').toLowerCase().trim();
-      items = pool.filter(ch => {
-        if (!s) return true;
-        const full = (ch.name + ch.sym).toLowerCase();
-        return full.includes(s) ||
-               ch.quality.toLowerCase().includes(s) ||
-               ch.roman.toLowerCase().includes(s) ||
-               ch.notes.join(' ').toLowerCase().includes(s) ||
-               ch.category.toLowerCase().includes(s);
-      }).slice(0, 35);
+      const sRaw = normAcc((q||'').trim());
+      const s = sRaw.replace(/\s+/g, '');
+      const scored = [];
+      for (const ch of pool) {
+        if (!s) { scored.push({ ch, rank: 0 }); continue; }
+        const full = normAcc(ch.name + ch.sym);
+        let rank = -1;
+        if (full === s) rank = 4;
+        else if (full.startsWith(s)) rank = 3;
+        else if (full.includes(s)) rank = 2;
+        else if (subseq(s, full)) rank = 1;
+        else {
+          const rest = normAcc([ch.quality, ch.roman, ch.notes.join(' '), ch.category].join(' '));
+          if (rest.includes(sRaw) || rest.includes(s)) rank = 0;
+        }
+        if (rank >= 0) scored.push({ ch, rank });
+      }
+      scored.sort((a, b) => b.rank - a.rank);
+      items = scored.slice(0, 35).map(x => x.ch);
       if (!items.length) { dd.classList.remove('open'); return; }
       dd.innerHTML = items.map((ch, i) => `
         <div class="comp-search-item" data-i="${i}">
