@@ -7305,6 +7305,31 @@ function midiToNoteName(midi) {
   return names[midi % 12] + Math.floor(midi / 12 - 1);
 }
 
+// ── Sampler master bus ──────────────────────────
+// Both samplers (and, during composition playback, the drum synths) route
+// through this chain instead of straight to the destination. Without it,
+// dense chords — full mode re-strikes every beat, so a 6-note chord stacks
+// ~12 overlapping voices — sum past 0 dBFS and clip into a gurgly distortion.
+// A gentle compressor tames hot peaks (transparent on simple chords, which
+// stay well under threshold) and a fast brickwall limiter guarantees the
+// summed output never reaches the clip point on any system.
+let compMasterBus = null; // DynamicsCompressor input node of the chain
+function ensureCompMasterBus() {
+  if (compMasterBus) return compMasterBus;
+  const ctx = Tone.getContext().rawContext;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -6; comp.knee.value = 6;
+  comp.ratio.value = 3; comp.attack.value = 0.005; comp.release.value = 0.15;
+  const limiter = ctx.createDynamicsCompressor();
+  limiter.threshold.value = -0.8; limiter.knee.value = 0;
+  limiter.ratio.value = 20; limiter.attack.value = 0.0005; limiter.release.value = 0.05;
+  comp.connect(limiter);
+  limiter.connect(ctx.destination);
+  comp.limiterNode = limiter;
+  compMasterBus = comp;
+  return compMasterBus;
+}
+
 function initSampler() {
   const loading = document.getElementById('sampler-loading');
   if (loading) loading.style.display = 'inline';
@@ -7330,7 +7355,7 @@ function initSampler() {
     onerror: () => {
       if (loading) { loading.style.display = 'inline'; loading.textContent = '⚠ samples failed to load — using synth fallback'; }
     }
-  }).toDestination();
+  }).connect(ensureCompMasterBus());
 }
 
 // ── Guitar sampler (real acoustic guitar samples) ──
@@ -7366,7 +7391,7 @@ function initGuitarSampler() {
       const gl = document.getElementById('guitar-sampler-loading');
       if (gl) { gl.style.display = 'inline'; gl.textContent = '⚠ guitar samples failed to load'; }
     }
-  }).toDestination();
+  }).connect(ensureCompMasterBus());
 }
 
 // ── Audio Context ───────────────────────────────
@@ -10134,7 +10159,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v48 &nbsp;·&nbsp; deployed 2026-06-08 17:05</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v49 &nbsp;·&nbsp; deployed 2026-06-08 12:11</span></div>
     </div>
 
     <div class="tech-section">
@@ -12423,6 +12448,10 @@ function compStartPlayback(id) {
     Tone.Transport.stop();
     Tone.Transport.cancel(0);
 
+    // Route the drum synths through the same compressor/limiter as the chords
+    // so the combined peak is what gets tamed, not just the piano on its own.
+    progMasterBus = ensureCompMasterBus();
+
     const bpm     = comp.bpm || 90;
     const beatDur = 60 / bpm;
     Tone.Transport.bpm.value = bpm;
@@ -12599,6 +12628,7 @@ function compStopPlayback() {
   try { Tone.Transport.stop(); Tone.Transport.cancel(0); } catch(e) {}
   if (sampler) sampler.releaseAll();
   if (guitarSampler) guitarSampler.releaseAll();
+  if (progMasterBus === compMasterBus) progMasterBus = null;
   compIsPlaying = false;
   compMobSetTab('edit');
   document.querySelectorAll('.comp-chord-card.playing').forEach(el => el.classList.remove('playing'));
