@@ -1474,6 +1474,8 @@
     font-size:11px; padding:0 2px; line-height:1; flex-shrink:0; transition:color .1s;
   }
   .comp-card-sub:hover { color:var(--accent2); }
+  .comp-chord-editable { cursor:pointer; border-bottom:1px dashed transparent; transition:border-color .12s, color .12s; }
+  .comp-chord-editable:hover { color:var(--accent2); border-bottom-color:var(--accent2); }
   /* Compact toggle button */
   .comp-compact-btn {
     background:none; border:1px solid var(--border2); color:var(--muted);
@@ -10132,7 +10134,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v47 &nbsp;·&nbsp; deployed 2026-06-08 16:20</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v48 &nbsp;·&nbsp; deployed 2026-06-08 17:05</span></div>
     </div>
 
     <div class="tech-section">
@@ -11335,6 +11337,107 @@ function buildAllKeysChordPool() {
   return pool;
 }
 
+// Shared chord-search matcher (used by the add-search bar and the card editor).
+// Treats typed b/# as ♭/♯, falls back to subsequence, and ranks exact first.
+function compMatchChords(pool, q) {
+  const normAcc = t => t.toLowerCase().replace(/♭/g, 'b').replace(/♯/g, '#');
+  const subseq = (needle, hay) => {
+    let i = 0;
+    for (const c of hay) { if (c === needle[i]) i++; if (i === needle.length) return true; }
+    return needle.length === 0;
+  };
+  const sRaw = normAcc((q||'').trim());
+  const s = sRaw.replace(/\s+/g, '');
+  const scored = [];
+  for (const ch of pool) {
+    if (!s) { scored.push({ ch, rank: 0 }); continue; }
+    const full = normAcc(ch.name + ch.sym);
+    let rank = -1;
+    if (full === s) rank = 4;
+    else if (full.startsWith(s)) rank = 3;
+    else if (full.includes(s)) rank = 2;
+    else if (subseq(s, full)) rank = 1;
+    else {
+      const rest = normAcc([ch.quality, ch.roman, ch.notes.join(' '), ch.category].join(' '));
+      if (rest.includes(sRaw) || rest.includes(s)) rank = 0;
+    }
+    if (rank >= 0) scored.push({ ch, rank });
+  }
+  scored.sort((a, b) => b.rank - a.rank);
+  return scored.slice(0, 35).map(x => x.ch);
+}
+
+// Popover to replace an existing progression chord in place, keeping its
+// rhythm settings (beats / note value / play mode / arp pattern).
+function showChordEditPopover(triggerEl, compId, i) {
+  document.getElementById('comp-chord-edit-pop')?.remove();
+  const comp = compLoad().find(c => c.id === compId);
+  if (!comp || !comp.chords[i]) return;
+  const cur = comp.chords[i];
+  const pop = document.createElement('div');
+  pop.id = 'comp-chord-edit-pop';
+  pop.style.cssText = `position:fixed;z-index:calc(var(--z-top) + 20);background:#141820;border:1px solid #2e3440;border-radius:5px;padding:9px;width:236px;box-shadow:0 8px 30px rgba(0,0,0,.6);`;
+  pop.innerHTML = `
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:6px;line-height:1.4">Change <strong style="color:var(--accent2)">${_escHtml(cur.name + cur.sym)}</strong> — rhythm is kept</div>
+    <input class="comp-chord-search" id="comp-chord-edit-inp" placeholder="e.g. Cm9, F#7b13…" autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box">
+    <div class="comp-chord-search-dropdown open" id="comp-chord-edit-dd" style="position:static;margin-top:6px;max-height:200px"></div>`;
+  document.body.appendChild(pop);
+  const inp = pop.querySelector('#comp-chord-edit-inp');
+  const dd  = pop.querySelector('#comp-chord-edit-dd');
+  const pool = buildCompChordPool();
+  function closePop() {
+    pop.remove();
+    document.removeEventListener('mousedown', outside, true);
+    document.removeEventListener('keydown', onKey, true);
+  }
+  function outside(e) { if (!pop.contains(e.target)) closePop(); }
+  function onKey(e) { if (e.key === 'Escape') { e.stopPropagation(); closePop(); } }
+  function render(q) {
+    const items = compMatchChords(pool, q);
+    dd.innerHTML = items.map((ch, idx) => `
+      <div class="comp-search-item" data-i="${idx}">
+        <span class="comp-search-name">${_escHtml(ch.name + ch.sym)}</span>
+        <span class="comp-search-cat">${_escHtml(ch.category)}</span>
+        <span class="comp-search-notes">${_escHtml(ch.notes.slice(0,4).join(' · '))}</span>
+      </div>`).join('');
+    dd.querySelectorAll('.comp-search-item').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        const ch = items[+el.dataset.i];
+        const comps = compLoad();
+        const c = comps.find(x => x.id === compId);
+        if (!c || !c.chords[i]) return;
+        const slot = c.chords[i];
+        slot.name = ch.name; slot.sym = ch.sym; slot.roman = ch.roman;
+        slot.notes = ch.notes; slot.pcs = ch.pcs; slot.quality = ch.quality;
+        compSave(comps);
+        const row = document.getElementById('comp-chord-row');
+        const wasCompact = row?.classList.contains('compact-mode');
+        compRenderChordRow(compLoad().find(x => x.id === compId));
+        if (wasCompact) document.getElementById('comp-chord-row')?.classList.add('compact-mode');
+        compRenderList();
+        if (compIsPlaying) compPendingRestart = true;
+        closePop();
+      });
+    });
+  }
+  inp.addEventListener('input', () => render(inp.value));
+  render('');
+  const rect = triggerEl.getBoundingClientRect();
+  const pw = 236;
+  let left = rect.left, top = rect.bottom + 6;
+  if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+  if (left < 8) left = 8;
+  if (top + 270 > window.innerHeight) top = Math.max(8, rect.top - 276);
+  pop.style.left = left + 'px';
+  pop.style.top  = top + 'px';
+  inp.focus();
+  setTimeout(() => {
+    document.addEventListener('mousedown', outside, true);
+    document.addEventListener('keydown', onKey, true);
+  }, 0);
+}
+
 function buildCompChordPool() {
   const rootPc = parseInt(state.key);
   const scaleData = SCALES[state.scale];
@@ -11815,35 +11918,9 @@ function compRenderDetail(comp) {
     const dd  = document.getElementById('comp-chord-search-dd');
     let pool = null, items = [];
 
-    // Treat typed 'b'/'#' as ♭/♯ so flats are findable (e.g. "F#7b13" → F#7♭13)
-    const normAcc = t => t.toLowerCase().replace(/♭/g, 'b').replace(/♯/g, '#');
-    // ordered-subsequence match so an omitted implied 7 still hits (e.g. "F#b13")
-    const subseq = (needle, hay) => {
-      let i = 0;
-      for (const c of hay) { if (c === needle[i]) i++; if (i === needle.length) return true; }
-      return needle.length === 0;
-    };
     function showDd(q) {
       if (!pool) pool = buildCompChordPool();
-      const sRaw = normAcc((q||'').trim());
-      const s = sRaw.replace(/\s+/g, '');
-      const scored = [];
-      for (const ch of pool) {
-        if (!s) { scored.push({ ch, rank: 0 }); continue; }
-        const full = normAcc(ch.name + ch.sym);
-        let rank = -1;
-        if (full === s) rank = 4;
-        else if (full.startsWith(s)) rank = 3;
-        else if (full.includes(s)) rank = 2;
-        else if (subseq(s, full)) rank = 1;
-        else {
-          const rest = normAcc([ch.quality, ch.roman, ch.notes.join(' '), ch.category].join(' '));
-          if (rest.includes(sRaw) || rest.includes(s)) rank = 0;
-        }
-        if (rank >= 0) scored.push({ ch, rank });
-      }
-      scored.sort((a, b) => b.rank - a.rank);
-      items = scored.slice(0, 35).map(x => x.ch);
+      items = compMatchChords(pool, q);
       if (!items.length) { dd.classList.remove('open'); return; }
       dd.innerHTML = items.map((ch, i) => `
         <div class="comp-search-item" data-i="${i}">
@@ -12053,9 +12130,10 @@ function compRenderChordRow(comp) {
     card.innerHTML = `
       <div class="comp-card-header" title="Tap to expand/collapse">
         <button class="comp-card-mv" data-dir="left" ${isFirst?'disabled':''} title="Move left">◀</button>
-        <span class="comp-chord-name">${_escHtml(chDisplayName)}</span>
+        <span class="comp-chord-name comp-chord-editable" title="Click to change this chord">${_escHtml(chDisplayName)}</span>
         <span class="comp-chord-roman">${_escHtml(ch.roman || '')}</span>
         <span class="comp-card-toggle">▸</span>
+        <button class="comp-card-sub comp-card-edit" title="Change this chord">✎</button>
         <button class="comp-card-sub" title="Substitution ideas">≈</button>
         <button class="comp-card-mv" data-dir="right" ${isLast?'disabled':''} title="Move right">▶</button>
       </div>
@@ -12086,7 +12164,10 @@ function compRenderChordRow(comp) {
       card.classList.toggle('expanded');
       card.querySelector('.comp-card-toggle').textContent = card.classList.contains('expanded') ? '▾' : '▸';
     });
-    card.querySelector('.comp-card-sub').addEventListener('click', e => {
+    const openEdit = e => { e.stopPropagation(); showChordEditPopover(card.querySelector('.comp-chord-name'), comp.id, i); };
+    card.querySelector('.comp-chord-editable').addEventListener('click', openEdit);
+    card.querySelector('.comp-card-edit').addEventListener('click', openEdit);
+    card.querySelectorAll('.comp-card-sub:not(.comp-card-edit)')[0].addEventListener('click', e => {
       e.stopPropagation();
       showSlotSubPopover(e.currentTarget, ch, i, newChord => {
         const comps = compLoad();
