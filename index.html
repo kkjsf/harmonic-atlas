@@ -10132,7 +10132,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v44 &nbsp;·&nbsp; deployed 2026-06-08 14:30</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v45 &nbsp;·&nbsp; deployed 2026-06-08 15:10</span></div>
     </div>
 
     <div class="tech-section">
@@ -11260,42 +11260,65 @@ function compRenderChipBar(comps) {
 
 // Full chromatic chord library — every common quality on all 12 roots,
 // so the composition search finds any chord, in-key or not.
+// Each tone is [semitone, scale-degree letter offset] so chord tones spell
+// on the right letter (e.g. C6's 6th is A, not Bbb; C°7's 7th is Bbb, not A).
+// Degree offsets: 0=root 1=2/9 2=3 3=4/11 4=5 5=6/13 6=7.
 const ALL_KEYS_QUALITIES = [
-  { sym:'',     iv:[0,4,7],          quality:'Major' },
-  { sym:'m',    iv:[0,3,7],          quality:'Minor' },
-  { sym:'°',    iv:[0,3,6],          quality:'Diminished' },
-  { sym:'+',    iv:[0,4,8],          quality:'Augmented' },
-  { sym:'sus2', iv:[0,2,7],          quality:'Suspended 2nd' },
-  { sym:'sus4', iv:[0,5,7],          quality:'Suspended 4th' },
-  { sym:'6',    iv:[0,4,7,9],        quality:'Major 6th' },
-  { sym:'m6',   iv:[0,3,7,9],        quality:'Minor 6th' },
-  { sym:'Δ7',   iv:[0,4,7,11],       quality:'Major 7th' },
-  { sym:'7',    iv:[0,4,7,10],       quality:'Dominant 7th' },
-  { sym:'m7',   iv:[0,3,7,10],       quality:'Minor 7th' },
-  { sym:'ø7',   iv:[0,3,6,10],       quality:'Half-diminished 7th' },
-  { sym:'°7',   iv:[0,3,6,9],        quality:'Diminished 7th' },
-  { sym:'mΔ7',  iv:[0,3,7,11],       quality:'Minor-major 7th' },
-  { sym:'7sus4',iv:[0,5,7,10],       quality:'Dominant 7 sus4' },
-  { sym:'add9', iv:[0,4,7,14],       quality:'Add 9' },
-  { sym:'madd9',iv:[0,3,7,14],       quality:'Minor add 9' },
-  { sym:'6/9',  iv:[0,4,7,9,14],     quality:'Six-nine' },
-  { sym:'9',    iv:[0,4,7,10,14],    quality:'Dominant 9th' },
-  { sym:'Δ9',   iv:[0,4,7,11,14],    quality:'Major 9th' },
-  { sym:'m9',   iv:[0,3,7,10,14],    quality:'Minor 9th' },
-  { sym:'7♭9',  iv:[0,4,7,10,13],    quality:'Dominant 7♭9' },
-  { sym:'7♯9',  iv:[0,4,7,10,15],    quality:'Dominant 7♯9' },
-  { sym:'7♯5',  iv:[0,4,8,10],       quality:'Dominant 7♯5' },
-  { sym:'7♭5',  iv:[0,4,6,10],       quality:'Dominant 7♭5' },
-  { sym:'7♯11', iv:[0,4,7,10,18],    quality:'Dominant 7♯11' },
-  { sym:'7♭13', iv:[0,4,7,10,20],    quality:'Dominant 7♭13' },
+  { sym:'',     quality:'Major',                tones:[[0,0],[4,2],[7,4]] },
+  { sym:'m',    quality:'Minor',                tones:[[0,0],[3,2],[7,4]] },
+  { sym:'°',    quality:'Diminished',           tones:[[0,0],[3,2],[6,4]] },
+  { sym:'+',    quality:'Augmented',            tones:[[0,0],[4,2],[8,4]] },
+  { sym:'sus2', quality:'Suspended 2nd',        tones:[[0,0],[2,1],[7,4]] },
+  { sym:'sus4', quality:'Suspended 4th',        tones:[[0,0],[5,3],[7,4]] },
+  { sym:'6',    quality:'Major 6th',            tones:[[0,0],[4,2],[7,4],[9,5]] },
+  { sym:'m6',   quality:'Minor 6th',            tones:[[0,0],[3,2],[7,4],[9,5]] },
+  { sym:'Δ7',   quality:'Major 7th',            tones:[[0,0],[4,2],[7,4],[11,6]] },
+  { sym:'7',    quality:'Dominant 7th',         tones:[[0,0],[4,2],[7,4],[10,6]] },
+  { sym:'m7',   quality:'Minor 7th',            tones:[[0,0],[3,2],[7,4],[10,6]] },
+  { sym:'ø7',   quality:'Half-diminished 7th',  tones:[[0,0],[3,2],[6,4],[10,6]] },
+  { sym:'°7',   quality:'Diminished 7th',       tones:[[0,0],[3,2],[6,4],[9,6]] },
+  { sym:'mΔ7',  quality:'Minor-major 7th',      tones:[[0,0],[3,2],[7,4],[11,6]] },
+  { sym:'7sus4',quality:'Dominant 7 sus4',      tones:[[0,0],[5,3],[7,4],[10,6]] },
+  { sym:'add9', quality:'Add 9',                tones:[[0,0],[4,2],[7,4],[14,1]] },
+  { sym:'madd9',quality:'Minor add 9',          tones:[[0,0],[3,2],[7,4],[14,1]] },
+  { sym:'6/9',  quality:'Six-nine',             tones:[[0,0],[4,2],[7,4],[9,5],[14,1]] },
+  { sym:'9',    quality:'Dominant 9th',         tones:[[0,0],[4,2],[7,4],[10,6],[14,1]] },
+  { sym:'Δ9',   quality:'Major 9th',            tones:[[0,0],[4,2],[7,4],[11,6],[14,1]] },
+  { sym:'m9',   quality:'Minor 9th',            tones:[[0,0],[3,2],[7,4],[10,6],[14,1]] },
+  { sym:'11',   quality:'Dominant 11th',        tones:[[0,0],[4,2],[7,4],[10,6],[14,1],[17,3]] },
+  { sym:'m11',  quality:'Minor 11th',           tones:[[0,0],[3,2],[7,4],[10,6],[14,1],[17,3]] },
+  { sym:'Δ11',  quality:'Major 11th',           tones:[[0,0],[4,2],[7,4],[11,6],[14,1],[17,3]] },
+  { sym:'13',   quality:'Dominant 13th',        tones:[[0,0],[4,2],[7,4],[10,6],[14,1],[17,3],[21,5]] },
+  { sym:'m13',  quality:'Minor 13th',           tones:[[0,0],[3,2],[7,4],[10,6],[14,1],[17,3],[21,5]] },
+  { sym:'Δ13',  quality:'Major 13th',           tones:[[0,0],[4,2],[7,4],[11,6],[14,1],[17,3],[21,5]] },
+  { sym:'7♭9',  quality:'Dominant 7♭9',         tones:[[0,0],[4,2],[7,4],[10,6],[13,1]] },
+  { sym:'7♯9',  quality:'Dominant 7♯9',         tones:[[0,0],[4,2],[7,4],[10,6],[15,1]] },
+  { sym:'7♯5',  quality:'Dominant 7♯5',         tones:[[0,0],[4,2],[8,4],[10,6]] },
+  { sym:'7♭5',  quality:'Dominant 7♭5',         tones:[[0,0],[4,2],[6,4],[10,6]] },
+  { sym:'7♯11', quality:'Dominant 7♯11',        tones:[[0,0],[4,2],[7,4],[10,6],[18,3]] },
+  { sym:'7♭13', quality:'Dominant 7♭13',        tones:[[0,0],[4,2],[7,4],[10,6],[20,5]] },
 ];
+// Spell chord tones by explicit scale degree (letter offset), so altered and
+// added tones land on the correct letter rather than a stacked-third guess.
+function _spellByDegrees(rootPc, rootName, tones) {
+  const rootLi = letterIndex(rootName);
+  return tones.map(([iv, deg]) => {
+    const targetLetter = LETTERS[(rootLi + deg) % 7];
+    const pc = (rootPc + iv) % 12;
+    const match = PITCH_CANDIDATES[pc].find(c => c[0] === targetLetter);
+    if (match) return match;
+    const naturalPc = PITCH_CANDIDATES.findIndex(a => a.includes(targetLetter));
+    const diff = ((pc - naturalPc) + 12) % 12;
+    return targetLetter + (diff===1?'#':diff===2?'##':diff===11?'b':diff===10?'bb':'');
+  });
+}
 function buildAllKeysChordPool() {
   const pool = [];
   for (let pc = 0; pc < 12; pc++) {
     const root = chromaticPcName(pc, PREFER_FLAT_PC.has(pc));
-    ALL_KEYS_QUALITIES.forEach(({ sym, iv, quality }) => {
-      const notes = spellChordFromRoot(pc, root, iv);
-      const pcs = iv.map(i => (pc + i) % 12);
+    ALL_KEYS_QUALITIES.forEach(({ sym, tones, quality }) => {
+      const notes = _spellByDegrees(pc, root, tones);
+      const pcs = tones.map(([i]) => (pc + i) % 12);
       pool.push({ category:'Any key', name:root, sym, roman:root + sym, notes, pcs, quality });
     });
   }
