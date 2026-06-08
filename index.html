@@ -8754,11 +8754,16 @@ const DRUM_PATTERNS = {
     {k:.8,r:.9},{r:.35},{r:.65},  {r:.9},{r:.35},{r:.65,s:.35},
     {k:.6,r:.9},{r:.35},{r:.65},  {r:.9,s:.75},{r:.35},{r:.65,oh:.5}
   ]},
-  'Bossa': { bpm: 4, subdiv: 4, beats: [
-    {k:1,h:.8},{h:.4},{h:.65},{h:.4},
-    {s:.45,h:.7},{h:.4},{h:.65},{k:.5,h:.4},
-    {k:.85,h:.8},{h:.4},{s:.3,h:.65},{h:.4},
-    {s:.6,h:.7},{h:.4},{k:.45,h:.65},{oh:.45,h:.4}
+  // Bossa nova — full 2-bar clave (bpm:8 = 8 beats per cell). Soft surdo kick on
+  // the strong beats (1 & 3 of each bar), cross-stick (low snare) on the son/bossa
+  // clave [1, &2, 4 | 2, 3], and a steady 8th-note hi-hat shaker pulse. No backbeat.
+  'Bossa': { bpm: 8, subdiv: 4, beats: [
+    // bar 1
+    {k:.7,s:.4,h:.45},{},{h:.3},{},   {h:.4},{},{s:.4,h:.3},{},
+    {k:.45,h:.4},{},{h:.3},{},        {s:.4,h:.4},{},{h:.3},{},
+    // bar 2
+    {k:.7,h:.45},{},{h:.3},{},        {s:.4,h:.4},{},{h:.3},{},
+    {k:.45,s:.4,h:.4},{},{h:.3},{},   {h:.4},{},{h:.3},{}
   ]},
   'Waltz': { bpm: 3, subdiv: 2, beats: [
     {k:1,h:.8},{h:.5},   {s:.7,h:.8},{h:.5},   {s:.5,h:.8},{oh:.5}
@@ -10159,7 +10164,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v49 &nbsp;·&nbsp; deployed 2026-06-08 12:11</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v50 &nbsp;·&nbsp; deployed 2026-06-08 12:25</span></div>
     </div>
 
     <div class="tech-section">
@@ -12502,6 +12507,46 @@ function compStartPlayback(id) {
               if (_compPlayGen !== gen || !activeReady()) return;
               activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time, vel);
             }, t);
+          }
+        } else if (activeStrum === 'Bossa') {
+          // Authentic 2-bar bossa nova comp (the João Gilberto "signature"):
+          //  • thumb (bass) alternates root↔fifth on the strong beats (1 & 3)
+          //  • fingers stab the chord on the son/bossa clave: bar1 = 1, &2, 4 ·
+          //    bar2 = 2, 3  →  8th-note slots [0,3,6,10,12] of the 2-bar cell.
+          // The cell is locked to the absolute beat grid so it stays continuous
+          // across chords and in sync with the bossa drum clave.
+          const CLAVE = new Set([0, 3, 6, 10, 12]); // 8th-note slots in the 2-bar cell
+          const eighthDur = beatDur / 2;
+          const nEighths  = Math.round(beats * 2);
+          const startE    = Math.round((tOffset / beatDur) * 2); // absolute 8th index
+          const rootPc    = (((pcs[0] || 0) % 12) + 12) % 12;
+          for (let e = 0; e < nEighths; e++) {
+            const cell      = (startE + e) % 16;
+            const beatInBar = Math.floor((startE + e) / 2) % 4;
+            const onBeat    = ((startE + e) % 2) === 0;
+            const swingOff  = !onBeat ? eighthDur * swingRatio : 0;
+            const jitter    = (Math.random() - 0.5) * 0.006;
+            const t         = tOffset + e * eighthDur + swingOff + jitter;
+            if (CLAVE.has(cell)) {
+              const vel     = cell === 0 ? 0.6 : 0.5;       // no hard accents — placement carries the feel
+              const noteDur = Math.max(0.3, eighthDur * 2.4);
+              voiced.forEach((v, ni) => {
+                Tone.Transport.schedule(time => {
+                  if (_compPlayGen !== gen || !activeReady()) return;
+                  activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time + ni * 0.006, vel);
+                }, t);
+              });
+            }
+            if (onBeat && (beatInBar === 0 || beatInBar === 2)) {
+              const bassMidi = 36 + rootPc + (beatInBar === 2 ? 7 : 0); // root on 1, fifth on 3
+              if (bassMidi >= 28) {
+                const bDur = Math.max(0.35, beatDur * 1.6);
+                Tone.Transport.schedule(time => {
+                  if (_compPlayGen !== gen || !activeReady()) return;
+                  activeSampler.triggerAttackRelease(midiToNoteName(bassMidi), bDur, time, 0.52);
+                }, t);
+              }
+            }
           }
         } else {
           for (let s = 0; s < nSteps; s++) {
