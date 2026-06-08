@@ -10132,7 +10132,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v43 &nbsp;·&nbsp; deployed 2026-06-02 23:45</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v44 &nbsp;·&nbsp; deployed 2026-06-08 14:30</span></div>
     </div>
 
     <div class="tech-section">
@@ -11068,6 +11068,134 @@ function compDelete(id) {
   compSave(comps);
 }
 
+// ── Share / import a composition as a portable code ──────────────────────────
+// Carries chords (with rhythm/arp/beats), tempo, strum, swing, drums, sound and
+// notes — everything needed to rebuild it on another device.
+function _haEncodeComp(comp) {
+  const payload = {
+    v: 1,
+    title: comp.title || 'Untitled',
+    bpm: comp.bpm || 90,
+    text: comp.text || '',
+    chords: comp.chords || [],
+    loop: !!comp.loop,
+    drums: !!comp.drums,
+    drumsStyle: comp.drumsStyle || 'auto',
+    sound: comp.sound || 'piano',
+    strum: comp.strum || 'Straight',
+    swing: comp.swing ?? 0,
+  };
+  const bytes = new TextEncoder().encode(JSON.stringify(payload));
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return 'HA1:' + btoa(bin);
+}
+function _haDecodeComp(code) {
+  const s = (code || '').trim().replace(/^HA1:/, '');
+  const bin = atob(s);
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function compImportCode(code) {
+  let p;
+  try { p = _haDecodeComp(code); } catch (e) { return null; }
+  if (!p || !Array.isArray(p.chords)) return null;
+  const comp = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+    title: p.title || 'Imported',
+    text: p.text || '',
+    chords: p.chords,
+    bpm: p.bpm || 90,
+    loop: !!p.loop,
+    drums: !!p.drums,
+    drumsStyle: p.drumsStyle || 'auto',
+    sound: p.sound || 'piano',
+    strum: p.strum || 'Straight',
+    swing: p.swing ?? 0,
+    createdAt: Date.now(),
+  };
+  const comps = compLoad();
+  comps.unshift(comp);
+  compSave(comps);
+  return comp;
+}
+
+function showCompCodeModal({ heading, hint, value, editable, actionLabel, onAction }) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `position:fixed;inset:0;z-index:calc(var(--z-top) + 10);background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;`;
+  const box = document.createElement('div');
+  box.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;padding:20px 22px;max-width:460px;width:92vw;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 40px rgba(0,0,0,.6);`;
+  const h = document.createElement('div');
+  h.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--text);`;
+  h.textContent = heading;
+  const hintEl = document.createElement('div');
+  hintEl.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);line-height:1.55;`;
+  hintEl.textContent = hint;
+  const ta = document.createElement('textarea');
+  ta.value = value || '';
+  ta.readOnly = !editable;
+  ta.spellcheck = false;
+  ta.placeholder = editable ? 'Paste a composition code here…' : '';
+  ta.style.cssText = `width:100%;height:120px;resize:none;background:#0e1117;border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.5;padding:8px;box-sizing:border-box;word-break:break-all;outline:none;`;
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = `display:flex;justify-content:flex-end;gap:8px;align-items:center;`;
+  const status = document.createElement('span');
+  status.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-right:auto;`;
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Close';
+  closeBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 14px;border-radius:3px;border:1px solid var(--border2);background:none;color:var(--muted);cursor:pointer;`;
+  const actBtn = document.createElement('button');
+  actBtn.textContent = actionLabel;
+  actBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 14px;border-radius:3px;border:1px solid var(--accent);background:rgba(124,111,160,.14);color:var(--accent2);cursor:pointer;`;
+  const close = () => { overlay.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  closeBtn.addEventListener('click', close);
+  actBtn.addEventListener('click', () => onAction(ta, status, close));
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', onKey);
+  btnRow.append(status, closeBtn, actBtn);
+  box.append(h, hintEl, ta, btnRow);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  if (!editable) { ta.focus(); ta.select(); } else ta.focus();
+}
+
+function compShare(id) {
+  const comp = compLoad().find(c => c.id === id);
+  if (!comp) return;
+  showCompCodeModal({
+    heading: `Share "${comp.title || 'Untitled'}"`,
+    hint: 'Copy this code, then paste it into Harmonic Atlas on another device via ⇩ Import. It carries the chords, rhythm, tempo, strum, swing, drums, sound and notes.',
+    value: _haEncodeComp(comp),
+    editable: false,
+    actionLabel: 'Copy',
+    onAction: (ta, status) => {
+      ta.select();
+      const done = () => { status.textContent = 'Copied ✓'; status.style.color = 'var(--accent2)'; };
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, () => { try { document.execCommand('copy'); } catch (e) {} done(); });
+      } else { try { document.execCommand('copy'); } catch (e) {} done(); }
+    },
+  });
+}
+
+function compImportPrompt() {
+  showCompCodeModal({
+    heading: 'Import a composition',
+    hint: 'Paste a code shared from another device (it starts with HA1:). A new composition will be added to your list.',
+    value: '',
+    editable: true,
+    actionLabel: 'Import',
+    onAction: (ta, status, close) => {
+      const comp = compImportCode(ta.value);
+      if (!comp) { status.textContent = 'Invalid code'; status.style.color = '#e06060'; return; }
+      close();
+      compRenderList();
+      compSelectId(comp.id);
+    },
+  });
+}
+
 function openCompositions() {
   document.getElementById('comp-overlay').classList.add('open');
   document.getElementById('comp-btn').classList.add('active');
@@ -11122,6 +11250,56 @@ function compRenderChipBar(comps) {
   newChip.textContent = '+ New';
   newChip.addEventListener('click', () => document.getElementById('comp-new-btn')?.click());
   bar.appendChild(newChip);
+  const importChip = document.createElement('button');
+  importChip.className = 'comp-chip-new';
+  importChip.textContent = '⇩ Import';
+  importChip.title = 'Import a shared composition code';
+  importChip.addEventListener('click', compImportPrompt);
+  bar.appendChild(importChip);
+}
+
+// Full chromatic chord library — every common quality on all 12 roots,
+// so the composition search finds any chord, in-key or not.
+const ALL_KEYS_QUALITIES = [
+  { sym:'',     iv:[0,4,7],          quality:'Major' },
+  { sym:'m',    iv:[0,3,7],          quality:'Minor' },
+  { sym:'°',    iv:[0,3,6],          quality:'Diminished' },
+  { sym:'+',    iv:[0,4,8],          quality:'Augmented' },
+  { sym:'sus2', iv:[0,2,7],          quality:'Suspended 2nd' },
+  { sym:'sus4', iv:[0,5,7],          quality:'Suspended 4th' },
+  { sym:'6',    iv:[0,4,7,9],        quality:'Major 6th' },
+  { sym:'m6',   iv:[0,3,7,9],        quality:'Minor 6th' },
+  { sym:'Δ7',   iv:[0,4,7,11],       quality:'Major 7th' },
+  { sym:'7',    iv:[0,4,7,10],       quality:'Dominant 7th' },
+  { sym:'m7',   iv:[0,3,7,10],       quality:'Minor 7th' },
+  { sym:'ø7',   iv:[0,3,6,10],       quality:'Half-diminished 7th' },
+  { sym:'°7',   iv:[0,3,6,9],        quality:'Diminished 7th' },
+  { sym:'mΔ7',  iv:[0,3,7,11],       quality:'Minor-major 7th' },
+  { sym:'7sus4',iv:[0,5,7,10],       quality:'Dominant 7 sus4' },
+  { sym:'add9', iv:[0,4,7,14],       quality:'Add 9' },
+  { sym:'madd9',iv:[0,3,7,14],       quality:'Minor add 9' },
+  { sym:'6/9',  iv:[0,4,7,9,14],     quality:'Six-nine' },
+  { sym:'9',    iv:[0,4,7,10,14],    quality:'Dominant 9th' },
+  { sym:'Δ9',   iv:[0,4,7,11,14],    quality:'Major 9th' },
+  { sym:'m9',   iv:[0,3,7,10,14],    quality:'Minor 9th' },
+  { sym:'7♭9',  iv:[0,4,7,10,13],    quality:'Dominant 7♭9' },
+  { sym:'7♯9',  iv:[0,4,7,10,15],    quality:'Dominant 7♯9' },
+  { sym:'7♯5',  iv:[0,4,8,10],       quality:'Dominant 7♯5' },
+  { sym:'7♭5',  iv:[0,4,6,10],       quality:'Dominant 7♭5' },
+  { sym:'7♯11', iv:[0,4,7,10,18],    quality:'Dominant 7♯11' },
+  { sym:'7♭13', iv:[0,4,7,10,20],    quality:'Dominant 7♭13' },
+];
+function buildAllKeysChordPool() {
+  const pool = [];
+  for (let pc = 0; pc < 12; pc++) {
+    const root = chromaticPcName(pc, PREFER_FLAT_PC.has(pc));
+    ALL_KEYS_QUALITIES.forEach(({ sym, iv, quality }) => {
+      const notes = spellChordFromRoot(pc, root, iv);
+      const pcs = iv.map(i => (pc + i) % 12);
+      pool.push({ category:'Any key', name:root, sym, roman:root + sym, notes, pcs, quality });
+    });
+  }
+  return pool;
 }
 
 function buildCompChordPool() {
@@ -11199,6 +11377,9 @@ function buildCompChordPool() {
       pool.push({ category:'Alt.Dom', name:dn, sym, roman:`${dn}${sym}`, notes, pcs, quality:'Altered Dominant' });
     });
   });
+  // Every other chord, any root — so search reaches chords outside the key.
+  // Appended last so in-key entries (with roman numerals/categories) win the dedup.
+  buildAllKeysChordPool().forEach(ch => pool.push(ch));
   // Deduplicate by root+sym
   const seen = new Set();
   return pool.filter(ch => {
@@ -11478,6 +11659,7 @@ function compRenderDetail(comp) {
   panel.innerHTML = `
     <div class="comp-detail-top">
       <input class="comp-title-input" value="${_escHtml(comp.title)}" placeholder="Untitled">
+      <button class="comp-import-btn comp-share-btn" title="Share / export this composition">⇪ Share</button>
       <button class="comp-del-comp-btn" title="Delete composition">Delete</button>
     </div>
     <div id="comp-chord-section">
@@ -11489,7 +11671,7 @@ function compRenderDetail(comp) {
         <span class="strum-label">Presets</span>
       </div>
       <div class="comp-chord-search-wrap">
-        <input class="comp-chord-search" id="comp-chord-search" placeholder="Add chord — search by name, note, or category…" autocomplete="off" spellcheck="false">
+        <input class="comp-chord-search" id="comp-chord-search" placeholder="Add any chord — search by name, note, or category (in-key & beyond)…" autocomplete="off" spellcheck="false">
         <div class="comp-chord-search-dropdown" id="comp-chord-search-dd"></div>
       </div>
       <div class="comp-chord-row" id="comp-chord-row"></div>
@@ -11567,6 +11749,7 @@ function compRenderDetail(comp) {
     compUpdate(comp.id, { title: e.target.value });
     compRenderList();
   });
+  panel.querySelector('.comp-share-btn').addEventListener('click', () => compShare(comp.id));
   panel.querySelector('.comp-del-comp-btn').addEventListener('click', () => {
     showCompConfirm(`Delete composition "${comp.title || 'Untitled'}"?\nThis cannot be undone.`, 'Delete', () => {
       compDelete(comp.id);
