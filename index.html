@@ -10132,7 +10132,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v46 &nbsp;·&nbsp; deployed 2026-06-08 15:45</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v47 &nbsp;·&nbsp; deployed 2026-06-08 16:20</span></div>
     </div>
 
     <div class="tech-section">
@@ -11297,6 +11297,16 @@ const ALL_KEYS_QUALITIES = [
   { sym:'7♭5',  quality:'Dominant 7♭5',         tones:[[0,0],[4,2],[6,4],[10,6]] },
   { sym:'7♯11', quality:'Dominant 7♯11',        tones:[[0,0],[4,2],[7,4],[10,6],[18,3]] },
   { sym:'7♭13', quality:'Dominant 7♭13',        tones:[[0,0],[4,2],[7,4],[10,6],[20,5]] },
+  // Compound / "double-altered" dominants — the full set showcased in the
+  // guitar Alt-Dominant tab (kept in sync with ALT_DOM_VOICINGS).
+  { sym:'7sus4♭9',quality:'Dominant 7sus4♭9',   tones:[[0,0],[5,3],[10,6],[13,1]] },
+  { sym:'13♭9', quality:'Dominant 13♭9',         tones:[[0,0],[4,2],[10,6],[13,1],[21,5]] },
+  { sym:'13♯9', quality:'Dominant 13♯9',         tones:[[0,0],[4,2],[10,6],[15,1],[21,5]] },
+  { sym:'7♭9♭13',quality:'Dominant 7♭9♭13',     tones:[[0,0],[4,2],[10,6],[13,1],[20,5]] },
+  { sym:'7♭5♭9',quality:'Dominant 7♭5♭9',       tones:[[0,0],[4,2],[6,4],[10,6],[13,1]] },
+  { sym:'7♭5♯9',quality:'Dominant 7♭5♯9',       tones:[[0,0],[4,2],[6,4],[10,6],[15,1]] },
+  { sym:'7♯5♭9',quality:'Dominant 7♯5♭9',       tones:[[0,0],[4,2],[8,4],[10,6],[13,1]] },
+  { sym:'7♯5♯9',quality:'Dominant 7♯5♯9',       tones:[[0,0],[4,2],[8,4],[10,6],[15,1]] },
 ];
 // Spell chord tones by explicit scale degree (letter offset), so altered and
 // added tones land on the correct letter rather than a stacked-third guess.
