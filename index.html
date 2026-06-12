@@ -1427,42 +1427,42 @@
   .comp-drums-btn.active { border-color:var(--accent); color:var(--accent2); background:rgba(124,111,160,.18); }
   .comp-drums-btn:hover:not(.active) { color:var(--text); }
   .comp-drums-hint { font-size:9px; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
-  /* Comp card header/body split */
-  .comp-card-header {
-    display:flex; align-items:baseline; gap:5px; width:100%;
-    cursor:pointer; padding:2px 0;
-    /* Wrap on narrow/compact cards so the ✎/≈/move buttons drop to a second
-       line inside the card instead of overflowing onto the neighbouring card
-       (where they become unclickable). No effect when everything fits. */
-    flex-wrap:wrap; row-gap:2px;
-  }
-  .comp-card-toggle { font-size:8px; color:var(--muted); margin-left:auto; flex-shrink:0; }
-  .comp-card-body { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
+  /* ── Chord card (edit): name + quality up top, per-chord controls behind ⚙ ── */
+  .comp-chord-card { position:relative; }
+  .cc-head { display:flex; flex-direction:column; align-items:center; gap:1px; width:100%; }
+  .cc-roman { font-size:9px; color:var(--muted); font-family:'IBM Plex Mono',monospace; letter-spacing:.1em; min-height:11px; line-height:1.1; }
+  .cc-name { font-family:'Playfair Display',Georgia,serif; font-size:21px; font-weight:600; color:var(--text); line-height:1.05; }
+  .cc-name sub { font-size:.55em; color:var(--accent2); font-weight:600; bottom:0; }
+  .cc-quality { font-size:8px; color:var(--dim); font-family:'IBM Plex Mono',monospace; letter-spacing:.05em; min-height:10px; }
   /* Comp card notes line */
   .comp-chord-notes { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--dim); letter-spacing:.03em; margin-top:3px; text-align:center; line-height:1.4; }
+  .cc-foot { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; }
+  .cc-dur { font-size:8.5px; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
+  .cc-gear { position:absolute; top:5px; right:7px; background:none; border:none; color:var(--dim); font-size:11px; cursor:pointer; line-height:1; padding:0; transition:color .12s; }
+  .cc-gear:hover { color:var(--accent2); }
+  .comp-chord-card.cc-open { border-color:var(--accent); }
+  .comp-chord-card.cc-open .cc-gear { color:var(--accent2); }
+  .cc-panel { display:none; width:100%; margin-top:7px; padding-top:7px; border-top:1px solid var(--border2); flex-direction:column; gap:5px; align-items:center; }
+  .comp-chord-card.cc-open .cc-panel { display:flex; }
+  .cc-panel-row { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
+  .cc-panel-mv { display:flex; align-items:center; gap:4px; }
   /* Note value + arp pattern dropdowns */
   .comp-nv-select, .comp-arp-select {
     background:var(--surface); border:1px solid var(--border2); color:var(--muted);
     border-radius:2px; padding:2px 4px; font-size:8px; font-family:'IBM Plex Mono',monospace;
-    cursor:pointer; outline:none; width:100%; margin-top:3px;
+    cursor:pointer; outline:none;
   }
   .comp-nv-select:focus, .comp-arp-select:focus { border-color:var(--accent); }
+  .comp-arp-select { width:100%; }
   .comp-hidden { display:none !important; }
-  /* Compact mode (global toggle or mobile default) */
-  .comp-chord-row.compact-mode .comp-card-body { display:none !important; }
-  .comp-chord-row.compact-mode .comp-card-toggle { display:none; }
+  /* Compact mode: collapse cards to just the name */
+  .comp-chord-row.compact-mode .cc-roman,
+  .comp-chord-row.compact-mode .cc-quality,
+  .comp-chord-row.compact-mode .cc-notes,
+  .comp-chord-row.compact-mode .cc-foot,
+  .comp-chord-row.compact-mode .cc-panel { display:none !important; }
+  .comp-chord-row.compact-mode .comp-chord-card.cc-open .cc-panel { display:flex !important; }
   .comp-chord-row.compact-mode .comp-chord-card { cursor:default; }
-  /* Mobile: compact by default unless expanded */
-  @media (max-width: 600px) {
-    .comp-chord-card:not(.expanded):not(.comp-chord-row.compact-mode *) .comp-card-body { display:none; }
-    .comp-chord-card.expanded { border-color:var(--accent); }
-    .comp-chord-card { min-width:70px; }
-  }
-  /* Desktop: always show body + toggle arrow hidden */
-  @media (min-width: 601px) {
-    .comp-card-toggle { display:none; }
-    .comp-card-header { cursor:default; }
-  }
   /* Compact mode overrides grid to single-column chip strip */
   .comp-chord-row.compact-mode { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
   /* Chord reorder arrows */
@@ -2058,11 +2058,16 @@
   .cmob-tab.active { color:var(--accent2); border-bottom-color:var(--accent); }
   #comp-mob-play-pane { display:none; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
   #mob-stage { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:20px 16px 10px; }
-  #mob-stage-roman { font-size:11px; color:var(--muted); letter-spacing:.1em; min-height:16px; }
+  #mob-stage-roman { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:.18em; text-transform:uppercase; min-height:14px; }
   #mob-stage-name { font-family:'Playfair Display',serif; font-size:62px; color:var(--accent2); letter-spacing:-.02em; line-height:1; }
-  #mob-stage-notes { font-size:10px; color:var(--muted); letter-spacing:.08em; margin-top:2px; }
-  #mob-stage-scales { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-top:12px; }
-  .mob-scale-pill { font-size:8px; padding:3px 10px; border-radius:2px; border:1px solid rgba(124,111,160,.35); background:rgba(124,111,160,.07); color:var(--accent2); letter-spacing:.06em; cursor:default; }
+  #mob-stage-name sub { font-size:.45em; letter-spacing:0; bottom:0; }
+  #mob-stage-notes { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:8px; }
+  .cc-dot { width:28px; height:28px; border-radius:50%; border:1px solid var(--accent); background:rgba(124,111,160,.16); color:var(--accent2); font-family:'IBM Plex Mono',monospace; font-size:10px; display:flex; align-items:center; justify-content:center; }
+  #mob-stage-next { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); margin-top:10px; min-height:14px; }
+  #mob-stage-next b { color:var(--muted); font-weight:600; }
+  /* Improv help column: scale pills + the scale spelled out as notes */
+  #mob-scale-notes { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--text); letter-spacing:.14em; padding:8px 14px 2px; }
+  #mob-scale-notes .cc-sc-root { color:var(--gold2); font-weight:700; }
   #mob-prog-bar { height:2px; background:var(--border2); border-radius:1px; margin:0 20px; position:relative; flex-shrink:0; }
   #mob-prog-fill { height:100%; width:0%; background:var(--accent); border-radius:1px; }
   #mob-transport { display:flex; align-items:center; justify-content:center; gap:18px; padding:12px 20px 10px; flex-shrink:0; }
@@ -2094,74 +2099,14 @@
   .comp-chip .comp-chip-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); flex-shrink:0; }
   .comp-chip-new { display:flex; align-items:center; gap:4px; padding:5px 12px; border-radius:16px; border:1px dashed var(--border2); background:none; font-size:11px; color:var(--dim); cursor:pointer; font-family:'IBM Plex Mono',monospace; transition:all .12s; flex-shrink:0; }
   .comp-chip-new:hover { border-color:var(--accent); color:var(--accent2); }
-  /* Mobile play pane — scale switcher + fretboard strip */
-  #mob-scale-switcher { display:none; gap:6px; padding:6px 12px; flex-shrink:0; overflow-x:auto; align-items:center; border-bottom:1px solid var(--border2); scrollbar-width:none; }
+  /* Mobile play pane — scale switcher pills (improv help) */
+  #mob-scale-switcher { display:none; gap:6px; padding:8px 12px 2px; flex-shrink:0; overflow-x:auto; align-items:center; flex-wrap:wrap; scrollbar-width:none; }
   #mob-scale-switcher::-webkit-scrollbar { display:none; }
-  .mob-scale-sw-label { font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); font-family:'IBM Plex Mono',monospace; flex-shrink:0; }
-  .mob-scale-sw-btn { padding:3px 10px; border-radius:12px; border:1px solid var(--border2); background:none; color:var(--muted); font-size:11px; font-family:'IBM Plex Mono',monospace; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .12s; }
-  .mob-scale-sw-btn.active { border-color:var(--accent); background:rgba(124,111,160,.15); color:var(--accent2); }
-  .mob-scale-dropdown { appearance:none; background:var(--surface2); border:1px solid var(--border2); color:var(--cream); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:3px 22px 3px 8px; border-radius:12px; cursor:pointer; flex-shrink:0; outline:none; transition:border-color .12s; max-width:130px;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%23c9a84c' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat:no-repeat; background-position:right 7px center; }
-  #mob-scale-root-sel { max-width:52px; }
-  .mob-scale-dropdown:focus { border-color:var(--accent); }
-  .mob-scale-dropdown option { background:var(--surface2); }
-  #mob-fret-toggle-btn { display:none; }
-  #mob-fret-wrap { display:none; flex:1; overflow-x:auto; overflow-y:hidden; padding:6px 10px; align-items:center; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; min-height:80px; }
+  .mob-scale-sw-label { font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); font-family:'IBM Plex Mono',monospace; flex-shrink:0; width:100%; }
+  .mob-scale-sw-btn { padding:4px 12px; border-radius:13px; border:1px solid var(--border2); background:none; color:var(--muted); font-size:11px; font-family:'IBM Plex Mono',monospace; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .12s; }
+  .mob-scale-sw-btn:hover { border-color:var(--gold); color:var(--gold2); }
+  .mob-scale-sw-btn.active { border-color:var(--gold); background:rgba(201,168,76,.1); color:var(--gold2); }
   #mob-scale-fret-col { display:none; flex-direction:column; min-width:0; overflow:hidden; }
-
-  /* ══ LANDSCAPE PLAY — mobile touch only (class mob-ls set by JS) ══
-     Double class mob-ls+mob-tab-play beats desktop min-width:601px rules regardless of source order */
-  #comp-modal.mob-ls.mob-tab-play { position:fixed !important; inset:0 !important; border-radius:0 !important; display:flex !important; flex-direction:column !important; max-height:100vh !important; overflow:hidden !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-modal-header { padding:4px 10px !important; flex-shrink:0; }
-  #comp-modal.mob-ls.mob-tab-play #comp-modal-title { font-size:9px !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-new-btn { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-mob-edit-btn { display:flex !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-close-btn { width:22px !important; height:22px !important; font-size:11px !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-chip-bar { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-mob-tabbar { display:none !important; }
-  /* Grid layout: chord banner | fretboard | prog | strip | transport */
-  #comp-modal.mob-ls.mob-tab-play #comp-mob-play-pane {
-    display:grid !important;
-    grid-template-rows:auto 1fr auto auto auto;
-    grid-template-columns:1fr;
-    flex:1 !important; min-height:0 !important; overflow:hidden !important;
-  }
-  /* Chord info: compact horizontal banner at top */
-  #comp-modal.mob-ls.mob-tab-play #mob-stage {
-    grid-row:1; grid-column:1;
-    display:flex !important; flex-direction:row !important;
-    align-items:center !important; justify-content:flex-start !important;
-    gap:10px !important; padding:3px 12px !important;
-    border-bottom:1px solid var(--border2) !important; border-right:none !important;
-    background:var(--surface) !important; overflow:hidden !important;
-  }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-roman { font-size:9px !important; color:var(--muted) !important; min-width:0; flex-shrink:0; }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-name  { font-size:20px !important; line-height:1 !important; flex-shrink:0; }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-notes { font-size:9px !important; letter-spacing:.06em !important; color:var(--muted) !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-scales { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-pause-btn   { display:none !important; }
-  /* Fret column: full width, row 2 */
-  #comp-modal.mob-ls.mob-tab-play #mob-scale-fret-col { grid-row:2; grid-column:1; display:flex !important; flex-direction:column !important; min-width:0 !important; overflow:hidden !important; min-height:0 !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-scale-switcher { display:flex !important; padding:3px 8px !important; flex-shrink:0; overflow-x:auto; }
-  #comp-modal.mob-ls.mob-tab-play #mob-fret-wrap { display:block !important; flex:1 !important; overflow-x:auto !important; overflow-y:hidden !important; -webkit-overflow-scrolling:touch !important; min-height:0 !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-fret-toggle-btn { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-prog-bar { grid-row:3; grid-column:1; margin:0 !important; height:2px; }
-  #comp-modal.mob-ls.mob-tab-play #mob-strip-wrap { grid-row:4; grid-column:1; padding:2px 8px 3px !important; border-top:1px solid var(--border2); overflow:hidden; }
-  #comp-modal.mob-ls.mob-tab-play #mob-strip-lbl { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-strip { gap:4px !important; }
-  #comp-modal.mob-ls.mob-tab-play .mob-sc { width:46px !important; padding:3px 2px 2px !important; }
-  #comp-modal.mob-ls.mob-tab-play .mob-sc-name { font-size:9px !important; }
-  #comp-modal.mob-ls.mob-tab-play .mob-sc-roman { font-size:6px !important; }
-  #comp-modal.mob-ls.mob-tab-play .mob-sc-beats { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-transport { grid-row:5; grid-column:1; display:flex !important; padding:4px 10px !important; gap:6px; justify-content:center; align-items:center; border-top:1px solid var(--border2); }
-  #comp-modal.mob-ls.mob-tab-play #mob-transport .mob-tbtn { width:30px !important; height:30px !important; border-radius:4px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-transport .mob-tbtn.play-main { width:auto !important; height:30px !important; border-radius:4px !important; flex:1; padding:4px 12px !important; font-family:'IBM Plex Mono',monospace; font-size:11px !important; letter-spacing:.06em; gap:5px; }
-  #comp-modal.mob-ls.mob-tab-play .mob-play-label { display:inline !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-bpm-wrap { display:flex !important; align-items:center; gap:3px; }
-  #comp-modal.mob-ls.mob-tab-play .mob-bpm-input { width:38px !important; font-size:11px !important; padding:3px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-loop-btn { display:flex !important; width:30px !important; height:30px !important; border-radius:4px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-loop-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(124,111,160,.1); }
 
   /* ══ Desktop tab system ══ */
   @media (min-width:601px) {
@@ -2175,7 +2120,7 @@
     /* Default (edit tab): play pane hidden */
     #comp-mob-play-pane { display:none; }
 
-    /* ── Play tab: full-screen impro ── */
+    /* ── Play tab: improv view (chord left · scales right · strip + transport below) ── */
     #comp-modal.mob-tab-play #comp-detail-panel { display:none !important; }
     #comp-modal.mob-tab-play #comp-transport   { display:none !important; }
     #comp-modal.mob-tab-play #comp-style-panel { display:none !important; }
@@ -2183,22 +2128,28 @@
       display:flex !important; width:100%;
       flex-direction:row; flex-wrap:wrap; align-items:stretch;
     }
-    /* Left column: chord info + pause btn */
+    /* Left column: current chord */
     #comp-modal.mob-tab-play #mob-stage {
-      width:300px; flex:0 0 300px; flex-shrink:0;
+      width:320px; flex:0 0 320px; flex-shrink:0;
       border-right:1px solid var(--border2); border-bottom:none;
-      padding:28px 22px; justify-content:center;
+      padding:30px 24px; justify-content:center;
     }
-    #comp-modal.mob-tab-play #mob-stage-name  { font-size:72px; }
-    #comp-modal.mob-tab-play #mob-stage-scales { display:none; }
-    /* Right column: scale switcher + fretboard */
-    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; }
-    #comp-modal.mob-tab-play #mob-scale-switcher  { display:flex !important; }
-    #comp-modal.mob-tab-play #mob-fret-wrap       { display:block !important; flex:1; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; min-height:0; }
-    /* Bottom: progress bar + sequence strip spanning full width */
+    #comp-modal.mob-tab-play #mob-stage-name { font-size:72px; }
+    /* Right column: scale pills + the scale spelled out as notes */
+    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; justify-content:center; gap:6px; padding:20px 24px; }
+    #comp-modal.mob-tab-play #mob-scale-switcher { display:flex !important; padding:0; }
+    #comp-modal.mob-tab-play #mob-scale-notes    { padding:6px 0 0; font-size:15px; }
+    /* Bottom: progress bar, sequence strip, then one transport footer — all full width */
     #comp-modal.mob-tab-play #mob-prog-bar   { flex-basis:100%; margin:0; }
-    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; }
-    #comp-modal.mob-tab-play #mob-transport  { display:none !important; }
+    #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; padding:10px 0 12px; }
+    #comp-modal.mob-tab-play #mob-transport  {
+      flex-basis:100%; display:flex !important; gap:11px; padding:11px 18px;
+      justify-content:flex-start; border-top:1px solid var(--border2); background:var(--surface);
+    }
+    #comp-modal.mob-tab-play #mob-transport .mob-tbtn { width:34px; height:34px; }
+    #comp-modal.mob-tab-play #mob-transport .mob-tbtn.play-main { width:44px; height:44px; }
+    #comp-modal.mob-tab-play #mob-bpm-wrap { display:flex !important; margin-left:auto; }
+    #comp-modal.mob-tab-play #mob-loop-btn { display:flex !important; }
   }
 
   @media (max-width:600px) {
@@ -2211,24 +2162,28 @@
     /* Edit tab */
     #comp-modal.mob-tab-edit #comp-chord-section { display:block; }
     #comp-modal.mob-tab-edit #comp-settings-section { display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--border2); padding-top:10px; margin-top:4px; }
-    /* Play tab — keep layout visible, hide detail, show play pane */
+    /* Play tab — stacked: chord · improv (pills + notes) · transport · sequence */
     #comp-modal.mob-tab-play #comp-detail-panel { display:none !important; }
     #comp-modal.mob-tab-play #comp-mob-play-pane { display:flex !important; flex:1; flex-direction:column; }
+    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:0 0 auto; border-top:1px solid var(--border2); border-bottom:1px solid var(--border2); padding:4px 4px 8px; }
+    #comp-modal.mob-tab-play #mob-scale-switcher { display:flex !important; }
     #comp-modal.mob-tab-play #mob-bpm-wrap { display:flex; }
     #comp-modal.mob-tab-play #mob-loop-btn { display:flex; }
-    /* Accordion-style chord cards on mobile */
+    #comp-modal.mob-tab-play #mob-transport  { order:4; border-top:1px solid var(--border2); }
+    #comp-modal.mob-tab-play #mob-strip-wrap { order:5; }
+    /* Mobile: chord cards become compact horizontal rows (name + quality · length · ⚙) */
     #comp-chord-section .comp-chord-row { display:flex !important; flex-direction:column; gap:5px; align-items:stretch; }
-    #comp-chord-section .comp-chord-card { width:100%; min-width:unset; border-radius:5px; }
-    #comp-chord-section .comp-card-header { cursor:pointer !important; }
-    #comp-chord-section .comp-card-toggle { display:inline !important; font-size:11px; }
+    #comp-chord-section .comp-chord-card { width:100%; min-width:unset; border-radius:5px; flex-direction:row; flex-wrap:wrap; align-items:center; gap:8px; padding:9px 12px; }
+    #comp-chord-section .cc-head { flex-direction:row; align-items:baseline; gap:9px; width:auto; flex:1; min-width:0; }
+    #comp-chord-section .cc-roman, #comp-chord-section .cc-notes { display:none; }
+    #comp-chord-section .cc-name { font-size:18px; }
+    #comp-chord-section .cc-foot { margin-top:0; gap:6px; }
+    #comp-chord-section .cc-gear { position:static; font-size:14px; }
+    #comp-chord-section .cc-panel { order:9; }
     /* Compact btn less prominent on mobile */
     #comp-compact-btn { display:none; }
     /* Settings section */
     #comp-settings-section { display:flex; flex-direction:column; gap:10px; }
-    /* Mobile fretboard toggle — hidden until toggled on */
-    #mob-fret-wrap { display:none !important; }
-    #mob-fret-wrap.mob-fret-open { display:flex !important; }
-    #mob-fret-toggle-btn { display:flex; }
   }
 
   /* Chord playing highlight */
@@ -2239,16 +2194,6 @@
   /* Sound selector */
   .comp-sound-select { background:var(--surface); border:1px solid var(--border2); color:var(--muted); border-radius:2px; padding:2px 4px; font-size:8px; font-family:'IBM Plex Mono',monospace; cursor:pointer; outline:none; }
   .comp-sound-select:focus { border-color:var(--accent); }
-  /* Play/Pause button — centred below note bubbles in improv overlay */
-  #comp-pause-btn {
-    width:64px; height:64px; border-radius:50%;
-    background:rgba(124,111,160,.25); border:2px solid var(--accent); color:#fff;
-    font-size:24px; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    transition:all .18s; line-height:1; margin:18px auto 0; flex-shrink:0;
-  }
-  #comp-pause-btn:hover { background:rgba(124,111,160,.5); border-color:var(--accent2); }
-  @media (max-width:480px) { #comp-pause-btn { width:72px; height:72px; font-size:28px; } }
   /* Comp button purple background */
   #comp-btn { background:var(--accent); border-color:var(--accent); color:#fff; }
   #comp-btn:hover { background:var(--accent2); border-color:var(--accent2); color:#fff; }
@@ -10168,7 +10113,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v51 &nbsp;·&nbsp; deployed 2026-06-08 12:38</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v52 &nbsp;·&nbsp; deployed 2026-06-12 09:27</span></div>
     </div>
 
     <div class="tech-section">
@@ -10284,21 +10229,23 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     </div>
     <div id="comp-layout">
       <div id="comp-detail-panel"><div class="comp-empty-state">No compositions yet.<br>Click + New to create one.</div></div>
-      <!-- Play pane: mobile Play tab + desktop playing right column -->
+      <!-- Play pane: the improv view (shared by mobile Play tab + desktop Play tab) -->
       <div id="comp-mob-play-pane">
         <div id="mob-stage">
           <div id="mob-stage-roman"></div>
           <div id="mob-stage-name">—</div>
           <div id="mob-stage-notes"></div>
-          <div id="mob-stage-scales"></div>
-          <button id="comp-pause-btn" aria-label="Pause"><svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg></button>
+          <div id="mob-stage-next"></div>
         </div>
         <div id="mob-scale-fret-col">
-          <div id="mob-scale-switcher">
-          </div>
-          <div id="mob-fret-wrap"></div>
+          <div id="mob-scale-switcher"></div>
+          <div id="mob-scale-notes"></div>
         </div>
         <div id="mob-prog-bar"><div id="mob-prog-fill"></div></div>
+        <div id="mob-strip-wrap">
+          <div id="mob-strip-lbl">Sequence</div>
+          <div id="mob-strip"></div>
+        </div>
         <div id="mob-transport">
           <button class="mob-tbtn" id="mob-back-btn" title="Restart">
             <svg viewBox="0 0 14 14" width="15" height="15" fill="currentColor"><polygon points="13,1 4,7 13,13"/><rect x="1" y="1" width="2.5" height="12" rx="1"/></svg>
@@ -10310,15 +10257,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <button class="mob-tbtn" id="mob-stop-btn2" title="Stop">
             <svg viewBox="0 0 12 12" width="14" height="14" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="1.5"/></svg>
           </button>
+          <button class="mob-tbtn" id="mob-loop-btn" title="Loop">↺</button>
           <div id="mob-bpm-wrap">
             <input class="mob-bpm-input" id="mob-bpm-input" type="number" min="40" max="240" value="110">
             <span class="mob-bpm-label">BPM</span>
           </div>
-          <button class="mob-tbtn" id="mob-loop-btn" title="Loop">↺</button>
-        </div>
-        <div id="mob-strip-wrap">
-          <div id="mob-strip-lbl">Sequence</div>
-          <div id="mob-strip"></div>
         </div>
       </div>
     </div>
@@ -11567,20 +11510,9 @@ function compMobSetTab(tab) {
   _mobActiveTab = tab;
   const modal = document.getElementById('comp-modal');
   if (!modal) return;
-  modal.classList.remove('mob-tab-edit','mob-tab-play','mob-tab-settings');
+  modal.classList.remove('mob-tab-edit','mob-tab-play','mob-tab-settings','mob-ls');
   modal.classList.add('mob-tab-' + tab);
   document.querySelectorAll('.cmob-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  const isTouchDevice = navigator.maxTouchPoints > 0;
-  modal.classList.toggle('mob-ls', tab === 'play' && isTouchDevice);
-  if (tab === 'play' && isTouchDevice) {
-    if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {});
-    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-  } else if (tab !== 'play' && isTouchDevice) {
-    if (screen.orientation?.unlock) screen.orientation.unlock();
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-  }
 }
 
 const _IMPROV_SCALE_IVLS = {
@@ -11595,6 +11527,7 @@ const _IMPROV_SCALE_IVLS = {
   'Major Pentatonic':[0,2,4,7,9],'Minor Pentatonic':[0,3,5,7,10],
   'Blues':[0,3,5,6,7,10],'Half-Whole Diminished':[0,1,3,4,6,7,9,10],'Whole-Half Diminished':[0,2,3,5,6,8,9,11],
   'Bebop Dominant':[0,2,4,5,7,9,10,11],
+  'Bebop Dorian':[0,2,3,4,5,7,9,10],'Bebop Major':[0,2,4,5,7,8,9,11],
 };
 const _NOTE_PC_LUT = {'C':0,'C#':1,'Db':1,'D':2,'D#':3,'Eb':3,'E':4,'F':5,'F#':6,'Gb':6,'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11};
 function _parseImprovScale(s) {
@@ -11607,109 +11540,28 @@ function _parseImprovScale(s) {
 let _mobScaleIdx = 0;
 let _mobScaleSuggs = [];
 
-function compMobRenderFretboard(rootPc, intervals) {
-  const wrap = document.getElementById('mob-fret-wrap');
-  if (!wrap) return;
-  const _render = () => {
-    // Fixed 900px width — frets 0-7 zoomed in, container scrolls laterally
-    wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 7, 900, true, null, null, 24, 11);
-  };
-  if (wrap.offsetWidth > 0) _render();
-  else requestAnimationFrame(_render);
-}
-
-let _mobManualScale = null;
-const _MOB_ROOT_NAMES = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
-
-function _mobApplyScaleFromDropdowns() {
-  const rootSel = document.getElementById('mob-scale-root-sel');
-  const scaleSel = document.getElementById('mob-scale-type-sel');
-  if (!rootSel || !scaleSel) return;
-  const rootPc = parseInt(rootSel.value);
-  const ivls = _IMPROV_SCALE_IVLS[scaleSel.value];
-  if (isNaN(rootPc) || !ivls) return;
-  _mobManualScale = { rootPc, ivls };
-  document.querySelectorAll('.mob-scale-sw-btn').forEach(b => b.classList.remove('active'));
-  compMobRenderFretboard(rootPc, ivls);
-}
-
+// Improv help: scale-switcher pills + the active scale spelled out as notes
+// (root highlighted). No keyboard, no fretboard.
 function compMobRenderScaleSwitcher(suggs, activeIdx) {
   const sw = document.getElementById('mob-scale-switcher');
+  const notesEl = document.getElementById('mob-scale-notes');
   if (!sw) return;
-  sw.innerHTML = '<span class="mob-scale-sw-label">Scale</span>';
-  suggs.slice(0, 3).forEach((s, i) => {
+  sw.innerHTML = '<span class="mob-scale-sw-label">Play over it — scale</span>';
+  (suggs || []).forEach((s, i) => {
     const btn = document.createElement('button');
     btn.className = 'mob-scale-sw-btn' + (i === activeIdx ? ' active' : '');
-    btn.textContent = s.scale.replace(/^[A-G][#b♯♭]?\s/, '');
+    btn.textContent = s.scale.replace(/\s*\([^)]*\)/, '');
+    if (s.tip) btn.title = s.tip;
     btn.addEventListener('click', () => {
       _mobScaleIdx = i;
-      _mobManualScale = null;
       compMobRenderScaleSwitcher(_mobScaleSuggs, i);
-      const p = _parseImprovScale(s.scale);
-      if (p) compMobRenderFretboard(p.rootPc, p.ivls);
     });
     sw.appendChild(btn);
   });
-
-  const sep = document.createElement('span');
-  sep.style.cssText = 'width:1px;height:16px;background:var(--border2);flex-shrink:0;margin:0 2px';
-  sw.appendChild(sep);
-
-  const activeSugg = suggs[activeIdx];
-  const parsed = _mobManualScale || _parseImprovScale(activeSugg?.scale || '');
-  const curRoot = parsed?.rootPc ?? 0;
-  const curIvls = parsed?.ivls;
-  const curScaleName = curIvls ? Object.keys(_IMPROV_SCALE_IVLS).find(k => {
-    const v = _IMPROV_SCALE_IVLS[k];
-    return v.length === curIvls.length && v.every((n,i) => n === curIvls[i]);
-  }) || '' : '';
-
-  const rootSel = document.createElement('select');
-  rootSel.id = 'mob-scale-root-sel';
-  rootSel.className = 'mob-scale-dropdown';
-  _MOB_ROOT_NAMES.forEach((name, pc) => {
-    const opt = document.createElement('option');
-    opt.value = pc;
-    opt.textContent = name;
-    if (pc === curRoot) opt.selected = true;
-    rootSel.appendChild(opt);
-  });
-  rootSel.addEventListener('change', _mobApplyScaleFromDropdowns);
-  sw.appendChild(rootSel);
-
-  const scaleSel = document.createElement('select');
-  scaleSel.id = 'mob-scale-type-sel';
-  scaleSel.className = 'mob-scale-dropdown';
-  Object.keys(_IMPROV_SCALE_IVLS).forEach(name => {
-    const opt = document.createElement('option');
-    opt.value = name;
-    opt.textContent = name;
-    if (name === curScaleName) opt.selected = true;
-    scaleSel.appendChild(opt);
-  });
-  scaleSel.addEventListener('change', _mobApplyScaleFromDropdowns);
-  sw.appendChild(scaleSel);
-
-  // Fret toggle button (mobile-only, re-appended each render since innerHTML is reset)
-  const fretBtn = document.createElement('button');
-  fretBtn.id = 'mob-fret-toggle-btn';
-  fretBtn.style.cssText = "padding:3px 10px;border-radius:12px;border:1px solid var(--border2);background:none;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;cursor:pointer;flex-shrink:0;transition:all .12s";
-  fretBtn.title = 'Toggle fretboard';
-  fretBtn.textContent = '⬛ fretboard';
-  fretBtn.addEventListener('click', () => {
-    const wrap = document.getElementById('mob-fret-wrap');
-    const open = wrap.classList.toggle('mob-fret-open');
-    fretBtn.textContent = open ? '✕ fretboard' : '⬛ fretboard';
-    fretBtn.style.color = open ? 'var(--accent2)' : '';
-    fretBtn.style.borderColor = open ? 'var(--accent)' : '';
-    if (open && !wrap.querySelector('svg')) {
-      const sc = _mobManualScale || _parseImprovScale(_mobScaleSuggs[_mobScaleIdx]?.scale || '');
-      if (sc) compMobRenderFretboard(sc.rootPc, sc.ivls);
-    }
-  });
-  sw.appendChild(fretBtn);
-  const firstParsed = _mobManualScale || _parseImprovScale(suggs[activeIdx]?.scale || '');
-  if (firstParsed) compMobRenderFretboard(firstParsed.rootPc, firstParsed.ivls);
+  if (notesEl) {
+    const active = (suggs || [])[activeIdx];
+    notesEl.innerHTML = active ? _compScaleNotesHtml(active.scale) : '';
+  }
 }
 
 function compMobRenderStrip(comp) {
@@ -11717,12 +11569,11 @@ function compMobRenderStrip(comp) {
   if (!strip) return;
   strip.innerHTML = '';
   (comp?.chords || []).forEach((ch, i) => {
-    const name = ch.name && ch.sym && !ch.sym.startsWith(ch.name) ? ch.name + ch.sym : (ch.sym || ch.name || '?');
+    const name = _compChordParts(ch).display;
     const card = document.createElement('div');
     card.className = 'mob-sc';
     card.dataset.idx = i;
     card.innerHTML = `<div class="mob-sc-name">${_escHtml(name)}</div>
-      <div class="mob-sc-roman">${_escHtml(ch.roman || '')}</div>
       <div class="mob-sc-beats">${ch.beats || 4}b</div>`;
     card.addEventListener('click', () => compMobSetTab('play'));
     strip.appendChild(card);
@@ -11731,23 +11582,37 @@ function compMobRenderStrip(comp) {
 
 function compMobUpdateStage(chord, idx) {
   const nameEl  = document.getElementById('mob-stage-name');
-  const romanEl = document.getElementById('mob-stage-roman');
+  const ctxEl   = document.getElementById('mob-stage-roman');   // repurposed: "Chord i / N"
   const notesEl = document.getElementById('mob-stage-notes');
-  const scalesEl = document.getElementById('mob-stage-scales');
+  const nextEl  = document.getElementById('mob-stage-next');
   if (!nameEl) return;
+  const comp  = compLoad().find(c => c.id === compActiveId);
+  const total = comp?.chords?.length || 0;
   if (!chord) {
-    const comp = compLoad().find(c => c.id === compActiveId);
     const first = comp?.chords?.[0];
-    if (!first) { nameEl.textContent = '—'; romanEl.textContent = ''; notesEl.textContent = ''; scalesEl.innerHTML = ''; return; }
+    if (!first) {
+      nameEl.textContent = '—';
+      if (ctxEl)   ctxEl.textContent = '';
+      if (notesEl) notesEl.innerHTML = '';
+      if (nextEl)  nextEl.innerHTML = '';
+      _mobScaleSuggs = [];
+      compMobRenderScaleSwitcher([], 0);
+      return;
+    }
     chord = first; idx = 0;
   }
-  const name = chord.name && chord.sym && !chord.sym.startsWith(chord.name) ? chord.name + chord.sym : (chord.sym || chord.name || '?');
-  nameEl.textContent = name;
-  romanEl.textContent = chord.roman || '';
-  const notes = (chord.pcs || []).map(p => pcToName(((p%12)+12)%12));
-  notesEl.textContent = notes.join(' · ');
+  const parts = _compChordParts(chord);
+  nameEl.innerHTML = parts.nameHtml;
+  if (ctxEl) ctxEl.textContent = total ? `Chord ${idx + 1} / ${total}` : '';
+  if (notesEl) {
+    const notes = (chord.pcs || []).map(p => pcToName(((p % 12) + 12) % 12));
+    notesEl.innerHTML = notes.map(n => `<span class="cc-dot">${_escHtml(n)}</span>`).join('');
+  }
+  if (nextEl) {
+    const next = comp?.chords?.[idx + 1] || (comp?.loop ? comp?.chords?.[0] : null);
+    nextEl.innerHTML = next ? `next&nbsp;<b>${_escHtml(_compChordParts(next).display)}</b>` : '';
+  }
   const suggs = getImprovSuggestions(chord);
-  scalesEl.innerHTML = suggs.slice(0,4).map(s => `<span class="mob-scale-pill">${_escHtml(s.scale.replace(/^[A-G][#b♯♭]?\s/,''))}</span>`).join('');
   _mobScaleSuggs = suggs;
   _mobScaleIdx = 0;
   compMobRenderScaleSwitcher(suggs, 0);
@@ -12139,6 +12004,45 @@ function _renderCompSwingBtns(compId) {
   });
 }
 
+// Tidy a verbose quality string into a short uppercase label for cards
+// ("Minor 11th" → "MINOR 11", "Dominant 7♭9" → "DOM 7♭9", "Half-diminished 7th" → "HALF-DIM 7").
+function _compQualityLabel(q) {
+  if (!q) return '';
+  return q
+    .replace(/Half-diminished/ig, 'Half-dim')
+    .replace(/Dominant/ig, 'Dom')
+    .replace(/Minor-major/ig, 'Min-maj')
+    .replace(/Suspended/ig, 'Sus')
+    .replace(/(\d)(st|nd|rd|th)\b/ig, '$1')
+    .toUpperCase();
+}
+
+// Split a chord into display parts. `roman` is returned ONLY when it is a genuine
+// roman-numeral analysis (diatonic chords store "ii", "V7", "♭VII"…); searched /
+// imported chords store the chord's own name as `roman` (e.g. "Am6"), which starts
+// with a note letter A–G and is suppressed so cards don't show the name twice.
+function _compChordParts(ch) {
+  const root = ch.name || '';
+  const sym  = ch.sym  || '';
+  const display = root && sym && !sym.startsWith(root) ? root + sym : (sym || root || '?');
+  const nameHtml = (root && sym && !sym.startsWith(root))
+    ? `${_escHtml(root)}<sub>${_escHtml(sym)}</sub>`
+    : _escHtml(display);
+  const roman = (ch.roman || '').trim();
+  const isRoman = roman && /^[♭♯b#]?[ivIV]/.test(roman) && roman !== display;
+  return { display, nameHtml, roman: isRoman ? roman : '', quality: _compQualityLabel(ch.quality) };
+}
+
+// Spell out a scale ("A Dorian") as space-separated notes with the root highlighted.
+function _compScaleNotesHtml(scaleStr) {
+  const p = _parseImprovScale(scaleStr);
+  if (!p) return '';
+  return p.ivls.map((iv, i) => {
+    const nm = _escHtml(pcToName((p.rootPc + iv) % 12));
+    return i === 0 ? `<span class="cc-sc-root">${nm}</span>` : nm;
+  }).join(' ');
+}
+
 function compRenderChordRow(comp) {
   const row = document.getElementById('comp-chord-row');
   if (!row) return;
@@ -12159,21 +12063,20 @@ function compRenderChordRow(comp) {
     const nvLabels  = {1:'Whole',2:'Half',4:'Quarter',8:'Eighth',16:'16th'};
     const arpLabels = {up:'↑ Up',down:'↓ Down',updown:'↑↓ Up-Down',downup:'↓↑ Down-Up'};
     const isFirst = i === 0, isLast = i === comp.chords.length - 1;
-    const chDisplayName = ch.name && ch.sym && !ch.sym.startsWith(ch.name)
-      ? ch.name + ch.sym : (ch.sym || ch.name || '?');
+    const parts = _compChordParts(ch);
+    const beatLabel = `${beats} ${beats === 1 ? 'beat' : 'beats'}`;
     card.innerHTML = `
-      <div class="comp-card-header" title="Tap to expand/collapse">
-        <button class="comp-card-mv" data-dir="left" ${isFirst?'disabled':''} title="Move left">◀</button>
-        <span class="comp-chord-name comp-chord-editable" title="Click to change this chord">${_escHtml(chDisplayName)}</span>
-        <span class="comp-chord-roman">${_escHtml(ch.roman || '')}</span>
-        <span class="comp-card-toggle">▸</span>
-        <button class="comp-card-sub comp-card-edit" title="Change this chord">✎</button>
-        <button class="comp-card-sub" title="Substitution ideas">≈</button>
-        <button class="comp-card-mv" data-dir="right" ${isLast?'disabled':''} title="Move right">▶</button>
+      <button class="comp-chord-del" title="Remove">×</button>
+      <div class="cc-head">
+        <div class="cc-roman">${_escHtml(parts.roman)}</div>
+        <div class="cc-name comp-chord-editable" title="Click to change this chord">${parts.nameHtml}</div>
+        <div class="cc-quality">${_escHtml(parts.quality)}</div>
+        <div class="comp-chord-notes cc-notes">${_escHtml(noteList)}</div>
       </div>
-      <div class="comp-card-body">
-        <div class="comp-chord-notes">${_escHtml(noteList)}</div>
-        <div class="chord-ctrl-row" style="margin-top:5px">
+      <div class="cc-foot"><span class="cc-dur">${beatLabel}</span></div>
+      <button class="cc-gear" title="Rhythm, arp &amp; timing for this chord">⚙</button>
+      <div class="cc-panel">
+        <div class="chord-ctrl-row">
           <button class="chord-ctrl-btn${mode==='full'?' c-active':''}" data-cc="mode-full" title="Full chord">F</button>
           <button class="chord-ctrl-btn${mode==='arp'?' c-arp':''}" data-cc="mode-arp" title="Arpeggio">A</button>
           <div class="chord-ctrl-sep"></div>
@@ -12184,24 +12087,29 @@ function compRenderChordRow(comp) {
         <select class="comp-arp-select${mode!=='arp'?' comp-hidden':''}" title="Arp pattern">
           ${Object.entries(arpLabels).map(([v,l])=>`<option value="${v}"${ap===v?' selected':''}>${l}</option>`).join('')}
         </select>
-        <div class="comp-beat-ctrl" title="Duration in beats">
-          <button class="comp-beat-btn" data-action="dec">−</button>
-          <span class="comp-beat-val">${beats}b</span>
-          <button class="comp-beat-btn" data-action="inc">+</button>
+        <div class="cc-panel-row">
+          <div class="comp-beat-ctrl" title="Duration in beats">
+            <button class="comp-beat-btn" data-action="dec">−</button>
+            <span class="comp-beat-val">${beats}b</span>
+            <button class="comp-beat-btn" data-action="inc">+</button>
+          </div>
+          <div class="cc-panel-mv">
+            <button class="comp-card-mv" data-dir="left" ${isFirst?'disabled':''} title="Move left">◀</button>
+            <button class="comp-card-sub" title="Substitution ideas">≈</button>
+            <button class="comp-card-mv" data-dir="right" ${isLast?'disabled':''} title="Move right">▶</button>
+          </div>
         </div>
-      </div>
-      <button class="comp-chord-del" title="Remove">×</button>`;
+      </div>`;
 
-    card.querySelector('.comp-card-header').addEventListener('click', e => {
-      if (e.target.classList.contains('comp-card-mv')) return;
+    card.querySelector('.cc-gear').addEventListener('click', e => {
       e.stopPropagation();
-      card.classList.toggle('expanded');
-      card.querySelector('.comp-card-toggle').textContent = card.classList.contains('expanded') ? '▾' : '▸';
+      const isOpen = card.classList.contains('cc-open');
+      document.querySelectorAll('.comp-chord-card.cc-open').forEach(c => c.classList.remove('cc-open'));
+      if (!isOpen) card.classList.add('cc-open');
     });
-    const openEdit = e => { e.stopPropagation(); showChordEditPopover(card.querySelector('.comp-chord-name'), comp.id, i); };
-    card.querySelector('.comp-chord-editable').addEventListener('click', openEdit);
-    card.querySelector('.comp-card-edit').addEventListener('click', openEdit);
-    card.querySelectorAll('.comp-card-sub:not(.comp-card-edit)')[0].addEventListener('click', e => {
+    const openEdit = e => { e.stopPropagation(); showChordEditPopover(card.querySelector('.cc-name'), comp.id, i); };
+    card.querySelector('.cc-name').addEventListener('click', openEdit);
+    card.querySelector('.comp-card-sub').addEventListener('click', e => {
       e.stopPropagation();
       showSlotSubPopover(e.currentTarget, ch, i, newChord => {
         const comps = compLoad();
@@ -12290,7 +12198,7 @@ function compRenderChordRow(comp) {
     });
     card.querySelector('.comp-chord-del').addEventListener('click', e => {
       e.stopPropagation();
-      showCompConfirm(`Remove "${chDisplayName}" from this composition?`, 'Remove', () => {
+      showCompConfirm(`Remove "${parts.display}" from this composition?`, 'Remove', () => {
         const comps = compLoad();
         const c = comps.find(c => c.id === comp.id);
         if (c) { c.chords.splice(i, 1); compSave(comps); compRenderChordRow(c); compRenderList(); if (compIsPlaying) compPendingRestart = true; }
@@ -12411,6 +12319,7 @@ let compPendingRestart = false;
 let _compTickRaf = null;
 let _improvRaf = null;
 let compIsPaused = false;
+let _compCurIdx = -1;
 
 function compStartPlayback(id) {
   compStopPlayback();
@@ -12423,19 +12332,13 @@ function compStartPlayback(id) {
   const waitingForSampler = !samplerReady || (needsGuitar && !guitarSamplerReady);
   if (waitingForSampler) {
     const playBtn = document.getElementById('comp-play-btn');
-    const pauseBtn = document.getElementById('comp-pause-btn');
     if (playBtn && !playBtn.dataset.waiting) {
       playBtn.dataset.waiting = '1';
       playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Loading…';
     }
-    if (pauseBtn && !pauseBtn.dataset.waiting) {
-      pauseBtn.dataset.waiting = '1';
-      pauseBtn.title = 'Loading samples…';
-    }
     const retry = () => {
       if (samplerReady && (!needsGuitar || guitarSamplerReady)) {
         if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; }
-        if (pauseBtn) { delete pauseBtn.dataset.waiting; pauseBtn.title = ''; }
         compStartPlayback(id);
       }
     };
@@ -12478,6 +12381,7 @@ function compStartPlayback(id) {
         Tone.Transport.schedule(time => {
           requestAnimationFrame(() => {
             if (_compPlayGen !== gen) return;
+            _compCurIdx = chordIdx;
             document.querySelectorAll('.comp-chord-card').forEach((el, j) => {
               el.classList.toggle('playing', j === chordIdx);
             });
@@ -12640,11 +12544,32 @@ function compStartPlayback(id) {
 
     const playBtn = document.getElementById('comp-play-btn');
     const stopBtn = document.getElementById('comp-stop-btn');
-    const pauseBtn = document.getElementById('comp-pause-btn');
     if (playBtn) playBtn.disabled = true;
     if (stopBtn) stopBtn.disabled = false;
-    if (pauseBtn) { pauseBtn.disabled = false; pauseBtn.innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>'; }
     compMobUpdatePlayIcon(true);
+
+    // Live improv readout: countdown to the next chord + progress bar fill
+    {
+      const bd = beatDur;
+      let acc = 0;
+      const ends = comp.chords.map(ch => (acc += (ch.beats || 4) * bd));
+      const progFill = document.getElementById('mob-prog-fill');
+      (function improvTick() {
+        if (!compIsPlaying || _compPlayGen !== gen) return;
+        const pos = Tone.Transport.seconds;
+        const idx = _compCurIdx;
+        if (idx >= 0 && idx < ends.length) {
+          const beatsLeft = Math.max(0, Math.ceil((ends[idx] - pos) / bd));
+          const next = comp.chords[idx + 1] || (comp.loop ? comp.chords[0] : null);
+          const nextEl = document.getElementById('mob-stage-next');
+          if (nextEl) nextEl.innerHTML = next
+            ? `next&nbsp;<b>${_escHtml(_compChordParts(next).display)}</b>&nbsp;in&nbsp;<b>${beatsLeft} ${beatsLeft === 1 ? 'beat' : 'beats'}</b>`
+            : 'last chord';
+        }
+        if (progFill && totalDur > 0) progFill.style.width = Math.min(100, pos / totalDur * 100) + '%';
+        _improvRaf = requestAnimationFrame(improvTick);
+      })();
+    }
 
     // Live loop update: watch for pending changes and apply at next cycle boundary
     if (comp.loop) {
@@ -12679,15 +12604,16 @@ function compStopPlayback() {
   if (guitarSampler) guitarSampler.releaseAll();
   if (progMasterBus === compMasterBus) progMasterBus = null;
   compIsPlaying = false;
+  _compCurIdx = -1;
   compMobSetTab('edit');
   document.querySelectorAll('.comp-chord-card.playing').forEach(el => el.classList.remove('playing'));
   if (_improvRaf) { cancelAnimationFrame(_improvRaf); _improvRaf = null; }
+  const progFill = document.getElementById('mob-prog-fill');
+  if (progFill) progFill.style.width = '0%';
   const playBtn  = document.getElementById('comp-play-btn');
   const stopBtn  = document.getElementById('comp-stop-btn');
-  const pauseBtn = document.getElementById('comp-pause-btn');
   if (playBtn)  playBtn.disabled  = false;
   if (stopBtn)  stopBtn.disabled  = true;
-  if (pauseBtn) { pauseBtn.innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>'; }
   compMobUpdatePlayIcon(false);
   compMobUpdateStage(null, -1);
   document.getElementById('comp-modal')?.classList.remove('comp-playing');
@@ -12703,9 +12629,14 @@ document.getElementById('comp-mob-tabbar').addEventListener('click', e => {
 document.getElementById('mob-play-btn').addEventListener('click', () => {
   if (!compIsPlaying) {
     if (compActiveId) { compStartPlayback(compActiveId); compMobSetTab('play'); }
+  } else if (compIsPaused) {
+    Tone.Transport.start();
+    compIsPaused = false;
+    compMobUpdatePlayIcon(true);
   } else {
-    document.getElementById('comp-pause-btn')?.click();
-    compMobUpdatePlayIcon(!document.getElementById('comp-mob-play-pane')?.classList.contains('paused'));
+    Tone.Transport.pause();
+    compIsPaused = true;
+    compMobUpdatePlayIcon(false);
   }
 });
 document.getElementById('mob-back-btn').addEventListener('click', () => {
@@ -12729,20 +12660,6 @@ document.getElementById('mob-loop-btn').addEventListener('click', () => {
   document.getElementById('mob-loop-btn').classList.toggle('active', next);
   document.getElementById('comp-loop-btn')?.classList.toggle('active', next);
 });
-document.getElementById('comp-pause-btn').addEventListener('click', () => {
-  if (!compIsPlaying) {
-    if (compActiveId) compStartPlayback(compActiveId);
-  } else if (compIsPaused) {
-    Tone.Transport.start();
-    compIsPaused = false;
-    document.getElementById('comp-pause-btn').innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>';
-  } else {
-    Tone.Transport.pause();
-    compIsPaused = true;
-    document.getElementById('comp-pause-btn').innerHTML = '<svg viewBox="0 0 10 12" width="16" height="16" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>';
-  }
-});
-
 // Wire compositions UI
 document.getElementById('comp-btn').addEventListener('click', openCompositions);
 document.getElementById('comp-close-btn').addEventListener('click', closeCompositions);
