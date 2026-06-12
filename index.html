@@ -2119,42 +2119,6 @@
   #mob-fret-wrap { display:none; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
   #mob-fret-wrap svg { display:block; }
 
-  /* ══ LANDSCAPE PLAY — mobile touch only (class mob-ls set by JS) ══
-     Two-class .mob-ls.mob-tab-play out-specifies the single-class desktop rules,
-     so it wins at landscape widths (>601px) regardless of source order. */
-  #comp-modal.mob-ls.mob-tab-play { position:fixed !important; inset:0 !important; border-radius:0 !important; display:flex !important; flex-direction:column !important; max-height:100vh !important; overflow:hidden !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-modal-header { padding:4px 10px !important; flex-shrink:0; }
-  #comp-modal.mob-ls.mob-tab-play #comp-modal-title { font-size:9px !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-new-btn { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-mob-edit-btn { display:flex !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-close-btn { width:22px !important; height:22px !important; font-size:11px !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-chip-bar,
-  #comp-modal.mob-ls.mob-tab-play #comp-mob-tabbar { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play #comp-mob-play-pane { display:flex !important; flex-direction:column !important; flex:1 !important; min-height:0 !important; overflow:hidden !important; }
-  /* Chord: compact horizontal banner */
-  #comp-modal.mob-ls.mob-tab-play #mob-stage { flex:0 0 auto !important; width:auto !important; flex-direction:row !important; align-items:center !important; justify-content:flex-start !important; gap:12px !important; padding:4px 12px !important; border-right:none !important; border-bottom:1px solid var(--border2) !important; background:var(--surface) !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-roman { font-size:8px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-name  { font-size:26px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-notes { margin-top:0 !important; gap:4px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-notes .cc-dot { width:20px !important; height:20px !important; font-size:8px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-stage-next  { display:none !important; }
-  /* Scales: thin row under the banner */
-  #comp-modal.mob-ls.mob-tab-play #mob-scale-fret-col { flex:0 0 auto !important; flex-direction:column !important; padding:3px 10px !important; border-bottom:1px solid var(--border2) !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-scale-switcher { display:flex !important; padding:0 !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-scale-notes { padding:2px 0 0 !important; font-size:11px !important; }
-  /* Fretboard fills the remaining height */
-  #comp-modal.mob-ls.mob-tab-play #mob-fret-wrap { display:block !important; flex:1 1 auto !important; min-height:0 !important; overflow:auto !important; padding:4px 8px !important; }
-  /* Progress + sequence + transport along the bottom */
-  #comp-modal.mob-ls.mob-tab-play #mob-prog-bar { flex:0 0 auto !important; margin:0 !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-strip-wrap { flex:0 0 auto !important; padding:3px 10px !important; border-top:1px solid var(--border2); }
-  #comp-modal.mob-ls.mob-tab-play #mob-strip-lbl { display:none !important; }
-  #comp-modal.mob-ls.mob-tab-play .mob-sc { width:46px !important; padding:3px 2px 2px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-transport { flex:0 0 auto !important; display:flex !important; padding:5px 12px !important; gap:8px; justify-content:flex-start; align-items:center; border-top:1px solid var(--border2); }
-  #comp-modal.mob-ls.mob-tab-play #mob-transport .mob-tbtn { width:30px !important; height:30px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-transport .mob-tbtn.play-main { width:38px !important; height:38px !important; }
-  #comp-modal.mob-ls.mob-tab-play #mob-bpm-wrap { display:flex !important; margin-left:auto; }
-  #comp-modal.mob-ls.mob-tab-play #mob-loop-btn { display:flex !important; }
-
   /* ══ Desktop tab system ══ */
   @media (min-width:601px) {
     /* Tab bar visible on desktop as top navigation */
@@ -10163,7 +10127,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v53 &nbsp;·&nbsp; deployed 2026-06-12 17:04</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v54 &nbsp;·&nbsp; deployed 2026-06-12 18:04</span></div>
     </div>
 
     <div class="tech-section">
@@ -11564,19 +11528,6 @@ function compMobSetTab(tab) {
   modal.classList.remove('mob-tab-edit','mob-tab-play','mob-tab-settings','mob-ls');
   modal.classList.add('mob-tab-' + tab);
   document.querySelectorAll('.cmob-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  // On touch phones the Play tab rotates to landscape + fullscreen so the
-  // improv fretboard gets the full screen width.
-  const isTouchDevice = navigator.maxTouchPoints > 0;
-  modal.classList.toggle('mob-ls', tab === 'play' && isTouchDevice);
-  if (tab === 'play' && isTouchDevice) {
-    if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {});
-    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-  } else if (tab !== 'play' && isTouchDevice) {
-    if (screen.orientation?.unlock) screen.orientation.unlock();
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-  }
 }
 
 const _IMPROV_SCALE_IVLS = {
