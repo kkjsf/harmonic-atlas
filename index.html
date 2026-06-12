@@ -2106,7 +2106,54 @@
   .mob-scale-sw-btn { padding:4px 12px; border-radius:13px; border:1px solid var(--border2); background:none; color:var(--muted); font-size:11px; font-family:'IBM Plex Mono',monospace; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .12s; }
   .mob-scale-sw-btn:hover { border-color:var(--gold); color:var(--gold2); }
   .mob-scale-sw-btn.active { border-color:var(--gold); background:rgba(201,168,76,.1); color:var(--gold2); }
+  .mob-scale-sep { width:1px; height:16px; background:var(--border2); flex-shrink:0; margin:0 2px; }
+  /* Manual scale picker — choose any root + scale to display on the fretboard */
+  .mob-scale-dropdown { appearance:none; background:var(--surface2); border:1px solid var(--border2); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:3px 22px 3px 8px; border-radius:12px; cursor:pointer; flex-shrink:0; outline:none; transition:border-color .12s; max-width:150px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%23c9a84c' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 7px center; }
+  #mob-scale-root-sel { max-width:54px; }
+  .mob-scale-dropdown:focus { border-color:var(--gold); }
+  .mob-scale-dropdown option { background:var(--surface2); }
   #mob-scale-fret-col { display:none; flex-direction:column; min-width:0; overflow:hidden; }
+  /* Guitar fretboard — improv (full-width row on desktop, fills the screen in landscape) */
+  #mob-fret-wrap { display:none; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
+  #mob-fret-wrap svg { display:block; }
+
+  /* ══ LANDSCAPE PLAY — mobile touch only (class mob-ls set by JS) ══
+     Two-class .mob-ls.mob-tab-play out-specifies the single-class desktop rules,
+     so it wins at landscape widths (>601px) regardless of source order. */
+  #comp-modal.mob-ls.mob-tab-play { position:fixed !important; inset:0 !important; border-radius:0 !important; display:flex !important; flex-direction:column !important; max-height:100vh !important; overflow:hidden !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-modal-header { padding:4px 10px !important; flex-shrink:0; }
+  #comp-modal.mob-ls.mob-tab-play #comp-modal-title { font-size:9px !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-new-btn { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-mob-edit-btn { display:flex !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-close-btn { width:22px !important; height:22px !important; font-size:11px !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-chip-bar,
+  #comp-modal.mob-ls.mob-tab-play #comp-mob-tabbar { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play #comp-mob-play-pane { display:flex !important; flex-direction:column !important; flex:1 !important; min-height:0 !important; overflow:hidden !important; }
+  /* Chord: compact horizontal banner */
+  #comp-modal.mob-ls.mob-tab-play #mob-stage { flex:0 0 auto !important; width:auto !important; flex-direction:row !important; align-items:center !important; justify-content:flex-start !important; gap:12px !important; padding:4px 12px !important; border-right:none !important; border-bottom:1px solid var(--border2) !important; background:var(--surface) !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-roman { font-size:8px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-name  { font-size:26px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-notes { margin-top:0 !important; gap:4px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-notes .cc-dot { width:20px !important; height:20px !important; font-size:8px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-stage-next  { display:none !important; }
+  /* Scales: thin row under the banner */
+  #comp-modal.mob-ls.mob-tab-play #mob-scale-fret-col { flex:0 0 auto !important; flex-direction:column !important; padding:3px 10px !important; border-bottom:1px solid var(--border2) !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-scale-switcher { display:flex !important; padding:0 !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-scale-notes { padding:2px 0 0 !important; font-size:11px !important; }
+  /* Fretboard fills the remaining height */
+  #comp-modal.mob-ls.mob-tab-play #mob-fret-wrap { display:block !important; flex:1 1 auto !important; min-height:0 !important; overflow:auto !important; padding:4px 8px !important; }
+  /* Progress + sequence + transport along the bottom */
+  #comp-modal.mob-ls.mob-tab-play #mob-prog-bar { flex:0 0 auto !important; margin:0 !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-strip-wrap { flex:0 0 auto !important; padding:3px 10px !important; border-top:1px solid var(--border2); }
+  #comp-modal.mob-ls.mob-tab-play #mob-strip-lbl { display:none !important; }
+  #comp-modal.mob-ls.mob-tab-play .mob-sc { width:46px !important; padding:3px 2px 2px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-transport { flex:0 0 auto !important; display:flex !important; padding:5px 12px !important; gap:8px; justify-content:flex-start; align-items:center; border-top:1px solid var(--border2); }
+  #comp-modal.mob-ls.mob-tab-play #mob-transport .mob-tbtn { width:30px !important; height:30px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-transport .mob-tbtn.play-main { width:38px !important; height:38px !important; }
+  #comp-modal.mob-ls.mob-tab-play #mob-bpm-wrap { display:flex !important; margin-left:auto; }
+  #comp-modal.mob-ls.mob-tab-play #mob-loop-btn { display:flex !important; }
 
   /* ══ Desktop tab system ══ */
   @media (min-width:601px) {
@@ -2139,6 +2186,8 @@
     #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:1; min-width:0; flex-direction:column; justify-content:center; gap:6px; padding:20px 24px; }
     #comp-modal.mob-tab-play #mob-scale-switcher { display:flex !important; padding:0; }
     #comp-modal.mob-tab-play #mob-scale-notes    { padding:6px 0 0; font-size:15px; }
+    /* Fretboard: its own full-width row under the chord/scales */
+    #comp-modal.mob-tab-play #mob-fret-wrap { display:block !important; flex-basis:100%; overflow-x:auto; padding:10px 16px 14px; border-top:1px solid var(--border2); background:var(--surface2); }
     /* Bottom: progress bar, sequence strip, then one transport footer — all full width */
     #comp-modal.mob-tab-play #mob-prog-bar   { flex-basis:100%; margin:0; }
     #comp-modal.mob-tab-play #mob-strip-wrap { flex-basis:100%; padding:10px 0 12px; }
@@ -2165,8 +2214,9 @@
     /* Play tab — stacked: chord · improv (pills + notes) · transport · sequence */
     #comp-modal.mob-tab-play #comp-detail-panel { display:none !important; }
     #comp-modal.mob-tab-play #comp-mob-play-pane { display:flex !important; flex:1; flex-direction:column; }
-    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:0 0 auto; border-top:1px solid var(--border2); border-bottom:1px solid var(--border2); padding:4px 4px 8px; }
+    #comp-modal.mob-tab-play #mob-scale-fret-col { display:flex !important; flex:0 0 auto; border-top:1px solid var(--border2); padding:4px 4px 8px; }
     #comp-modal.mob-tab-play #mob-scale-switcher { display:flex !important; }
+    #comp-modal.mob-tab-play #mob-fret-wrap { display:block !important; flex:0 0 auto; max-height:42vh; overflow:auto; border-top:1px solid var(--border2); border-bottom:1px solid var(--border2); padding:6px 8px; }
     #comp-modal.mob-tab-play #mob-bpm-wrap { display:flex; }
     #comp-modal.mob-tab-play #mob-loop-btn { display:flex; }
     #comp-modal.mob-tab-play #mob-transport  { order:4; border-top:1px solid var(--border2); }
@@ -10113,7 +10163,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v52 &nbsp;·&nbsp; deployed 2026-06-12 09:27</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v53 &nbsp;·&nbsp; deployed 2026-06-12 17:04</span></div>
     </div>
 
     <div class="tech-section">
@@ -10241,6 +10291,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div id="mob-scale-switcher"></div>
           <div id="mob-scale-notes"></div>
         </div>
+        <div id="mob-fret-wrap"></div>
         <div id="mob-prog-bar"><div id="mob-prog-fill"></div></div>
         <div id="mob-strip-wrap">
           <div id="mob-strip-lbl">Sequence</div>
@@ -11513,6 +11564,19 @@ function compMobSetTab(tab) {
   modal.classList.remove('mob-tab-edit','mob-tab-play','mob-tab-settings','mob-ls');
   modal.classList.add('mob-tab-' + tab);
   document.querySelectorAll('.cmob-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  // On touch phones the Play tab rotates to landscape + fullscreen so the
+  // improv fretboard gets the full screen width.
+  const isTouchDevice = navigator.maxTouchPoints > 0;
+  modal.classList.toggle('mob-ls', tab === 'play' && isTouchDevice);
+  if (tab === 'play' && isTouchDevice) {
+    if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {});
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  } else if (tab !== 'play' && isTouchDevice) {
+    if (screen.orientation?.unlock) screen.orientation.unlock();
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
 }
 
 const _IMPROV_SCALE_IVLS = {
@@ -11539,9 +11603,44 @@ function _parseImprovScale(s) {
 }
 let _mobScaleIdx = 0;
 let _mobScaleSuggs = [];
+let _mobManualScale = null;   // {rootPc, ivls} when a scale is chosen via the dropdowns
+const _MOB_ROOT_NAMES = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
 
-// Improv help: scale-switcher pills + the active scale spelled out as notes
-// (root highlighted). No keyboard, no fretboard.
+function _compSpellScale(rootPc, ivls) {
+  return ivls.map((iv, i) => {
+    const nm = _escHtml(pcToName((rootPc + iv) % 12));
+    return i === 0 ? `<span class="cc-sc-root">${nm}</span>` : nm;
+  }).join(' ');
+}
+
+// Render the guitar fretboard for a scale into the play view.
+function compMobRenderFretboard(rootPc, intervals) {
+  const wrap = document.getElementById('mob-fret-wrap');
+  if (!wrap) return;
+  const _render = () => {
+    wrap.innerHTML = makeScaleFretboardSVG(intervals, rootPc, [], 0, 7, 900, true, null, null, 24, 11);
+  };
+  if (wrap.offsetWidth > 0) _render();
+  else requestAnimationFrame(_render);
+}
+
+// Manual scale picker (root + scale type) — show ANY scale's fretboard, not just suggestions.
+function _mobApplyScaleFromDropdowns() {
+  const rootSel  = document.getElementById('mob-scale-root-sel');
+  const scaleSel = document.getElementById('mob-scale-type-sel');
+  if (!rootSel || !scaleSel) return;
+  const rootPc = parseInt(rootSel.value);
+  const ivls   = _IMPROV_SCALE_IVLS[scaleSel.value];
+  if (isNaN(rootPc) || !ivls) return;
+  _mobManualScale = { rootPc, ivls };
+  document.querySelectorAll('.mob-scale-sw-btn').forEach(b => b.classList.remove('active'));
+  const notesEl = document.getElementById('mob-scale-notes');
+  if (notesEl) notesEl.innerHTML = _compSpellScale(rootPc, ivls);
+  compMobRenderFretboard(rootPc, ivls);
+}
+
+// Improv help: suggestion pills + a manual root/scale picker; updates the spelled
+// notes AND the guitar fretboard for whichever scale is active.
 function compMobRenderScaleSwitcher(suggs, activeIdx) {
   const sw = document.getElementById('mob-scale-switcher');
   const notesEl = document.getElementById('mob-scale-notes');
@@ -11549,19 +11648,50 @@ function compMobRenderScaleSwitcher(suggs, activeIdx) {
   sw.innerHTML = '<span class="mob-scale-sw-label">Play over it — scale</span>';
   (suggs || []).forEach((s, i) => {
     const btn = document.createElement('button');
-    btn.className = 'mob-scale-sw-btn' + (i === activeIdx ? ' active' : '');
+    btn.className = 'mob-scale-sw-btn' + (!_mobManualScale && i === activeIdx ? ' active' : '');
     btn.textContent = s.scale.replace(/\s*\([^)]*\)/, '');
     if (s.tip) btn.title = s.tip;
     btn.addEventListener('click', () => {
       _mobScaleIdx = i;
+      _mobManualScale = null;
       compMobRenderScaleSwitcher(_mobScaleSuggs, i);
     });
     sw.appendChild(btn);
   });
-  if (notesEl) {
-    const active = (suggs || [])[activeIdx];
-    notesEl.innerHTML = active ? _compScaleNotesHtml(active.scale) : '';
-  }
+
+  // Active scale = manual pick, else the selected suggestion
+  const active   = _mobManualScale || _parseImprovScale((suggs || [])[activeIdx]?.scale || '');
+  const curRoot  = active?.rootPc ?? 0;
+  const curIvls  = active?.ivls;
+  const curName  = curIvls ? (Object.keys(_IMPROV_SCALE_IVLS).find(k => {
+    const v = _IMPROV_SCALE_IVLS[k];
+    return v.length === curIvls.length && v.every((n, i) => n === curIvls[i]);
+  }) || '') : '';
+
+  const sep = document.createElement('span');
+  sep.className = 'mob-scale-sep';
+  sw.appendChild(sep);
+
+  const rootSel = document.createElement('select');
+  rootSel.id = 'mob-scale-root-sel'; rootSel.className = 'mob-scale-dropdown';
+  _MOB_ROOT_NAMES.forEach((name, pc) => {
+    const o = document.createElement('option'); o.value = pc; o.textContent = name;
+    if (pc === curRoot) o.selected = true; rootSel.appendChild(o);
+  });
+  rootSel.addEventListener('change', _mobApplyScaleFromDropdowns);
+  sw.appendChild(rootSel);
+
+  const scaleSel = document.createElement('select');
+  scaleSel.id = 'mob-scale-type-sel'; scaleSel.className = 'mob-scale-dropdown';
+  Object.keys(_IMPROV_SCALE_IVLS).forEach(name => {
+    const o = document.createElement('option'); o.value = name; o.textContent = name;
+    if (name === curName) o.selected = true; scaleSel.appendChild(o);
+  });
+  scaleSel.addEventListener('change', _mobApplyScaleFromDropdowns);
+  sw.appendChild(scaleSel);
+
+  if (notesEl) notesEl.innerHTML = curIvls ? _compSpellScale(curRoot, curIvls) : '';
+  if (active) compMobRenderFretboard(active.rootPc, active.ivls);
 }
 
 function compMobRenderStrip(comp) {
@@ -11641,7 +11771,7 @@ function compMobInit(comp) {
   if (!comp) return;
   const isNewComp = comp.id !== _mobCompId;
   _mobCompId = comp.id;
-  if (isNewComp) _mobActiveTab = 'edit';
+  if (isNewComp) { _mobActiveTab = 'edit'; _mobManualScale = null; }
   compMobRenderStrip(comp);
   compMobUpdateStage(comp.chords?.[0] || null, 0);
   compMobSetTab(_mobActiveTab);
