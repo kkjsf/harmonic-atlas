@@ -10127,7 +10127,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v59 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v60 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
     </div>
 
     <div class="tech-section">
@@ -11330,15 +11330,15 @@ function _pickBestPartId(doc) {
 }
 
 // Map a Guitar Pro percussion instrument name to one of the app's drum synths.
-const _DRUM_VEL = { kick: 0.95, snare: 0.8, hihat: 0.5, openhat: 0.6, ride: 0.55, clap: 0.7 };
+const _DRUM_VEL = { kick: 0.95, snare: 0.8, hihat: 0.5, openhat: 0.6, ride: 0.55, clap: 0.7, shaker: 0.34 };
 function _drumTypeFromName(name) {
   const s = (name || '').toLowerCase();
-  if (/kick|bass drum/.test(s))               return 'kick';
-  if (/hat/.test(s))                          return /open|half/.test(s) ? 'openhat' : 'hihat';
-  if (/ride|crash|splash|china|cymbal/.test(s)) return 'ride';
-  if (/snare|rim|stick|tom/.test(s))          return 'snare';
-  if (/clap/.test(s))                         return 'clap';
-  if (/shaker|maraca|cabasa|tambour/.test(s)) return 'hihat';
+  if (/kick|bass drum/.test(s))                        return 'kick';
+  if (/shaker|maraca|cabasa|cabaza|guiro|tambour/.test(s)) return 'shaker';  // keep distinct from hi-hat
+  if (/hat/.test(s))                                   return /open|half/.test(s) ? 'openhat' : 'hihat';
+  if (/ride|crash|splash|china|cymbal/.test(s))        return 'ride';
+  if (/snare|rim|stick|tom/.test(s))                   return 'snare';
+  if (/clap/.test(s))                                  return 'clap';
   return null;
 }
 
@@ -13059,6 +13059,7 @@ function compStartPlayback(id) {
               case 'snare':   _synthSnare(dctx, time, v); break;
               case 'hihat':   _synthHihat(dctx, time, false, v); break;
               case 'openhat': _synthHihat(dctx, time, true, v); break;
+              case 'shaker':  _synthHihat(dctx, time, true, v); break;
               case 'ride':    _synthRide(dctx, time, false, v); break;
               case 'clap':    _synthClap(dctx, time, v); break;
             }
