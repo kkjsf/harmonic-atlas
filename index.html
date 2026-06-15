@@ -10127,7 +10127,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v56 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v57 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
     </div>
 
     <div class="tech-section">
@@ -10187,7 +10187,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Strum patterns</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">STRUM_PATTERNS</code> object — each pattern defines beat arrays with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{d, a, g}</code> flags (downstroke, accent, ghost). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations(dur, beats)</code> converts to hit objects with velocity (accent=1.0, normal=0.72, up=0.48, ghost=0.22).</span></div>
       <div class="tech-row"><span class="tech-key">Drums</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DRUM_PATTERNS</code> — 9 styles (Rock/Funk/Jazz/Bossa/Waltz/Ballad/Reggae/HiHat/Click), each with bpm+subdiv+beat arrays. Synthesised entirely via Web Audio API: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthKick</code> (sub+punch), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthSnare</code> (dual bandpass), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthHihat</code> (HP 8.5 kHz), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthRide</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthClap</code> (3 layered bursts). Auto mode maps strum pattern name to matching drum style.</span></div>
       <div class="tech-row"><span class="tech-key">Improv suggestions</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getImprovSuggestions(chord)</code> — quality-first regex matching against <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> output strings. No degree-based lookup — scale choice is determined by chord type (dom7→Mixolydian/Altered, Δ7→Ionian/Lydian, m7→Dorian, ø7→Locrian/Locrian♯2, etc.).</span></div>
-      <div class="tech-row"><span class="tech-key">MusicXML import</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compImportMusicXML()</code> — imports a Guitar Pro / partwise MusicXML export into a composition with chords + <em>exact groove</em>. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseMusicXMLDoc()</code> walks measures via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DOMParser</code> (no library), tracking divisions/backup/forward for onset times. Each note onset becomes a per-chord <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">rhythm:[{at,dur,vel}]</code>, played back by a dedicated branch in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">scheduleChords</code>. Multi-part exports (drums/solo/bass/comp) show a part chooser — <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_pickBestPartId()</code> defaults to the most chordal pitched part and excludes <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;unpitched&gt;</code> drum tracks. Chords from <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;harmony&gt;</code> labels used verbatim; otherwise detected per half-bar by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_matchChordFromPcs()</code> — a pool scorer (over <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildAllKeysChordPool()</code>) tolerant of omitted 5ths, so altered guitar voicings like G7♭9♭13 (no 5th) name correctly.</span></div>
+      <div class="tech-row"><span class="tech-key">MusicXML import</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compImportMusicXML()</code> — imports a Guitar Pro / partwise MusicXML export into a composition with chords + <em>exact groove</em>. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseMusicXMLDoc()</code> walks measures via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DOMParser</code> (no library), tracking divisions/backup/forward for onset times. Each onset becomes a per-chord <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">rhythm:[{at,dur,vel,midis}]</code> capturing the <em>actual notes</em> played (preserving bass/chord alternation), played back by a dedicated branch in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">scheduleChords</code>. Duplicate TAB staff skipped; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">octave-change</code> transpose applied; consecutive identical chords merged. Percussion part parsed into an absolute-beat <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">drumTrack</code> (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseDrumTrack</code> → GP instrument names mapped to kick/snare/hat/ride synths). Multi-part exports (drums/solo/bass/comp) show a part chooser — <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_pickBestPartId()</code> defaults to the most chordal pitched part and excludes <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;unpitched&gt;</code> drum tracks. Chords from <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;harmony&gt;</code> labels used verbatim; otherwise detected per half-bar by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_matchChordFromPcs()</code> — a pool scorer (over <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildAllKeysChordPool()</code>) tolerant of omitted 5ths, so altered guitar voicings like G7♭9♭13 (no 5th) name correctly.</span></div>
       <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> — assigns minimum octave keeping notes strictly ascending from C3.</span></div>
       <div class="tech-row"><span class="tech-key">iOS/PWA unlock</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.start()</code> on first user gesture; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.releaseAll()</code> on stop.</span></div>
     </div>
@@ -11076,6 +11076,7 @@ function _haEncodeComp(comp) {
     loop: !!comp.loop,
     drums: !!comp.drums,
     drumsStyle: comp.drumsStyle || 'auto',
+    drumTrack: comp.drumTrack || undefined,
     sound: comp.sound || 'piano',
     strum: comp.strum || 'Straight',
     swing: comp.swing ?? 0,
@@ -11104,6 +11105,7 @@ function compImportCode(code) {
     loop: !!p.loop,
     drums: !!p.drums,
     drumsStyle: p.drumsStyle || 'auto',
+    drumTrack: p.drumTrack || undefined,
     sound: p.sound || 'piano',
     strum: p.strum || 'Straight',
     swing: p.swing ?? 0,
@@ -11327,6 +11329,61 @@ function _pickBestPartId(doc) {
   return cand[0].id;
 }
 
+// Map a Guitar Pro percussion instrument name to one of the app's drum synths.
+const _DRUM_VEL = { kick: 0.95, snare: 0.8, hihat: 0.5, openhat: 0.6, ride: 0.55, clap: 0.7 };
+function _drumTypeFromName(name) {
+  const s = (name || '').toLowerCase();
+  if (/kick|bass drum/.test(s))               return 'kick';
+  if (/hat/.test(s))                          return /open|half/.test(s) ? 'openhat' : 'hihat';
+  if (/ride|crash|splash|china|cymbal/.test(s)) return 'ride';
+  if (/snare|rim|stick|tom/.test(s))          return 'snare';
+  if (/clap/.test(s))                         return 'clap';
+  if (/shaker|maraca|cabasa|tambour/.test(s)) return 'hihat';
+  return null;
+}
+
+// Parse the percussion part into an absolute-beat hit list the player can
+// schedule against the app's synth drums (imported groove replaces presets).
+function _parseDrumTrack(doc) {
+  const score = doc.getElementsByTagName('score-partwise')[0];
+  const instName = {};
+  [...score.getElementsByTagName('score-instrument')].forEach(si => {
+    instName[si.getAttribute('id')] = (si.getElementsByTagName('instrument-name')[0]?.textContent || '').trim();
+  });
+  const drumSum = _mxmlPartSummaries(doc).filter(p => p.unpitched > 0).sort((a, b) => b.unpitched - a.unpitched)[0];
+  if (!drumSum) return null;
+  const part = [...score.getElementsByTagName('part')].find(p => p.getAttribute('id') === drumSum.id);
+  if (!part) return null;
+  const hits = [];
+  let divisions = 1, pos = 0, lastAt = 0;
+  for (const measure of [...part.children].filter(c => c.localName === 'measure')) {
+    for (const el of [...measure.children]) {
+      switch (el.localName) {
+        case 'attributes': {
+          const d = el.getElementsByTagName('divisions')[0];
+          if (d) divisions = parseInt(d.textContent) || divisions;
+          break;
+        }
+        case 'note': {
+          const isChord = el.getElementsByTagName('chord').length > 0;
+          const isRest  = el.getElementsByTagName('rest').length > 0;
+          const dur     = parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0;
+          const onset   = isChord ? lastAt : pos;
+          if (!isRest && el.getElementsByTagName('unpitched').length) {
+            const type = _drumTypeFromName(instName[el.getElementsByTagName('instrument')[0]?.getAttribute('id')]);
+            if (type) hits.push({ at: onset / divisions, type, vel: _DRUM_VEL[type] || 0.7 });
+          }
+          if (!isChord) { lastAt = pos; pos += dur; }
+          break;
+        }
+        case 'backup':  pos -= parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0; break;
+        case 'forward': pos += parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0; break;
+      }
+    }
+  }
+  return hits.length ? hits : null;
+}
+
 function _parseMusicXMLDoc(doc, partId) {
   const score = doc.getElementsByTagName('score-partwise')[0];
 
@@ -11349,7 +11406,8 @@ function _parseMusicXMLDoc(doc, partId) {
 
   const notes = [];   // { at, dur, pc, midi }  (at/dur in quarter-note beats)
   const harms = [];   // { at, root, pcs }
-  let divisions = 1, beats = 4, beatType = 4, pos = 0, lastAt = 0;
+  const tabStaves = new Set();   // TAB staff numbers — duplicate the standard staff, skip them
+  let divisions = 1, beats = 4, beatType = 4, pos = 0, lastAt = 0, octaveChange = 0;
   for (const measure of [...part.children].filter(c => c.localName === 'measure')) {
     for (const el of [...measure.children]) {
       switch (el.localName) {
@@ -11360,6 +11418,14 @@ function _parseMusicXMLDoc(doc, partId) {
           if (b) beats = parseInt(b.textContent) || beats;
           const bt = el.getElementsByTagName('beat-type')[0];
           if (bt) beatType = parseInt(bt.textContent) || beatType;
+          const oc = el.getElementsByTagName('octave-change')[0];
+          if (oc) octaveChange = parseInt(oc.textContent) || 0;
+          [...el.getElementsByTagName('clef')].forEach(cl => {
+            if ((cl.getElementsByTagName('sign')[0]?.textContent || '').trim().toUpperCase() === 'TAB') {
+              const num = cl.getAttribute('number');
+              if (num) tabStaves.add(num);
+            }
+          });
           break;
         }
         case 'harmony': {
@@ -11372,9 +11438,13 @@ function _parseMusicXMLDoc(doc, partId) {
           const isRest  = el.getElementsByTagName('rest').length > 0;
           const dur     = parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0;
           const onset   = isChord ? lastAt : pos;
-          if (!isRest) {
-            const midi = _mxmlNoteMidi(el);
-            if (midi != null) notes.push({ at: onset / divisions, dur: Math.max(1, dur) / divisions, pc: ((midi % 12) + 12) % 12, midi });
+          const staff   = el.getElementsByTagName('staff')[0]?.textContent?.trim();
+          if (!isRest && !(staff && tabStaves.has(staff))) {   // skip TAB-staff duplicates
+            const raw = _mxmlNoteMidi(el);
+            if (raw != null) {
+              const midi = raw + 12 * octaveChange;            // sounding pitch
+              notes.push({ at: onset / divisions, dur: Math.max(1, dur) / divisions, pc: ((midi % 12) + 12) % 12, midi });
+            }
           }
           if (!isChord) { lastAt = pos; pos += dur; }
           break;
@@ -11426,23 +11496,28 @@ function compImportMusicXML(doc, filename, partId) {
       || { name: pcToName(seg.root), sym: '', roman: '', notes: [pcToName(seg.root)], pcs: seg.pcs, quality: 'Unknown' };
     const root = ((seg.root % 12) + 12) % 12;
     const prev = merged[merged.length - 1];
-    if (seg.raw && prev && prev._sym === m.sym && prev._root === root) prev.end = seg.end;
+    // Merge consecutive identical chords (e.g. 2×4 beats of the same chord → one 8-beat card).
+    if (prev && prev._sym === m.sym && prev._root === root) prev.end = seg.end;
     else merged.push({ ...m, _sym: m.sym, _root: root, start: seg.start, end: seg.end });
   });
 
-  // 3) Attach the captured rhythm (note onsets) to each chord.
+  // 3) Attach the captured rhythm to each chord — the *actual notes* at each
+  //    onset, so the original bass/chord alternation plays back as written.
   const chords = merged.map(c => {
     const span = Math.max(0.5, Math.round((c.end - c.start) * 4) / 4);
     const byOnset = new Map();
     notes.filter(n => n.at >= c.start - 1e-6 && n.at < c.end - 1e-6).forEach(n => {
       const at = Math.round((n.at - c.start) * 48) / 48;
-      if (!byOnset.has(at) || n.dur > byOnset.get(at)) byOnset.set(at, n.dur);
+      let h = byOnset.get(at);
+      if (!h) { h = { dur: 0, midis: new Set() }; byOnset.set(at, h); }
+      h.dur = Math.max(h.dur, n.dur);
+      h.midis.add(n.midi);
     });
     const hits = [...byOnset.entries()]
-      .map(([at, dur]) => ({ at, dur }))
+      .map(([at, h]) => ({ at, dur: h.dur, midis: [...h.midis].sort((a, b) => a - b) }))
       .filter(h => h.at < span - 1e-6)
       .sort((a, b) => a.at - b.at)
-      .map((h, i) => ({ at: h.at, dur: Math.min(h.dur, span - h.at), vel: i === 0 ? 0.6 : 0.5 }));
+      .map((h, i) => ({ at: h.at, dur: Math.min(h.dur, span - h.at), vel: i === 0 ? 0.6 : 0.5, midis: h.midis }));
     return {
       name: c.name, sym: c.sym, roman: c.roman, notes: c.notes,
       pcs: c.pcs.map(p => ((p % 12) + 12) % 12), quality: c.quality,
@@ -11452,10 +11527,12 @@ function compImportMusicXML(doc, filename, partId) {
 
   if (!chords.length) throw new Error('Could not extract any chords.');
 
+  const drumTrack = _parseDrumTrack(doc);
   const comp = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2),
     title: title || (filename || '').replace(/\.[^.]+$/, '') || 'Imported',
-    text: '', chords, bpm, loop: true, drums: false, drumsStyle: 'auto',
+    text: '', chords, bpm, loop: true,
+    drums: !!drumTrack, drumsStyle: drumTrack ? 'imported' : 'auto', drumTrack: drumTrack || undefined,
     sound: 'guitar', strum: 'Straight', swing: 0, createdAt: Date.now(),
   };
   const comps = compLoad();
@@ -12865,22 +12942,24 @@ function compStartPlayback(id) {
             }, t);
           }
         } else if (ch.rhythm && ch.rhythm.length) {
-          // Imported groove: play the voiced chord at each captured note onset,
-          // so the original Guitar Pro rhythm (e.g. a bossa comp) is preserved.
+          // Imported groove: play the *actual notes* captured at each onset, so
+          // the original bass/chord alternation (the bossa comp) is preserved.
           ch.rhythm.forEach(hit => {
             const at = Math.max(0, hit.at || 0);
             if (at * beatDur >= chDur - 1e-3) return;
             const t       = tOffset + at * beatDur;
             const noteDur = Math.max(0.18, Math.min((hit.dur || 0.5) * beatDur * 1.05, chDur));
             const vel     = hit.vel || 0.55;
-            voiced.forEach((v, ni) => {
+            const hitNotes = (hit.midis && hit.midis.length) ? hit.midis.map(m => ({ midi: m })) : voiced;
+            hitNotes.forEach((v, ni) => {
               Tone.Transport.schedule(time => {
                 if (_compPlayGen !== gen || !activeReady()) return;
                 activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time + ni * 0.006, vel);
               }, t);
             });
           });
-          if (voiced.length) {
+          // Octave-down root reinforcement only for legacy grooves without captured notes.
+          if (!ch.rhythm.some(h => h.midis && h.midis.length) && voiced.length) {
             const rootMidi = voiced[0].midi - 12;
             if (rootMidi >= 28) {
               const t = tOffset + Math.max(0, ch.rhythm[0].at || 0) * beatDur;
@@ -12962,6 +13041,26 @@ function compStartPlayback(id) {
 
     function scheduleDrums(srcComp) {
       if (!srcComp.drums) return;
+      // Imported drum track (from MusicXML): play the captured hits literally.
+      if (srcComp.drumTrack && srcComp.drumTrack.length) {
+        const dctx = Tone.getContext().rawContext;
+        srcComp.drumTrack.forEach(h => {
+          const t = (h.at || 0) * beatDur;
+          const v = h.vel || 0.7;
+          Tone.Transport.schedule(time => {
+            if (_compPlayGen !== gen) return;
+            switch (h.type) {
+              case 'kick':    _synthKick(dctx, time, v); break;
+              case 'snare':   _synthSnare(dctx, time, v); break;
+              case 'hihat':   _synthHihat(dctx, time, false, v); break;
+              case 'openhat': _synthHihat(dctx, time, true, v); break;
+              case 'ride':    _synthRide(dctx, time, false, v); break;
+              case 'clap':    _synthClap(dctx, time, v); break;
+            }
+          }, t);
+        });
+        return;
+      }
       const actx = Tone.getContext().rawContext;
       const strumName = activeStrum || 'Straight';
       const styleName = srcComp.drumsStyle || 'auto';
