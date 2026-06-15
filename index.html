@@ -10127,7 +10127,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v58 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v59 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
     </div>
 
     <div class="tech-section">
@@ -12280,7 +12280,8 @@ function compRenderDetail(comp) {
     <div class="comp-drums-row">
       <button class="comp-drums-btn${comp.drums?' active':''}" id="comp-drums-btn">Drums</button>
       <select class="comp-drums-style" id="comp-drums-style"${!comp.drums?' disabled':''}>
-        <option value="auto"${!(comp.drumsStyle)||comp.drumsStyle==='auto'?' selected':''}>Auto (match strum)</option>
+        ${comp.drumTrack&&comp.drumTrack.length?`<option value="imported"${comp.drumsStyle==='imported'?' selected':''}>Imported (from file)</option>`:''}
+        <option value="auto"${comp.drumsStyle==='auto'||(!comp.drumsStyle&&!(comp.drumTrack&&comp.drumTrack.length))?' selected':''}>Auto (match strum)</option>
         <option value="rock"${comp.drumsStyle==='rock'?' selected':''}>Rock</option>
         <option value="funk"${comp.drumsStyle==='funk'?' selected':''}>Funk</option>
         <option value="jazz"${comp.drumsStyle==='jazz'?' selected':''}>Jazz</option>
@@ -13045,7 +13046,8 @@ function compStartPlayback(id) {
     function scheduleDrums(srcComp) {
       if (!srcComp.drums) return;
       // Imported drum track (from MusicXML): play the captured hits literally.
-      if (srcComp.drumTrack && srcComp.drumTrack.length) {
+      // Active when the style is "imported"; pick a preset style to override it.
+      if (srcComp.drumTrack && srcComp.drumTrack.length && (srcComp.drumsStyle === 'imported' || !srcComp.drumsStyle)) {
         const dctx = Tone.getContext().rawContext;
         srcComp.drumTrack.forEach(h => {
           const t = (h.at || 0) * beatDur;
