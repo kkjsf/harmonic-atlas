@@ -10127,7 +10127,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v57 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v58 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
     </div>
 
     <div class="tech-section">
@@ -11371,17 +11371,20 @@ function _parseDrumTrack(doc) {
           const onset   = isChord ? lastAt : pos;
           if (!isRest && el.getElementsByTagName('unpitched').length) {
             const type = _drumTypeFromName(instName[el.getElementsByTagName('instrument')[0]?.getAttribute('id')]);
-            if (type) hits.push({ at: onset / divisions, type, vel: _DRUM_VEL[type] || 0.7 });
+            if (type) hits.push({ at: onset, type, vel: _DRUM_VEL[type] || 0.7 });   // onset in beats
           }
-          if (!isChord) { lastAt = pos; pos += dur; }
+          if (!isChord) { lastAt = pos; pos += dur / divisions; }   // accumulate in beats
           break;
         }
-        case 'backup':  pos -= parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0; break;
-        case 'forward': pos += parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0; break;
+        case 'backup':  pos -= (parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0) / divisions; break;
+        case 'forward': pos += (parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0) / divisions; break;
       }
     }
   }
-  return hits.length ? hits : null;
+  if (!hits.length) return null;
+  // Drop duplicate same-instrument hits at the same instant (avoids flamming).
+  const seen = new Set();
+  return hits.filter(h => { const k = h.at.toFixed(3) + h.type; if (seen.has(k)) return false; seen.add(k); return true; });
 }
 
 function _parseMusicXMLDoc(doc, partId) {
@@ -11430,7 +11433,7 @@ function _parseMusicXMLDoc(doc, partId) {
         }
         case 'harmony': {
           const h = _mxmlHarmony(el);
-          if (h) harms.push({ at: pos / divisions, root: h.root, pcs: h.pcs });
+          if (h) harms.push({ at: pos, root: h.root, pcs: h.pcs });   // pos is in beats
           break;
         }
         case 'note': {
@@ -11443,14 +11446,14 @@ function _parseMusicXMLDoc(doc, partId) {
             const raw = _mxmlNoteMidi(el);
             if (raw != null) {
               const midi = raw + 12 * octaveChange;            // sounding pitch
-              notes.push({ at: onset / divisions, dur: Math.max(1, dur) / divisions, pc: ((midi % 12) + 12) % 12, midi });
+              notes.push({ at: onset, dur: Math.max(dur, 1) / divisions, pc: ((midi % 12) + 12) % 12, midi });
             }
           }
-          if (!isChord) { lastAt = pos; pos += dur; }
+          if (!isChord) { lastAt = pos; pos += dur / divisions; }   // accumulate in beats
           break;
         }
-        case 'backup':  pos -= parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0; break;
-        case 'forward': pos += parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0; break;
+        case 'backup':  pos -= (parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0) / divisions; break;
+        case 'forward': pos += (parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0) / divisions; break;
       }
     }
   }
