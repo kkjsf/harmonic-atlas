@@ -10127,7 +10127,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v54 &nbsp;·&nbsp; deployed 2026-06-12 18:04</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v55 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
     </div>
 
     <div class="tech-section">
@@ -10187,6 +10187,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Strum patterns</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">STRUM_PATTERNS</code> object — each pattern defines beat arrays with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{d, a, g}</code> flags (downstroke, accent, ghost). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations(dur, beats)</code> converts to hit objects with velocity (accent=1.0, normal=0.72, up=0.48, ghost=0.22).</span></div>
       <div class="tech-row"><span class="tech-key">Drums</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DRUM_PATTERNS</code> — 9 styles (Rock/Funk/Jazz/Bossa/Waltz/Ballad/Reggae/HiHat/Click), each with bpm+subdiv+beat arrays. Synthesised entirely via Web Audio API: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthKick</code> (sub+punch), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthSnare</code> (dual bandpass), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthHihat</code> (HP 8.5 kHz), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthRide</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthClap</code> (3 layered bursts). Auto mode maps strum pattern name to matching drum style.</span></div>
       <div class="tech-row"><span class="tech-key">Improv suggestions</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getImprovSuggestions(chord)</code> — quality-first regex matching against <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> output strings. No degree-based lookup — scale choice is determined by chord type (dom7→Mixolydian/Altered, Δ7→Ionian/Lydian, m7→Dorian, ø7→Locrian/Locrian♯2, etc.).</span></div>
+      <div class="tech-row"><span class="tech-key">MusicXML import</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compImportMusicXML()</code> — imports a Guitar Pro / partwise MusicXML export into a composition with chords + <em>exact groove</em>. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseMusicXMLDoc()</code> walks measures via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DOMParser</code> (no library), tracking divisions/backup/forward for onset times. Each note onset becomes a per-chord <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">rhythm:[{at,dur,vel}]</code>, played back by a dedicated branch in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">scheduleChords</code>. Chords from <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;harmony&gt;</code> labels used verbatim; otherwise detected per half-bar by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_matchChordFromPcs()</code> — a pool scorer (over <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildAllKeysChordPool()</code>) tolerant of omitted 5ths, so altered guitar voicings like G7♭9♭13 (no 5th) name correctly.</span></div>
       <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> — assigns minimum octave keeping notes strictly ascending from C3.</span></div>
       <div class="tech-row"><span class="tech-key">iOS/PWA unlock</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.start()</code> on first user gesture; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.releaseAll()</code> on stop.</span></div>
     </div>
@@ -11190,6 +11191,289 @@ function compImportPrompt() {
   });
 }
 
+// ── MusicXML import (chords + exact groove) ─────────────────────────────────
+// Imports a Guitar Pro / MusicXML export into a composition. When the file
+// carries chord symbols (<harmony>) we use them verbatim; otherwise we detect
+// each bar's chord from the played notes (omitted-note tolerant). Either way
+// the actual note onsets become a per-chord "rhythm" so the original groove
+// (e.g. a bossa comp) plays back faithfully under your solo.
+
+let _compChordPoolCache = null;
+function _compChordPool() {
+  if (!_compChordPoolCache) _compChordPoolCache = buildAllKeysChordPool();
+  return _compChordPoolCache;
+}
+
+// Score every chord in the pool against a played pitch-class set and return the
+// best match as a ready-to-use chord object. `preferRoot` (a pc) biases toward
+// voicings whose root is the bass / written root. Missing 5ths are cheap;
+// missing 3rds/7ths are expensive — matching how guitarists omit notes.
+function _matchChordFromPcs(pcs, preferRoot) {
+  const played = new Set(pcs.map(p => ((p % 12) + 12) % 12));
+  if (!played.size) return null;
+  const pref = preferRoot == null ? null : ((preferRoot % 12) + 12) % 12;
+  let best = null, bestScore = -1e9;
+  for (const cand of _compChordPool()) {
+    const cps  = cand.pcs.map(p => ((p % 12) + 12) % 12);
+    const cset = new Set(cps);
+    const rootPc = cps[0];
+    let score = 0;
+    cps.forEach(pc => {
+      if (played.has(pc)) { score += 2; return; }
+      const iv = (pc - rootPc + 12) % 12;
+      if (iv === 7)               score -= 0.3;  // omitted 5th — common, cheap
+      else if (iv === 3 || iv === 4)  score -= 2.5;  // missing 3rd hurts
+      else if (iv === 10 || iv === 11) score -= 2;   // missing 7th hurts
+      else                        score -= 1.2;  // missing extension/alteration
+    });
+    played.forEach(pc => {                                       // notes not in chord
+      if (cset.has(pc)) return;
+      if ((pc - rootPc + 12) % 12 === 7) return;                 // a played 5th never hurts
+      score -= 1.6;
+    });
+    if (pref != null && rootPc === pref) score += 4;
+    score -= Math.abs(cps.length - played.size) * 0.05;          // prefer tidy fit
+    if (score > bestScore) { bestScore = score; best = cand; }
+  }
+  if (!best) return null;
+  return { name: best.name, sym: best.sym, roman: best.roman, notes: [...best.notes],
+           pcs: best.pcs.map(p => ((p % 12) + 12) % 12), quality: best.quality };
+}
+
+const _MXML_STEP_PC = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+const _MXML_DEG_IV  = { 1:0, 2:2, 3:4, 4:5, 5:7, 6:9, 7:11, 9:2, 11:5, 13:9 };
+const _MXML_KIND_IV = {
+  'major':[0,4,7], 'minor':[0,3,7], 'augmented':[0,4,8], 'diminished':[0,3,6],
+  'dominant':[0,4,7,10], 'major-seventh':[0,4,7,11], 'minor-seventh':[0,3,7,10],
+  'diminished-seventh':[0,3,6,9], 'augmented-seventh':[0,4,8,10],
+  'half-diminished':[0,3,6,10], 'major-minor':[0,3,7,11],
+  'major-sixth':[0,4,7,9], 'minor-sixth':[0,3,7,9],
+  'dominant-ninth':[0,4,7,10,2], 'major-ninth':[0,4,7,11,2], 'minor-ninth':[0,3,7,10,2],
+  'dominant-11th':[0,4,7,10,2,5], 'major-11th':[0,4,7,11,2,5], 'minor-11th':[0,3,7,10,2,5],
+  'dominant-13th':[0,4,7,10,2,5,9], 'major-13th':[0,4,7,11,2,5,9], 'minor-13th':[0,3,7,10,2,5,9],
+  'suspended-second':[0,2,7], 'suspended-fourth':[0,5,7], 'power':[0,7],
+};
+
+function _mxmlNoteMidi(el) {
+  const p = el.getElementsByTagName('pitch')[0];
+  if (!p) return null;
+  const sp = _MXML_STEP_PC[(p.getElementsByTagName('step')[0]?.textContent || '').trim().toUpperCase()];
+  if (sp == null) return null;
+  const alter = parseInt(p.getElementsByTagName('alter')[0]?.textContent) || 0;
+  const oct   = parseInt(p.getElementsByTagName('octave')[0]?.textContent);
+  if (isNaN(oct)) return null;
+  return (oct + 1) * 12 + sp + alter;
+}
+
+function _mxmlHarmony(el) {
+  const rs = el.getElementsByTagName('root-step')[0];
+  if (!rs) return null;
+  const stepPc = _MXML_STEP_PC[(rs.textContent || '').trim().toUpperCase()];
+  if (stepPc == null) return null;
+  const ra = el.getElementsByTagName('root-alter')[0];
+  const rootPc = (((stepPc + (ra ? parseInt(ra.textContent) || 0 : 0)) % 12) + 12) % 12;
+  const kindEl = el.getElementsByTagName('kind')[0];
+  const kindTxt = (kindEl?.textContent || '').trim().toLowerCase();
+  let ivs = (_MXML_KIND_IV[kindTxt] || [0,4,7]).slice();
+  [...el.getElementsByTagName('degree')].forEach(d => {
+    const v  = parseInt(d.getElementsByTagName('degree-value')[0]?.textContent);
+    const al = parseInt(d.getElementsByTagName('degree-alter')[0]?.textContent) || 0;
+    const ty = (d.getElementsByTagName('degree-type')[0]?.textContent || 'add').trim().toLowerCase();
+    const base = _MXML_DEG_IV[v];
+    if (base == null) return;
+    const semi = (((base + al) % 12) + 12) % 12;
+    ivs = ivs.filter(x => x !== base);
+    if (ty !== 'subtract') ivs.push(semi);
+  });
+  return { root: rootPc, pcs: [...new Set(ivs.map(i => (rootPc + i) % 12))] };
+}
+
+function _parseMusicXMLDoc(xmlText) {
+  if (/^\s*PK\x03\x04/.test(xmlText))
+    throw new Error('That is a compressed .mxl file. In Guitar Pro export as "MusicXML (uncompressed)" / .xml.');
+  const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('Could not parse this file as XML.');
+  const score = doc.getElementsByTagName('score-partwise')[0];
+  if (!score) throw new Error('Only partwise MusicXML is supported — re-export from Guitar Pro as MusicXML.');
+
+  const title = (doc.getElementsByTagName('work-title')[0]?.textContent
+              || doc.getElementsByTagName('movement-title')[0]?.textContent
+              || doc.getElementsByTagName('part-name')[0]?.textContent || '').trim();
+
+  let bpm = 0;
+  const snd = [...doc.getElementsByTagName('sound')].find(s => s.getAttribute('tempo'));
+  if (snd) bpm = parseFloat(snd.getAttribute('tempo'));
+  if (!bpm) bpm = parseFloat(doc.getElementsByTagName('per-minute')[0]?.textContent);
+  bpm = Math.round(bpm) || 90;
+
+  // Pick the part with the most notes (the comping part on a single export).
+  const parts = [...score.getElementsByTagName('part')];
+  if (!parts.length) throw new Error('No parts found in this file.');
+  let part = parts[0], maxNotes = -1;
+  for (const p of parts) { const n = p.getElementsByTagName('note').length; if (n > maxNotes) { maxNotes = n; part = p; } }
+
+  const notes = [];   // { at, dur, pc, midi }  (at/dur in quarter-note beats)
+  const harms = [];   // { at, root, pcs }
+  let divisions = 1, beats = 4, beatType = 4, pos = 0, lastAt = 0;
+  for (const measure of [...part.children].filter(c => c.localName === 'measure')) {
+    for (const el of [...measure.children]) {
+      switch (el.localName) {
+        case 'attributes': {
+          const d = el.getElementsByTagName('divisions')[0];
+          if (d) divisions = parseInt(d.textContent) || divisions;
+          const b = el.getElementsByTagName('beats')[0];
+          if (b) beats = parseInt(b.textContent) || beats;
+          const bt = el.getElementsByTagName('beat-type')[0];
+          if (bt) beatType = parseInt(bt.textContent) || beatType;
+          break;
+        }
+        case 'harmony': {
+          const h = _mxmlHarmony(el);
+          if (h) harms.push({ at: pos / divisions, root: h.root, pcs: h.pcs });
+          break;
+        }
+        case 'note': {
+          const isChord = el.getElementsByTagName('chord').length > 0;
+          const isRest  = el.getElementsByTagName('rest').length > 0;
+          const dur     = parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0;
+          const onset   = isChord ? lastAt : pos;
+          if (!isRest) {
+            const midi = _mxmlNoteMidi(el);
+            if (midi != null) notes.push({ at: onset / divisions, dur: Math.max(1, dur) / divisions, pc: ((midi % 12) + 12) % 12, midi });
+          }
+          if (!isChord) { lastAt = pos; pos += dur; }
+          break;
+        }
+        case 'backup':  pos -= parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0; break;
+        case 'forward': pos += parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0; break;
+      }
+    }
+  }
+  return { title, bpm, notes, harms, barQ: Math.max(1, beats * 4 / beatType) };
+}
+
+function compImportMusicXML(xmlText, filename) {
+  const { title, bpm, notes, harms, barQ } = _parseMusicXMLDoc(xmlText);
+  if (!notes.length && !harms.length) throw new Error('No notes or chords found in this file.');
+
+  const pieceEnd = Math.max(
+    notes.reduce((m, n) => Math.max(m, n.at + n.dur), 0),
+    harms.length ? harms.reduce((m, h) => Math.max(m, h.at), 0) + barQ : 0
+  );
+
+  // 1) Decide chord segments [start,end). Labelled bars → use harmony; else
+  //    split each bar into halves, detect, and merge equal neighbours.
+  const segs = [];
+  let detected = false;
+  if (harms.length) {
+    const hs = harms.slice().sort((a, b) => a.at - b.at);
+    hs.forEach((h, i) => {
+      const start = h.at, end = i + 1 < hs.length ? hs[i + 1].at : pieceEnd;
+      if (end - start > 0.05) segs.push({ start, end, root: h.root, pcs: h.pcs });
+    });
+  } else {
+    detected = true;
+    const half = barQ / 2;
+    const nSeg = Math.max(1, Math.round(pieceEnd / half));
+    for (let k = 0; k < nSeg; k++) {
+      const start = k * half, end = start + half;
+      const inSeg = notes.filter(n => n.at >= start - 1e-6 && n.at < end - 1e-6);
+      if (!inSeg.length) continue;
+      const bass = inSeg.reduce((a, b) => (b.midi < a.midi ? b : a)).pc;
+      segs.push({ start, end, root: bass, pcs: [...new Set(inSeg.map(n => n.pc))], raw: true });
+    }
+  }
+
+  // 2) Identify each segment's chord and merge adjacent identical ones.
+  const merged = [];
+  segs.forEach(seg => {
+    const m = _matchChordFromPcs(seg.pcs, seg.root)
+      || { name: pcToName(seg.root), sym: '', roman: '', notes: [pcToName(seg.root)], pcs: seg.pcs, quality: 'Unknown' };
+    const root = ((seg.root % 12) + 12) % 12;
+    const prev = merged[merged.length - 1];
+    if (seg.raw && prev && prev._sym === m.sym && prev._root === root) prev.end = seg.end;
+    else merged.push({ ...m, _sym: m.sym, _root: root, start: seg.start, end: seg.end });
+  });
+
+  // 3) Attach the captured rhythm (note onsets) to each chord.
+  const chords = merged.map(c => {
+    const span = Math.max(0.5, Math.round((c.end - c.start) * 4) / 4);
+    const byOnset = new Map();
+    notes.filter(n => n.at >= c.start - 1e-6 && n.at < c.end - 1e-6).forEach(n => {
+      const at = Math.round((n.at - c.start) * 48) / 48;
+      if (!byOnset.has(at) || n.dur > byOnset.get(at)) byOnset.set(at, n.dur);
+    });
+    const hits = [...byOnset.entries()]
+      .map(([at, dur]) => ({ at, dur }))
+      .filter(h => h.at < span - 1e-6)
+      .sort((a, b) => a.at - b.at)
+      .map((h, i) => ({ at: h.at, dur: Math.min(h.dur, span - h.at), vel: i === 0 ? 0.6 : 0.5 }));
+    return {
+      name: c.name, sym: c.sym, roman: c.roman, notes: c.notes,
+      pcs: c.pcs.map(p => ((p % 12) + 12) % 12), quality: c.quality,
+      beats: span, noteVal: 4, playMode: 'full', arpPattern: 'up', rhythm: hits,
+    };
+  }).filter(c => c.pcs.length);
+
+  if (!chords.length) throw new Error('Could not extract any chords.');
+
+  const comp = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+    title: title || (filename || '').replace(/\.[^.]+$/, '') || 'Imported',
+    text: '', chords, bpm, loop: true, drums: false, drumsStyle: 'auto',
+    sound: 'guitar', strum: 'Straight', swing: 0, createdAt: Date.now(),
+  };
+  const comps = compLoad();
+  comps.unshift(comp);
+  compSave(comps);
+  comp._detected = detected;
+  return comp;
+}
+
+function compImportMusicXMLPrompt() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.xml,.musicxml,.mxl,application/xml,text/xml';
+  inp.style.display = 'none';
+  inp.addEventListener('change', () => {
+    const file = inp.files && inp.files[0];
+    inp.remove();
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const comp = compImportMusicXML(String(reader.result), file.name);
+        compRenderList();
+        compSelectId(comp.id);
+        _compToast(`Imported “${comp.title}” — ${comp.chords.length} chords, ${comp.bpm} bpm`
+          + (comp._detected ? '. Chords detected from notes — review the names & ⚙ rhythm.' : '.'));
+      } catch (e) {
+        _compToast('Import failed: ' + (e.message || e), true);
+      }
+    };
+    reader.readAsText(file);
+  });
+  document.body.appendChild(inp);
+  inp.click();
+}
+
+function _compToast(msg, isError) {
+  let t = document.getElementById('comp-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'comp-toast';
+    t.style.cssText = `position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:calc(var(--z-top) + 20);max-width:84vw;padding:10px 16px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.5);pointer-events:none;opacity:0;transition:opacity .2s;`;
+    document.body.appendChild(t);
+  }
+  t.style.background = isError ? 'rgba(224,96,96,.16)' : '#141820';
+  t.style.border = '1px solid ' + (isError ? '#e06060' : '#2e3440');
+  t.style.color = isError ? '#e06060' : 'var(--text)';
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 5000);
+}
+
 function openCompositions() {
   document.getElementById('comp-overlay').classList.add('open');
   document.getElementById('comp-btn').classList.add('active');
@@ -11250,6 +11534,12 @@ function compRenderChipBar(comps) {
   importChip.title = 'Import a shared composition code';
   importChip.addEventListener('click', compImportPrompt);
   bar.appendChild(importChip);
+  const xmlChip = document.createElement('button');
+  xmlChip.className = 'comp-chip-new';
+  xmlChip.textContent = '♫ MusicXML';
+  xmlChip.title = 'Import a Guitar Pro / MusicXML file — chords + exact rhythm';
+  xmlChip.addEventListener('click', compImportMusicXMLPrompt);
+  bar.appendChild(xmlChip);
 }
 
 // Full chromatic chord library — every common quality on all 12 roots,
@@ -12496,6 +12786,32 @@ function compStartPlayback(id) {
               if (_compPlayGen !== gen || !activeReady()) return;
               activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time, vel);
             }, t);
+          }
+        } else if (ch.rhythm && ch.rhythm.length) {
+          // Imported groove: play the voiced chord at each captured note onset,
+          // so the original Guitar Pro rhythm (e.g. a bossa comp) is preserved.
+          ch.rhythm.forEach(hit => {
+            const at = Math.max(0, hit.at || 0);
+            if (at * beatDur >= chDur - 1e-3) return;
+            const t       = tOffset + at * beatDur;
+            const noteDur = Math.max(0.18, Math.min((hit.dur || 0.5) * beatDur * 1.05, chDur));
+            const vel     = hit.vel || 0.55;
+            voiced.forEach((v, ni) => {
+              Tone.Transport.schedule(time => {
+                if (_compPlayGen !== gen || !activeReady()) return;
+                activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time + ni * 0.006, vel);
+              }, t);
+            });
+          });
+          if (voiced.length) {
+            const rootMidi = voiced[0].midi - 12;
+            if (rootMidi >= 28) {
+              const t = tOffset + Math.max(0, ch.rhythm[0].at || 0) * beatDur;
+              Tone.Transport.schedule(time => {
+                if (_compPlayGen !== gen || !activeReady()) return;
+                activeSampler.triggerAttackRelease(midiToNoteName(rootMidi), Math.max(0.4, beatDur), time, 0.5);
+              }, t);
+            }
           }
         } else if (activeStrum === 'Bossa') {
           // Authentic 2-bar bossa nova comp (the João Gilberto "signature"):
