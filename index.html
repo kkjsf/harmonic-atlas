@@ -1351,7 +1351,7 @@
     position: relative; background: var(--surface2);
     border: 1px solid var(--border2); border-radius: 4px;
     padding: 8px 10px 6px; display: flex; flex-direction: column;
-    align-items: center; gap: 3px; width: 100%;
+    align-items: center; gap: 3px; width: 100%; cursor: pointer;
   }
   .comp-chord-name { font-size: 13px; font-weight: 600; color: var(--text); }
   .comp-chord-roman { font-size: 9px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
@@ -1462,7 +1462,7 @@
   .comp-chord-row.compact-mode .cc-foot,
   .comp-chord-row.compact-mode .cc-panel { display:none !important; }
   .comp-chord-row.compact-mode .comp-chord-card.cc-open .cc-panel { display:flex !important; }
-  .comp-chord-row.compact-mode .comp-chord-card { cursor:default; }
+  .comp-chord-row.compact-mode .comp-chord-card { cursor:pointer; }
   /* Compact mode overrides grid to single-column chip strip */
   .comp-chord-row.compact-mode { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
   /* Chord reorder arrows */
@@ -4010,11 +4010,49 @@ const IMPRO_MAP = [
   { match: q => q.includes('Major'),                          scales: ['Major (Ionian)', 'Lydian'] },
 ];
 
-function makeImproDiv(quality, chordRootPc) {
+// True if the scale (rooted on the chord root) contains every chord tone.
+function scaleCoversChord(scaleName, chordPcSet) {
+  const s = SCALES[scaleName];
+  if (!s) return false;
+  const sPcs = new Set(s.intervals.map(i => ((i % 12) + 12) % 12));
+  for (const pc of chordPcSet) if (!sPcs.has(pc)) return false;
+  return true;
+}
+
+// Find the best full scale in SCALES that contains every chord tone.
+// Prefer complete 7-note scales over sparse pentatonics: a pentatonic is a
+// subset that omits the chord's colour tones, so it's a poor default.
+function findCoveringScale(chordPcSet) {
+  let best = null, bestKey = Infinity;
+  for (const name of Object.keys(SCALES)) {
+    if (!scaleCoversChord(name, chordPcSet)) continue;
+    const s = SCALES[name];
+    const key = (s.pentatonic ? 100 : 0) + s.intervals.length; // pentatonics ranked last
+    if (key < bestKey) { best = name; bestKey = key; }
+  }
+  return best;
+}
+
+function makeImproDiv(quality, chordRootPc, chordIv) {
   const entry = IMPRO_MAP.find(e => e.match(quality));
   if (!entry) return null;
-  const scales = entry.scales.filter(s => SCALES[s]);
+  let scales = entry.scales.filter(s => SCALES[s]);
   if (!scales.length) return null;
+
+  // Ensure the default (first) scale contains ALL the chord's notes.
+  const chordPcSet = Array.isArray(chordIv)
+    ? new Set(chordIv.map(i => ((i % 12) + 12) % 12)) : null;
+  if (chordPcSet) {
+    const covering = scales.filter(s => scaleCoversChord(s, chordPcSet));
+    const nonCov = scales.filter(s => !scaleCoversChord(s, chordPcSet));
+    if (covering.length) {
+      scales = covering.concat(nonCov);          // covering scales first
+    } else {
+      const fb = findCoveringScale(chordPcSet);   // none cover → pull in one that does
+      scales = fb ? [fb, ...nonCov] : scales;
+    }
+  }
+
   const div = document.createElement('div');
   div.className = 'chord-impro';
   const lbl = document.createElement('span');
@@ -4027,7 +4065,11 @@ function makeImproDiv(quality, chordRootPc) {
     pill.textContent = scaleName.replace(' (Ionian)', '').replace('Aeolian (Natural Minor)', 'Aeolian');
     pill.dataset.scale = scaleName;
     pill.dataset.rootPc = chordRootPc;
-    pill.title = `Navigate to ${scaleName} at this chord root`;
+    const fullyCovers = !chordPcSet || scaleCoversChord(scaleName, chordPcSet);
+    if (!fullyCovers) pill.style.opacity = '.55';
+    pill.title = fullyCovers
+      ? `Navigate to ${scaleName} at this chord root`
+      : `${scaleName} — color choice; omits a chord tone`;
     div.appendChild(pill);
   });
   return div;
@@ -4136,7 +4178,7 @@ function renderChords(scaleNotes, scaleData){
         if (chord.iv.length >= 4) {
           const rPc = noteNameToPc(chord.root);
           if (rPc >= 0) {
-            const improDiv = makeImproDiv(chord.qual, rPc);
+            const improDiv = makeImproDiv(chord.qual, rPc, chord.iv);
             if (improDiv) card.appendChild(improDiv);
           }
         }
@@ -4244,7 +4286,7 @@ function renderChords(scaleNotes, scaleData){
       }
       if (n >= 4) {
         const rPc = noteNameToPc(chordNotes[0]);
-        if (rPc >= 0) { const improDiv = makeImproDiv(quality, rPc); if (improDiv) card.appendChild(improDiv); }
+        if (rPc >= 0) { const improDiv = makeImproDiv(quality, rPc, iv); if (improDiv) card.appendChild(improDiv); }
       }
 
       // Middle arrow
@@ -4272,7 +4314,7 @@ function renderChords(scaleNotes, scaleData){
         addCardAddBtn(negCard, negCh.root, negCh.sym, romans[di], negCh.notes, negCh.qual);
         const negRootPc = noteNameToPc(negCh.root);
         if (negRootPc >= 0 && n >= 4) {
-          const improDiv = makeImproDiv(negCh.qual, negRootPc);
+          const improDiv = makeImproDiv(negCh.qual, negRootPc, negCh.iv);
           if (improDiv) negCard.appendChild(improDiv);
         }
       } else {
@@ -4355,7 +4397,7 @@ function renderChords(scaleNotes, scaleData){
           }
         }
         if (n >= 4 && rPc >= 0) {
-          const improDiv = makeImproDiv(quality, rPc);
+          const improDiv = makeImproDiv(quality, rPc, iv);
           if (improDiv) card.appendChild(improDiv);
         }
         grid.appendChild(card);
@@ -10127,7 +10169,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v60 &nbsp;·&nbsp; deployed 2026-06-15 11:03</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v64 &nbsp;·&nbsp; deployed 2026-06-17</span></div>
     </div>
 
     <div class="tech-section">
@@ -12103,7 +12145,7 @@ function compMobRenderStrip(comp) {
     card.dataset.idx = i;
     card.innerHTML = `<div class="mob-sc-name">${_escHtml(name)}</div>
       <div class="mob-sc-beats">${ch.beats || 4}b</div>`;
-    card.addEventListener('click', () => compMobSetTab('play'));
+    card.addEventListener('click', () => { compMobSetTab('play'); compStartPlayback(compActiveId, i); });
     strip.appendChild(card);
   });
 }
@@ -12733,8 +12775,41 @@ function compRenderChordRow(comp) {
         if (c) { c.chords.splice(i, 1); compSave(comps); compRenderChordRow(c); compRenderList(); if (compIsPlaying) compPendingRestart = true; }
       });
     });
+    // Click the card body → start (or jump) playback from this chord.
+    card.title = 'Click to play from here';
+    card.addEventListener('click', e => {
+      if (e.target.closest('button, select, input, .cc-name, .cc-panel')) return;
+      compStartPlayback(comp.id, i);
+    });
     row.appendChild(card);
   });
+}
+
+// Does the suggested "Root ScaleName" contain every chord tone in chordPcs?
+function _improvScaleCovers(scaleStr, chordPcs) {
+  const p = _parseImprovScale(scaleStr);
+  if (!p) return false;
+  const set = new Set(p.ivls.map(iv => (p.rootPc + iv) % 12));
+  return chordPcs.every(pc => set.has(pc));
+}
+
+// Pentatonic / blues scales are subsets — never a good default improv scale.
+const _THIN_IMPROV_SCALES = new Set(['Major Pentatonic', 'Minor Pentatonic', 'Blues']);
+
+// Find the best full scale (rooted on the chord) that contains every chord tone.
+// Prefer complete 7-note scales over sparse pentatonics.
+function _findImprovCoveringScale(rootPc, chordPcs) {
+  const root = rootPc >= 0 ? pcToName(rootPc) : '';
+  if (!root) return null;
+  let best = null, bestKey = Infinity;
+  for (const name of Object.keys(_IMPROV_SCALE_IVLS)) {
+    const ivls = _IMPROV_SCALE_IVLS[name];
+    const set = new Set(ivls.map(iv => (rootPc + iv) % 12));
+    if (!chordPcs.every(pc => set.has(pc))) continue;
+    const key = (_THIN_IMPROV_SCALES.has(name) ? 100 : 0) + ivls.length; // pentatonics last
+    if (key < bestKey) { best = name; bestKey = key; }
+  }
+  return best ? { scale: `${root} ${best}`, tip: 'Contains every chord tone' } : null;
 }
 
 function getImprovSuggestions(chord) {
@@ -12750,8 +12825,8 @@ function getImprovSuggestions(chord) {
   const isMinMaj  = /^Minor-Ma/.test(q);
   const isMin7    = /^Minor (7|9|1)/.test(q) && !isMinMaj;
   const isMin6    = q === 'Minor 6th';
-  const isHalf    = /^Half-Dim/.test(q);
-  const isDim     = /^(Dim|Diminished)/.test(q) && !isHalf;
+  const isHalf    = /^Half-Dim/i.test(q);
+  const isDim     = /^(Dim|Diminished)/i.test(q) && !isHalf;
   const isAug     = q === 'Augmented' || /^Aug Maj/.test(q);
   const isMaj6    = q === 'Major 6th' || /^Major.*6/.test(q);
   const isMajor   = q === 'Major' || q === 'Major ♭5' || q === '';
@@ -12839,6 +12914,16 @@ function getImprovSuggestions(chord) {
     add('Minor Pentatonic', 'Universal — bluesy, works over most chords');
   }
 
+  // Only ever propose scales that contain every chord tone — a scale that omits a
+  // chord note clashes when held against the chord (e.g. a pentatonic over m7♭5).
+  const chordPcs = (chord.pcs || []).map(p => ((p % 12) + 12) % 12);
+  if (chordPcs.length) {
+    const covering = sugg.filter(s => _improvScaleCovers(s.scale, chordPcs));
+    if (covering.length) return covering.slice(0, 4);
+    const fb = _findImprovCoveringScale(rootPc, chordPcs);
+    if (fb) return [fb];
+  }
+
   return sugg.slice(0, 4);
 }
 
@@ -12850,12 +12935,13 @@ let _improvRaf = null;
 let compIsPaused = false;
 let _compCurIdx = -1;
 
-function compStartPlayback(id) {
+function compStartPlayback(id, startIdx = 0) {
   compStopPlayback();
   compPendingRestart = false;
   compIsPaused = false;
   const comp = compLoad().find(c => c.id === id);
   if (!comp || !comp.chords.length) return;
+  startIdx = Math.max(0, Math.min(startIdx | 0, comp.chords.length - 1));
   const needsGuitar = comp.sound === 'guitar';
   if (needsGuitar) initGuitarSampler();
   const waitingForSampler = !samplerReady || (needsGuitar && !guitarSamplerReady);
@@ -12868,7 +12954,7 @@ function compStartPlayback(id) {
     const retry = () => {
       if (samplerReady && (!needsGuitar || guitarSamplerReady)) {
         if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; }
-        compStartPlayback(id);
+        compStartPlayback(id, startIdx);
       }
     };
     if (!samplerReady) _samplerReadyCbs.push(retry);
@@ -13116,7 +13202,15 @@ function compStartPlayback(id) {
       Tone.Transport.loop = false;
     }
 
-    Tone.Transport.start('+0.05');
+    // Start from the requested chord: offset the transport to that chord's position.
+    let startSeconds = 0;
+    for (let k = 0; k < startIdx; k++) startSeconds += (comp.chords[k].beats || 4) * beatDur;
+    Tone.Transport.start('+0.05', startSeconds);
+    // Seed the highlight/improv readout immediately (the scheduled event at the exact
+    // start offset may not re-fire when the transport starts there).
+    _compCurIdx = startIdx;
+    document.querySelectorAll('.comp-chord-card').forEach((el, j) => el.classList.toggle('playing', j === startIdx));
+    compMobUpdateStage(comp.chords[startIdx], startIdx);
     compIsPlaying = true;
     document.getElementById('comp-modal')?.classList.add('comp-playing');
     compMobSetTab('play');
