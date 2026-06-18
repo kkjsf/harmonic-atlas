@@ -1286,13 +1286,18 @@
   #comp-overlay {
     display: none; position: fixed; inset: 0; z-index: var(--z-overlay);
     background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
-    align-items: center; justify-content: center; padding: 20px;
+    align-items: flex-start; justify-content: center; padding: 20px;
+    overflow-y: auto;
   }
   #comp-overlay.open { display: flex; }
+  /* Auto margins center the modal when it fits, but let it scroll (not clip the
+     top) when it's taller than the viewport — keeps the transport + style panel
+     reachable on short screens. */
+  #comp-overlay > #comp-modal { margin: auto; }
   #comp-modal {
     background: var(--surface); border: 1px solid var(--border2); border-top: 2px solid var(--accent); border-radius: 8px;
     width: 100%; max-width: 1100px; max-height: 92vh;
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: column; min-height: 0;
     box-shadow: 0 8px 40px rgba(124,111,160,.25), 0 8px 40px rgba(0,0,0,.5);
   }
   #comp-modal-header {
@@ -2223,6 +2228,7 @@
     border-top:1px solid var(--border2); background:var(--surface2);
     padding:12px 18px; display:none; flex-wrap:wrap; gap:12px 22px;
     align-items:flex-start; flex-shrink:0;
+    max-height:40vh; overflow-y:auto;
   }
   #comp-style-panel.open { display:flex; }
   #comp-style-panel > * { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
@@ -10169,7 +10175,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v64 &nbsp;·&nbsp; deployed 2026-06-17</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v65 &nbsp;·&nbsp; deployed 2026-06-18</span></div>
     </div>
 
     <div class="tech-section">
