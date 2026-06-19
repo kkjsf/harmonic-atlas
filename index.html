@@ -1482,13 +1482,6 @@
     background:none; border:none; color:var(--muted); cursor:pointer;
     font-size:11px; padding:0 2px; line-height:1; flex-shrink:0; transition:color .1s;
   }
-  .comp-card-loop {
-    background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer;
-    font-size:8px; font-family:'IBM Plex Mono',monospace; letter-spacing:.04em;
-    padding:2px 6px; border-radius:3px; line-height:1; flex-shrink:0; transition:all .12s;
-  }
-  .comp-card-loop:hover { border-color:var(--accent2); color:var(--accent2); }
-  .comp-chord-card.loop-one .comp-card-loop { border-color:var(--accent); color:var(--accent2); background:rgba(124,111,160,.18); }
   .comp-chord-card.loop-one { border-color:var(--accent); box-shadow:0 0 10px rgba(124,111,160,.3); }
   .comp-card-sub:hover { color:var(--accent2); }
   .comp-chord-editable { cursor:pointer; border-bottom:1px dashed transparent; transition:border-color .12s, color .12s; }
@@ -2103,6 +2096,11 @@
   .mob-sc-roman { font-size:7px; color:var(--muted); }
   .mob-sc-beats { font-size:7px; color:var(--dim); }
   .mob-sc.active .mob-sc-beats { color:var(--accent); }
+  .mob-sc-loop { margin-top:3px; width:100%; padding:3px 0; border-radius:4px; border:1px solid var(--border2); background:none; color:var(--muted); font-size:8px; font-family:'IBM Plex Mono',monospace; letter-spacing:.04em; line-height:1; cursor:pointer; transition:all .12s; }
+  .mob-sc-loop:hover { border-color:var(--accent2); color:var(--accent2); }
+  .mob-sc.loop-one { border-color:var(--accent); background:rgba(124,111,160,.18); box-shadow:0 0 8px rgba(124,111,160,.28); }
+  .mob-sc.loop-one .mob-sc-name { color:var(--accent2); }
+  .mob-sc.loop-one .mob-sc-loop { border-color:var(--accent); color:var(--accent2); background:rgba(124,111,160,.22); }
 
   /* Chip bar — replaces sidebar for composition selection */
   #comp-chip-bar { display:flex; align-items:center; gap:6px; padding:8px 14px; border-bottom:1px solid var(--border2); overflow-x:auto; flex-shrink:0; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
@@ -10183,7 +10181,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v66 &nbsp;·&nbsp; deployed 2026-06-19</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v67 &nbsp;·&nbsp; deployed 2026-06-19</span></div>
     </div>
 
     <div class="tech-section">
@@ -12155,11 +12153,26 @@ function compMobRenderStrip(comp) {
   (comp?.chords || []).forEach((ch, i) => {
     const name = _compChordParts(ch).display;
     const card = document.createElement('div');
-    card.className = 'mob-sc';
+    card.className = 'mob-sc' + (_compLoopOneIdx === i ? ' loop-one' : '');
     card.dataset.idx = i;
     card.innerHTML = `<div class="mob-sc-name">${_escHtml(name)}</div>
-      <div class="mob-sc-beats">${ch.beats || 4}b</div>`;
+      <div class="mob-sc-beats">${ch.beats || 4}b</div>
+      <button class="mob-sc-loop" title="Loop just this chord — improvise over it">⟳ loop</button>`;
     card.addEventListener('click', () => { compMobSetTab('play'); compStartPlayback(compActiveId, i); });
+    card.querySelector('.mob-sc-loop').addEventListener('click', e => {
+      e.stopPropagation();
+      // Toggle: if already looping this chord, stop — but stay on the Play tab with
+      // this chord's fretboard up, so improv practice isn't interrupted.
+      if (compIsPlaying && _compLoopOneIdx === i) {
+        compStopPlayback();
+        compMobSetTab('play');
+        const c = compLoad().find(c => c.id === compActiveId);
+        if (c && c.chords[i]) compMobUpdateStage(c.chords[i], i);
+      } else {
+        compMobSetTab('play');
+        compStartPlayback(compActiveId, i, i);
+      }
+    });
     strip.appendChild(card);
   });
 }
@@ -12658,7 +12671,7 @@ function compRenderChordRow(comp) {
         <div class="cc-quality">${_escHtml(parts.quality)}</div>
         <div class="comp-chord-notes cc-notes">${_escHtml(noteList)}</div>
       </div>
-      <div class="cc-foot"><span class="cc-dur">${beatLabel}</span><button class="comp-card-loop" title="Loop just this chord — practice improv/comp over it">⟳ loop</button></div>
+      <div class="cc-foot"><span class="cc-dur">${beatLabel}</span></div>
       <button class="cc-gear" title="Rhythm, arp &amp; timing for this chord">⚙</button>
       <div class="cc-panel">
         <div class="chord-ctrl-row">
@@ -12709,12 +12722,6 @@ function compRenderChordRow(comp) {
         if (wasCompact) document.getElementById('comp-chord-row')?.classList.add('compact-mode');
         compRenderList();
       });
-    });
-    card.querySelector('.comp-card-loop').addEventListener('click', e => {
-      e.stopPropagation();
-      // Toggle: if already looping this chord, stop; otherwise loop just this one.
-      if (compIsPlaying && _compLoopOneIdx === i) compStopPlayback();
-      else compStartPlayback(comp.id, i, i);
     });
     card.querySelectorAll('.comp-card-mv').forEach(btn => {
       btn.addEventListener('click', e => {
@@ -13240,6 +13247,7 @@ function compStartPlayback(id, startIdx = 0, loopOneIdx = null) {
       el.classList.toggle('playing', j === realIdx(startIdx));
       el.classList.toggle('loop-one', loopOne && j === loopOneIdx);
     });
+    document.querySelectorAll('.mob-sc').forEach((el, j) => el.classList.toggle('loop-one', loopOne && j === loopOneIdx));
     compMobUpdateStage(playComp.chords[startIdx], realIdx(startIdx));
     compIsPlaying = true;
     document.getElementById('comp-modal')?.classList.add('comp-playing');
@@ -13311,6 +13319,7 @@ function compStopPlayback() {
   _compLoopOneIdx = null;
   compMobSetTab('edit');
   document.querySelectorAll('.comp-chord-card.playing, .comp-chord-card.loop-one').forEach(el => el.classList.remove('playing', 'loop-one'));
+  document.querySelectorAll('.mob-sc.loop-one').forEach(el => el.classList.remove('loop-one'));
   if (_improvRaf) { cancelAnimationFrame(_improvRaf); _improvRaf = null; }
   const progFill = document.getElementById('mob-prog-fill');
   if (progFill) progFill.style.width = '0%';
