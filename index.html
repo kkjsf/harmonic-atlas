@@ -1482,6 +1482,14 @@
     background:none; border:none; color:var(--muted); cursor:pointer;
     font-size:11px; padding:0 2px; line-height:1; flex-shrink:0; transition:color .1s;
   }
+  .comp-card-loop {
+    background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer;
+    font-size:8px; font-family:'IBM Plex Mono',monospace; letter-spacing:.04em;
+    padding:2px 6px; border-radius:3px; line-height:1; flex-shrink:0; transition:all .12s;
+  }
+  .comp-card-loop:hover { border-color:var(--accent2); color:var(--accent2); }
+  .comp-chord-card.loop-one .comp-card-loop { border-color:var(--accent); color:var(--accent2); background:rgba(124,111,160,.18); }
+  .comp-chord-card.loop-one { border-color:var(--accent); box-shadow:0 0 10px rgba(124,111,160,.3); }
   .comp-card-sub:hover { color:var(--accent2); }
   .comp-chord-editable { cursor:pointer; border-bottom:1px dashed transparent; transition:border-color .12s, color .12s; }
   .comp-chord-editable:hover { color:var(--accent2); border-bottom-color:var(--accent2); }
@@ -10175,7 +10183,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v65 &nbsp;·&nbsp; deployed 2026-06-18</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v66 &nbsp;·&nbsp; deployed 2026-06-19</span></div>
     </div>
 
     <div class="tech-section">
@@ -12650,7 +12658,7 @@ function compRenderChordRow(comp) {
         <div class="cc-quality">${_escHtml(parts.quality)}</div>
         <div class="comp-chord-notes cc-notes">${_escHtml(noteList)}</div>
       </div>
-      <div class="cc-foot"><span class="cc-dur">${beatLabel}</span></div>
+      <div class="cc-foot"><span class="cc-dur">${beatLabel}</span><button class="comp-card-loop" title="Loop just this chord — practice improv/comp over it">⟳ loop</button></div>
       <button class="cc-gear" title="Rhythm, arp &amp; timing for this chord">⚙</button>
       <div class="cc-panel">
         <div class="chord-ctrl-row">
@@ -12701,6 +12709,12 @@ function compRenderChordRow(comp) {
         if (wasCompact) document.getElementById('comp-chord-row')?.classList.add('compact-mode');
         compRenderList();
       });
+    });
+    card.querySelector('.comp-card-loop').addEventListener('click', e => {
+      e.stopPropagation();
+      // Toggle: if already looping this chord, stop; otherwise loop just this one.
+      if (compIsPlaying && _compLoopOneIdx === i) compStopPlayback();
+      else compStartPlayback(comp.id, i, i);
     });
     card.querySelectorAll('.comp-card-mv').forEach(btn => {
       btn.addEventListener('click', e => {
@@ -12940,14 +12954,21 @@ let _compTickRaf = null;
 let _improvRaf = null;
 let compIsPaused = false;
 let _compCurIdx = -1;
+let _compLoopOneIdx = null;
 
-function compStartPlayback(id, startIdx = 0) {
+function compStartPlayback(id, startIdx = 0, loopOneIdx = null) {
   compStopPlayback();
   compPendingRestart = false;
   compIsPaused = false;
   const comp = compLoad().find(c => c.id === id);
   if (!comp || !comp.chords.length) return;
-  startIdx = Math.max(0, Math.min(startIdx | 0, comp.chords.length - 1));
+  // Single-chord loop: play only chord #loopOneIdx, forced to loop, so the user
+  // can woodshed improv/comp over one chord without the whole progression.
+  const loopOne = loopOneIdx != null && loopOneIdx >= 0 && loopOneIdx < comp.chords.length;
+  _compLoopOneIdx = loopOne ? loopOneIdx : null;
+  const playComp = loopOne ? { ...comp, chords: [comp.chords[loopOneIdx]], loop: true } : comp;
+  const realIdx = ci => loopOne ? loopOneIdx : ci;
+  startIdx = loopOne ? 0 : Math.max(0, Math.min(startIdx | 0, comp.chords.length - 1));
   const needsGuitar = comp.sound === 'guitar';
   if (needsGuitar) initGuitarSampler();
   const waitingForSampler = !samplerReady || (needsGuitar && !guitarSamplerReady);
@@ -12960,7 +12981,7 @@ function compStartPlayback(id, startIdx = 0) {
     const retry = () => {
       if (samplerReady && (!needsGuitar || guitarSamplerReady)) {
         if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; }
-        compStartPlayback(id, startIdx);
+        compStartPlayback(id, startIdx, loopOneIdx);
       }
     };
     if (!samplerReady) _samplerReadyCbs.push(retry);
@@ -13004,9 +13025,9 @@ function compStartPlayback(id, startIdx = 0) {
             if (_compPlayGen !== gen) return;
             _compCurIdx = chordIdx;
             document.querySelectorAll('.comp-chord-card').forEach((el, j) => {
-              el.classList.toggle('playing', j === chordIdx);
+              el.classList.toggle('playing', j === realIdx(chordIdx));
             });
-            compMobUpdateStage(srcComp.chords[chordIdx], chordIdx);
+            compMobUpdateStage(srcComp.chords[chordIdx], realIdx(chordIdx));
           });
         }, tOffset);
 
@@ -13197,10 +13218,10 @@ function compStartPlayback(id, startIdx = 0) {
       }
     }
 
-    const totalDur = scheduleChords(comp);
-    scheduleDrums(comp);
+    const totalDur = scheduleChords(playComp);
+    scheduleDrums(playComp);
 
-    if (comp.loop) {
+    if (playComp.loop) {
       Tone.Transport.loop = true;
       Tone.Transport.loopStart = 0;
       Tone.Transport.loopEnd = totalDur;
@@ -13210,13 +13231,16 @@ function compStartPlayback(id, startIdx = 0) {
 
     // Start from the requested chord: offset the transport to that chord's position.
     let startSeconds = 0;
-    for (let k = 0; k < startIdx; k++) startSeconds += (comp.chords[k].beats || 4) * beatDur;
+    for (let k = 0; k < startIdx; k++) startSeconds += (playComp.chords[k].beats || 4) * beatDur;
     Tone.Transport.start('+0.05', startSeconds);
     // Seed the highlight/improv readout immediately (the scheduled event at the exact
     // start offset may not re-fire when the transport starts there).
     _compCurIdx = startIdx;
-    document.querySelectorAll('.comp-chord-card').forEach((el, j) => el.classList.toggle('playing', j === startIdx));
-    compMobUpdateStage(comp.chords[startIdx], startIdx);
+    document.querySelectorAll('.comp-chord-card').forEach((el, j) => {
+      el.classList.toggle('playing', j === realIdx(startIdx));
+      el.classList.toggle('loop-one', loopOne && j === loopOneIdx);
+    });
+    compMobUpdateStage(playComp.chords[startIdx], realIdx(startIdx));
     compIsPlaying = true;
     document.getElementById('comp-modal')?.classList.add('comp-playing');
     compMobSetTab('play');
@@ -13231,7 +13255,7 @@ function compStartPlayback(id, startIdx = 0) {
     {
       const bd = beatDur;
       let acc = 0;
-      const ends = comp.chords.map(ch => (acc += (ch.beats || 4) * bd));
+      const ends = playComp.chords.map(ch => (acc += (ch.beats || 4) * bd));
       const progFill = document.getElementById('mob-prog-fill');
       (function improvTick() {
         if (!compIsPlaying || _compPlayGen !== gen) return;
@@ -13239,7 +13263,7 @@ function compStartPlayback(id, startIdx = 0) {
         const idx = _compCurIdx;
         if (idx >= 0 && idx < ends.length) {
           const beatsLeft = Math.max(0, Math.ceil((ends[idx] - pos) / bd));
-          const next = comp.chords[idx + 1] || (comp.loop ? comp.chords[0] : null);
+          const next = playComp.chords[idx + 1] || (playComp.loop ? playComp.chords[0] : null);
           const nextEl = document.getElementById('mob-stage-next');
           if (nextEl) nextEl.innerHTML = next
             ? `next&nbsp;<b>${_escHtml(_compChordParts(next).display)}</b>&nbsp;in&nbsp;<b>${beatsLeft} ${beatsLeft === 1 ? 'beat' : 'beats'}</b>`
@@ -13251,7 +13275,7 @@ function compStartPlayback(id, startIdx = 0) {
     }
 
     // Live loop update: watch for pending changes and apply at next cycle boundary
-    if (comp.loop) {
+    if (playComp.loop) {
       (function tick() {
         if (!compIsPlaying || _compPlayGen !== gen) return;
         if (compPendingRestart) {
@@ -13260,7 +13284,7 @@ function compStartPlayback(id, startIdx = 0) {
           if (timeLeft < 0.22 && timeLeft >= 0) {
             compPendingRestart = false;
             setTimeout(() => {
-              if (compIsPlaying && _compPlayGen === gen) compStartPlayback(id);
+              if (compIsPlaying && _compPlayGen === gen) compStartPlayback(id, startIdx, loopOneIdx);
             }, Math.max(0, timeLeft * 1000 - 20));
             return;
           }
@@ -13284,8 +13308,9 @@ function compStopPlayback() {
   if (progMasterBus === compMasterBus) progMasterBus = null;
   compIsPlaying = false;
   _compCurIdx = -1;
+  _compLoopOneIdx = null;
   compMobSetTab('edit');
-  document.querySelectorAll('.comp-chord-card.playing').forEach(el => el.classList.remove('playing'));
+  document.querySelectorAll('.comp-chord-card.playing, .comp-chord-card.loop-one').forEach(el => el.classList.remove('playing', 'loop-one'));
   if (_improvRaf) { cancelAnimationFrame(_improvRaf); _improvRaf = null; }
   const progFill = document.getElementById('mob-prog-fill');
   if (progFill) progFill.style.width = '0%';
