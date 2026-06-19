@@ -10181,7 +10181,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-sub">Architecture &amp; Implementation Reference</div>
 
     <div class="tech-section" style="margin-bottom:8px">
-      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v67 &nbsp;·&nbsp; deployed 2026-06-19</span></div>
+      <div class="tech-row"><span class="tech-key">Version</span><span class="tech-val" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.03em">v68 &nbsp;·&nbsp; deployed 2026-06-19</span></div>
     </div>
 
     <div class="tech-section">
@@ -12152,26 +12152,35 @@ function compMobRenderStrip(comp) {
   strip.innerHTML = '';
   (comp?.chords || []).forEach((ch, i) => {
     const name = _compChordParts(ch).display;
+    const inLoop = _compLoopRange && i >= _compLoopRange.start && i <= _compLoopRange.end;
     const card = document.createElement('div');
-    card.className = 'mob-sc' + (_compLoopOneIdx === i ? ' loop-one' : '');
+    card.className = 'mob-sc' + (inLoop ? ' loop-one' : '');
     card.dataset.idx = i;
     card.innerHTML = `<div class="mob-sc-name">${_escHtml(name)}</div>
       <div class="mob-sc-beats">${ch.beats || 4}b</div>
-      <button class="mob-sc-loop" title="Loop just this chord — improvise over it">⟳ loop</button>`;
+      <button class="mob-sc-loop" title="Loop this chord. Click another chord's loop to extend the loop into a phrase; click a looping chord to release and play on.">⟳ loop</button>`;
     card.addEventListener('click', () => { compMobSetTab('play'); compStartPlayback(compActiveId, i); });
     card.querySelector('.mob-sc-loop').addEventListener('click', e => {
       e.stopPropagation();
-      // Toggle: if already looping this chord, stop — but stay on the Play tab with
-      // this chord's fretboard up, so improv practice isn't interrupted.
-      if (compIsPlaying && _compLoopOneIdx === i) {
-        compStopPlayback();
-        compMobSetTab('play');
+      compMobSetTab('play');
+      const r = _compLoopRange;
+      if (compIsPlaying && r && i >= r.start && i <= r.end) {
+        // Releasing the loop — don't stop, just play on from the chord after the span.
         const c = compLoad().find(c => c.id === compActiveId);
-        if (c && c.chords[i]) compMobUpdateStage(c.chords[i], i);
+        const nextIdx = c && c.chords.length ? (r.end + 1) % c.chords.length : 0;
+        compStartPlayback(compActiveId, nextIdx);
+      } else if (compIsPlaying && r) {
+        // Extend the active loop to cover this chord too (build a multi-chord phrase).
+        compStartPlayback(compActiveId, 0, { start: Math.min(r.start, i), end: Math.max(r.end, i) });
       } else {
-        compMobSetTab('play');
-        compStartPlayback(compActiveId, i, i);
+        // No loop yet — start looping just this chord.
+        compStartPlayback(compActiveId, 0, { start: i, end: i });
       }
+      // Reflect the new loop span on the strip immediately (the audio-start seed that
+      // normally lights these only fires once the AudioContext resumes).
+      const rg = _compLoopRange;
+      strip.querySelectorAll('.mob-sc').forEach((el, j) =>
+        el.classList.toggle('loop-one', !!rg && j >= rg.start && j <= rg.end));
     });
     strip.appendChild(card);
   });
@@ -12961,21 +12970,21 @@ let _compTickRaf = null;
 let _improvRaf = null;
 let compIsPaused = false;
 let _compCurIdx = -1;
-let _compLoopOneIdx = null;
+let _compLoopRange = null;   // {start, end} inclusive chord indices when looping a span, else null
 
-function compStartPlayback(id, startIdx = 0, loopOneIdx = null) {
+function compStartPlayback(id, startIdx = 0, loopRange = null) {
   compStopPlayback();
   compPendingRestart = false;
   compIsPaused = false;
   const comp = compLoad().find(c => c.id === id);
   if (!comp || !comp.chords.length) return;
-  // Single-chord loop: play only chord #loopOneIdx, forced to loop, so the user
-  // can woodshed improv/comp over one chord without the whole progression.
-  const loopOne = loopOneIdx != null && loopOneIdx >= 0 && loopOneIdx < comp.chords.length;
-  _compLoopOneIdx = loopOne ? loopOneIdx : null;
-  const playComp = loopOne ? { ...comp, chords: [comp.chords[loopOneIdx]], loop: true } : comp;
-  const realIdx = ci => loopOne ? loopOneIdx : ci;
-  startIdx = loopOne ? 0 : Math.max(0, Math.min(startIdx | 0, comp.chords.length - 1));
+  // Span loop: play only chords [start..end], forced to loop, so the user can
+  // woodshed improv/comp over one chord or a short phrase (a few chords in a row).
+  const loopOn = loopRange && loopRange.start >= 0 && loopRange.end < comp.chords.length && loopRange.start <= loopRange.end;
+  _compLoopRange = loopOn ? { start: loopRange.start, end: loopRange.end } : null;
+  const playComp = loopOn ? { ...comp, chords: comp.chords.slice(loopRange.start, loopRange.end + 1), loop: true } : comp;
+  const realIdx = ci => loopOn ? loopRange.start + ci : ci;
+  startIdx = loopOn ? 0 : Math.max(0, Math.min(startIdx | 0, comp.chords.length - 1));
   const needsGuitar = comp.sound === 'guitar';
   if (needsGuitar) initGuitarSampler();
   const waitingForSampler = !samplerReady || (needsGuitar && !guitarSamplerReady);
@@ -12988,7 +12997,7 @@ function compStartPlayback(id, startIdx = 0, loopOneIdx = null) {
     const retry = () => {
       if (samplerReady && (!needsGuitar || guitarSamplerReady)) {
         if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; }
-        compStartPlayback(id, startIdx, loopOneIdx);
+        compStartPlayback(id, startIdx, loopRange);
       }
     };
     if (!samplerReady) _samplerReadyCbs.push(retry);
@@ -13245,9 +13254,9 @@ function compStartPlayback(id, startIdx = 0, loopOneIdx = null) {
     _compCurIdx = startIdx;
     document.querySelectorAll('.comp-chord-card').forEach((el, j) => {
       el.classList.toggle('playing', j === realIdx(startIdx));
-      el.classList.toggle('loop-one', loopOne && j === loopOneIdx);
+      el.classList.toggle('loop-one', loopOn && j >= loopRange.start && j <= loopRange.end);
     });
-    document.querySelectorAll('.mob-sc').forEach((el, j) => el.classList.toggle('loop-one', loopOne && j === loopOneIdx));
+    document.querySelectorAll('.mob-sc').forEach((el, j) => el.classList.toggle('loop-one', loopOn && j >= loopRange.start && j <= loopRange.end));
     compMobUpdateStage(playComp.chords[startIdx], realIdx(startIdx));
     compIsPlaying = true;
     document.getElementById('comp-modal')?.classList.add('comp-playing');
@@ -13292,7 +13301,7 @@ function compStartPlayback(id, startIdx = 0, loopOneIdx = null) {
           if (timeLeft < 0.22 && timeLeft >= 0) {
             compPendingRestart = false;
             setTimeout(() => {
-              if (compIsPlaying && _compPlayGen === gen) compStartPlayback(id, startIdx, loopOneIdx);
+              if (compIsPlaying && _compPlayGen === gen) compStartPlayback(id, startIdx, loopRange);
             }, Math.max(0, timeLeft * 1000 - 20));
             return;
           }
@@ -13316,7 +13325,7 @@ function compStopPlayback() {
   if (progMasterBus === compMasterBus) progMasterBus = null;
   compIsPlaying = false;
   _compCurIdx = -1;
-  _compLoopOneIdx = null;
+  _compLoopRange = null;
   compMobSetTab('edit');
   document.querySelectorAll('.comp-chord-card.playing, .comp-chord-card.loop-one').forEach(el => el.classList.remove('playing', 'loop-one'));
   document.querySelectorAll('.mob-sc.loop-one').forEach(el => el.classList.remove('loop-one'));
