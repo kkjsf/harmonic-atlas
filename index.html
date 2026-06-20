@@ -2656,24 +2656,9 @@ function spellScale(rootPc, intervals, scaleData) {
   let rootName = rootCandidates[0];
   if(!preferSharps && PREFER_FLAT_PC.has(rootPc%12) && rootCandidates.length > 1) rootName = rootCandidates[1];
 
-  // Hexatonic (6-note): ascending-letter only for sharp-preferring scales (e.g. Whole Tone)
-  // Flat-based scales (e.g. Blues) use the simple enharmonic path below
-  if (n === 6 && preferSharps) {
-    const result6 = [rootName];
-    const rootLi = letterIndex(rootName);
-    for (let i = 1; i < 6; i++) {
-      const targetLetter = LETTERS[(rootLi + i) % 7];
-      const pc = (rootPc + intervals[i]) % 12;
-      const match = PITCH_CANDIDATES[pc].find(c => c[0] === targetLetter);
-      if (match) { result6.push(match); continue; }
-      const naturalPc = PITCH_CANDIDATES.findIndex(a => a.includes(targetLetter));
-      const diff = ((pc - naturalPc) + 12) % 12;
-      result6.push(targetLetter + (diff===1?'#':diff===2?'##':diff===11?'b':diff===10?'bb':''));
-    }
-    return result6;
-  }
-
   // For pentatonic / short scales AND octatonic scales: use simple enharmonic spelling
+  // (Whole Tone falls here too — forcing one letter per degree produced wrong pitches
+  //  on sharp roots, e.g. A♯ Whole Tone ended on a bare "F" instead of G♯.)
   if (n !== 7) {
     const preferFlats = scaleData && scaleData.preferFlats;
     return intervals.map(iv => {
@@ -2848,10 +2833,16 @@ function romanNumeral(scaleIntervals, degIdx, iv3, iv5, scaleData) {
     return acc + ROMAN_BASE_7[refIdx];
   }
 
-  // Octatonic (8 notes): map to nearest 7-degree reference
+  // Octatonic (8 notes): map each degree to the closest major-scale degree by
+  // semitone distance (an ordinal map drifts and yields nonsense like ♭♭VI on a
+  // perfect 5th). Ties resolve to the lower degree.
   if (n > 7) {
-    const refIdx = Math.min(degIdx, 6);
-    const diff = scaleIntervals[degIdx] - MAJOR_REF[refIdx];
+    const semi = scaleIntervals[degIdx];
+    let refIdx = 0, bestD = 99;
+    // ties resolve to the higher degree → chromatic notes spell as flats (♭II, ♭III…),
+    // the conventional diminished-scale spelling
+    MAJOR_REF.forEach((m, i) => { const d = Math.abs(m - semi); if (d <= bestD) { bestD = d; refIdx = i; } });
+    const diff = semi - MAJOR_REF[refIdx];
     const acc = diff===-1?'♭':diff===-2?'♭♭':diff===1?'♯':'';
     const base = ROMAN_BASE_7[refIdx];
     if      (iv3===4 && iv5===7) return acc + base;
@@ -3512,7 +3503,16 @@ function scaleIdentity(intervals, scaleData) {
       const acc = diff === -1 ? '♭' : diff === -2 ? '♭♭' : diff === 1 ? '♯' : '';
       return acc + DEG_NAMES[refIdx];
     }
-    const refIdx = Math.min(di, 6);
+    // 8-note (octatonic): map to the closest major-scale degree by semitone
+    // distance (ordinal mapping drifts → ♭♭6 on a perfect 5th). Ties → flats.
+    if (intervals.length > 7) {
+      let refIdx = 0, bestD = 99;
+      MAJOR_REF.forEach((m, i) => { const d = Math.abs(m - semitones); if (d <= bestD) { bestD = d; refIdx = i; } });
+      const diff = semitones - MAJOR_REF[refIdx];
+      const acc = diff === -1 ? '♭' : diff === -2 ? '♭♭' : diff === 1 ? '♯' : '';
+      return acc + DEG_NAMES[refIdx];
+    }
+    const refIdx = Math.min(di, 6);   // heptatonic: one degree per letter
     const diff = semitones - MAJOR_REF[refIdx];
     const acc = diff === -1 ? '♭' : diff === -2 ? '♭♭' : diff === 1 ? '♯' : '';
     return acc + DEG_NAMES[refIdx];
@@ -4916,7 +4916,11 @@ function detectBarre(frets6) {
   if (played.length < 3) return null;
   const minF = Math.min(...played);
   const barreStrings = frets6.map((f, i) => f === minF ? i : -1).filter(i => i >= 0);
-  if (barreStrings.length >= 3) {
+  // Only a real barre if the shared-fret strings are contiguous — otherwise a solid
+  // bar would be drawn across muted/higher-fret strings in the gap.
+  const contiguous = barreStrings.length >= 3 &&
+    barreStrings[barreStrings.length - 1] - barreStrings[0] === barreStrings.length - 1;
+  if (contiguous) {
     // Barre: from lowest barred string to highest
     return { fret: minF, fromStr: barreStrings[0], toStr: barreStrings[barreStrings.length - 1] };
   }
@@ -7309,6 +7313,7 @@ let progression = [];   // [{name, sym, roman, notes, pcs, quality}]
 let progPlaying  = false;
 let progLoop     = false;
 let progScheduler = null;
+let _progPlayGen  = 0;   // invalidates deferred/looping callbacks across stop/restart
 let progAudioCtx  = null;
 let sampler       = null;
 let samplerReady  = false;
@@ -7345,6 +7350,15 @@ function ensureCompMasterBus() {
   comp.limiterNode = limiter;
   compMasterBus = comp;
   return compMasterBus;
+}
+
+// Re-establish a single sampler→bus connection. progStop() disconnects the
+// shared sampler to silence future-scheduled notes, so every playback entry
+// point must reconnect before scheduling.
+function _ensureSamplerConnected() {
+  const bus = ensureCompMasterBus();
+  if (sampler)       { try { sampler.disconnect(); }       catch(e){} try { sampler.connect(bus); }       catch(e){} }
+  if (guitarSampler) { try { guitarSampler.disconnect(); } catch(e){} try { guitarSampler.connect(bus); } catch(e){} }
 }
 
 function initSampler() {
@@ -7984,6 +7998,7 @@ function progGetSound() { const el = document.getElementById('prog-sound'); retu
 function progPlay() {
   if (!progression.length) return;
   progStop();
+  const myGen = _progPlayGen;   // progStop() bumped the counter; a later stop/play invalidates this run
 
   // On mobile the AudioContext may still be suspended even after _unlockAudio.
   // We must resume it and wait before scheduling any nodes.
@@ -8055,6 +8070,7 @@ function progPlay() {
     return audioT + totalDur;
   }
 
+  _ensureSamplerConnected();   // progStop() may have disconnected the shared sampler
   let iterationEnd = scheduleIteration(progStartTime);
   let nextLoopScheduled = false;
 
@@ -8069,7 +8085,7 @@ function progPlay() {
     if (progLoop && !nextLoopScheduled && (iterationEnd - now) < 0.25) {
       iterationEnd = scheduleIteration(iterationEnd);
       nextLoopScheduled = true;
-      setTimeout(() => { if (progPlaying) nextLoopScheduled = false; }, 150);
+      setTimeout(() => { if (progPlaying && myGen === _progPlayGen) nextLoopScheduled = false; }, 150);
     }
 
     if (!progLoop && elapsed >= totalDur) {
@@ -8097,17 +8113,27 @@ function progPlay() {
   } catch(err) { alert('Audio error: ' + err.message); progStop(); }
   }; // end doPlay
 
-  const startPlayback = () => setTimeout(doPlay, 200);
+  const startPlayback = () => setTimeout(() => { if (myGen === _progPlayGen) doPlay(); }, 200);
   Tone.start().then(startPlayback).catch(startPlayback);
 }
 
 function progStop() {
   progPlaying = false;
+  _progPlayGen++;   // invalidate any deferred start or queued loop iteration
   try { progReverbNode?.disconnect(); } catch(e){}
   progReverbNode = null;
   try { progMasterBus?.disconnect(); } catch(e){}
   progMasterBus = null;
-  if (sampler) sampler.releaseAll();
+  // The progression schedules its whole pass up front via sampler.triggerAttackRelease().
+  // releaseAll() only releases sounding voices, not future-scheduled ones — so briefly
+  // disconnect the shared sampler to silence everything still queued. Reconnected on next play.
+  if (sampler) {
+    try { sampler.releaseAll(); } catch(e){}
+    if (!compIsPlaying) {
+      const _s = sampler;
+      setTimeout(() => { if (!compIsPlaying && !progPlaying) { try { _s.disconnect(); } catch(e){} } }, 60);
+    }
+  }
   _releaseWakeLock();
   if (progScheduler) { cancelAnimationFrame(progScheduler); progScheduler = null; }
   progCurrentIdx = -1;
@@ -8121,7 +8147,7 @@ function progStop() {
   if (zpb) zpb.style.width = '0';
   // Immediately silence all scheduled nodes via a fast gain fade, then stop them
   const ctx = progAudioCtx;
-  if (!ctx) return;
+  if (!ctx) { progNodes = []; progGainNodes = []; return; }
   const now = ctx.currentTime;
   progGainNodes.forEach(g => {
     try { g.gain.cancelScheduledValues(now); g.gain.setTargetAtTime(0, now, 0.015); } catch(e){}
@@ -8872,8 +8898,8 @@ function findScaleRelationships(rootPc, scaleName) {
   // ── Always include the canonical parallel pair ──
   // Ionian (Major) <-> Aeolian (Natural Minor) share the same root but different modes
   const parallelPairs = {
-    'Major (Ionian)': 'Aeolian',
-    'Aeolian': 'Major (Ionian)',
+    'Major (Ionian)': 'Aeolian (Natural Minor)',
+    'Aeolian (Natural Minor)': 'Major (Ionian)',
   };
   if (parallelPairs[scaleName]) {
     const pName = parallelPairs[scaleName];
@@ -9624,7 +9650,7 @@ function showSlotSubPopover(triggerEl, ch, slotIdx, onAdd) {
   pop.className = 'slot-sub-popover';
   _subPopover = pop;
 
-  let inner = `<div class="slot-sub-popover-title">Substitutions for ${rootName}${sym}</div>
+  let inner = `<div class="slot-sub-popover-title">Substitutions for ${_escHtml(rootName)}${_escHtml(sym)}</div>
     <button class="slot-sub-close" title="Close">×</button>`;
   subs.forEach(s => {
     inner += `<div class="slot-sub-row" data-rootpc="${s.rootPc}" data-sym="${s.newSym}" data-qual="${encodeURIComponent(s.newQual)}" data-root="${s.rootName}">
@@ -9918,9 +9944,10 @@ function decodeHash(hash) {
   const k = p.get('k');
   const m = p.get('m') ? decodeURIComponent(p.get('m')) : null;
   const v = p.get('v') ? decodeURIComponent(p.get('v')) : null;
-  if (k === null || !s || !SCALES[s]) return null;
+  const keyInt = parseInt(k);
+  if (k === null || isNaN(keyInt) || keyInt < 0 || keyInt > 11 || !s || !SCALES[s]) return null;
   return {
-    key:   parseInt(k),
+    key:   keyInt,
     scale: s,
     mode:  m || '4',
     view:  v || 'list',
@@ -11067,9 +11094,17 @@ function unlockScroll() {
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      closeGuide();
+      // Only release the scroll lock when this handler actually closes one of its
+      // own modals — otherwise it stomps the lock held by another open overlay.
+      const guideEl = document.getElementById('guide-modal');
+      const _pzo = document.getElementById('prog-zoom-overlay');
+      const closedSomething = guideEl.classList.contains('open')
+        || techModal.classList.contains('open')
+        || (_pzo && _pzo.classList.contains('open'));
+      if (!closedSomething) return;
+      guideEl.classList.remove('open');
       techModal.classList.remove('open');
-      const _pzo = document.getElementById('prog-zoom-overlay'); if (_pzo) _pzo.classList.remove('open');
+      if (_pzo) _pzo.classList.remove('open');
       unlockScroll();
     }
   });
@@ -11500,7 +11535,14 @@ function _parseMusicXMLDoc(doc, partId) {
             const raw = _mxmlNoteMidi(el);
             if (raw != null) {
               const midi = raw + 12 * octaveChange;            // sounding pitch
-              notes.push({ at: onset, dur: Math.max(dur, 1) / divisions, pc: ((midi % 12) + 12) % 12, midi });
+              const dq   = Math.max(dur, 1) / divisions;       // duration in beats
+              // A tied-stop note continues the previous note of the same pitch — extend
+              // its duration instead of re-attacking it.
+              const tieStop = [...el.getElementsByTagName('tie'), ...el.getElementsByTagName('tied')]
+                .some(t => t.getAttribute('type') === 'stop');
+              const prev = tieStop && notes.find(n => n.midi === midi && Math.abs(n.at + n.dur - onset) < 1e-4);
+              if (prev) prev.dur += dq;
+              else notes.push({ at: onset, dur: dq, pc: ((midi % 12) + 12) % 12, midi });
             }
           }
           if (!isChord) { lastAt = pos; pos += dur / divisions; }   // accumulate in beats
@@ -11688,7 +11730,7 @@ function _compToast(msg, isError) {
 function openCompositions() {
   document.getElementById('comp-overlay').classList.add('open');
   document.getElementById('comp-btn').classList.add('active');
-  document.body.style.overflow = 'hidden';
+  lockScroll();
   compRenderList();
   const comps = compLoad();
   if (compActiveId && comps.find(c => c.id === compActiveId)) {
@@ -11704,7 +11746,7 @@ function openCompositions() {
 function closeCompositions() {
   document.getElementById('comp-overlay').classList.remove('open');
   document.getElementById('comp-btn').classList.remove('active');
-  document.body.style.overflow = '';
+  unlockScroll();
   compStopPlayback();
   if (screen.orientation?.unlock) screen.orientation.unlock();
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -13021,6 +13063,7 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
     // Route the drum synths through the same compressor/limiter as the chords
     // so the combined peak is what gets tamed, not just the piano on its own.
     progMasterBus = ensureCompMasterBus();
+    _ensureSamplerConnected();   // a prior progStop() may have disconnected the shared sampler
 
     const bpm     = comp.bpm || 90;
     const beatDur = 60 / bpm;
@@ -13259,6 +13302,7 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
     document.querySelectorAll('.mob-sc').forEach((el, j) => el.classList.toggle('loop-one', loopOn && j >= loopRange.start && j <= loopRange.end));
     compMobUpdateStage(playComp.chords[startIdx], realIdx(startIdx));
     compIsPlaying = true;
+    _acquireWakeLock();   // keep the screen awake during composition playback (mobile)
     document.getElementById('comp-modal')?.classList.add('comp-playing');
     compMobSetTab('play');
 
@@ -13324,6 +13368,7 @@ function compStopPlayback() {
   if (guitarSampler) guitarSampler.releaseAll();
   if (progMasterBus === compMasterBus) progMasterBus = null;
   compIsPlaying = false;
+  _releaseWakeLock();
   _compCurIdx = -1;
   _compLoopRange = null;
   compMobSetTab('edit');
@@ -13406,9 +13451,11 @@ function _releaseWakeLock() {
 // Re-acquire if page becomes visible while playing (lock is auto-released on hide)
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
+    Tone.getContext().rawContext.resume().catch(() => {});
     Tone.start().catch(() => {});
-    if (progPlaying) _acquireWakeLock();
-  } else {
+    if (progPlaying || compIsPlaying) _acquireWakeLock();
+  } else if (!progPlaying && !compIsPlaying) {
+    // Only suspend when idle — suspending mid-playback freezes the clock and cuts audio.
     Tone.getContext().rawContext.suspend().catch(() => {});
   }
 });
