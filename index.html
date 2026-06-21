@@ -4165,7 +4165,7 @@ function renderChords(scaleNotes, scaleData){
       sec.id=`deg-${di}`;
       const hdr=document.createElement('div');
       hdr.className='degree-header';
-      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span>${showDegreeNames?`<span class="degree-name-label">${DNAMES[di]}</span>`:''}`;
+      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span>${showDegreeNames?`<span class="degree-name-label">${DNAMES[di]||''}</span>`:''}`;
       sec.appendChild(hdr);
       const grid=document.createElement('div');
       grid.className='chords-grid';
@@ -4263,7 +4263,7 @@ function renderChords(scaleNotes, scaleData){
 
     const hdr=document.createElement('div');
     hdr.className='degree-header';
-    hdr.innerHTML=`<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`;
+    hdr.innerHTML=`<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]||''}</span>`;
     sec.appendChild(hdr);
 
     if(showNeg){
@@ -5340,7 +5340,7 @@ function renderDiagrams(scaleNotes, scaleData) {
     byDeg.forEach((degItems, di) => {
       const sec=document.createElement('div'); sec.className='degree-section'; sec.id=`deg-${di}`;
       const hdr=document.createElement('div'); hdr.className='degree-header';
-      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span>${showDegreeNames?`<span class="degree-name-label">${DNAMES[di]}</span>`:''}`;
+      hdr.innerHTML=`<span class="degree-num">${romans[di]}</span>${showDegreeNames?`<span class="degree-name-label">${DNAMES[di]||''}</span>`:''}`;
       sec.appendChild(hdr);
       const grid=document.createElement('div'); grid.className='chords-grid';
       degItems.forEach((item, ci) => {
@@ -5373,7 +5373,7 @@ function renderDiagrams(scaleNotes, scaleData) {
     sec.className = 'degree-section'; sec.id = `deg-${di}`;
     const hdr = document.createElement('div');
     hdr.className = 'degree-header';
-    hdr.innerHTML = `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`;
+    hdr.innerHTML = `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]||''}</span>`;
     sec.appendChild(hdr);
     const grid = document.createElement('div');
     grid.className = 'chords-grid';
@@ -5505,7 +5505,7 @@ function renderShellVoicings(scaleNotes, scaleData) {
       const chord4pcs  = chordNotes.map(n => noteNameToPc(n));
       chordEntries.push({
         degIdx: di, sectionId: `deg-${di}`,
-        headerHtml: `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`,
+        headerHtml: `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]||''}</span>`,
         chordNotes, sym, chRootPc, chord4pcs, labelBadge: ''
       });
     });
@@ -5660,7 +5660,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
       const chord4pcs  = chordNotes.map(n => noteNameToPc(n));
       chordEntries.push({
         degIdx: di, sectionId: `deg-${di}`,
-        headerHtml: `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`,
+        headerHtml: `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]||''}</span>`,
         chordNotes, sym, chRootPc, chord4pcs, labelBadge: ''
       });
     });
@@ -6332,10 +6332,9 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
     }
     for (let i = 0; i < n; i++) {
       const sem = ((intervals[i] - intervals[degIdx]) + 12) % 12;
-      if (!chordSems.has(sem)) {
-        const compound = sem < 7 ? sem + 12 : sem;
-        if (compound >= 13) tensionSems.add(sem);
-      }
+      // every non-root scale tone that isn't a chord tone is an available tension
+      // (the old sem<7?sem+12:sem test wrongly excluded the 13th)
+      if (sem !== 0 && !chordSems.has(sem)) tensionSems.add(sem);
     }
     return { chordSems, tensionSems };
   }
@@ -6530,7 +6529,7 @@ function renderMandolinChop(scaleNotes, scaleData) {
 
     const hdr = document.createElement('div');
     hdr.className = 'degree-header';
-    hdr.innerHTML = `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]}</span>`;
+    hdr.innerHTML = `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]||''}</span>`;
     sec.appendChild(hdr);
 
     const grid = document.createElement('div');
@@ -7145,7 +7144,7 @@ function renderMandolin(scaleNotes, scaleData) {
     sec.className = 'degree-section'; sec.id = `mando-deg-${degIdx}`;
     const hdr = document.createElement('div');
     hdr.className = 'degree-header';
-    hdr.innerHTML = `<span class="degree-num">${romans[degIdx]}</span><span class="degree-name-label">${DNAMES[degIdx]}</span>`;
+    hdr.innerHTML = `<span class="degree-num">${romans[degIdx]}</span><span class="degree-name-label">${DNAMES[degIdx]||''}</span>`;
     sec.appendChild(hdr);
     const grid = document.createElement('div');
     grid.className = 'chords-grid';
@@ -8586,9 +8585,10 @@ function drawNegAxis(svg, tonic, scaleIntervals) {
   const domName   = PITCH_CANDIDATES[domPc][0];
   const axLabel1  = tonicName + '–' + domName;
 
-  const subPc  = COF_PC[(ts + 11) % 12];   // subdominant
-  const stt7Pc = COF_PC[(ts + 10) % 12];   // bVII
-  const axLabel2 = PITCH_CANDIDATES[subPc][0] + '–' + PITCH_CANDIDATES[stt7Pc][0];
+  // far end of the diameter bisects the two slots opposite tonic/dominant
+  const oppPc1 = COF_PC[(ts + 6) % 12];
+  const oppPc2 = COF_PC[(ts + 7) % 12];
+  const axLabel2 = PITCH_CANDIDATES[oppPc1][0] + '–' + PITCH_CANDIDATES[oppPc2][0];
 
   [[axMid, axLabel1], [axOpp, axLabel2]].forEach(([ang, lbl]) => {
     const [lx, ly] = pxy(R_OUT + 22, ang);
@@ -12448,7 +12448,9 @@ function compRenderDetail(comp) {
   panel.querySelector('.comp-play-btn')?.addEventListener('click', () => compStartPlayback(comp.id));
   panel.querySelector('.comp-stop-btn')?.addEventListener('click', compStopPlayback);
   panel.querySelector('.comp-bpm-input')?.addEventListener('change', e => {
-    compUpdate(comp.id, { bpm: parseInt(e.target.value) || 90 });
+    const bpm = Math.min(240, Math.max(40, parseInt(e.target.value) || 90));
+    e.target.value = bpm;
+    compUpdate(comp.id, { bpm });
     if (compIsPlaying) compPendingRestart = true;
   });
   const mobLoopBtn = panel.querySelector('.comp-loop-btn');
@@ -13413,7 +13415,8 @@ document.getElementById('mob-stop-btn2').addEventListener('click', compStopPlayb
 document.getElementById('comp-mob-edit-btn').addEventListener('click', () => compMobSetTab('edit'));
 document.getElementById('mob-bpm-input').addEventListener('change', e => {
   if (!compActiveId) return;
-  const bpm = parseInt(e.target.value) || 90;
+  const bpm = Math.min(240, Math.max(40, parseInt(e.target.value) || 90));
+  e.target.value = bpm;
   compUpdate(compActiveId, { bpm });
   if (compIsPlaying) compPendingRestart = true;
   const deskBpm = document.querySelector('.comp-bpm-input');
