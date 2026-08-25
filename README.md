@@ -27,16 +27,18 @@ Each scale degree shows a chord card with:
 
 ### Guitar tab
 
-Four sub-tabs:
+Seven sub-tabs:
 
-- **Basic** — chord diagrams for all scale-degree chords; root-as-bass priority; barre shapes shown with purple bar
-- **Arpeggios** — horizontal CAGED arpeggio shapes for 7th chords (E/A/D/G/C forms, 5-fret window)
+- **Basic** — chord diagrams for all scale-degree chords; root-as-bass priority; barre shapes shown with purple bar. Any tone the voicing omits is named under the diagram (e.g. `C · E · B · D (no5)`)
+- **Arpeggios** — horizontal CAGED arpeggio shapes for 7th chords (E/A/D/G/C forms, 5-fret window). Every chord tone in the position, ascending; the root on the string the form is named after is ringed in gold
+- **Scale** — the full fretboard plus CAGED positions
+- **Shell** — three-note shell voicings
 - **Drop 2 / Drop 3** — jazz voicings: all 4 inversions × 3 string sets; slash notation for inversion (e.g. Gmaj7/B)
-- **Alt. Dom** — altered dominant voicings for every dominant chord in the current key (V7 + secondary dominants). Covers 9 chord types: 7♭9, 7♯9, 7♯11, 7♭13, 7♭9♭13, 7♭5♭9, 7♭5♯9, 7♯5♭9, 7♯5♯9. Each shows up to 3 moveable shapes (root on E / A / D string) with span ≤ 4 frets. Tab is hidden when the scale has no dominant chords.
+- **Alt. Dom** — altered dominant voicings for every dominant chord in the current key (V7 + secondary dominants). Covers 12 chord types across 27 shapes: 7♭9, 7♯9, 7sus4♭9, 13♭9, 13♯9, 7♯11, 7♭13, 7♭9♭13, 7♭5♭9, 7♭5♯9, 7♯5♭9, 7♯5♯9. Moveable shapes rooted on the E, A or D string, every one voiced within a 4-fret span. The tab is greyed out when the current harmonisation has no dominant chords.
 
 **Chord diagram navigation** — click any diagram to open it enlarged. Use ◀ ▶ buttons, swipe left/right, or arrow keys to step through all diagrams in the current view. The previous and next chord names are shown as context labels.
 
-**Chord List view** — on screens ≥ 900 px, degree sections are laid out in two columns for a more compact overview.
+**Chord List view** — on wide screens (1125 px, which is 900 CSS px once the 1.25× root zoom is accounted for) degree sections are laid out in two columns for a more compact overview.
 
 ### Mandolin tab
 
@@ -130,7 +132,8 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 harmonic-atlas/
 ├── index.html          ← The entire app (HTML + CSS + JS, ~10 000 lines)
 ├── manifest.json       ← PWA config (name, icon, theme)
-├── sw.js               ← Service worker (network-first for HTML, cache-first for assets)
+├── sw.js               ← Service worker (network-first HTML, cache-first own assets,
+│                          stale-while-revalidate for Tone.js and the audio samples)
 ├── dev-server.js       ← Local dev server with live-reload
 ├── start.bat           ← Windows launcher (double-click)
 ├── start.sh            ← Mac/Linux launcher
@@ -249,4 +252,15 @@ Each composition is a plain JS object stored as JSON in `localStorage` (key: `ha
 
 ### Service worker cache
 
-Cache key: `harmonic-atlas-v12`. Bump the version in `sw.js` when adding new static assets that need to be cached offline. HTML is always fetched fresh (network-first).
+Two caches:
+
+- **`harmonic-atlas-<version>`** — the app shell. The name is derived from the `?v=` the page
+  registers the worker with, so bumping `window.APP_VERSION` in `index.html` is the only edit a
+  deploy needs: the version string, the visible timestamp and the cache name all follow from it.
+  Old shell caches are dropped on activate.
+- **`harmonic-atlas-runtime`** — Tone.js, the piano and guitar samples, and Google Fonts, served
+  stale-while-revalidate. This is what makes the installed app work offline, and it deliberately
+  survives a deploy so a version bump does not re-download every sample.
+
+HTML is always fetched fresh (network-first). Assets are precached one at a time rather than with
+`addAll`, which is atomic and would drop the whole shell if a single request failed.
