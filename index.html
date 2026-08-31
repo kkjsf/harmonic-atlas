@@ -2529,13 +2529,14 @@
     <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Scale &amp; Chord Views</span>
     <span class="has-tip" style="display:inline-flex;align-items:center">
       <span class="tip-badge" tabindex="0">?</span>
-      <div class="tip-popup" style="left:auto;right:0;transform:none"><span class="tip-title">Scale &amp; Chord Views</span>Switch between different ways to display the harmonised chords. Chord List shows all notes and intervals. Guitar and Mandolin tabs include a Scale view showing the full fretboard and CAGED positions. Drop 2 and Drop 3 are jazz voicing techniques that redistribute chord tones across strings for smoother voice-leading.</div>
+      <div class="tip-popup" style="left:auto;right:0;transform:none"><span class="tip-title">Scale &amp; Chord Views</span>Switch between different ways to display the harmonised chords. Chord List shows all notes and intervals. Guitar, Mandolin and Banjo tabs each include a Scale view showing the full fretboard. Drop 2 and Drop 3 are jazz voicing techniques that redistribute chord tones across strings for smoother voice-leading. Mandolin Chop and Banjo Moveable show closed grips with no open strings, so every shape slides to any root.</div>
     </span>
   </div>
   <div class="view-tabs" id="view-tabs" style="align-items:center">
     <button class="view-tab active" data-view="list"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="5.6" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="9.2" width="7" height="1.8" rx=".5" fill="currentColor" opacity=".5"/></svg>Chord List</button>
     <button class="view-tab" data-view="guitar" id="tab-guitar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="9" r="1.2" fill="currentColor"/></svg>Guitar</button>
     <button class="view-tab" data-view="mandolin" id="tab-mandolin"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><ellipse cx="6.5" cy="8" rx="3.5" ry="4.5" stroke="currentColor" stroke-width="1.1" fill="none"/><line x1="6.5" y1="1" x2="6.5" y2="3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.5" y1="4" x2="8.5" y2="4" stroke="currentColor" stroke-width="1" opacity=".6"/><circle cx="6.5" cy="8" r="1" fill="currentColor" opacity=".4"/></svg>Mandolin</button>
+    <button class="view-tab" data-view="banjo" id="tab-banjo"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.1" fill="none"/><circle cx="6.5" cy="8.5" r="1.7" stroke="currentColor" stroke-width=".8" fill="none" opacity=".5"/><line x1="6.5" y1="1" x2="6.5" y2="4.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.9" y1="3.4" x2="4.9" y2="4.9" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".7"/></svg>Banjo</button>
   </div>
   <div class="guitar-sub-tabs" id="guitar-sub-tabs" style="display:none">
     <button class="guitar-sub-tab active" data-view="diagrams" id="tab-diagrams">Basic</button>
@@ -2550,6 +2551,11 @@
     <button class="guitar-sub-tab active" data-view="mandolin" id="tab-mando-chords">Chords</button>
     <button class="guitar-sub-tab" data-view="mandolin-scale" id="tab-mando-scale">Scale</button>
     <button class="guitar-sub-tab" data-view="mandolin-chop" id="tab-mando-chop">Chop</button>
+  </div>
+  <div class="guitar-sub-tabs" id="banjo-sub-tabs" style="display:none">
+    <button class="guitar-sub-tab active" data-view="banjo" id="tab-banjo-chords">Chords</button>
+    <button class="guitar-sub-tab" data-view="banjo-scale" id="tab-banjo-scale">Scale</button>
+    <button class="guitar-sub-tab" data-view="banjo-moveable" id="tab-banjo-moveable">Moveable</button>
   </div>
   <div id="compare-panel" style="display:none">
     <div class="compare-cols" id="compare-cols">
@@ -2576,8 +2582,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v73';
-window.APP_DEPLOYED = '2026-08-25 11:50';
+window.APP_VERSION = 'v74';
+window.APP_DEPLOYED = '2026-08-31 10:52';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -3761,7 +3767,7 @@ document.addEventListener('keydown', e => {
 // STATE & RENDERING
 // ══════════════════════════════════════════════
 
-let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastGuitarView:'diagrams',lastMandolinView:'mandolin',scaleLabelMode:'notes'};
+let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastGuitarView:'diagrams',lastMandolinView:'mandolin',lastBanjoView:'banjo',scaleLabelMode:'notes',gripLabel:'intervals'};
 
 function buildSelectors(){
   // Key selector: show both enharmonic names for ambiguous keys
@@ -4790,15 +4796,17 @@ function render(){
   }
   const isGuitar   = ['diagrams','arpeggio','scale','shell','drop2','drop3','altdom'].includes(state.view);
   const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
+  const isBanjo    = ['banjo','banjo-scale','banjo-moveable'].includes(state.view);
 
   document.querySelectorAll('.view-tab').forEach(t => {
     const tv = t.dataset.view;
-    const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv===state.view;
+    const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv==='banjo' ? isBanjo : tv===state.view;
     t.classList.toggle('active', isActive);
   });
   document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
   document.getElementById('guitar-sub-tabs').style.display   = isGuitar   ? 'flex' : 'none';
   document.getElementById('mandolin-sub-tabs').style.display = isMandolin ? 'flex' : 'none';
+  document.getElementById('banjo-sub-tabs').style.display    = isBanjo    ? 'flex' : 'none';
 
   // Debounce the heavy DOM rebuild with a smooth fade+slide transition
   if (_renderTimer) clearTimeout(_renderTimer);
@@ -5101,6 +5109,9 @@ function renderView(scaleNotes,scaleData){
   else if(state.view==='mandolin')        renderMandolin(scaleNotes,scaleData);
   else if(state.view==='mandolin-scale') renderMandolinScale(scaleNotes,scaleData);
   else if(state.view==='mandolin-chop')  renderMandolinChop(scaleNotes,scaleData);
+  else if(state.view==='banjo')          renderBanjo(scaleNotes,scaleData);
+  else if(state.view==='banjo-scale')    renderBanjoScale(scaleNotes,scaleData);
+  else if(state.view==='banjo-moveable') renderBanjoMoveable(scaleNotes,scaleData);
 }
 
 // ══════════════════════════════════════════════
@@ -6695,25 +6706,15 @@ function renderMandolinScale(scaleNotes, scaleData) {
     MANDO_OPEN_PC, MANDO_STR_TOP, 12, false);
 }
 
-// ── Mandolin voicings for chop chords (open strings allowed) ─────
-// One mandolin voicing search, shared by the chop-chord and the general chord
-// engines. They used to be two copies of the same backtracker differing only in
-// whether open strings were allowed and in one scoring term.
-//
-// `closed: true` is the chop case: no open strings (a chop grip has to be
-// transposable) and a hard span limit of 3 frets. Allowing 5 let shapes like
-// C major = 5-2-7-3 through, which is neither closed nor choppable.
-function computeMandoVoicing(pcs, stringIndices, opts) {
-  const closed  = !!(opts && opts.closed);
-  const maxSpan = closed ? 3 : 5;
-  const maxFret = closed ? 16 : 14;
+// ── Mandolin voicings for the general Chords tab (open strings allowed) ──
+function computeMandoVoicing(pcs, stringIndices) {
+  const maxSpan = 5, maxFret = 14;
   const PC = pcs.map(p => ((p%12)+12)%12);
   const candidates = PC.map((pc, i) => {
     const strPc = MANDO_MIDI[stringIndices[i]] % 12;
     const base  = (pc - strPc + 12) % 12;
-    const start = (closed && base === 0) ? 12 : base;
     const out   = [];
-    for (let f = start; f <= maxFret; f += 12) out.push(f);
+    for (let f = base; f <= maxFret; f += 12) out.push(f);
     return out;
   });
   let best = null, bestScore = Infinity;
@@ -6724,7 +6725,7 @@ function computeMandoVoicing(pcs, stringIndices, opts) {
       const span = Math.max(...cur) - Math.min(...cur);
       if (span > maxSpan) return;
       const minF = Math.min(...cur);
-      const score = span * 8 + (closed ? minF * 4 : (minF <= 3 ? minF : minF * 4));
+      const score = span * 8 + (minF <= 3 ? minF : minF * 4);
       if (score < bestScore) { bestScore = score; best = [...cur]; }
       return;
     }
@@ -6734,62 +6735,413 @@ function computeMandoVoicing(pcs, stringIndices, opts) {
   return best;
 }
 
-function computeClosedMandoVoicing(pcs, stringIndices) {
-  return computeMandoVoicing(pcs, stringIndices, { closed: true });
+// ══════════════════════════════════════════════════════
+// CLOSED-GRIP ENGINE — mandolin chop · banjo moveable shapes
+//
+// A chop only speaks if the whole grip lifts off the fretboard at once, so
+// every string has to be fretted: one open string left ringing and the
+// percussive snap is gone. The search below therefore looks exclusively at
+// closed voicings and returns them as relative fret offsets plus a base
+// fret, which is also what makes them moveable to any root.
+//
+// It enumerates which chord tone sits on which string, then every
+// per-string octave shift, and keeps the windows a hand can actually hold:
+//   · span ≤ 4 frets     — beyond that the grip is not a grip
+//   · fingers ≤ 4        — adjacent strings on one fret barre under a
+//                          single finger, non-adjacent ones do not
+//   · essential tones    — root, third (or the sus tone) and any altered
+//                          fifth / sixth / seventh must be present. Only a
+//                          PERFECT fifth is expendable, and only once the
+//                          chord has a seventh to carry its colour.
+//
+// Ranking prefers a tight span and doubling the root or fifth. Doubling the
+// third is what the previous version did on every single triad, and it is
+// the one doubling a chop should avoid: it thickens the chord exactly where
+// the backbeat wants it lean.
+//
+// Named shapes cross-checked against mandolincafe.com/chords, the mandozine
+// moveable-chord charts and mandolessons.com "Chop Chords".
+// ══════════════════════════════════════════════════════
+
+const GRIP_INSTR = {
+  mandolin: {
+    label:  'Mandolin',
+    tuning: 'G · D · A · E',
+    midi:   [55, 62, 69, 76],                    // G3 D4 A4 E5, low → high
+    names:  ['G', 'D', 'A', 'E'],
+    drone:  null,
+    maxTop: 14
+  },
+  banjo: {
+    label:  'Banjo',
+    tuning: 'g · D · G · B · D',
+    midi:   [50, 55, 59, 62],                    // 4th D3 · 3rd G3 · 2nd B3 · 1st D4
+    names:  ['D', 'G', 'B', 'D'],
+    // Two strings are called D, so anywhere a string is named on its own the
+    // number has to come with it.
+    nums:   ['4', '3', '2', '1'],
+    // 5th string: a short drone whose nut sits at fret 5, so its first
+    // fretted note is fret 6. It is a G, which is why open-G banjo lives so
+    // comfortably in G, C, D and Em and fights you everywhere else.
+    drone:  { midi: 67, name: 'g', nut: 5 },
+    maxTop: 14
+  }
+};
+
+// Traditional names, kept deliberately short: only shapes the literature
+// actually names, verified against the open chord they come from. Mandolin
+// [0,0,2,3] is the open-G grip and [0,2,3,3] the open-D grip; banjo
+// [2,1,0,2] is the F grip and [2,0,1,2] the D grip.
+const GRIP_NAMES = {
+  mandolin: {
+    '1,2,2,0|4,0,7,0': 'Big Chop',
+    '0,2,2,0|3,0,7,0': 'Big Chop',
+    '0,2,1,0|3,0,6,0': 'Big Chop',
+    '0,0,2,3|0,7,4,0': 'G shape',
+    '0,2,3,3|7,4,0,7': 'D shape'
+  },
+  banjo: {
+    '0,0,0,0|7,0,4,7': 'Barre',
+    '1,1,0,1|7,0,3,7': 'Barre',
+    '2,1,0,2|0,4,7,0': 'F shape',
+    '2,0,0,2|0,3,7,0': 'F shape',
+    '2,0,1,2|4,7,0,4': 'D shape',
+    '1,0,1,1|3,7,0,3': 'D shape'
+  }
+};
+
+// Interval label that respects the chord's own spelling: an augmented triad
+// wants ♯5 not ♭6, and a diminished seventh reads its 6 as a bb7.
+function gripIvLabel(iv, tset) {
+  if (iv === 8) return tset.indexOf(4) >= 0 ? '♯5' : '♭6';
+  if (iv === 6) return tset.indexOf(3) >= 0 ? '♭5' : '♯4';
+  if (iv === 9) return (tset.indexOf(3) >= 0 && tset.indexOf(6) >= 0) ? '°7' : '6';
+  return INTERVAL_LABEL[iv];
 }
 
-function getChopMandoVoicing(rootPc, ivArray) {
-  const allPcs = ivArray.map(iv => ((rootPc+iv)%12+12)%12);
-  let pcs = allPcs.length <= 4 ? [...new Set(allPcs)] :
-    [...new Set([0,1,3,allPcs.length-1].map(i => ((rootPc+ivArray[Math.min(i,ivArray.length-1)])%12+12)%12))];
-  while (pcs.length < 4) pcs.push(pcs[pcs.length % Math.max(1,pcs.length-1)]);
-  pcs = pcs.slice(0,4);
-  function allPerms(arr) {
-    if (arr.length<=1) return [arr];
-    return arr.flatMap((x,i)=>allPerms([...arr.slice(0,i),...arr.slice(i+1)]).map(p=>[x,...p]));
+// One finger per maximal run of adjacent strings sharing a fret.
+function gripFingerCount(off) {
+  let n = 0;
+  for (let i = 0; i < off.length; ) {
+    let j = i;
+    while (j + 1 < off.length && off[j + 1] === off[i]) j++;
+    n++; i = j + 1;
   }
-  const ss = [0,1,2,3];
-  let best = null, bestScore = Infinity;
-  for (const assign of allPerms(pcs)) {
-    const v = computeClosedMandoVoicing(assign, ss);
-    if (!v) continue;
-    const span = Math.max(...v) - Math.min(...v);
-    const minF = Math.min(...v);
-    const score = span * 8 + minF * 4;
-    if (score < bestScore) { bestScore = score; best = { frets: v, pcs: assign }; }
-  }
-  return best ? { frets4: best.frets, pcs4: best.pcs } : null;
+  return n;
 }
 
-function renderMandolinChop(scaleNotes, scaleData) {
+function gripScore(off, tones, span, fingers) {
+  const count = {};
+  for (const t of tones) count[t] = (count[t] || 0) + 1;
+  let dbl = 0;
+  for (const k in count) {
+    const extra = count[k] - 1, iv = +k;
+    if (!extra) continue;
+    dbl += extra * (iv === 0 ? 0 : iv === 7 ? 1 : (iv === 3 || iv === 4 || iv === 6 || iv === 8) ? 3 : 6);
+  }
+  return span * 3 + dbl + fingers * 0.5;
+}
+
+// Relative shapes for one interval set, cached: the tab asks for the same
+// handful of qualities again and again as you move through a scale.
+const _gripShapeCache = new Map();
+
+function findGripShapes(instr, ivArray) {
+  const cfg  = GRIP_INSTR[instr];
+  const tset = [...new Set(ivArray.map(i => ((i % 12) + 12) % 12))].sort((a, b) => a - b);
+  const ck   = instr + '|' + tset.join(',');
+  if (_gripShapeCache.has(ck)) return _gripShapeCache.get(ck);
+
+  const n   = cfg.midi.length;
+  const rel = cfg.midi.map(m => m - cfg.midi[0]);
+  const ess = tset.filter(t => !(t === 7 && tset.length >= 4));
+
+  const out = [], seen = new Set(), combo = new Array(n);
+  (function walk(s) {
+    if (s === n) {
+      for (const e of ess) if (combo.indexOf(e) < 0) return;
+      const raw = combo.map((t, i) => ((((t - rel[i]) % 12) + 12) % 12));
+      for (let mask = 0; mask < (1 << n); mask++) {
+        const g    = raw.map((f, i) => f + (((mask >> i) & 1) ? 12 : 0));
+        const lo   = Math.min.apply(null, g);
+        const span = Math.max.apply(null, g) - lo;
+        if (span > 4) continue;
+        const off  = g.map(f => f - lo);
+        const fing = gripFingerCount(off);
+        if (fing > 4) continue;
+        const key = off.join(',');
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push({ off, tones: combo.slice(), span, fingers: fing,
+                   score: gripScore(off, combo, span, fing) });
+      }
+      return;
+    }
+    for (const t of tset) { combo[s] = t; walk(s + 1); }
+  })(0);
+
+  out.sort((a, b) => a.score - b.score || a.span - b.span);
+  _gripShapeCache.set(ck, out);
+  return out;
+}
+
+// Resolve shapes to real frets for one root. allowOpen=false is the chop
+// case; the banjo Chords tab passes true so open-G shapes can appear.
+function getGrips(instr, rootPc, ivArray, opts) {
+  opts = opts || {};
+  const cfg     = GRIP_INSTR[instr];
+  const minBase = opts.allowOpen ? 0 : 1;
+  const maxTop  = opts.maxTop || cfg.maxTop;
+  const limit   = opts.limit  || 4;
+  const rootN   = ((rootPc % 12) + 12) % 12;
+  const tset    = [...new Set(ivArray.map(i => ((i % 12) + 12) % 12))];
+  const all     = [];
+
+  for (const sh of findGripShapes(instr, ivArray)) {
+    // Base fret that lands the shape's first string on the right pitch class.
+    let base = (((rootN + sh.tones[0] - cfg.midi[0] - sh.off[0]) % 12) + 12) % 12;
+    while (base < minBase) base += 12;
+    if (base + Math.max.apply(null, sh.off) > maxTop) continue;
+
+    const frets = sh.off.map(o => base + o);
+    // Derive the intervals from the sounding pitches rather than trusting the
+    // search bookkeeping — this is what would catch an octave slip.
+    const tones = frets.map((f, i) => ((((cfg.midi[i] + f) - rootN) % 12) + 12) % 12);
+    if (tones.some(t => tset.indexOf(t) < 0)) continue;
+
+    const pos = Math.min.apply(null, frets);
+    all.push(Object.assign({}, sh, { base, frets, tones, pos, rootStr: tones.indexOf(0),
+      name: GRIP_NAMES[instr][sh.off.join(',') + '|' + sh.tones.join(',')] || null }));
+  }
+
+  // Which grips to KEEP: mostly by quality, with a light position bias so the
+  // alternates still spread over the neck. At most two per root string, so
+  // they are genuinely different ideas and not four fingerings of one.
+  all.sort((a, b) => (a.score + a.pos * 0.4) - (b.score + b.pos * 0.4));
+  const kept = [], perRoot = new Map(), seenPos = new Set();
+  for (const g of all) {
+    if (kept.length >= limit) break;
+    const n = perRoot.get(g.rootStr) || 0;
+    if (n >= 2 || seenPos.has(g.rootStr + ':' + g.pos)) continue;
+    perRoot.set(g.rootStr, n + 1);
+    seenPos.add(g.rootStr + ':' + g.pos);
+    kept.push(g);
+  }
+  // Which grip to SHOW first: position matters far more here. Nobody chops at
+  // the 12th fret when the same chord sits under the hand at the 2nd, so a
+  // fret of height has to cost more than a point of shape quality.
+  const rank = g => g.score + g.pos * 1.2;
+  const best = kept.reduce((a, b) => (rank(b) < rank(a) ? b : a), kept[0]);
+  kept.sort((a, b) => a.pos - b.pos || a.score - b.score);
+  kept.best = Math.max(0, kept.indexOf(best));
+  return kept;
+}
+
+// Suggested fingering: 1–4 by ascending fret, one number per barre group.
+function gripFingering(frets) {
+  const groups = [];
+  for (let i = 0; i < frets.length; ) {
+    let j = i;
+    while (j + 1 < frets.length && frets[j + 1] === frets[i]) j++;
+    groups.push({ fret: frets[i], from: i, to: j });
+    i = j + 1;
+  }
+  const out = new Array(frets.length).fill(0);
+  groups.slice().sort((a, b) => a.fret - b.fret || a.from - b.from)
+    .forEach((grp, k) => { for (let s = grp.from; s <= grp.to; s++) out[s] = k + 1; });
+  return out;
+}
+
+// The banjo 5th string is a G drone with its nut at fret 5, so its first
+// fretted note is fret 6. Inside a grip's window it is either a usable chord
+// tone (fretted, or open) or a string you simply do not strike.
+function droneState(cfg, frets, rootPc, tset) {
+  if (!cfg.drone) return null;
+  const rootN = ((rootPc % 12) + 12) % 12;
+  const tone  = f => ((((cfg.drone.midi + f) - rootN) % 12) + 12) % 12;
+  const lo = Math.min.apply(null, frets), hi = Math.max.apply(null, frets);
+  for (let f = Math.max(cfg.drone.nut + 1, lo); f <= hi; f++)
+    if (tset.indexOf(tone(f)) >= 0) return { fret: f, tone: tone(f) };
+  if (tset.indexOf(tone(0)) >= 0) return { fret: 0, tone: tone(0) };
+  return { fret: -1, tone: -1 };
+}
+
+// ── Grip diagram ──────────────────────────────────────
+// One renderer for both instruments. The banjo drone gets its own short
+// column with a nut at fret 5, which is the only honest way to chart it.
+function makeGripDiagram(instr, grip, rootPc, w, opts) {
+  opts = opts || {};
+  const cfg   = GRIP_INSTR[instr];
+  const frets = grip.frets, tones = grip.tones;
+  const tset  = opts.chordTones || [...new Set(tones)];
+  const showN = opts.label === 'notes';
+  const rootN = ((rootPc % 12) + 12) % 12;
+  const drone = (opts.drone === false || !cfg.drone) ? null : droneState(cfg, frets, rootPc, tset);
+  const nCol  = cfg.midi.length + (drone ? 1 : 0);
+  const NUM_FRET = 5;
+
+  w = w || 128;
+  const showFing = opts.fingers !== false;
+  // Wider left gutter when a drone column is present: its open/muted marker
+  // sits at the far left, where the fret-position label also wants to be.
+  const padL = drone ? 25 : 19, padR = 14, padT = 25, padB = showFing ? 33 : 22;
+  const strGap = (w - padL - padR) / (nCol - 1);
+  const fretH  = Math.round((w - padL - padR) * (drone ? 0.33 : 0.42));
+  const gridH  = NUM_FRET * fretH;
+  const h      = padT + gridH + padB;
+  const lo     = Math.min.apply(null, frets);
+  const startF = lo <= 1 ? 0 : lo - 1;
+  const fing   = gripFingering(frets);
+  const off    = drone ? 1 : 0;
+  const colX   = i => padL + i * strGap;
+  const g      = [];
+
+  g.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block" overflow="hidden">`);
+
+  if (startF === 0) {
+    g.push(`<rect x="${colX(off) - 1}" y="${padT - 4}" width="${strGap * (cfg.midi.length - 1) + 2}" height="5" rx="1.5" fill="#b8b0a0"/>`);
+  } else {
+    // Above the grid, not beside it: at this width a dot on the lowest string
+    // sits right on top of a label placed in the left margin.
+    g.push(`<text x="0" y="${padT - 5}" font-family="IBM Plex Mono,monospace" font-size="8.5" fill="#7c8798">${startF + 1}fr</text>`);
+  }
+  for (let f = 0; f <= NUM_FRET; f++) {
+    const y = padT + f * fretH;
+    g.push(`<line x1="${colX(off)}" y1="${y}" x2="${colX(nCol - 1)}" y2="${y}" stroke="#2a3040" stroke-width="${f === 0 ? 1.2 : 0.7}"/>`);
+  }
+  for (let s = 0; s < cfg.midi.length; s++) {
+    const x = colX(s + off);
+    g.push(`<line x1="${x}" y1="${padT}" x2="${x}" y2="${padT + gridH}" stroke="#3c4455" stroke-width="1.2"/>`);
+  }
+
+  if (drone) {
+    const x = colX(0);
+    const nutRow = cfg.drone.nut - startF;          // drone nut, in displayed fret rows
+    if (nutRow < NUM_FRET) {
+      const y0 = padT + Math.max(0, nutRow) * fretH;
+      g.push(`<line x1="${x}" y1="${y0}" x2="${x}" y2="${padT + gridH}" stroke="#3c4455" stroke-width="1.2"/>`);
+      if (nutRow >= 0) g.push(`<rect x="${x - 3.5}" y="${y0 - 2}" width="7" height="4" rx="1.2" fill="#b8b0a0"/>`);
+    } else {
+      g.push(`<line x1="${x}" y1="${padT}" x2="${x}" y2="${padT + gridH}" stroke="#232936" stroke-width="0.6" stroke-dasharray="2 3"/>`);
+    }
+  }
+
+  for (let s = 0; s < cfg.midi.length; s++)
+    g.push(`<text x="${colX(s + off)}" y="${padT + gridH + 13}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#5a6475" text-anchor="middle">${cfg.names[s]}</text>`);
+  if (drone)
+    g.push(`<text x="${colX(0)}" y="${padT + gridH + 13}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#5a6475" text-anchor="middle">${cfg.drone.name}</text>`);
+
+  if (showFing) {
+    for (let s = 0; s < cfg.midi.length; s++)
+      g.push(`<text x="${colX(s + off)}" y="${padT + gridH + 26}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#4a5262" text-anchor="middle">${fing[s]}</text>`);
+  }
+
+  const dr = Math.min(Math.max(5.5, fretH * 0.34), strGap * 0.46, padR - 1);
+  function dot(x, fr, iv, faded) {
+    const isRoot = iv === 0;
+    if (fr === 0) {
+      g.push(`<circle cx="${x}" cy="${padT - 11}" r="4.2" fill="none" stroke="${isRoot ? '#c9a84c' : '#4a5878'}" stroke-width="1.4"/>`);
+      return;
+    }
+    if (fr < 0) {
+      const d = 3.2;
+      g.push(`<line x1="${x - d}" y1="${padT - 11 - d}" x2="${x + d}" y2="${padT - 11 + d}" stroke="#4a5262" stroke-width="1.3" stroke-linecap="round"/>`);
+      g.push(`<line x1="${x + d}" y1="${padT - 11 - d}" x2="${x - d}" y2="${padT - 11 + d}" stroke="#4a5262" stroke-width="1.3" stroke-linecap="round"/>`);
+      return;
+    }
+    const dispF = fr - startF;
+    if (dispF < 1 || dispF > NUM_FRET) return;
+    const y   = padT + (dispF - 0.5) * fretH;
+    const lbl = showN ? pcToName((rootN + iv) % 12) : gripIvLabel(iv, tset);
+    g.push(`<circle cx="${x}" cy="${y}" r="${dr}" fill="${isRoot ? '#c9a84c' : '#6a5f90'}"${faded ? ' opacity=".5"' : ''}/>`);
+    g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${(dr * (lbl.length > 2 ? 0.62 : 0.8)).toFixed(1)}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
+  }
+
+  if (drone) dot(colX(0), drone.fret, drone.tone, true);
+  for (let s = 0; s < cfg.midi.length; s++) dot(colX(s + off), frets[s], tones[s], false);
+
+  g.push('</svg>');
+  return g.join('');
+}
+
+// Naming a string on its own: the banjo has two D strings, so it needs the
+// string number in front of the letter to say which one.
+function gripStrName(cfg, i) {
+  return (cfg.nums ? cfg.nums[i] : '') + cfg.names[i];
+}
+
+// Short caption for one grip: the traditional name when there is one, else
+// the string the root sits on, plus the position.
+function gripCaption(instr, grip) {
+  const cfg = GRIP_INSTR[instr];
+  const pos = Math.min.apply(null, grip.frets);
+  const who = grip.name ? grip.name
+            : grip.rootStr >= 0 ? `Root on ${gripStrName(cfg, grip.rootStr)}`
+            : 'Rootless';
+  return `${who} · ${pos === 0 ? 'open' : pos + 'fr'}`;
+}
+
+function gripPill(instr, grip) {
+  const cfg = GRIP_INSTR[instr];
+  const pos = Math.min.apply(null, grip.frets);
+  const who = grip.rootStr >= 0 ? gripStrName(cfg, grip.rootStr) : '—';
+  return `${who}·${pos === 0 ? 'op' : pos}`;
+}
+
+// ── Shared renderer for the two closed-grip tabs ──────
+// state.gripLabel ('intervals' | 'notes') is remembered across renders so
+// switching degree or key does not reset how you are reading the dots.
+function renderGripTab(instr, scaleNotes, scaleData, cfgUI) {
+  const cfg       = GRIP_INSTR[instr];
   const container = document.getElementById('all-degrees');
   container.innerHTML = '';
 
   const hRow = document.createElement('div');
   hRow.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;';
   hRow.innerHTML = `
-    <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-family:'IBM Plex Mono',monospace;font-weight:600">Mandolin Chop Chords</span>
-    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)">G · D · A · E &nbsp;·&nbsp; Closed positions</span>`;
+    <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-family:'IBM Plex Mono',monospace;font-weight:600">${cfgUI.title}</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)">${cfg.tuning} &nbsp;·&nbsp; ${cfgUI.subtitle}</span>`;
+
+  const labelBtn = document.createElement('button');
+  labelBtn.style.cssText = `margin-left:auto;padding:4px 10px;background:transparent;border:1px solid var(--border);border-radius:2px;
+    color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;
+    text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s`;
+  labelBtn.textContent = state.gripLabel === 'notes' ? 'Show intervals' : 'Show notes';
+  labelBtn.addEventListener('click', () => {
+    state.gripLabel = state.gripLabel === 'notes' ? 'intervals' : 'notes';
+    const sd = SCALES[state.scale];
+    renderView(spellScale(parseInt(state.key), sd.intervals, sd), sd);
+  });
+  hRow.appendChild(labelBtn);
   container.appendChild(hRow);
 
   const desc = document.createElement('div');
-  desc.style.cssText = 'font-size:9px;color:var(--muted);margin-bottom:20px;line-height:1.55;max-width:560px;font-family:"IBM Plex Mono",monospace;letter-spacing:.03em;border-left:2px solid var(--border2);padding-left:10px';
-  desc.textContent = 'Monroe-style chop: fret all 4 strings (no open strings — shapes are fully moveable), then strike and instantly release pressure to produce a percussive muted snap. Chops land on beats 2 & 4, mimicking a snare drum. Span ≤ 5 frets; lowest playable position per root.';
+  desc.style.cssText = 'font-size:9px;color:var(--muted);margin-bottom:14px;line-height:1.6;max-width:600px;font-family:"IBM Plex Mono",monospace;letter-spacing:.03em;border-left:2px solid var(--border2);padding-left:10px';
+  desc.innerHTML = cfgUI.blurb;
   container.appendChild(desc);
 
-  const rootPc  = parseInt(state.key);
+  const legend = document.createElement('div');
+  legend.style.cssText = 'display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:20px;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--muted)';
+  legend.innerHTML = `
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#c9a84c;display:inline-block"></span>Root</span>
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#6a5f90;display:inline-block"></span>Chord tone</span>
+    <span>1 2 3 4 = suggested fingers</span>
+    ${cfg.drone ? '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;border:1.4px solid #4a5878;display:inline-block"></span>5th-string drone — ✕ means leave it out of the roll</span>' : ''}`;
+  container.appendChild(legend);
+
+  const rootPc   = parseInt(state.key);
   const scaleLen = scaleNotes.length;
-  const DNAMES  = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
-  const romans  = computeAllRomans(scaleData.intervals, scaleData);
+  const DNAMES   = scaleLen === 5 ? DEGREE_NAMES_5 : scaleLen === 6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const romans   = computeAllRomans(scaleData.intervals, scaleData);
 
   scaleNotes.forEach((_, di) => {
     const sec = document.createElement('div');
     sec.className = 'degree-section';
-    sec.id = `mando-chop-deg-${di}`;
+    sec.id = `${instr}-grip-deg-${di}`;
 
     const hdr = document.createElement('div');
     hdr.className = 'degree-header';
-    hdr.innerHTML = `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di]||''}</span>`;
+    hdr.innerHTML = `<span class="degree-num">${romans[di]}</span><span class="degree-name-label">${DNAMES[di] || ''}</span>`;
     sec.appendChild(hdr);
 
     const grid = document.createElement('div');
@@ -6800,39 +7152,63 @@ function renderMandolinChop(scaleNotes, scaleData) {
       const iv       = chordIntervals(scaleData.intervals, di, n);
       const { sym, quality } = getChordSymbol(notes[0], iv);
       const chRootPc = noteNameToPc(notes[0]);
-      const voicing  = getChopMandoVoicing(chRootPc, iv);
+      const grips    = getGrips(instr, chRootPc, iv, { allowOpen: !!cfgUI.allowOpen, limit: 4 });
 
       const card = document.createElement('div');
       card.className = 'diag-card';
+      card.innerHTML = `
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">${n === 3 ? 'Triad' : '7th'}</div>
+        <div class="diag-chord-name">${notes[0]}<sup>${sym}</sup></div>
+        <div class="diag-quality">${quality}</div>`;
 
-      const badge = document.createElement('div');
-      badge.style.cssText = 'font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;';
-      badge.textContent = n === 3 ? 'Triad' : '7th';
-      card.appendChild(badge);
-
-      const nameDiv = document.createElement('div');
-      nameDiv.className = 'diag-chord-name';
-      nameDiv.innerHTML = `${notes[0]}<sup>${sym}</sup>`;
-      card.appendChild(nameDiv);
-
-      const qualDiv = document.createElement('div');
-      qualDiv.className = 'diag-quality';
-      qualDiv.textContent = quality;
-      card.appendChild(qualDiv);
-
-      if (voicing) {
-        card.insertAdjacentHTML('beforeend', makeMandoDiagram(voicing.frets4, voicing.pcs4, chRootPc, 116));
-        card.style.cursor = 'pointer';
-        card._voicing = { frets4: voicing.frets4, pcs4: voicing.pcs4, rootPc: chRootPc, title: `${notes[0]}${sym}` };
-        card.dataset.navCard = 'mando';
-        card.addEventListener('click', () => {
-          const all = Array.from(document.querySelectorAll('[data-nav-card="mando"]'));
-          const navList = all.map(c => c._voicing);
-          const ni = all.indexOf(card);
-          showMandoDiagramModal(null, null, null, null, navList, ni >= 0 ? ni : 0);
-        });
+      if (!grips.length) {
+        card.insertAdjacentHTML('beforeend',
+          `<div style="color:var(--muted);font-size:9px;padding:26px 4px;text-align:center;line-height:1.5;font-family:'IBM Plex Mono',monospace">No closed grip<br><span style="color:var(--dim)">within reach on ${cfg.label.toLowerCase()}</span></div>`);
       } else {
-        card.insertAdjacentHTML('beforeend', '<div style="color:var(--muted);font-size:10px;padding:20px 0;text-align:center">-</div>');
+        const diagWrap = document.createElement('div');
+        const capWrap  = document.createElement('div');
+        capWrap.style.cssText = "font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--gold2);letter-spacing:.05em;margin-top:2px";
+        const pillWrap = document.createElement('div');
+        pillWrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-top:5px';
+
+        let sel = grips.best || 0;
+        const paint = () => {
+          const gr = grips[sel];
+          diagWrap.innerHTML = makeGripDiagram(instr, gr, chRootPc, 128,
+            { label: state.gripLabel, chordTones: iv.map(x => ((x % 12) + 12) % 12) });
+          capWrap.textContent = gripCaption(instr, gr);
+          pillWrap.querySelectorAll('button').forEach((b, i) => {
+            b.style.color       = i === sel ? 'var(--gold2)' : 'var(--muted)';
+            b.style.borderColor = i === sel ? 'var(--gold)'  : 'var(--border)';
+          });
+          card._voicing = { instr, grip: gr, rootPc: chRootPc, iv,
+                            title: `${notes[0]}${sym} — ${gripCaption(instr, gr)}` };
+        };
+
+        grips.forEach((gr, i) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = gripPill(instr, gr);
+          b.style.cssText = `padding:2px 6px;background:transparent;border:1px solid var(--border);border-radius:2px;
+            font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.04em;cursor:pointer;
+            color:var(--muted);transition:color .12s,border-color .12s`;
+          b.title = gripCaption(instr, gr) + ` · span ${gr.span} · ${gr.fingers} finger${gr.fingers > 1 ? 's' : ''}`;
+          b.addEventListener('click', e => { e.stopPropagation(); sel = i; paint(); });
+          pillWrap.appendChild(b);
+        });
+
+        card.appendChild(diagWrap);
+        card.appendChild(capWrap);
+        if (grips.length > 1) card.appendChild(pillWrap);
+        paint();
+
+        card.style.cursor = 'pointer';
+        card.dataset.navCard = 'grip';
+        card.addEventListener('click', () => {
+          const all = Array.from(document.querySelectorAll('[data-nav-card="grip"]'));
+          const navList = all.map(c => c._voicing).filter(Boolean);
+          showGripModal(navList, Math.max(0, all.indexOf(card)));
+        });
       }
 
       const notesDiv = document.createElement('div');
@@ -6843,9 +7219,117 @@ function renderMandolinChop(scaleNotes, scaleData) {
     });
 
     sec.appendChild(grid);
-    if (di < scaleLen-1) { const dv=document.createElement('div'); dv.className='section-divider'; sec.appendChild(dv); }
+    if (di < scaleLen - 1) { const dv = document.createElement('div'); dv.className = 'section-divider'; sec.appendChild(dv); }
     container.appendChild(sec);
   });
+}
+
+// Its own modal rather than showSvgModal: that one stretches the SVG to the
+// full 1400px box, which is right for a fretboard map and absurd for a grid
+// five frets wide. Arrows / swipe step through every card on the tab.
+function showGripModal(navList, idx) {
+  const cur = navList[idx];
+  if (!cur) return;
+  const cfg     = GRIP_INSTR[cur.instr];
+  const hasPrev = idx > 0, hasNext = idx < navList.length - 1;
+
+  function onKey(e) {
+    const m = document.getElementById('diag-modal');
+    if (!m) { document.removeEventListener('keydown', onKey); return; }
+    if (e.key === 'Escape') { m.remove(); document.removeEventListener('keydown', onKey); }
+    if (e.key === 'ArrowLeft'  && m._nav.idx > 0)                        showGripModal(m._nav.list, m._nav.idx - 1);
+    if (e.key === 'ArrowRight' && m._nav.idx < m._nav.list.length - 1)   showGripModal(m._nav.list, m._nav.idx + 1);
+  }
+
+  let modal = document.getElementById('diag-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'diag-modal';
+    modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.9);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;padding:20px;box-sizing:border-box`;
+    modal.addEventListener('click', () => { modal.remove(); document.removeEventListener('keydown', onKey); });
+    let tx = 0;
+    modal.addEventListener('touchstart', e => { tx = e.changedTouches[0].clientX; }, { passive: true });
+    modal.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx, s = modal._nav;
+      if (!s) return;
+      if (dx >  55 && s.idx > 0)                      showGripModal(s.list, s.idx - 1);
+      if (dx < -55 && s.idx < s.list.length - 1)      showGripModal(s.list, s.idx + 1);
+    });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(modal);
+  }
+  modal._nav = { list: navList, idx };
+
+  const btn = (on, ch) => `<button ${on ? '' : 'disabled'} style="background:none;border:1px solid ${on ? '#3e4a5a' : '#1e2530'};
+    color:${on ? '#8a9bb0' : '#2e3440'};padding:5px 16px;border-radius:3px;cursor:${on ? 'pointer' : 'default'};font-size:14px;line-height:1">${ch}</button>`;
+
+  const html = `
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8;text-align:center">${cur.title}</div>
+    ${makeGripDiagram(cur.instr, cur.grip, cur.rootPc, 260, { label: state.gripLabel, chordTones: cur.iv.map(x => ((x % 12) + 12) % 12) })}
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="gm-prev">${btn(hasPrev, '◀')}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6878;letter-spacing:.1em">${idx + 1} / ${navList.length}</span>
+      <span id="gm-next">${btn(hasNext, '▶')}</span>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#5a6878;text-align:center;line-height:1.6">
+      ${cfg.label} ${cfg.tuning}<br>span ${cur.grip.span} fret${cur.grip.span === 1 ? '' : 's'} · ${cur.grip.fingers} finger${cur.grip.fingers > 1 ? 's' : ''}<br>
+      <span style="color:#3a4556">← swipe or arrows → · click anywhere to close</span>
+    </div>`;
+
+  let inner = modal.querySelector('#gm-inner');
+  if (!inner) {
+    inner = document.createElement('div');
+    inner.id = 'gm-inner';
+    inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;padding:22px 26px;
+      display:flex;flex-direction:column;align-items:center;gap:12px;cursor:default;max-width:92vw;max-height:92vh;overflow:auto`;
+    inner.addEventListener('click', e => e.stopPropagation());
+    modal.appendChild(inner);
+  }
+  inner.innerHTML = html;
+  inner.querySelector('#gm-prev').addEventListener('click', e => { e.stopPropagation(); if (hasPrev) showGripModal(navList, idx - 1); });
+  inner.querySelector('#gm-next').addEventListener('click', e => { e.stopPropagation(); if (hasNext) showGripModal(navList, idx + 1); });
+}
+
+function renderMandolinChop(scaleNotes, scaleData) {
+  renderGripTab('mandolin', scaleNotes, scaleData, {
+    title:    'Mandolin Chop Chords',
+    subtitle: 'closed grips, no open strings',
+    allowOpen: false,
+    blurb:    'Monroe-style chop: fret all four courses, strike on beats 2 and 4, then kill the ring by releasing finger pressure. The snap comes from the release, so every string has to be stopped — an open string keeps sounding and the chop turns into a strum. Every grip below is closed and therefore moveable: the same shape slides up the neck for any root. Pills switch between grips; the letter is the string carrying the root.'
+  });
+}
+
+function renderBanjoMoveable(scaleNotes, scaleData) {
+  renderGripTab('banjo', scaleNotes, scaleData, {
+    title:    'Banjo Moveable Shapes',
+    subtitle: 'closed grips, no open strings',
+    allowOpen: false,
+    blurb:    'The three closed grips of bluegrass banjo — barre, F shape and D shape — plus whatever else the chord needs. Because none of them use an open string they move to any root, which is how you get out of open G and up the neck. The 5th string is drawn short: its nut is at fret 5, so it can only be fretted from fret 6 up.'
+  });
+}
+
+function renderBanjo(scaleNotes, scaleData) {
+  renderGripTab('banjo', scaleNotes, scaleData, {
+    title:    'Banjo Chords',
+    subtitle: 'open G tuning, open strings allowed',
+    allowOpen: true,
+    blurb:    'Chord shapes in open G tuning (gDGBD), open strings included, so the familiar first-position G, C and D grips show up where you expect them. The 5th string is a fixed g drone with its nut at fret 5 — it is drawn open when G belongs to the chord, fretted when the grip reaches past fret 5, and crossed out when it clashes and should stay out of the roll.'
+  });
+}
+
+function renderBanjoScale(scaleNotes, scaleData) {
+  const container = document.getElementById('all-degrees');
+  container.innerHTML = '';
+  const note = document.createElement('div');
+  note.style.cssText = 'font-size:9px;color:var(--muted);margin-bottom:14px;line-height:1.6;font-family:"IBM Plex Mono",monospace;letter-spacing:.03em;border-left:2px solid var(--border2);padding-left:10px';
+  note.textContent = 'The four melody strings, 4th to 1st (D G B D). The 5th string is left off the map on purpose: its nut is at fret 5, so it does not share a fret grid with the others — it sounds a fixed g whatever the position.';
+  // The four melody strings, low → high: D3 G3 B3 D4.
+  const BANJO_OPEN_PC = [2, 7, 11, 2];
+  const BANJO_STR_TOP = ['D', 'B', 'G', 'D'];
+  renderScaleTabFor(container, scaleNotes, scaleData, 'Banjo',
+    BANJO_OPEN_PC, BANJO_STR_TOP, 12, false);
+  container.insertBefore(note, container.firstChild);
 }
 
 // Drop 2: close position = 1-3-5-7, drop 2nd-from-top (5) one octave
@@ -10119,19 +10603,22 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   const tv = tab.dataset.view;
   if (tv==='guitar')   state.view = state.lastGuitarView   || 'diagrams';
   else if (tv==='mandolin') state.view = state.lastMandolinView || 'mandolin';
+  else if (tv==='banjo')    state.view = state.lastBanjoView    || 'banjo';
   else state.view = tv;
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   const isGuitar2  =['diagrams','arpeggio','scale','shell','drop2','drop3','altdom'].includes(state.view);
   const isMandolin2=['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
+  const isBanjo2   =['banjo','banjo-scale','banjo-moveable'].includes(state.view);
   document.querySelectorAll('.view-tab').forEach(t=>{
     const v=t.dataset.view;
-    t.classList.toggle('active', v==='guitar'?isGuitar2:v==='mandolin'?isMandolin2:v===state.view);
+    t.classList.toggle('active', v==='guitar'?isGuitar2:v==='mandolin'?isMandolin2:v==='banjo'?isBanjo2:v===state.view);
   });
   document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
   document.getElementById('guitar-sub-tabs').style.display  =isGuitar2  ?'flex':'none';
   document.getElementById('mandolin-sub-tabs').style.display=isMandolin2?'flex':'none';
+  document.getElementById('banjo-sub-tabs').style.display   =isBanjo2   ?'flex':'none';
   renderView(scaleNotes,scaleData);
   wireChordCards();
 });
@@ -10155,6 +10642,19 @@ document.getElementById('mandolin-sub-tabs').addEventListener('click',e=>{
   state.view = tab.dataset.view;
   state.lastMandolinView = tab.dataset.view;
   document.querySelectorAll('#mandolin-sub-tabs .guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
+  const rootPc=parseInt(state.key);
+  const scaleData=SCALES[state.scale];
+  const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
+  renderView(scaleNotes,scaleData);
+  wireChordCards();
+});
+
+document.getElementById('banjo-sub-tabs').addEventListener('click',e=>{
+  const tab = e.target.closest('.guitar-sub-tab');
+  if(!tab || tab.classList.contains('disabled')) return;
+  state.view = tab.dataset.view;
+  state.lastBanjoView = tab.dataset.view;
+  document.querySelectorAll('#banjo-sub-tabs .guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
@@ -10510,8 +11010,25 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-section-title">Mandolin Engine</div>
       <div class="tech-row"><span class="tech-key">Tuning</span><span class="tech-val">G3-D4-A4-E5 (MIDI 55-62-69-76) - 4 courses</span></div>
       <div class="tech-row"><span class="tech-key">Regular voicing</span><span class="tech-val">Triads/7ths: all chord tones. Extended: jazz shell [root, 3rd, 7th, ext]. Exhaustive permutation search; span ≤5 frets.</span></div>
+    </div>
 
+    <div class="tech-section">
+      <div class="tech-section-title">Banjo Engine</div>
+      <div class="tech-row"><span class="tech-key">Tuning</span><span class="tech-val">Open G, gDGBD. Melody strings 4th-1st = D3-G3-B3-D4 (MIDI 50-55-59-62); 5th string = a fixed g drone (G4, MIDI 67) whose nut sits at fret 5, so its first fretted note is fret 6.</span></div>
+      <div class="tech-row"><span class="tech-key">Drone handling</span><span class="tech-val">Per grip the 5th string is shown fretted when the shape reaches past fret 5 and lands on a chord tone, open when g itself belongs to the chord, and crossed out otherwise - a clash you keep out of the roll rather than a note you play.</span></div>
+      <div class="tech-row"><span class="tech-key">Scale view</span><span class="tech-val">Melody strings only. The 5th string has its own nut, so it shares no fret grid with the other four and cannot be drawn on the same map.</span></div>
+    </div>
 
+    <div class="tech-section">
+      <div class="tech-section-title">Closed-Grip Engine <span style="color:var(--muted);font-weight:400">— mandolin Chop · banjo Moveable</span></div>
+      <div class="tech-row"><span class="tech-key">Why closed</span><span class="tech-val">A chop speaks because the whole grip lifts off at once. One open string keeps ringing and the percussive snap is gone, so the search only ever returns voicings with every string fretted - which is also what makes the shapes moveable to any root.</span></div>
+      <div class="tech-row"><span class="tech-key">Search</span><span class="tech-val">Exhaustive over which chord tone lands on which string, then over every per-string octave shift. Shapes are cached per interval set, so exotic scales get real grips instead of a fallback table.</span></div>
+      <div class="tech-row"><span class="tech-key">Playability filter</span><span class="tech-val">Span ≤4 frets; ≤4 fingers, counting one finger per maximal run of <em>adjacent</em> strings on the same fret (non-adjacent strings sharing a fret each cost a finger).</span></div>
+      <div class="tech-row"><span class="tech-key">Required tones</span><span class="tech-val">Root, third (or the sus tone) and any altered fifth / sixth / seventh must sound. Only a perfect fifth may be dropped, and only from a four-note chord.</span></div>
+      <div class="tech-row"><span class="tech-key">Ranking</span><span class="tech-val">Tight span first, then doubling: root and fifth are free, a doubled third is penalised, a doubled seventh heavily. The grip shown first also pays for height, because nobody chops at the 12th fret when the chord sits under the hand at the 2nd.</span></div>
+      <div class="tech-row"><span class="tech-key">Alternates</span><span class="tech-val">Up to four grips per chord, at most two per root string so they are different ideas rather than four fingerings of one. Pills are labelled by the string carrying the root - with its number on banjo, which has two D strings.</span></div>
+      <div class="tech-row"><span class="tech-key">Named shapes</span><span class="tech-val">Mandolin <em>Big Chop</em>, <em>G shape</em>, <em>D shape</em>; banjo <em>Barre</em>, <em>F shape</em>, <em>D shape</em>. Only shapes the literature actually names, each verified against the open chord it derives from.</span></div>
+      <div class="tech-row"><span class="tech-key">Sources</span><span class="tech-val"><a href="https://www.mandozine.com/resources/chords/moveablechords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">mandozine.com</a> moveable-chord charts, <a href="https://www.mandolincafe.com/chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">mandolincafe.com</a>, mandolessons.com "Chop Chords"</span></div>
     </div>
 
     <div class="tech-section">
@@ -10968,7 +11485,19 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-key">Scale</span>
         <span class="guide-kv-val">Full fretboard scale map for mandolin. Swipe horizontally on mobile.</span>
         <span class="guide-kv-key">Chop</span>
-        <span class="guide-kv-val"><strong>Chop chords</strong> — closed (moveable) shapes with no open strings, shown for both triads and 7th chords. Strike and immediately mute by releasing finger pressure for the classic backbeat chop on beats 2 &amp; 4. These shapes can be moved anywhere on the neck.</span>
+        <span class="guide-kv-val"><strong>Chop chords</strong> — closed shapes with every string fretted, for triads and 7ths. Strike on beats 2 &amp; 4 and kill the ring by releasing finger pressure: the snap comes from the release, which is why an open string ruins it. Because nothing is open, each shape slides up the neck to any root. Dots are labelled by interval (R, 3, 5, ♭7); the row under the string names is a suggested fingering; the pills switch between grips, lettered by the string carrying the root.</span>
+      </div>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Banjo</span>
+        <span class="guide-kv-val">Three sub-tabs for 5-string banjo in open G (g-D-G-B-D):</span>
+      </div>
+      <div class="guide-kv" style="margin-left:18px">
+        <span class="guide-kv-key">Chords</span>
+        <span class="guide-kv-val">Chord shapes with open strings allowed, so first-position G, C and D land where you expect. The 5th string is drawn short because its nut is at fret 5 — open when g belongs to the chord, fretted when the grip reaches past fret 5, crossed out when it clashes and should stay out of the roll.</span>
+        <span class="guide-kv-key">Scale</span>
+        <span class="guide-kv-val">Full fretboard map of the four melody strings. The 5th string is left off: it has its own nut, so it shares no fret grid with the others.</span>
+        <span class="guide-kv-key">Moveable</span>
+        <span class="guide-kv-val"><strong>Closed shapes</strong> — the three grips of bluegrass banjo (<em>barre</em>, <em>F shape</em>, <em>D shape</em>) plus whatever else a chord needs. No open strings, so they move to any root: this is how you get out of open G and up the neck.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
@@ -11271,7 +11800,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </span></div>
 
       <div class="guide-tip"><span class="guide-tip-icon">🪗</span><span class="guide-tip-text">
-        <strong>Mandolin Chords:</strong> <a href="https://www.mandolincafe.com/chords/" target="_blank" style="color:var(--gold2)">mandolincafe.com/chords</a> - chord charts and community discussion. The chop chord technique is a staple of bluegrass and Western swing rhythm playing.
+        <strong>Mandolin &amp; banjo chords:</strong> <a href="https://www.mandolincafe.com/chords/" target="_blank" style="color:var(--gold2)">mandolincafe.com/chords</a> and the <a href="https://www.mandozine.com/resources/chords/moveablechords/" target="_blank" style="color:var(--gold2)">mandozine moveable-chord charts</a> - chord charts and community discussion; mandolessons.com "Chop Chords" for the technique. Bill Monroe's chop is a staple of bluegrass and Western swing rhythm, standing in for the snare on beats 2 &amp; 4. The named shapes here were checked against those sources and against the open chord each one derives from; everything else is generated by the closed-grip search described in Technical Details.
       </span></div>
 
       <div class="guide-tip"><span class="guide-tip-icon">🎵</span><span class="guide-tip-text">

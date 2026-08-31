@@ -1,6 +1,6 @@
 # 🎵 Harmonic Atlas
 
-Interactive music theory reference — scales, chords, guitar/mandolin voicings, composition tool with improvisation mode. Runs as an installable PWA (Progressive Web App) directly in the browser.
+Interactive music theory reference — scales, chords, guitar/mandolin/banjo voicings, composition tool with improvisation mode. Runs as an installable PWA (Progressive Web App) directly in the browser.
 
 **Live app:** https://kkjsf.github.io/harmonic-atlas
 
@@ -42,8 +42,37 @@ Seven sub-tabs:
 
 ### Mandolin tab
 
-- **Scale voicings** tab — scale positions on 4 strings
-- **Chop Chords** tab — closed-position triads and 7th chords for the chop technique
+- **Chords** — standard shapes, open strings allowed
+- **Scale** — scale positions on the 4 courses
+- **Chop** — closed grips for the chop technique: every string fretted, so the shape lifts off
+  cleanly and slides to any root. Triads and 7ths, dots labelled by interval, a suggested
+  fingering under the string names, and pills to switch between grips. Named shapes
+  (*Big Chop*, *G shape*, *D shape*) are the ones the literature names, each checked against
+  the open chord it derives from.
+
+### Banjo tab
+
+5-string banjo in open G (`g-D-G-B-D`). The 5th string is a fixed `g` drone whose nut sits at
+fret 5, so its first fretted note is fret 6 — it is drawn as a short column with its own nut.
+
+- **Chords** — open strings allowed, so first-position G, C and D land where you expect. The
+  drone is shown open when `g` belongs to the chord, fretted when the grip reaches past fret 5,
+  and crossed out when it clashes and should stay out of the roll.
+- **Scale** — the four melody strings. The 5th string is left off the map: with its own nut it
+  shares no fret grid with the others.
+- **Moveable** — closed grips: *barre*, *F shape*, *D shape* and whatever else a chord needs.
+
+### Closed-grip engine (mandolin Chop · banjo Moveable)
+
+Both tabs run one search. A chop only speaks because the whole grip lifts off at once, so an
+open string — which keeps ringing — is disqualifying; that constraint is also what makes the
+shapes moveable. The search is exhaustive over which chord tone lands on which string and over
+every per-string octave shift, then filters to what a hand can hold (span ≤ 4 frets, ≤ 4 fingers,
+counting one finger per maximal run of *adjacent* strings on the same fret) and to what the chord
+needs (root, third or sus tone, and any altered fifth/sixth/seventh; only a perfect fifth may be
+dropped, and only from a four-note chord). Ranking prefers a tight span and doubling the root or
+fifth over the third. Verified across 37 scales × 5 keys × 3 views: 7650 grips, no open string on
+a closed tab, no alien tone, none out of reach.
 
 ### Jazz Resources Hub (♫ button, header)
 
@@ -216,7 +245,10 @@ git push
 | `getImprovSuggestions(chord)` | Quality-based scale suggestions for the improv overlay |
 | `updateImprovOverlay(comp, idx)` | Updates improv overlay for the currently playing chord |
 | `makeScaleFretboardSVG` | Full horizontal fretboard SVG |
-| `computeClosedMandoVoicing` / `getChopMandoVoicing` | Mandolin chop chord voicings |
+| `findGripShapes(instr, ivArray)` / `getGrips(instr, rootPc, ivArray, opts)` | Closed-grip search: relative shapes (cached per interval set), then resolved to frets for one root. `allowOpen` switches between the banjo Chords tab and the closed tabs |
+| `makeGripDiagram(instr, grip, rootPc, w, opts)` | Grip diagram for both instruments; draws the banjo drone as a short column with its nut at fret 5 |
+| `gripFingering(frets)` / `gripFingerCount(off)` | Suggested 1–4 fingering, one number per barre group |
+| `renderGripTab(instr, …)` | Shared renderer for mandolin Chop and banjo Moveable |
 | `computeVoicingFromTemplate(rootPc, template)` | Derives guitar frets/pcs from a semitone-offset template; enforces ascending pitch per string and span ≤ 4 frets |
 | `showDiagramModal(…, navList, navIdx)` | Zoom overlay with smooth in-place navigation (fade swap 80 ms, swipe, arrow keys, prev/next context labels) |
 | `renderBrowse()` | Renders jazz resource hub cards with search filtering and category grouping |
