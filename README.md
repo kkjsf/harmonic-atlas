@@ -44,11 +44,19 @@ Seven sub-tabs:
 
 - **Chords** — standard shapes, open strings allowed
 - **Scale** — scale positions on the 4 courses
-- **Chop** — closed grips for the chop technique: every string fretted, so the shape lifts off
-  cleanly and slides to any root. Triads and 7ths, dots labelled by interval, a suggested
-  fingering under the string names, and pills to switch between grips. Named shapes
-  (*Big Chop*, *G shape*, *D shape*) are the ones the literature names, each checked against
-  the open chord it derives from.
+- **Chop** — closed grips for the chop technique. Two things make a grip chop: **no open
+  strings** (the whole shape lifts off and damps at once, which is also what lets it slide to
+  any root) and **weight on the bass side** (the G and D courses fretted high, where the bark
+  comes from and what the pick aims at).
+  - The **big chop** is the four-finger stretch, five frets wide, root on the D course:
+    G is `7-5-2-3` (D G B G). Its sibling voicing for D is `7-4-5-2` (D F♯ D F♯ — no fifth
+    at all).
+  - The **small chop** brings the pinky home and damps the top course: G is `4-5-2-✕`,
+    C is `5-2-3-✕`. Same idea, less reach, for faster changes and smaller hands.
+  - Both are guaranteed a pill wherever they are in reach. Dots are labelled by interval, the
+    row under the string names is a suggested fingering, and ✕ marks a damped course.
+  - Other named shapes are descriptive: *E shape* (open E moved up), *G shape* (open G — and
+    open A is the same shape), *D shape* (open D).
 
 ### Banjo tab
 
@@ -67,12 +75,27 @@ fret 5, so its first fretted note is fret 6 — it is drawn as a short column wi
 Both tabs run one search. A chop only speaks because the whole grip lifts off at once, so an
 open string — which keeps ringing — is disqualifying; that constraint is also what makes the
 shapes moveable. The search is exhaustive over which chord tone lands on which string and over
-every per-string octave shift, then filters to what a hand can hold (span ≤ 4 frets, ≤ 4 fingers,
-counting one finger per maximal run of *adjacent* strings on the same fret) and to what the chord
-needs (root, third or sus tone, and any altered fifth/sixth/seventh; only a perfect fifth may be
-dropped, and only from a four-note chord). Ranking prefers a tight span and doubling the root or
-fifth over the third. Verified across 37 scales × 5 keys × 3 views: 7650 grips, no open string on
-a closed tab, no alien tone, none out of reach.
+every per-string octave shift, then filters to what a hand can hold and what the chord needs.
+
+- **Fingers** ≤ 4, one per maximal run of *adjacent* strings on the same fret. Non-adjacent
+  strings sharing a fret cost a finger each (a barre cannot skip over a lower fret); a damped
+  course breaks the run and costs none.
+- **Span** ≤ 4 frets on banjo, **≤ 5 on mandolin** — the traditional chops stretch that far, and
+  a four-fret cap silently deletes them. A five-fret stretch is allowed one way round only: the
+  highest fret on the bass side, the lowest on the treble side, which is how the hand angles.
+  It also has to sit at the 2nd fret or above, where the frets have closed up.
+- **Damped courses**: mandolin only, top course only. Damping the G would throw away the bass
+  weight the chop lives on.
+- **Tones**: root, third (or sus tone) and any altered fifth/sixth/seventh must sound. The
+  perfect fifth may be dropped — the documented D chop has none — but it costs points, so
+  ordinary voicings still prefer the whole chord.
+- **Ranking**: tight span, then doubling (root and fifth free, third penalised, seventh heavily),
+  then bass-side weight. The grip shown first also pays for height, and a named chop hands its
+  bonus back above the 5th fret — which is why G chops `7-5-2-3` but C chops `5-2-3-3` rather
+  than `12-10-7-8`.
+
+Verified across 37 scales × 5 keys × 3 views: 7650 grips, no open string on a closed tab, no
+alien tone, no wrong-way stretch, nothing clipped off the diagram, none out of reach.
 
 ### Jazz Resources Hub (♫ button, header)
 
