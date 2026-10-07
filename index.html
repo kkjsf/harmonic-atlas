@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Interactive music theory reference: scales, chords, guitar and mandolin voicings, negative harmony, and a progression builder with playback.">
+<meta name="description" content="Interactive music theory reference: scales, chords, guitar, mandolin and banjo voicings, negative harmony, and a composition tool with playback.">
 <title>Harmonic Atlas - Scale Chord Explorer</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" id="meta-theme-color" content="#12101c">
@@ -143,26 +143,7 @@
   }
   .hist-chip:hover { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.07); }
   .hist-chip.hist-current { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.1); cursor: default; }
-  .hist-sep { color: var(--border2); font-size: 9px; flex-shrink: 0; user-select: none; }
-  .hist-share-btn {
-    margin-left: auto;
-    flex-shrink: 0;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    padding: 3px 8px;
-    border-radius: 2px;
-    border: 1px solid var(--border2);
-    background: none;
-    color: var(--muted);
-    cursor: pointer;
-    display: flex; align-items: center; gap: 4px;
-    white-space: nowrap;
-    transition: all .14s;
-    letter-spacing: .04em;
-  }
-  .hist-share-btn:hover { border-color: var(--accent2); color: var(--accent2); }
-  .hist-share-btn.copied { border-color: #50c87a; color: #50c87a; }
-  .scale-hero::before {
+  .hist-sep { color: var(--border2); font-size: 9px; flex-shrink: 0; user-select: none; }  .scale-hero::before {
     content: '';
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(ellipse 70% 100% at 50% -10%, rgba(201,168,76,.06), transparent 70%);
@@ -382,9 +363,7 @@
   .cof-slice { cursor: pointer; }
   /* The axis overlay is drawn on top of the wheel but is not interactive. */
   .neg-axis { pointer-events: none; }
-  .cof-slice:hover { fill: rgba(255,255,255,.13) !important; }
-  .cof-slice-hover { pointer-events: none; }
-  /* Chord card highlight when CoF is hovered */
+  .cof-slice:hover { fill: rgba(255,255,255,.13) !important; }  /* Chord card highlight when CoF is hovered */
   .chord-card.cof-dim   { opacity:.35; transition: opacity .2s, border-color .2s, box-shadow .2s; }
   .chord-card.cof-hi    { border-color: var(--gold) !important; box-shadow: 0 0 0 1px var(--gold), 0 4px 24px rgba(201,168,76,.35) !important; opacity:1 !important; transform: translateY(-2px); }
   .diag-card.cof-dim, .drop-card.cof-dim  { opacity:.35; transition: opacity .2s; }
@@ -413,26 +392,7 @@
   }
 
   /* Scale info card */
-  .scale-info { padding:18px 20px; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--gold); border-radius:0 2px 2px 0; }
-  .scale-name { font-family:'Playfair Display',serif; font-size:18px; color:var(--cream); font-weight:700; }
-  .scale-formula { font-size:10px; color:var(--dim); letter-spacing:.12em; margin-top:4px; margin-bottom:14px; }
-
-  /* Note pills with degree below */
-  .scale-notes { display:flex; gap:8px; flex-wrap:wrap; }
-  .note-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; }
-  .note-pill {
-    padding:6px 13px; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.25);
-    border-radius:20px; font-size:13px; font-weight:500; color:var(--gold2); letter-spacing:.06em;
-    transition:all .18s; user-select:none; white-space:nowrap;
-  }
-  .note-item:hover .note-pill { background:rgba(201,168,76,.22); border-color:var(--gold); color:var(--cream); transform:translateY(-2px); }
-  .note-degree {
-    font-family:'EB Garamond',serif;
-    font-size:13px; font-weight:600; color:#fff;
-    letter-spacing:.03em; line-height:1;
-  }
-
-  /* CoF */
+  .scale-info { padding:18px 20px; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--gold); border-radius:0 2px 2px 0; }  .note-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; }  /* CoF */
   .cof-section { background:var(--surface); border:1px solid var(--border); border-radius:2px; padding:14px 12px 10px; }
   .cof-eyebrow { font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); text-align:center; margin-bottom:8px; }
   .cof-legend { display:flex; justify-content:center; gap:16px; margin-top:8px; flex-wrap:wrap; }
@@ -610,14 +570,7 @@
   .diag-chord-name { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--cream); line-height:1; }
   .diag-chord-name sup { font-size:10px; font-family:'IBM Plex Mono',monospace; color:var(--gold2); }
   .diag-quality { font-size:9px; letter-spacing:.13em; color:var(--dim); text-transform:uppercase; }
-  .diag-notes { font-size:9px; color:var(--muted); letter-spacing:.06em; }
-
-  /* Drop voicing cards */
-  .drop-section { margin-bottom:28px; }
-  .drop-section-hdr { font-family:'EB Garamond',serif; font-size:20px; font-weight:600; color:#fff; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
-  .drop-voicings-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; }
-  @media(max-width:560px){ .drop-voicings-grid { grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); } }
-  .drop-card {
+  .diag-notes { font-size:9px; color:var(--muted); letter-spacing:.06em; }    .drop-card {
     background:var(--surface); border:1px solid var(--border2);
     border-radius:2px; padding:10px 8px 8px; display:flex; flex-direction:column;
     align-items:center; gap:6px; animation:fadeUp .22s ease both;
@@ -625,13 +578,7 @@
   }
   .drop-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
   .drop-card.d2-card::before { background:rgba(160,139,200,.6); }
-  .drop-card.d3-card::before { background:rgba(212,129,58,.6); }
-  .drop-inv-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
-  .drop-str-label { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--dim); }
-  .drop-chord-name { font-family:'Playfair Display',serif; font-size:14px; font-weight:700; color:var(--cream); line-height:1; }
-  .drop-chord-name sup { font-size:10px; font-family:'IBM Plex Mono',monospace; color:var(--gold2); }
-
-  @keyframes fadeIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
+  .drop-card.d3-card::before { background:rgba(212,129,58,.6); }  .drop-str-label { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--dim); }  @keyframes fadeIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
   @keyframes viewEnter { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   .view-enter { animation: viewEnter .22s ease both; }
   .scale-hero { transition: opacity .18s ease; }
@@ -639,273 +586,13 @@
   #diag-modal .inner { animation:fadeIn .15s ease both; }
   .diag-card, .drop-card { transition: transform .15s, border-color .15s, box-shadow .15s; }
   .diag-card:hover, .drop-card:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.5); }
-  footer { border-top:1px solid var(--border); padding:24px 0; color:var(--muted); font-size:10px; letter-spacing:.12em; text-align:center; margin-top:60px; }
-
-  /* ══════════════════════════════════════
-     PROGRESSION BUILDER
-  ══════════════════════════════════════ */
-  .prog-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-top: 2px solid var(--accent);
-    border-radius: 0 0 2px 2px;
-    padding: 20px 24px 18px;
-    margin-bottom: 28px;
-    position: relative;
-  }
-  .prog-panel::before {
-    content:''; position:absolute; top:0; left:24px; right:24px; height:1px;
-    background: linear-gradient(90deg, transparent, rgba(124,111,160,.4), transparent);
-    pointer-events:none;
-  }
-  .prog-top {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 10px; margin-bottom: 16px;
-  }
-  .prog-title {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    letter-spacing: .20em; text-transform: uppercase; color: var(--accent2);
-    display: flex; align-items: center; gap: 8px;
-    font-weight: 600;
-  }
-  .prog-title svg { opacity: .9; }
-  .prog-controls-row {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  }
-
-  /* Transport buttons */
-  .prog-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 7px 13px; border-radius: 2px; font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px; letter-spacing: .1em; cursor: pointer;
-    border: 1px solid var(--border2); background: var(--surface2);
-    color: var(--muted); transition: all .17s; white-space: nowrap;
-  }
-  .prog-btn:hover { color: var(--cream); border-color: var(--accent); }
-  .prog-btn.play-btn { border-color: var(--accent); color: var(--accent2); }
-  .prog-btn.play-btn:hover, .prog-btn.play-btn.playing {
-    background: rgba(124,111,160,.15); color: var(--accent2); border-color: var(--accent2);
-  }
-  .prog-btn.stop-btn:hover { border-color: #c86450; color: #c86450; }
-  .prog-btn.clear-btn:hover { border-color: var(--muted); color: var(--text); }
-  .prog-btn:disabled { opacity: .3; cursor: not-allowed; }
-  .prog-btn.active { color: var(--gold2) !important; border-color: var(--gold) !important; background: rgba(201,168,76,.1) !important; }
-
-  /* BPM / beats controls */
-  .prog-param { display: flex; align-items: center; gap: 6px; }
-  .prog-param label { font-family:'IBM Plex Mono',monospace; font-size: 9px; letter-spacing:.14em; color: var(--muted); text-transform:uppercase; }
-  .prog-input {
-    background: var(--surface2); border: 1px solid var(--border2);
-    color: var(--cream); font-family: 'IBM Plex Mono', monospace; font-size: 12px;
-    padding: 5px 8px; border-radius: 2px; width: 58px; text-align: center;
-    transition: border-color .17s;
-  }
-  .prog-input:focus { outline: none; border-color: var(--accent); }
-  .prog-select {
-    appearance: none; background: var(--surface2); border: 1px solid var(--border2);
-    color: var(--cream); font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-    padding: 5px 28px 5px 10px; border-radius: 2px; cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237c6fa0' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 10px center;
-  }
-  .prog-select:focus { outline: none; border-color: var(--accent); }
-  .prog-select option { background: var(--surface2); }
-
-  /* Presets row */
-  .prog-presets { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
-  .preset-btn {
+  footer { border-top:1px solid var(--border); padding:24px 0; color:var(--muted); font-size:10px; letter-spacing:.12em; text-align:center; margin-top:60px; }  .preset-btn {
     padding:5px 10px; border-radius:2px; font-family:'IBM Plex Mono',monospace;
     font-size:10px; letter-spacing:.06em; cursor:pointer;
     border:1px solid var(--border2); background:var(--surface2); color:var(--dim);
     transition:all .17s;
   }
-  .preset-btn:hover { color:var(--accent2); border-color:var(--accent); }
-
-  /* Slot strip */
-  .prog-slots-wrap {
-    min-height: 88px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 2px; padding: 10px;
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    margin-bottom: 12px; position: relative;
-  }
-  .prog-empty-hint {
-    font-family:'IBM Plex Mono',monospace; font-size:10px;
-    color: var(--border2); letter-spacing:.1em; text-align:center;
-    width:100%; pointer-events:none; user-select:none;
-  }
-  .prog-slot {
-    display:flex; flex-direction:column; align-items:center;
-    background: var(--surface); border: 1px solid var(--border2);
-    border-radius:3px; padding: 8px 10px 6px;
-    cursor: grab; user-select:none; position:relative;
-    transition: border-color .15s, transform .15s, box-shadow .15s;
-    min-width: 60px;
-  }
-  .prog-slot:hover { border-color: var(--accent); }
-  .prog-slot.playing {
-    border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 0 14px rgba(201,168,76,.4);
-    background: rgba(201,168,76,.08); transform: translateY(-2px);
-  }
-  .prog-slot.dragging { opacity:.4; }
-  .prog-slot.drag-over { border-color:var(--accent2); border-style:dashed; }
-  .prog-slot-name {
-    font-family:'Playfair Display',serif; font-size:17px; font-weight:700;
-    color:var(--cream); line-height:1; white-space:nowrap;
-  }
-  .prog-slot-name sup { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--gold2); vertical-align:super; }
-  .prog-slot-roman {
-    font-family:'EB Garamond',serif; font-size:12px; font-weight:600;
-    color:var(--dim); margin-top:3px;
-  }
-  .prog-slot-beats-ctrl {
-    display: flex; align-items: center; gap: 3px; margin-top: 4px;
-  }
-  .prog-slot-notes {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size:10px; color: var(--dim); letter-spacing: .04em;
-    margin-top: 4px; line-height: 1.3; word-break: break-word;
-    opacity: .8;
-  }
-
-  /* ── PROGRESSION ZOOM OVERLAY ── */
-  #prog-zoom-overlay {
-    display: none; position: fixed; inset: 0; z-index: var(--z-overlay);
-    background: rgba(0,0,0,.86);
-    align-items: center; justify-content: center;
-    padding: 24px 16px;
-  }
-  @supports (backdrop-filter: blur(8px)) {
-    #prog-zoom-overlay { background: rgba(0,0,0,.78); backdrop-filter: blur(8px); }
-  }
-  #prog-zoom-overlay.open { display: flex; }
-  #prog-zoom-panel {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-top: 3px solid var(--gold);
-    border-radius: 4px;
-    width: 100%; max-width: 1100px;
-    max-height: 90vh; overflow-y: auto;
-    padding: 28px 32px 32px;
-    position: relative;
-    box-shadow: 0 24px 80px rgba(0,0,0,.7);
-  }
-  #prog-zoom-close {
-    position: absolute; top: 14px; right: 14px;
-    background: none; border: 1px solid var(--border2);
-    color: var(--muted); cursor: pointer;
-    width: 32px; height: 32px; border-radius: 50%;
-    font-size: 18px; line-height: 1;
-    display: flex; align-items: center; justify-content: center;
-    transition: all .18s;
-  }
-  #prog-zoom-close:hover { color: var(--cream); border-color: var(--gold); }
-  .zoom-header {
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 22px; flex-wrap: wrap;
-  }
-  .zoom-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px; font-weight: 700; color: var(--cream);
-    flex: 1;
-  }
-  .zoom-controls {
-    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-  }
-  .zoom-slots-wrap {
-    display: flex; flex-wrap: wrap; gap: 14px;
-    margin-bottom: 20px; position: relative;
-    min-height: 60px;
-  }
-  .zoom-slot {
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 4px;
-    padding: 22px 24px 20px;
-    min-width: 170px; flex: 1 1 170px; max-width: 260px;
-    position: relative; cursor: pointer;
-    transition: border-color .18s, box-shadow .18s;
-    user-select: none;
-  }
-  .zoom-slot:hover { border-color: var(--gold); box-shadow: 0 4px 20px rgba(201,168,76,.2); }
-  .zoom-slot.playing {
-    border-color: var(--gold); background: rgba(201,168,76,.08);
-    box-shadow: 0 0 0 2px var(--gold), 0 6px 24px rgba(201,168,76,.3);
-  }
-  .zoom-slot-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 32px; font-weight: 700; color: var(--cream);
-    line-height: 1; margin-bottom: 6px;
-  }
-  .zoom-slot-name sup { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--gold2); vertical-align: super; }
-  .zoom-slot-roman {
-    font-family: 'EB Garamond', serif; font-size: 17px;
-    font-weight: 600; color: var(--dim); margin-bottom: 12px;
-  }
-  .zoom-slot-notes {
-    display: flex; flex-wrap: wrap; gap: 5px;
-  }
-  .zoom-note-pill {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px; padding: 3px 8px;
-    background: rgba(201,168,76,.07); border: 1px solid rgba(201,168,76,.22);
-    border-radius: 3px; color: var(--gold2); letter-spacing: .04em;
-  }
-  .zoom-slot-del {
-    position: absolute; top: -6px; right: -6px;
-    width: 18px; height: 18px; background: var(--surface);
-    border: 1px solid var(--border2); border-radius: 50%;
-    color: var(--muted); font-size: 11px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; opacity: 0; transition: opacity .15s;
-  }
-  .zoom-slot:hover .zoom-slot-del { opacity: 1; }
-  .zoom-slot-del:hover { color: #e07070; border-color: #e07070; }
-  .zoom-empty {
-    color: var(--muted); font-size: 12px; letter-spacing: .08em;
-    padding: 20px; text-align: center; width: 100%;
-  }
-  @media (max-width: 600px) {
-    #prog-zoom-panel { padding: 18px 14px 20px; }
-    .zoom-slots-wrap { gap: 10px; }
-    .zoom-slot { min-width: calc(50% - 5px); max-width: calc(50% - 5px); flex: 0 0 calc(50% - 5px); padding: 16px 14px 14px; }
-    .zoom-slot-name { font-size: 26px; }
-    .zoom-slot-roman { font-size: 14px; }
-    .zoom-note-pill { font-size: 10px; padding: 2px 6px; }
-  }
-  .slot-beat-btn {
-    width: 16px; height: 16px; border-radius: 2px; border: 1px solid var(--border2);
-    background: var(--surface); color: var(--muted); font-size: 11px; line-height: 1;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all .14s; padding: 0; font-family: monospace;
-  }
-  .slot-beat-btn:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(124,111,160,.12); }
-  @media (pointer: coarse) {
-    .slot-beat-btn { width: 30px; height: 30px; font-size: 14px; }
-  }
-  .prog-slot-beats {
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--gold2);
-    letter-spacing: .06em; min-width: 18px; text-align: center;
-  }
-  .prog-slot-del {
-    position:absolute; top:-6px; right:-6px; width:16px; height:16px;
-    background:var(--shadow); border:1px solid var(--border2); border-radius:50%;
-    color:var(--muted); font-size:10px; line-height:16px; text-align:center;
-    cursor:pointer; opacity:0; transition:opacity .15s;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .prog-slot:hover .prog-slot-del { opacity:1; }
-  .prog-slot-del:hover { color:#e07070; border-color:#e07070; }
-
-  /* Progress bar inside slot strip */
-  .prog-playhead {
-    position:absolute; bottom:0; left:0; height:2px;
-    background: var(--gold); border-radius:0 0 2px 2px;
-    transition: width .05s linear; width:0;
-    pointer-events:none;
-  }
-
-  .chord-card.just-added { animation: addFlash .35s ease both; }
+  .preset-btn:hover { color:var(--accent2); border-color:var(--accent); }  @supports (backdrop-filter: blur(8px)) {  }      .chord-card.just-added { animation: addFlash .35s ease both; }
   @keyframes addFlash {
     0%   { box-shadow: 0 0 0 0 rgba(124,111,160,.8); }
     50%  { box-shadow: 0 0 0 6px rgba(124,111,160,.3); }
@@ -984,22 +671,7 @@
     color: #e07070; text-transform: uppercase; opacity: 0;
     transition: opacity .2s;
   }
-  .neg-active .neg-badge { opacity: 1; }
-
-  /* neg-harmony column layout */
-  .deg-row {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 0;
-  }
-  .deg-col-orig { border-right: 1px solid var(--border); padding-right: 14px; }
-  .deg-col-neg  { padding-left: 14px; }
-  .deg-col-hdr {
-    font-family: 'IBM Plex Mono', monospace; font-size:10px; letter-spacing: .18em;
-    text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
-  .deg-col-orig .deg-col-hdr { color: var(--gold); }
-  .deg-col-neg  .deg-col-hdr { color: #e07070; }
-  /* Hover pairing: when orig card hovered, neg card lights up and vice versa */
+  .neg-active .neg-badge { opacity: 1; }  /* Hover pairing: when orig card hovered, neg card lights up and vice versa */
   .neg-pair { position: relative; }
   .neg-pair .chord-card,
   .neg-pair .neg-card {
@@ -1014,18 +686,7 @@
     box-shadow: 0 2px 16px rgba(224,80,80,.2);
   }
   .neg-pair:hover .chord-card::after { transform: scaleY(1); }
-  .neg-pair:hover .neg-card::after   { transform: scaleY(1); }
-  /* Connector arrow between the two cards */
-  .neg-connector {
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; color: rgba(224,112,112,0.5); user-select: none;
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    width: 24px; height: 24px; pointer-events: none;
-    transition: color .18s;
-  }
-  .neg-pair:hover .neg-connector { color: #e07070; }
-  .neg-card {
+  .neg-pair:hover .neg-card::after   { transform: scaleY(1); }  .neg-card {
     background: rgba(220,80,80,.05); border: 1px solid rgba(220,80,80,.2);
     padding: 12px 14px; border-radius: 2px; position: relative; overflow: hidden;
     animation: fadeUp .24s ease both;
@@ -1034,12 +695,7 @@
     background:#e07070; transform:scaleY(0); transform-origin:bottom; transition:transform .2s; }
   .neg-card:hover { border-color: #e07070; background: rgba(220,80,80,.1); }
   .neg-card:hover::after { transform: scaleY(1); }
-  .neg-card .chord-root { font-size: 20px; }
-  .neg-label {
-    font-size:10px; font-family: 'IBM Plex Mono', monospace;
-    letter-spacing: .12em; color: #e07070; text-transform: uppercase; margin-bottom: 4px;
-  }
-  /* Locked / disabled neg toggle */
+  .neg-card .chord-root { font-size: 20px; }  /* Locked / disabled neg toggle */
   .neg-toggle-row.neg-locked .neg-toggle { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
   .neg-toggle-row.neg-locked .neg-toggle-label { opacity: 0.4; cursor: not-allowed; }
   .neg-toggle-row.neg-locked .neg-lock-msg { display: inline-flex; }
@@ -1390,10 +1046,7 @@
     border: 1px solid var(--border2); border-radius: 4px;
     padding: 8px 10px 6px; display: flex; flex-direction: column;
     align-items: center; gap: 3px; width: 100%; cursor: pointer;
-  }
-  .comp-chord-name { font-size: 13px; font-weight: 600; color: var(--text); }
-  .comp-chord-roman { font-size: 9px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
-  .comp-chord-del {
+  }  .comp-chord-del {
     position: absolute; top: -7px; right: -7px;
     width: 15px; height: 15px; border-radius: 50%;
     background: var(--surface); border: 1px solid var(--border2);
@@ -1435,14 +1088,7 @@
   .comp-beat-ctrl { display:flex; align-items:center; gap:3px; margin-top:5px; }
   .comp-beat-btn { width:15px; height:15px; border-radius:2px; background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; padding:0; line-height:1; transition:all .1s; flex-shrink:0; }
   .comp-beat-btn:hover { border-color:var(--accent2); color:var(--accent2); }
-  .comp-beat-val { color:var(--muted); min-width:20px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:9px; }
-  .comp-mode-wrap { display:flex; align-items:center; gap:5px; margin-left:auto; }
-  .comp-mode-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; }
-  .comp-mode-btns { display:flex; border:1px solid var(--border2); border-radius:3px; overflow:hidden; }
-  .comp-mode-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:4px 9px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .12s; }
-  .comp-mode-btn.active { background:rgba(124,111,160,.22); color:var(--accent2); }
-  .comp-mode-btn:hover:not(.active) { color:var(--text); }
-  /* Per-chord mode + note-value controls (comp cards & prog slots) */
+  .comp-beat-val { color:var(--muted); min-width:20px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:9px; }  /* Per-chord mode + note-value controls (comp cards & prog slots) */
   .chord-ctrl-row { display:flex; align-items:center; gap:2px; margin-top:4px; flex-wrap:nowrap; }
   .chord-ctrl-btn { height:14px; min-width:14px; padding:0 3px; border-radius:2px; background:none; border:1px solid var(--border2); color:var(--muted); font-size:10px; cursor:pointer; line-height:1; transition:all .1s; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
   .chord-ctrl-btn:hover:not(.c-active):not(.c-arp) { border-color:var(--text); color:var(--text); }
@@ -1451,10 +1097,7 @@
   .chord-ctrl-sep { width:3px; flex-shrink:0; border-left:1px solid var(--border2); height:10px; margin:0 1px; }
   .comp-loop-btn { background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; border-radius:3px; padding:4px 9px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .15s; }
   .comp-loop-btn.active { border-color:var(--accent); color:var(--accent2); background:rgba(124,111,160,.18); }
-  .comp-loop-btn:hover:not(.active) { color:var(--text); }
-  /* Prog slot gets a bit more room for the new row */
-  .prog-slot { min-width: 86px; }
-  /* Comp presets row */
+  .comp-loop-btn:hover:not(.active) { color:var(--text); }  /* Comp presets row */
   .comp-presets-row { flex-wrap:wrap; gap:4px; }
   .comp-presets-row .strum-label { align-self:center; }
   /* Comp strum/swing rows inside modal */
@@ -1463,9 +1106,7 @@
   .comp-drums-row { display:flex; align-items:center; gap:8px; margin-top:4px; }
   .comp-drums-btn { background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer; border-radius:3px; padding:4px 9px; font-size:9px; font-family:'IBM Plex Mono',monospace; transition:all .15s; }
   .comp-drums-btn.active { border-color:var(--accent); color:var(--accent2); background:rgba(124,111,160,.18); }
-  .comp-drums-btn:hover:not(.active) { color:var(--text); }
-  .comp-drums-hint { font-size:9px; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
-  /* ── Chord card (edit): name + quality up top, per-chord controls behind ⚙ ── */
+  .comp-drums-btn:hover:not(.active) { color:var(--text); }  /* ── Chord card (edit): name + quality up top, per-chord controls behind ⚙ ── */
   .comp-chord-card { position:relative; }
   .cc-head { display:flex; flex-direction:column; align-items:center; gap:1px; width:100%; }
   .cc-roman { font-size:9px; color:var(--muted); font-family:'IBM Plex Mono',monospace; letter-spacing:.1em; min-height:11px; line-height:1.1; }
@@ -1838,26 +1479,7 @@
     background: rgba(124,111,160,.12);
     border-color: var(--accent2);
     color: var(--accent2);
-  }
-  .strum-viz {
-    display: flex;
-    gap: 1px;
-    align-items: center;
-    margin-left: 4px;
-  }
-  .strum-beat {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    min-width: 12px;
-    text-align: center;
-    line-height: 1;
-  }
-  .strum-beat.down { color: var(--gold2); }
-  .strum-beat.up   { color: var(--accent2); }
-  .strum-beat.rest { color: var(--border2); }
-
-
-  /* ══════════════════════════════════════
+  }  /* ══════════════════════════════════════
      COLLAPSIBLE SECTIONS
   ══════════════════════════════════════ */
   .collapsible-hdr {
@@ -1937,9 +1559,6 @@
   /* ── Scale search ── */
   #scale-search:focus { border-color: var(--gold); }
   #scale-search::placeholder { color: var(--muted); opacity:.7; }
-
-
-
 
 
   /* ══ SCALE HERO STAFF ══ */
@@ -2026,23 +1645,7 @@
     background:none; border:none; color:var(--muted); cursor:pointer;
     font-size:14px; line-height:1; padding:2px 4px;
   }
-  .slot-sub-close:hover { color:var(--text); }
-  /* ── Prog slot: sub button ── */
-  .prog-slot-sub {
-    position:absolute; top:-6px; right:12px;
-    width:16px; height:16px;
-    background:var(--shadow); border:1px solid rgba(124,111,160,.35); border-radius:50%;
-    color:var(--accent2); font-size:9px; line-height:16px; text-align:center;
-    cursor:pointer; opacity:0; transition:opacity .15s, background .15s;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'IBM Plex Mono',monospace; user-select:none;
-    font-weight:700; letter-spacing:0;
-  }
-  .prog-slot:hover .prog-slot-sub { opacity:1; }
-  .prog-slot-sub:hover { background:rgba(124,111,160,.2); }
-  .prog-slot { position:relative; }
-
-  /* ── Pivot panel ── */
+  .slot-sub-close:hover { color:var(--text); }  /* ── Pivot panel ── */
   .pivot-result {
     display:flex; flex-direction:column; gap:5px;
   }
@@ -2086,16 +1689,12 @@
     #lick-lib-btn { width:30px; height:30px; right:126px; top:12px; font-size:15px; }
     #comp-overlay { padding: 0; }
     #comp-modal { max-height: 100vh; border-radius: 0; }
-    #comp-layout { flex-direction: column; }
-    .prog-slot { min-width: 70px; }
-    .mode-groups { flex-direction:column; gap:6px; }
+    #comp-layout { flex-direction: column; }    .mode-groups { flex-direction:column; gap:6px; }
     .strum-patterns { gap:3px; }
     .strum-btn { padding:3px 7px; font-size:9px; }
     .rel-chips { gap:3px; }
     .cad-row { gap:4px; }
-    .cad-name { min-width:90px; font-size:10px; }
-    .prog-param label { font-size:10px; }
-    select { font-size:12px; }
+    .cad-name { min-width:90px; font-size:10px; }    select { font-size:12px; }
   }
   /* ═══ MOBILE COMP — tab bar + play pane (hidden on desktop) ═══ */
   #comp-mob-tabbar { display:none; flex-shrink:0; border-bottom:1px solid var(--border); }
@@ -2131,9 +1730,7 @@
   .mob-sc { flex-shrink:0; width:62px; background:var(--surface2); border:1px solid var(--border2); border-radius:6px; padding:7px 5px 5px; display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; transition:all .15s; }
   .mob-sc.active { border-color:var(--accent); background:rgba(124,111,160,.12); box-shadow:0 0 8px rgba(124,111,160,.2); }
   .mob-sc-name { font-size:11px; font-weight:600; color:var(--text); white-space:nowrap; }
-  .mob-sc.active .mob-sc-name { color:var(--accent2); }
-  .mob-sc-roman { font-size:10px; color:var(--muted); }
-  .mob-sc-beats { font-size:10px; color:var(--dim); }
+  .mob-sc.active .mob-sc-name { color:var(--accent2); }  .mob-sc-beats { font-size:10px; color:var(--dim); }
   .mob-sc.active .mob-sc-beats { color:var(--accent); }
   .mob-sc-loop { margin-top:3px; width:100%; padding:3px 0; border-radius:4px; border:1px solid var(--border2); background:none; color:var(--muted); font-size:10px; font-family:'IBM Plex Mono',monospace; letter-spacing:.04em; line-height:1; cursor:pointer; transition:all .12s; }
   .mob-sc-loop:hover { border-color:var(--accent2); color:var(--accent2); }
@@ -2334,7 +1931,7 @@
         </div>
       </div>
       <div class="ctrl-scale-block">
-        <div class="ctrl-label has-tip" style="display:flex;align-items:center">Scale / Mode<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Scale / Mode</span>Choose from 26 scales across Major modes, Harmonic Minor, Melodic Minor, and Exotic families. Type to filter the list.</div></div>
+        <div class="ctrl-label has-tip" style="display:flex;align-items:center">Scale / Mode<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Scale / Mode</span>Choose from 37 scales in 7 families: major modes, harmonic minor, melodic minor, bebop, pentatonic, symmetric and exotic. Type to filter the list.</div></div>
         <div style="display:flex;flex-direction:column;gap:5px">
           <input id="scale-search" type="text" placeholder="Filter scales…" autocomplete="off"
             style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:2px;padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;outline:none;transition:border-color .15s" aria-label="Filter scales by name">
@@ -2455,7 +2052,7 @@
       Cadence Suggester
       <span class="has-tip" style="display:inline-flex;align-items:center;margin-left:4px" onclick="event.stopPropagation()">
         <span class="tip-badge" tabindex="0">?</span>
-        <div class="tip-popup"><span class="tip-title">Cadences</span>A cadence is a chord sequence that creates a sense of resolution or pause. Perfect = V→I (strongest closure). Plagal = IV→I (church "amen"). Deceptive = V→vi (surprise). Half = ends on V (unresolved). Click any chord chip to add it to the progression.</div>
+        <div class="tip-popup"><span class="tip-title">Cadences</span>A cadence is a chord sequence that creates a sense of resolution or pause. Perfect = V→I (strongest closure). Plagal = IV→I (church "amen"). Deceptive = V→vi (surprise). Half = ends on V (unresolved). Click any chord chip to add it to the active composition.</div>
       </span>
       <span class="collapse-chevron"><svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </div>
@@ -2568,7 +2165,7 @@
 
 </div><!-- end main-layout -->
 
-  <footer>Harmonic Atlas · All 12 keys · Major modes · Harmonic minor · Melodic minor · Exotic scales
+  <footer>Harmonic Atlas · All 12 keys · 37 scales · Major modes · Harmonic &amp; melodic minor · Bebop · Pentatonic · Symmetric · Exotic
     <span style="display:block;margin-top:8px"><button id="reset-prefs-btn" style="background:none;border:none;color:var(--muted);font-family:inherit;font-size:9px;letter-spacing:.1em;cursor:pointer;text-decoration:underline dotted;padding:0" title="Clears theme, history and toggle preferences">Reset preferences</button></span>
   </footer>
 </main><!-- end wrap -->
@@ -2582,8 +2179,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v75';
-window.APP_DEPLOYED = '2026-09-02 09:46';
+window.APP_VERSION = 'v76';
+window.APP_DEPLOYED = '2026-10-07 09:39';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -2607,144 +2204,83 @@ const PITCH_CANDIDATES = [
 ];
 
 const LETTERS = ['C','D','E','F','G','A','B'];
+const _LETTER_PC = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
 const PREFER_FLAT_PC = new Set([1,3,8,10]); // Db Eb Ab Bb - preferred over C# D# G# A#
 
 
 // ── Scale playback ──────────────────────────────
-let _activeScaleBtn = null;
-function _stopActiveScale() {
-  if (_activeScaleBtn && _activeScaleBtn._scaleTimer) {
-    clearTimeout(_activeScaleBtn._scaleTimer);
-    _activeScaleBtn._scaleTimer = null;
-    _activeScaleBtn.classList.remove('playing');
-    _activeScaleBtn.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M1 1l7 4-7 4V1z" fill="currentColor"/></svg>';
-  }
-  _activeScaleBtn = null;
-}
-function playScale(noteNames, btnEl) {
-  if (btnEl && btnEl._scaleTimer) {
-    _stopActiveScale();
-    return;
-  }
-  _stopActiveScale();
-  if (!noteNames || !noteNames.length) return;
-
-  // Build ascending MIDI notes from C4
-  const KEYS_PC = {C:0,'C#':1,'Db':1,'C♯':1,'D♭':1,D:2,'D#':3,'Eb':3,'D♯':3,'E♭':3,
-    E:4,F:5,'F#':6,'Gb':6,'F♯':6,'G♭':6,G:7,'G#':8,'Ab':8,'G♯':8,'A♭':8,
-    A:9,'A#':10,'Bb':10,'A♯':10,'B♭':10,B:11};
-  const midis = [];
-  noteNames.forEach((name, i) => {
-    const letter = name[0].toUpperCase();
-    const pc = (KEYS_PC[name] !== undefined ? KEYS_PC[name] : KEYS_PC[letter]) || 0;
-    let oct = 4;
-    if (i > 0) {
-      const prev = midis[i-1];
-      let midi = pc + (oct + 1) * 12;
-      while (midi <= prev) { oct++; midi = pc + (oct + 1) * 12; }
-      midis.push(midi);
-    } else {
-      midis.push(pc + (oct + 1) * 12);
-    }
-  });
-
-  // Add octave root at the end
-  midis.push(midis[0] + 12);
-
-  if (btnEl) {
-    btnEl.classList.add('playing');
-    btnEl.innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><rect x="1" y="1" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="5" y="1" width="3" height="7" rx="0.5" fill="currentColor"/></svg>';
-    _activeScaleBtn = btnEl;
-  }
-
-  const ctx      = getAudioCtx();
-  if (!ctx) return;
-  const BPM_SCALE = 120;
-  const noteMs   = (60000 / BPM_SCALE) * 0.7;  // ~350ms step interval
-  const stepSecs = noteMs / 1000;
-  const noteDur  = stepSecs * 1.8;  // overlap into next note
-
-  const scheduleScale = () => {
-    const t0  = ctx.currentTime + 0.05;
-    const now = Tone.now();
-    midis.forEach((midi, i) => {
-      if (samplerReady) {
-        sampler.triggerAttackRelease(midiToNoteName(midi), noteDur, now + (t0 + i * stepSecs - ctx.currentTime));
-      } else {
-        const freq = 440 * Math.pow(2, (midi - 69) / 12);
-        makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
-      }
-    });
-  };
-  if (ctx.state === 'suspended') {
-    ctx.resume().then(() => setTimeout(scheduleScale, 30)).catch(scheduleScale);
-  } else {
-    scheduleScale();
-  }
-
-  // setTimeout only for UI cleanup — jitter here is harmless
-  const totalMs = midis.length * noteMs + 300;
-  if (btnEl) {
-    btnEl._scaleTimer = setTimeout(() => {
-      btnEl.classList.remove('playing');
-      btnEl.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M1 1l7 4-7 4V1z" fill="currentColor"/></svg>';
-      btnEl._scaleTimer = null;
-      if (_activeScaleBtn === btnEl) _activeScaleBtn = null;
-    }, totalMs);
-  }
-}
 
 
 function letterOf(name) { return name[0]; }
 function letterIndex(name) { return LETTERS.indexOf(name[0]); }
 
-// Spell a scale starting from rootPc (0-11) with given interval array.
-// Returns array of note name strings with correct enharmonic spelling.
-// scaleData: optional — if provided, uses .preferSharps to override flat preference.
+// Degree (letter offset from the root) each semitone usually takes in a scale that
+// is not heptatonic. 6 and 8 depend on the scale (b5 vs #4, b6 vs #5), see below.
+const _DEG_PREF = [[0],[1],[1],[2],[2],[3],null,[4],null,[5],[6],[6]];
+
+function _nameOnLetter(letter, pc) {
+  const d = ((pc - _LETTER_PC[letter]) % 12 + 12) % 12;
+  return d === 0 ? letter : d === 1 ? letter + '#' : d === 2 ? letter + '##'
+       : d === 11 ? letter + 'b' : d === 10 ? letter + 'bb' : null;
+}
+function _plainName(pc) {
+  const c = PITCH_CANDIDATES[pc];
+  return PREFER_FLAT_PC.has(pc) ? c[1] : c[0];
+}
+// Double accidentals weigh far more than single ones.
+function _spellCost(notes) {
+  return notes.reduce((t, n) => t + (n === null ? 1000 : n.length - 1 + (n.length > 2 ? 100 : 0)), 0);
+}
+
+// Spell a scale from a given tonic name. Heptatonic scales take one letter per
+// degree. Other scales give each note the letter of the degree it stands for
+// (E major pentatonic = E F# G# B C#, never E F# Ab B Db), avoiding a letter
+// already taken and anything beyond a single accidental when there is a choice.
+function _spellFromRoot(rootPc, rootName, intervals, preferSharps) {
+  const rootLi = letterIndex(rootName);
+  if (intervals.length === 7) {
+    return intervals.map((iv, i) => i === 0 ? rootName : _nameOnLetter(LETTERS[(rootLi + i) % 7], (rootPc + iv) % 12));
+  }
+  const has = new Set(intervals.map(iv => iv % 12));
+  const used = new Set();
+  return intervals.map((iv, i) => {
+    if (i === 0) { used.add(0); return rootName; }
+    const s = iv % 12, pc = (rootPc + iv) % 12;
+    const prefs = s === 6 ? (has.has(5) ? [4, 3] : [3, 4])
+                : s === 8 ? (has.has(7) ? [5, 4] : [4, 5])
+                : s === 10 && preferSharps ? [5, 6] : _DEG_PREF[s];
+    const opts = prefs.map(o => ({ o, name: _nameOnLetter(LETTERS[(rootLi + o) % 7], pc) }));
+    const simple = o => o.name && o.name.length <= 2;
+    const pick = opts.find(o => simple(o) && !used.has(o.o)) || opts.find(simple)
+              || opts.find(o => o.name && !used.has(o.o)) || opts[0];
+    used.add(pick.o);
+    return pick.name;
+  });
+}
+
+// scaleData: optional - .preferSharps picks the sharp tonic on a tie.
 function spellScale(rootPc, intervals, scaleData) {
+  const pc0 = ((rootPc % 12) + 12) % 12;
+  const preferSharps = !!(scaleData && scaleData.preferSharps);
+  const cands = PITCH_CANDIDATES[pc0];
+  let rootName = cands[0];
+  if (!preferSharps && PREFER_FLAT_PC.has(pc0) && cands.length > 1) rootName = cands[1];
+  let notes = _spellFromRoot(pc0, rootName, intervals, preferSharps);
+  // On a black key, keep the other tonic when it reads clearly simpler:
+  // C# minor, not Db minor with a B double flat.
+  if ([1, 3, 6, 8, 10].includes(pc0)) {
+    const alt = _spellFromRoot(pc0, cands.find(c => c !== rootName), intervals, preferSharps);
+    if (_spellCost(alt) < _spellCost(notes)) notes = alt;
+  }
   const n = intervals.length;
-  const preferSharps = scaleData && scaleData.preferSharps;
-
-  // Canonical root name
-  const rootCandidates = PITCH_CANDIDATES[rootPc % 12];
-  let rootName = rootCandidates[0];
-  if(!preferSharps && PREFER_FLAT_PC.has(rootPc%12) && rootCandidates.length > 1) rootName = rootCandidates[1];
-
-  // For pentatonic / short scales AND octatonic scales: use simple enharmonic spelling
-  // (Whole Tone falls here too — forcing one letter per degree produced wrong pitches
-  //  on sharp roots, e.g. A♯ Whole Tone ended on a bare "F" instead of G♯.)
-  if (n !== 7) {
-    const preferFlats = scaleData && scaleData.preferFlats;
-    return intervals.map(iv => {
-      const pc = (rootPc + iv) % 12;
-      const cands = PITCH_CANDIDATES[pc];
-      if (cands.length === 1) return cands[0];
-      if (preferSharps) return cands[0];
-      if (preferFlats && cands.length > 1 && [1,3,6,8,10].includes(pc)) return cands[1]; // force flat spelling (skip naturals like C=PC0)
-      return PREFER_FLAT_PC.has(pc) ? cands[1] : cands[0];
-    });
-  }
-
-  // Heptatonic: assign one letter per degree
-  const rootLetterIdx = letterIndex(rootName);
-  const result = [rootName];
-  for(let i = 1; i < n; i++){
-    const targetLetterIdx = (rootLetterIdx + i) % 7;
-    const targetLetter = LETTERS[targetLetterIdx];
-    const pc = (rootPc + intervals[i]) % 12;
-    const candidates = PITCH_CANDIDATES[pc];
-    const match = candidates.find(c => c[0] === targetLetter);
-    if(match){
-      result.push(match);
-    } else {
-      // Double accidental fallback
-      const naturalPc = PITCH_CANDIDATES.findIndex(arr => arr.includes(targetLetter));
-      const diff = ((pc - naturalPc) + 12) % 12;
-      let acc = diff===1?'#':diff===2?'##':diff===11?'b':diff===10?'bb':'';
-      result.push(targetLetter + acc);
-    }
-  }
-  return result;
+  return notes.map((name, i) => {
+    const pc = (pc0 + intervals[i]) % 12;
+    if (name === null) return _plainName(pc);
+    // Short symmetric and pentatonic scales read better without B#, E#, Cb, Fb
+    // or double accidentals (E whole tone = E F# G# A# C D).
+    if (n <= 6 && i > 0 && (name.length > 2 || /^(B#|E#|Cb|Fb)$/.test(name))) return _plainName(pc);
+    return name;
+  });
 }
 
 // ══════════════════════════════════════════════
@@ -3938,11 +3474,15 @@ function renderScaleInfo(scaleNotes, scaleData){
     if (playG) {
       let _notes = scaleNotes.slice();
       let _timer = null;
+      let _noteTimers = [];
       const playCircle = playG.querySelector('circle');
       const playIcon   = playG.querySelector('.staff-play-icon');
       playG.addEventListener('click', () => {
         if (_timer) {
           clearTimeout(_timer); _timer = null;
+          // Notes are queued one by one, so pause really stops the scale.
+          _noteTimers.forEach(clearTimeout); _noteTimers = [];
+          if (samplerReady) sampler.releaseAll();
           // reset icon to play triangle
           playIcon.setAttribute('d','M' + playG.dataset.px + ' ' + playG.dataset.py1 + 'l6 3.5-6 3.5z');
           return;
@@ -3952,15 +3492,9 @@ function renderScaleInfo(scaleNotes, scaleData){
         const ctx = getAudioCtx();
         if (!ctx) return;
         const noteMs = 380;  // step interval
-        const KEYS_PC = {C:0,'C#':1,'Db':1,'C♯':1,'D♭':1,D:2,'D#':3,'Eb':3,'D♯':3,'E♭':3,
-          E:4,F:5,'F#':6,'Gb':6,'F♯':6,'G♭':6,G:7,'G#':8,'Ab':8,'G♯':8,'A♭':8,
-          A:9,'A#':10,'Bb':10,'A♯':10,'B♭':10,B:11};
-        const _DIA_ORDER = {C:0,D:1,E:2,F:3,G:4,A:5,B:6};
         const midis = [];
         _notes.forEach((name, i) => {
-          const letter = name[0].toUpperCase();
-          const pc = KEYS_PC[name] !== undefined ? KEYS_PC[name] : (KEYS_PC[letter] || 0);
-          const dia = _DIA_ORDER[letter] || 0;
+          const pc = noteNameToPc(name);
           let oct = 4;
           if (i > 0) {
             const prev = midis[i-1];
@@ -3975,17 +3509,12 @@ function renderScaleInfo(scaleNotes, scaleData){
         playIcon.setAttribute('d',`M${px} ${py-5}v10M${px+4} ${py-5}v10`);
 
         const schedule = () => {
-          const t0       = ctx.currentTime + 0.05;
-          const stepSecs = noteMs / 1000;
-          const noteDur  = stepSecs * 1.8;
-          const now      = Tone.now();
+          const noteDur = noteMs / 1000 * 1.8;
           midis.forEach((midi, i) => {
-            if (samplerReady) {
-              sampler.triggerAttackRelease(midiToNoteName(midi), noteDur, now + (t0 + i * stepSecs - ctx.currentTime));
-            } else {
-              const freq = 440 * Math.pow(2, (midi - 69) / 12);
-              makePianoNote(ctx, freq, t0 + i * stepSecs, noteDur, 0.13);
-            }
+            _noteTimers.push(setTimeout(() => {
+              if (samplerReady) sampler.triggerAttackRelease(midiToNoteName(midi), noteDur);
+              else makePianoNote(ctx, 440 * Math.pow(2, (midi - 69) / 12), ctx.currentTime, noteDur, 0.13);
+            }, i * noteMs));
           });
           const totalMs = midis.length * noteMs + 300;
           _timer = setTimeout(() => {
@@ -4038,32 +3567,42 @@ function chromaticPcName(pc, preferFlat){
   return preferFlat ? cands[1] : cands[0];
 }
 
+// Name a chromatic chord root from the letter it stands on, counted from a spelled
+// note (a secondary dominant sits a fifth above its target: V/ii in E is C#7, not Db7).
+function rootOnLetter(fromName, letterSteps, pc){
+  const name = _nameOnLetter(LETTERS[(letterIndex(fromName) + letterSteps + 7) % 7], pc);
+  return name && name.length <= 2 ? name : chromaticPcName(pc, PREFER_FLAT_PC.has(pc));
+}
+
 // Spell chord tones from a spelled root using sequential letter assignment.
 // Chord tone i gets the letter +2i above root (root=+0, 3rd=+2, 5th=+4, 7th=+6).
 // Falls back to double-accidental if no single-accidental candidate matches.
+// Letter offset of each interval read as a chord extension: b9/9/#9 on the 2nd
+// letter, 11/#11 on the 4th, b13/13 on the 6th.
+const _EXT_DEG = [0, 1, 1, 1, 2, 3, 3, 4, 5, 5, 6, 6];
 function spellChordFromRoot(rootPc, rootName, intervals){
   const rootLi = letterIndex(rootName);
   return intervals.map((iv, i) => {
-    const targetLetter = LETTERS[(rootLi + i * 2) % 7];
-    const pc = (rootPc + iv) % 12;
-    const match = PITCH_CANDIDATES[pc].find(c => c[0] === targetLetter);
-    if (match) return match;
-    const naturalPc = PITCH_CANDIDATES.findIndex(a => a.includes(targetLetter));
-    const diff = ((pc - naturalPc) + 12) % 12;
-    return targetLetter + (diff===1?'#':diff===2?'##':diff===11?'b':diff===10?'bb':'');
+    const pc = ((rootPc + iv) % 12 + 12) % 12;
+    // Stacked thirds first (1 3 5 7 9...). When the interval does not fit that
+    // slot (a #11 written as 6 in 5th position), use the degree it stands for,
+    // and never fall back to a bare letter that names another pitch.
+    return _nameOnLetter(LETTERS[(rootLi + i * 2) % 7], pc)
+        || _nameOnLetter(LETTERS[(rootLi + _EXT_DEG[((iv % 12) + 12) % 12]) % 7], pc)
+        || chromaticPcName(pc, PREFER_FLAT_PC.has(pc));
   });
 }
 
 // Spell a dom7 chord from a root pc: root maj3 p5 m7
-function spellDom7(rootPc){
-  const r = chromaticPcName(rootPc, PREFER_FLAT_PC.has(rootPc));
+function spellDom7(rootPc, rootName){
+  const r = rootName || chromaticPcName(rootPc, PREFER_FLAT_PC.has(rootPc));
   const notes = spellChordFromRoot(rootPc, r, [0,4,7,10]);
   return {root:r, notes, sym:'7', qual:'Dominant 7th', iv:[0,4,7,10]};
 }
 
 // Spell a major or minor triad from a root pc
-function spellTriad(rootPc, qual){
-  const r = chromaticPcName(rootPc, PREFER_FLAT_PC.has(rootPc));
+function spellTriad(rootPc, qual, rootName){
+  const r = rootName || chromaticPcName(rootPc, PREFER_FLAT_PC.has(rootPc));
   const iv = qual==='minor' ? [0,3,7] : [0,4,7];
   const notes = spellChordFromRoot(rootPc, r, iv);
   const sym  = qual==='minor'?'m':'';
@@ -4091,6 +3630,7 @@ function diatonicQuality(scaleIntervals, degIdx){
 // Returns array of {degIdx, roman, label, chord} 
 function buildSecondaryDominants(rootPc, scaleIntervals, romans){
   const n=scaleIntervals.length;
+  const spelled=spellScale(rootPc, scaleIntervals);
   const scalePcs=new Set(scaleIntervals.map(i=>(rootPc+i)%12));
   const result=[];
   for(let di=0;di<n;di++){
@@ -4102,7 +3642,7 @@ function buildSecondaryDominants(rootPc, scaleIntervals, romans){
     const domPcs=[domRootPc,(domRootPc+4)%12,(domRootPc+7)%12,(domRootPc+10)%12];
     // Skip if fully diatonic (it's already a diatonic chord)
     if(domPcs.every(p=>scalePcs.has(p))) continue;
-    const chord=spellDom7(domRootPc);
+    const chord=spellDom7(domRootPc, rootOnLetter(spelled[di], 4, domRootPc));
     result.push({degIdx:di, roman:romans[di], label:`V / ${romans[di]}`, chord});
   }
   return result;
@@ -4118,6 +3658,7 @@ function buildChromaticMediants(rootPc, scaleIntervals, romans){
   if(tonicQuality !== 'major' && tonicQuality !== 'minor') return [];
 
   const result = [];
+  const spelled = spellScale(rootPc, scaleIntervals);
   // The 4 chromatic mediant roots relative to tonic
   const offsets = [
     { semitones:  3, dir: 'Upper', intName: 'm3' },
@@ -4129,8 +3670,10 @@ function buildChromaticMediants(rootPc, scaleIntervals, romans){
   offsets.forEach(({ semitones, dir, intName }) => {
     const mRootPc = ((rootPc + semitones) % 12 + 12) % 12;
     // Same quality as tonic
-    const chord = spellTriad(mRootPc, tonicQuality);
-    const sharedTone = findSharedTone(rootPc, tonicQuality, mRootPc, tonicQuality);
+    // A third away: two letters up or down from the tonic.
+    const chord = spellTriad(mRootPc, tonicQuality, rootOnLetter(spelled[0], semitones > 0 ? 2 : -2, mRootPc));
+    const sharedPc = findSharedTone(rootPc, tonicQuality, mRootPc, tonicQuality);
+    const sharedTone = sharedPc === null ? '?' : (spelled.find(nm => noteNameToPc(nm) === sharedPc) || chromaticPcName(sharedPc, PREFER_FLAT_PC.has(sharedPc)));
     result.push({
       degIdx: 0,
       roman: romans[0],
@@ -4147,7 +3690,7 @@ function findSharedTone(r1, q1, r2, q2) {
   const t1 = q1==='major' ? [r1,(r1+4)%12,(r1+7)%12] : [r1,(r1+3)%12,(r1+7)%12];
   const t2 = q2==='major' ? [r2,(r2+4)%12,(r2+7)%12] : [r2,(r2+3)%12,(r2+7)%12];
   const shared = t1.find(p => t2.includes(p));
-  return shared !== undefined ? chromaticPcName(shared, PREFER_FLAT_PC.has(shared)) : '?';
+  return shared !== undefined ? shared : null;
 }
 
 // Build secondary diminished chords: vii°7 of X = fully-diminished 7th a semitone below X's root
@@ -4181,6 +3724,7 @@ function buildSecondaryDiminished(rootPc, scaleIntervals, romans, scaleNotes){
 // Using Maj7 (4-note) as it's more musically useful and consistent with secdom approach
 function buildSecondarySubdominants(rootPc, scaleIntervals, romans){
   const n=scaleIntervals.length;
+  const spelled=spellScale(rootPc, scaleIntervals);
   const scalePcs=new Set(scaleIntervals.map(i=>(rootPc+i)%12));
   const result=[];
   for(let di=0;di<n;di++){
@@ -4195,7 +3739,7 @@ function buildSecondarySubdominants(rootPc, scaleIntervals, romans){
     const p7pc = (ivRootPc+11)%12;
     const ivPcs=[p1pc,p3pc,p5pc,p7pc];
     if(ivPcs.every(p=>scalePcs.has(p))) continue; // fully diatonic - skip
-    const r  = chromaticPcName(p1pc, PREFER_FLAT_PC.has(p1pc));
+    const r  = rootOnLetter(spelled[di], 3, p1pc);
     const notes = spellChordFromRoot(p1pc, r, [0,4,7,11]);
     const chord={root:r, notes, sym:'Δ7', qual:'Major 7th', iv:[0,4,7,11]};
     result.push({degIdx:di, roman:romans[di], label:`IVΔ7 / ${romans[di]}`, chord});
@@ -4247,7 +3791,9 @@ function addCardStaff(card, notes) {
 
 function addCardPlayBtn(card, notes) {
   if (!notes || !notes.length) return;
-  const pcs = [...new Set(notes.map(n => noteNameToPc(n)).filter(p => p >= 0))].sort((a,b)=>a-b);
+  // Keep the chord's own order (root, 3rd, 5th...) so it sounds in root position;
+  // sorting by pitch class put whatever note was nearest C in the bass.
+  const pcs = [...new Set(notes.map(n => noteNameToPc(n)).filter(p => p >= 0))];
   if (!pcs.length) return;
 
   // Full chord button — all notes simultaneously with slight strum spread
@@ -4769,6 +4315,7 @@ function render(){
   if (!scaleData) return;
   syncKeyDisplay();
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
+  setDotSpelling(scaleNotes);
 
   // Immediate lightweight updates (no DOM rebuild)
   renderScaleInfo(scaleNotes,scaleData);
@@ -4824,8 +4371,6 @@ function render(){
     renderSubstitutions(scaleNotes,scaleData);
     renderPivotChords();
     renderEarTraining();
-    renderStrumSelector();
-    renderSwingSelector();
     container.classList.remove('view-enter');
     void container.offsetWidth;
     container.classList.add('view-enter');
@@ -5187,11 +4732,83 @@ function computeGuitarVoicing(pcs, stringIndices, ascendingPitch=true) {
   return best;
 }
 
+// Chord shapes for the Basic tab, searched in a four-fret window. base 0 is the
+// open position (frets 0-4, open strings allowed); a higher base allows no open
+// string, which is where barre shapes live. Rules: the root is the lowest note,
+// every chord tone is present (a perfect fifth may go on a four-note chord), no gap
+// between played strings, a fretted span of 2 at most, four fingers. This is where
+// C = x32010, G = 320003, E7 = 020100 and C#m = x46654 come from.
+function chordShapeInWindow(rootPc, ivArray, base) {
+  const tones = ivArray.map(iv => ((rootPc + iv) % 12 + 12) % 12);
+  const optional = new Set(ivArray.length >= 4 ? ivArray.filter(iv => iv % 12 === 7).map(iv => (rootPc + iv) % 12) : []);
+  const required = [...new Set(tones)].filter(p => !optional.has(p));
+  const minStrings = tones.length <= 2 ? 3 : 4;
+  const opts = GUITAR_MIDI.map(m => {
+    const o = [-1];
+    for (let f = base === 0 ? 0 : base; f <= base + (base === 0 ? 4 : 3); f++) if (tones.includes((m + f) % 12)) o.push(f);
+    return o;
+  });
+  let best = null, bestScore = -Infinity;
+  const cur = new Array(6);
+  const rec = s => {
+    if (s < 6) { for (const f of opts[s]) { cur[s] = f; rec(s + 1); } return; }
+    const played = [];
+    for (let i = 0; i < 6; i++) if (cur[i] >= 0) played.push(i);
+    if (played.length < minStrings || played[played.length - 1] - played[0] !== played.length - 1) return;
+    const bass = played[0];
+    if ((GUITAR_MIDI[bass] + cur[bass]) % 12 !== tones[0]) return;
+    // A fretted bass with an open string right above it (F as 1-0-3-2-1-x) is not
+    // how anyone plays it.
+    if (cur[bass] > 0 && cur[bass + 1] === 0) return;
+    const sounding = new Set(played.map(i => (GUITAR_MIDI[i] + cur[i]) % 12));
+    if (!required.every(p => sounding.has(p))) return;
+    const fretted = played.filter(i => cur[i] > 0);
+    let fingers = fretted.length, barre = false, maxF = 0;
+    if (fretted.length) {
+      const fr = fretted.map(i => cur[i]);
+      const lo = Math.min(...fr);
+      maxF = Math.max(...fr);
+      if (maxF - lo > 2) return;
+      if (fingers > 4) {
+        // A barre at the lowest fret, with nothing open or muted underneath it.
+        const at = fretted.filter(i => cur[i] === lo);
+        if (at.length < 2) return;
+        for (let i = at[0]; i <= at[at.length - 1]; i++) if (!(cur[i] >= lo)) return;
+        fingers -= at.length - 1;
+        barre = true;
+        if (fingers > 4) return;
+      }
+    }
+    const open = played.length - fretted.length;
+    const score = played.length * 6 + open * 3 - fretted.length * 2 - maxF
+                - (barre ? 3 : 0) - (barre && open ? 6 : 0);
+    if (score > bestScore) { bestScore = score; best = cur.slice(); }
+  };
+  rec(0);
+  return best ? { frets6: best, pcs6: best.map((f, i) => f < 0 ? -1 : (GUITAR_MIDI[i] + f) % 12), score: bestScore } : null;
+}
+
+// Open position first; a triad with no open shape takes the lowest barre shape.
+function basicChordShape(rootPc, ivArray) {
+  const open = chordShapeInWindow(rootPc, ivArray, 0);
+  if (open || ivArray.length !== 3) return open;
+  let best = null;
+  for (let base = 1; base <= 9; base++) {
+    const v = chordShapeInWindow(rootPc, ivArray, base);
+    if (v && (!best || v.score - base * 2 > best.score - best.base * 2)) best = Object.assign(v, { base });
+  }
+  return best;
+}
+
 // Jazz-context guitar voicing engine
 // Enforces root as the lowest sounding pitch (bass register) when possible
 // Uses 4-string closed voicings across strings [1-4], [2-5], [3-6]
 // Returns {frets6, pcs6} with unused strings = -1.
 function getBasicVoicing(rootPc, ivArray, bassStr = null) {
+  if (bassStr === null && ivArray.length <= 4) {
+    const shape = basicChordShape(rootPc, ivArray);
+    if (shape) return { frets6: shape.frets6, pcs6: shape.pcs6 };
+  }
   const allPcs = ivArray.map(iv=>((rootPc+iv)%12+12)%12);
   const rootPcNorm = ((rootPc%12)+12)%12;
 
@@ -5260,7 +4877,9 @@ function getBasicVoicing(rootPc, ivArray, bassStr = null) {
   if(!globalBest) return null;
 
   const frets6=[-1,-1,-1,-1,-1,-1], pcs6=[-1,-1,-1,-1,-1,-1];
-  globalBest.ss.forEach((si,i)=>{ frets6[si]=globalBest.frets[i]; pcs6[si]=globalBest.pcs[i]; });
+  // A three-note shape tried on a four-string set only fills the first three strings;
+  // the rest stay muted instead of being drawn as an unmarked string.
+  globalBest.ss.slice(0, globalBest.frets.length).forEach((si,i)=>{ frets6[si]=globalBest.frets[i]; pcs6[si]=globalBest.pcs[i]; });
   return {frets6, pcs6};
 }
 
@@ -5281,9 +4900,35 @@ const NOTE_NAMES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const NOTE_NAMES_FLAT  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
 function pcToName(pc){const p=((pc%12)+12)%12; return PREFER_FLAT_PC.has(p)?NOTE_NAMES_FLAT[p]:NOTE_NAMES_SHARP[p];}
 
+// Names on diagram dots follow the spelling of the current scale, and of the chord
+// being drawn when there is one: A major shows C#, not Db.
+let _dotSpell = [];
+function _spellMap(base, names) {
+  const m = base.slice();
+  (names || []).forEach(n => { const p = noteNameToPc(n); if (p >= 0 && n.length <= 2) m[p] = n; });
+  return m;
+}
+function setDotSpelling(names) { _dotSpell = _spellMap([], names); }
+function withChordSpelling(names, fn) {
+  const saved = _dotSpell;
+  _dotSpell = _spellMap(saved, names);
+  try { return fn(); } finally { _dotSpell = saved; }
+}
+function dotName(pc) { const p = ((pc % 12) + 12) % 12; return _dotSpell[p] || pcToName(p); }
+
+// Letter plus any run of accidentals, ASCII or Unicode. A table lookup used to miss
+// double sharps and flats (Bbb, C##), which then came back as -1 and were drawn as B.
 function noteNameToPc(name){
-  const idx = PITCH_CANDIDATES.findIndex(arr=>arr.some(x=>x===name));
-  return idx < 0 ? -1 : idx;
+  if (typeof name !== 'string' || !(name[0] in _LETTER_PC)) return -1;
+  let pc = _LETTER_PC[name[0]];
+  for (const ch of name.slice(1)) {
+    if (ch === '#' || ch === '♯') pc++;
+    else if (ch === 'b' || ch === '♭') pc--;
+    else if (ch === '𝄪') pc += 2;
+    else if (ch === '𝄫') pc -= 2;
+    else return -1;
+  }
+  return ((pc % 12) + 12) % 12;
 }
 
 /**
@@ -5397,7 +5042,7 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140, forceSharpPcs=null) {
         const fill = isRoot ? '#c9a84c' : isBarreNote ? '#5c5075' : '#6a5f90';
         const dotR = Math.min(Math.max(6.5, fretH * 0.34), strGap * 0.44);
         const _pc  = ((pc%12)+12)%12;
-        const lbl  = pc !== -1 ? (forceSharpPcs?.has(_pc) ? NOTE_NAMES_SHARP[_pc] : pcToName(_pc)) : '';
+        const lbl  = pc !== -1 ? (forceSharpPcs?.has(_pc) ? NOTE_NAMES_SHARP[_pc] : dotName(_pc)) : '';
         g.push(`<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}"/>`);
         if (lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dotR*0.88}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
       }
@@ -5514,7 +5159,7 @@ function makeDiagCard(chRootPc, notes, sym, qual, iv, animDelay) {
   let displayNotes = notes;
   let omitTag = '';
   if (voicing) {
-    diagSvg = makeChordDiagram(voicing.frets6, voicing.pcs6, chRootPc, 128);
+    diagSvg = withChordSpelling(notes, () => makeChordDiagram(voicing.frets6, voicing.pcs6, chRootPc, 128));
     card.style.cursor = 'pointer';
     card._voicing = { frets6: voicing.frets6, pcs6: voicing.pcs6, rootPc: chRootPc, title };
     card.dataset.navCard = 'guitar';
@@ -5819,7 +5464,7 @@ function renderShellVoicings(scaleNotes, scaleData) {
         card.innerHTML = `
           <div class="drop-str-label" style="color:${col.label};opacity:.7">${type}</div>
           ${makeChordDiagram(frets6, pcs6, chRootPc, 118)}
-          <div class="diag-notes" style="font-size:10px">${notes.map(p=>pcToName(((p%12)+12)%12)).join(' – ')}</div>`;
+          <div class="diag-notes" style="font-size:10px">${notes.map(p=>dotName(((p%12)+12)%12)).join(' – ')}</div>`;
         grid.appendChild(card);
         totalCards++;
       });
@@ -5944,7 +5589,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
       const group = document.createElement('div');
       group.style.cssText = `background:${col.bg};border:1px solid ${col.border};border-radius:4px;padding:10px 12px 12px;display:flex;flex-direction:column;`;
 
-      const bassNoteName = pcToName(((notes[0]%12)+12)%12);
+      const bassNoteName = dotName(((notes[0]%12)+12)%12);
       const groupHdr = document.createElement('div');
       groupHdr.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap;';
       groupHdr.innerHTML = `
@@ -5979,7 +5624,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
           card.innerHTML = `
             <div class="drop-str-label" style="color:${col.label};opacity:.7">strings ${strLabel}</div>
             ${makeChordDiagram(frets6, pcs6, chRootPc, 118)}
-            <div class="diag-notes" style="font-size:10px">${notes.map(p=>pcToName(((p%12)+12)%12)).join('–')}</div>`;
+            <div class="diag-notes" style="font-size:10px">${notes.map(p=>dotName(((p%12)+12)%12)).join('–')}</div>`;
           grid.appendChild(card);
           totalCards++;
         });
@@ -6095,7 +5740,7 @@ function makeArpeggioDiagram(notes, rootPc, w=440, pcNameMap=null, anchorStr=nul
   const STR_NAMES = ['e','B','G','D','A','E'];
 
   // Text alternative: the note names in ascending order.
-  const _alt = notes.map(n => pcToName(((n.pc % 12) + 12) % 12)).join(' ');
+  const _alt = notes.map(n => dotName(((n.pc % 12) + 12) % 12)).join(' ');
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="Arpeggio shape: ${_alt}" style="display:block;flex-shrink:0">`;
 
   // Fret lines (vertical)
@@ -6367,7 +6012,7 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
       if (intNorm.includes(sem)) {
         const col    = dotColor(sem);
         const op     = dotOp(sem);
-        const lbl    = showNotes ? pcToName((openPc + 12) % 12) : (INTERVAL_LABEL[sem] || '?');
+        const lbl    = showNotes ? dotName((openPc + 12) % 12) : (INTERVAL_LABEL[sem] || '?');
         const cx     = padL - DOT_R - 2;
         svg += `<circle cx="${cx}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="${op}"/>`;
         svg += `<text x="${cx}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${lbl.length > 1 ? Math.round(DOT_R*0.85) : Math.round(DOT_R*1.1)}" font-family="IBM Plex Mono,monospace" font-weight="600" fill="#fff" opacity="${op}">${lbl}</text>`;
@@ -6381,7 +6026,7 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
       if (!intNorm.includes(sem)) continue;
       const col    = dotColor(sem);
       const op     = dotOp(sem);
-      const lbl    = showNotes ? pcToName(pc) : (INTERVAL_LABEL[sem] || '?');
+      const lbl    = showNotes ? dotName(pc) : (INTERVAL_LABEL[sem] || '?');
       const slot   = f - startFret;
       const cx     = padL + (slot - 0.5) * fretW;
       svg += `<circle cx="${cx.toFixed(1)}" cy="${y.toFixed(1)}" r="${DOT_R}" fill="${col}" opacity="${op}"/>`;
@@ -6538,7 +6183,7 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
   // ── Characteristic note descriptions ─────────────────
   const charDesc = charSems.map(s => {
     const pc = (rootPcN + s + 12) % 12;
-    return `${INTERVAL_LABEL[s]} (${pcToName(pc)})`;
+    return `${INTERVAL_LABEL[s]} (${dotName(pc)})`;
   }).join(', ');
 
   // ── Header row (title + toggle) ───────────────────────
@@ -7158,7 +6803,7 @@ function makeGripDiagram(instr, grip, rootPc, w, opts) {
     const dispF = fr - startF;
     if (dispF < 1 || dispF > NUM_FRET) return;
     const y   = padT + (dispF - 0.5) * fretH;
-    const lbl = showN ? pcToName((rootN + iv) % 12) : gripIvLabel(iv, tset);
+    const lbl = showN ? dotName((rootN + iv) % 12) : gripIvLabel(iv, tset);
     g.push(`<circle cx="${x}" cy="${y}" r="${dr}" fill="${isRoot ? '#c9a84c' : '#6a5f90'}"${faded ? ' opacity=".5"' : ''}/>`);
     g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${(dr * (lbl.length > 2 ? 0.62 : 0.8)).toFixed(1)}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
   }
@@ -7475,7 +7120,7 @@ const _DIA_STEP = {C:0,D:1,E:2,F:3,G:4,A:5,B:6};
 function _parseNote(name) {
   if (!name) return {diaStep:0, acc:''};
   const letter = name[0].toUpperCase();
-  const rest   = name.slice(1).replace('b','♭').replace('#','♯');
+  const rest   = name.slice(1).replace(/b/g,'♭').replace(/#/g,'♯');
   const diaStep = _DIA_STEP[letter] !== undefined ? _DIA_STEP[letter] : 0;
   let acc = '';
   if (rest==='♯♯')       acc='♯♯';
@@ -7767,8 +7412,15 @@ function getMandolinVoicing(rootPc, ivArray) {
     const topIdx = ivArray.length - 1;
     pcs = [...new Set([0,1,3,topIdx].map(i => ((rootPc+ivArray[Math.min(i,ivArray.length-1)])%12+12)%12))];
   }
-  while (pcs.length < 4) pcs.push(pcs[pcs.length % Math.max(1,pcs.length-1)]);
-  pcs = pcs.slice(0,4);
+  // A triad needs a fourth note: try doubling the root, the fifth and the third and
+  // let the score choose (G = 0-0-2-3, A = 2-2-4-5, C = 0-2-3-0). Always doubling the
+  // third made the standard open shapes unreachable.
+  let sets;
+  if (pcs.length === 3) sets = [[pcs[0], 0], [pcs[2], 1], [pcs[1], 1]].map(([d, pen]) => ({ pcs: [...pcs, d], pen }));
+  else {
+    while (pcs.length < 4) pcs.push(pcs[0]);
+    sets = [{ pcs: pcs.slice(0, 4), pen: 0 }];
+  }
 
   function allPerms(arr) {
     if (arr.length<=1) return [arr];
@@ -7776,12 +7428,14 @@ function getMandolinVoicing(rootPc, ivArray) {
   }
   const ss = [0,1,2,3];
   let best = null, bestScore = Infinity;
-  for (const assign of allPerms(pcs)) {
+  for (const set of sets) for (const assign of allPerms(set.pcs)) {
     const v = computeMandoVoicing(assign, ss);
     if (!v) continue;
-    const span = Math.max(...v) - Math.min(...v);
-    const minF = Math.min(...v);
-    const score = span * 8 + (minF <= 3 ? minF : minF * 4);
+    // Open strings cost no finger and no stretch: measure span on fretted strings.
+    const fr = v.filter(f => f > 0);
+    const span = fr.length ? Math.max(...fr) - Math.min(...fr) : 0;
+    const minF = fr.length ? Math.min(...fr) : 0;
+    const score = span * 8 + (minF <= 3 ? minF : minF * 4) + set.pen;
     if (score < bestScore) { bestScore = score; best = { frets: v, pcs: assign }; }
   }
   return best ? { frets4: best.frets, pcs4: best.pcs } : null;
@@ -7790,14 +7444,19 @@ function getMandolinVoicing(rootPc, ivArray) {
 function makeMandoDiagram(frets4, pcs4, rootPc, w) {
   w = w || 120;
   const NUM_FRET = 5;
-  const padL = 18, padR = 18, padT = 22, padB = 22;
-  const strGap = (w - padL - padR) / 3;
-  const fretH  = Math.round((w - padL - padR) * 0.44);
-  const gridH  = NUM_FRET * fretH;
-  const h      = padT + gridH + padB;
   const played = (frets4||[]).filter(f=>f>0);
   const minP   = played.length ? Math.min(...played) : 0;
-  const startF = minP <= 1 ? 0 : minP - 1;
+  const maxP   = played.length ? Math.max(...played) : 0;
+  // An open-position shape keeps the nut in view (G = 0-0-2-3), instead of a
+  // window starting at fret 2 with open strings floating above it.
+  const hasOpen = (frets4||[]).some(f => f === 0);
+  const startF = (minP <= 1 || (hasOpen && maxP <= NUM_FRET)) ? 0 : minP - 1;
+  // Room for the "Nfr" label so it never sits under a dot on the G string.
+  const padL = startF > 0 ? 28 : 18, padR = 18, padT = 22, padB = 22;
+  const strGap = (w - padL - padR) / 3;
+  const fretH  = Math.round((w - 36) * 0.44);
+  const gridH  = NUM_FRET * fretH;
+  const h      = padT + gridH + padB;
   const g = [];
   g.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block" overflow="hidden">`);
   if (startF===0) {
@@ -7836,7 +7495,7 @@ function makeMandoDiagram(frets4, pcs4, rootPc, w) {
           const isRoot=pc!==-1&&((pc%12+12)%12)===((rootPc%12+12)%12);
           const fill=isRoot?'#c9a84c':'#6a5f90';
           const dr=Math.min(Math.max(5.5,fretH*0.32),strGap*0.44,padR-1);
-          const lbl=pc!==-1?pcToName(((pc%12)+12)%12):'';
+          const lbl=pc!==-1?dotName(((pc%12)+12)%12):'';
           g.push(`<circle cx="${x}" cy="${y}" r="${dr}" fill="${fill}"/>`);
           if(lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dr*0.85}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
         }
@@ -7994,7 +7653,7 @@ function renderMandolin(scaleNotes, scaleData) {
       let diagHTML = `<div style="color:var(--muted);font-size:10px;padding:20px 0;text-align:center">-</div>`;
       let displayNotes = ch.notes;
       if (voicing) {
-        diagHTML = makeMandoDiagram(voicing.frets4, voicing.pcs4, chRootPc, 116);
+        diagHTML = withChordSpelling(ch.notes, () => makeMandoDiagram(voicing.frets4, voicing.pcs4, chRootPc, 116));
         card.style.cursor = 'pointer';
         card._voicing = { frets4: voicing.frets4, pcs4: voicing.pcs4, rootPc: chRootPc, title };
         card.dataset.navCard = 'mando';
@@ -8134,21 +7793,15 @@ function getDrop3Voicings(chord4pcs, chordNotes) {
 
 
 // ══════════════════════════════════════════════
-// PROGRESSION BUILDER ENGINE
+// AUDIO ENGINE - samplers, synth fallback, drum synths, chord helpers
+// (the old Progression Builder lived here; the composition tool replaced it)
 // ══════════════════════════════════════════════
 
 // ── State ──────────────────────────────────────
-let progression = [];   // [{name, sym, roman, notes, pcs, quality}]
-let progPlaying  = false;
-let progLoop     = false;
-let progScheduler = null;
-let _progPlayGen  = 0;   // invalidates deferred/looping callbacks across stop/restart
 let progAudioCtx  = null;
 let sampler       = null;
 let samplerReady  = false;
 let _samplerReadyCbs = [];
-let progCurrentIdx = -1;
-let progDragIdx    = null;
 
 // ── Tone.js Sampler (Salamander Grand Piano) ────
 function midiToNoteName(midi) {
@@ -8181,9 +7834,8 @@ function ensureCompMasterBus() {
   return compMasterBus;
 }
 
-// Re-establish a single sampler→bus connection. progStop() disconnects the
-// shared sampler to silence future-scheduled notes, so every playback entry
-// point must reconnect before scheduling.
+// Re-establish a single sampler→bus connection before scheduling: a stop may have
+// disconnected the shared sampler to silence notes already queued.
 function _ensureSamplerConnected() {
   const bus = ensureCompMasterBus();
   if (sampler)       { try { sampler.disconnect(); }       catch(e){} try { sampler.connect(bus); }       catch(e){} }
@@ -8270,15 +7922,10 @@ function _unlockAudio() {
 );
 
 // ── Note frequency ─────────────────────────────
-function pcToFreq(pc, octave) {
-  // octave 0 = C3 (MIDI 48), 1 = C4 (MIDI 60), 2 = C5 (MIDI 72)
-  const midi = 48 + octave * 12 + ((pc % 12) + 12) % 12;
-  return 440 * Math.pow(2, (midi - 69) / 12);
-}
 
 // Spread chord PCs across octaves so notes ascend smoothly (no clusters)
 // Returns array of {pc, octave} in ascending pitch order
-function spreadChordOctaves(sortedPcs) {
+function spreadChordOctaves(sortedPcs) {   // pcs in chord order, root first
   // Start around octave 0 (C3) for bass notes, rise naturally
   const result = [];
   let prevMidi = -Infinity;
@@ -8418,110 +8065,15 @@ function makePianoNote(ctx, freq, startTime, duration, gain = 0.13) {
 
   master.connect(shaper); shaper.connect(hp); hp.connect(warm); warm.connect(shelf);
   shelf.connect(progMasterBus || ctx.destination);
-  if (progReverbNode) shelf.connect(progReverbNode);
 }
 
 // ── ORGAN - Hammond-style drawbars ──
-function makeOrganNote(ctx, freq, startTime, duration, gain=0.10) {
-  // Hammond tonewheel harmonics: 16',8',5⅓',4',2⅔',2',1⅗',1⅓',1'
-  const drawbars = [0.5, 1, 1.5, 2, 3, 4, 5, 6, 8];
-  const settings = [0.2, 1.0, 0.8, 0.6, 0.3, 0.4, 0.15, 0.1, 0.05];
-  const relEnd   = startTime + duration;
-
-  // Mix bus for all oscillators
-  const mix = ctx.createGain(); mix.gain.value = 1.0;
-
-  // Leslie tremolo: a separate gain node modulated by the LFO
-  const tremolo = ctx.createGain(); tremolo.gain.value = gain * 0.9;
-  const lfo     = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 5.6;
-  const lfoAmp  = ctx.createGain(); lfoAmp.gain.value = gain * 0.08; // tremolo depth
-  lfo.connect(lfoAmp); lfoAmp.connect(tremolo.gain);
-  lfo.start(startTime); lfo.stop(relEnd + 0.15);
-
-  drawbars.forEach((harmonic, i) => {
-    if (settings[i] < 0.04) return;
-    const osc = ctx.createOscillator(); osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq * harmonic, startTime);
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, startTime);
-    g.gain.linearRampToValueAtTime(settings[i] * 0.12, startTime + 0.012);
-    g.gain.setValueAtTime(settings[i] * 0.12, relEnd - 0.015);
-    g.gain.linearRampToValueAtTime(0.0001, relEnd + 0.06);
-    osc.connect(g); g.connect(mix);
-    osc.start(startTime); osc.stop(relEnd + 0.1);
-  });
-
-  mix.connect(tremolo);
-  tremolo.connect(progMasterBus || ctx.destination);
-  if (progReverbNode) tremolo.connect(progReverbNode);
-}
 
 // ── GUITAR - physical model approximation (Karplus-Strong) ──
-function makeGuitarNote(ctx, freq, startTime, duration, gain=0.28) {
-  const master = ctx.destination;
-  const sampleRate = ctx.sampleRate;
-  const delayLen  = Math.round(sampleRate / freq);
-  const durSamples = Math.round(sampleRate * (duration + 1.5));
-
-  // Create noise burst to excite the string
-  const exciteLen = Math.min(delayLen * 2, 512);
-  const buf = ctx.createBuffer(1, durSamples, sampleRate);
-  const data = buf.getChannelData(0);
-  // Seed the delay line with noise
-  for (let i = 0; i < exciteLen; i++) data[i] = (Math.random() * 2 - 1);
-  // Karplus-Strong: average adjacent samples with decay
-  // Guard: clamp lower index to 0 to avoid Float32Array[-1] → NaN propagation
-  const decay = Math.pow(0.5, 1.0 / (freq * (duration + 0.5)));
-  for (let i = delayLen; i < durSamples; i++) {
-    data[i] = decay * 0.5 * (data[i - delayLen] + data[Math.max(0, i - delayLen - 1)]);
-  }
-
-  const src = ctx.createBufferSource();
-  src.buffer = buf;
-  const g = ctx.createGain();
-  g.gain.setValueAtTime(0.0001, startTime);
-  g.gain.linearRampToValueAtTime(gain, startTime + 0.002);
-  // No long decay needed - Karplus-Strong already decays naturally
-  const lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=4800;
-  // Body resonance: +5dB peak at ~300 Hz (guitar body warmth)
-  const body = ctx.createBiquadFilter(); body.type='peaking';
-  body.frequency.value=300; body.Q.value=1.2; body.gain.value=5;
-  src.connect(lp); lp.connect(body); body.connect(g);
-  g.connect(progMasterBus || ctx.destination);
-  if (progReverbNode) g.connect(progReverbNode);
-  src.start(startTime); src.stop(startTime + duration + 1.5);
-}
 
 // ── PAD - warm detuned choral synth ──
-function makePadNote(ctx, freq, startTime, duration, gain=0.07) {
-  // 3 slightly detuned sawtooth oscillators for a warm choral pad
-  const detuneCents = [0, -7, +7];
-  const atk  = Math.min(0.45, duration * 0.25);
-  const rel  = Math.min(0.5, duration * 0.18);
-  const relEnd = startTime + duration;
-  const envG = ctx.createGain();
-  envG.gain.setValueAtTime(0.0001, startTime);
-  envG.gain.linearRampToValueAtTime(gain, startTime + atk);
-  envG.gain.setValueAtTime(gain, relEnd);
-  envG.gain.linearRampToValueAtTime(0.0001, relEnd + rel);
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'lowpass'; filter.frequency.value = 1800; filter.Q.value = 0.4;
-  detuneCents.forEach(d => {
-    const osc = ctx.createOscillator();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(freq * Math.pow(2, d/1200), startTime);
-    const g = ctx.createGain(); g.gain.value = 0.35;
-    osc.connect(g); g.connect(filter);
-    osc.start(startTime); osc.stop(relEnd + rel + 0.1);
-  });
-  filter.connect(envG);
-  envG.connect(progMasterBus || ctx.destination);
-  if (progReverbNode) envG.connect(progReverbNode);
-}
 
 // ── DRUMS / METRONOME ───────────────────────────
-let metronomeEnabled = false;
-let metronomeSound   = 'click'; // 'click' | 'kick+snare'
 
 function makeClickBeat(ctx, t, isDownbeat) {
   const osc = ctx.createOscillator();
@@ -8534,112 +8086,8 @@ function makeClickBeat(ctx, t, isDownbeat) {
   osc.start(t); osc.stop(t + 0.07);
 }
 
-function makeKickBeat(ctx, t) {
-  const osc = ctx.createOscillator();
-  const g   = ctx.createGain();
-  osc.type  = 'sine';
-  osc.frequency.setValueAtTime(180, t);
-  osc.frequency.exponentialRampToValueAtTime(50, t + 0.08);
-  g.gain.setValueAtTime(0.5, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-  osc.connect(g); g.connect(progMasterBus || ctx.destination);
-  osc.start(t); osc.stop(t + 0.2);
-}
-
-function makeSnareBeat(ctx, t) {
-  const sampleRate = ctx.sampleRate;
-  const buf = ctx.createBuffer(1, sampleRate * 0.15, sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-  const src = ctx.createBufferSource(); src.buffer=buf;
-  const hp  = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1500;
-  const g   = ctx.createGain();
-  g.gain.setValueAtTime(0.35, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t+0.14);
-  src.connect(hp); hp.connect(g); g.connect(progMasterBus || ctx.destination);
-  src.start(t); src.stop(t+0.16);
-}
-
-function makeHiHat(ctx, t, isOpen=false) {
-  const buf = ctx.createBuffer(1, ctx.sampleRate * (isOpen?0.18:0.06), ctx.sampleRate);
-  const d   = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-  const src = ctx.createBufferSource(); src.buffer=buf; src.loop=false;
-  const hp  = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=7000;
-  const g   = ctx.createGain();
-  g.gain.setValueAtTime(0.22, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t+(isOpen?0.17:0.05));
-  src.connect(hp); hp.connect(g); g.connect(progMasterBus || ctx.destination);
-  src.start(t); src.stop(t+(isOpen?0.19:0.07));
-}
-
-// Play drum beat for one measure (beats=time-sig beats, beatDur=seconds per beat)
-function playDrumMeasure(ctx, startT, beats, beatDur) {
-  const sound = metronomeSound;
-  for (let b = 0; b < beats; b++) {
-    const t = startT + b * beatDur;
-    if (sound === 'click') {
-      makeClickBeat(ctx, t, b === 0);
-    } else {
-      // kick+snare+hats pattern
-      if (b === 0 || b === 2) makeKickBeat(ctx, t);
-      if (b === 1 || b === 3) { makeSnareBeat(ctx, t); }
-      // 8th-note hi-hats
-      makeHiHat(ctx, t, false);
-      if (b < beats - 1) makeHiHat(ctx, t + beatDur/2, false);
-    }
-  }
-}
 
 // ── Play a chord: spread notes across octaves ──
-function playChordAt(ctx, pcs, startTime, duration, sound) {
-  if (!pcs || !pcs.length) return;
-  const uniquePcs = [...new Set(pcs.map(p=>((p%12)+12)%12))].sort((a,b)=>a-b);
-
-  // Choose octave start based on instrument register
-  // Guitar: E2-E5 range, start at octave -1 (C2 = MIDI 36)
-  // Piano/Organ/Pad: start at C3 (MIDI 48 = octave 0)
-  const startMidi = sound === 'guitar' ? 40 : 48; // E2 for guitar, C3 for others
-
-  function spreadOctaves(sortedPcs, baseMidi) {
-    const result = [];
-    let prevMidi = -Infinity;
-    let midi = baseMidi - 12; // start one octave below base
-    for (const pc of sortedPcs) {
-      let candidate = baseMidi + ((pc - baseMidi % 12 + 12) % 12);
-      while (candidate <= prevMidi) candidate += 12;
-      const maxMidi = 84;
-      if (candidate > maxMidi) candidate -= 12;
-      result.push({ pc, midi: candidate });
-      prevMidi = candidate;
-    }
-    return result;
-  }
-
-  const voiced = spreadOctaves(uniquePcs, startMidi);
-
-  const beatsForChord = Math.max(1, Math.round(duration * progGetBpm() / 60));
-  const strumHits = getStrumDurations(duration, beatsForChord);
-  const now = Tone.now();
-  strumHits.forEach(hit => {
-    const notesOrdered = hit.up ? [...voiced].reverse() : voiced;
-    notesOrdered.forEach((v, i) => {
-      const noteOff  = i * 0.008;
-      const noteDur  = Math.max(0.15, (duration - hit.offset) + 0.15);
-      const toneTime = now + (startTime + hit.offset + noteOff - ctx.currentTime);
-      if (samplerReady) sampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, toneTime);
-    });
-    // Bass note emphasis on beat 1: root an octave lower
-    if (hit.isFirst && voiced.length > 0) {
-      const rootMidi = voiced[0].midi - 12;
-      if (rootMidi >= 28) {
-        const bassDur  = Math.max(0.15, duration + 0.15);
-        const toneTime = now + (startTime + hit.offset - ctx.currentTime);
-        if (samplerReady) sampler.triggerAttackRelease(midiToNoteName(rootMidi), bassDur, toneTime);
-      }
-    }
-  });
-}
 
 function _arpIndex(s, n, pattern) {
   if (n <= 1) return 0;
@@ -8651,34 +8099,7 @@ function _arpIndex(s, n, pattern) {
   }
 }
 
-function _progScheduleArp(pcs, startAudioTime, totalDur, noteVal, beatDur, arpPattern) {
-  if (!pcs || !pcs.length || !samplerReady) return;
-  const stepDur = beatDur * 4 / noteVal;
-  const nSteps  = Math.max(1, Math.round(totalDur / stepDur));
-  const voiced  = spreadChordOctaves([...new Set(pcs.map(p=>((p%12)+12)%12))].sort((a,b)=>a-b));
-  const noteDur = Math.min(stepDur * 1.08, 2.5);
-  const now = Tone.now();
-  for (let s = 0; s < nSteps; s++) {
-    const v = voiced[_arpIndex(s, voiced.length, arpPattern || 'up')];
-    const toneT = now + (startAudioTime + s * stepDur - Tone.getContext().rawContext.currentTime);
-    sampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, toneT);
-  }
-}
 
-function _progScheduleFull(ctx, pcs, startAudioTime, totalDur, noteVal, beatDur) {
-  if (!pcs || !pcs.length || !samplerReady) return;
-  const stepDur = beatDur * 4 / noteVal;
-  const nSteps  = Math.max(1, Math.round(totalDur / stepDur));
-  const voiced  = spreadChordOctaves([...new Set(pcs.map(p=>((p%12)+12)%12))].sort((a,b)=>a-b));
-  const noteDur = Math.min(stepDur * 0.92, 2.5);
-  const now = Tone.now();
-  for (let s = 0; s < nSteps; s++) {
-    const toneT = now + (startAudioTime + s * stepDur - Tone.getContext().rawContext.currentTime);
-    voiced.forEach((v, i) => {
-      sampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, toneT + i * 0.008);
-    });
-  }
-}
 
 function _synthKick(actx, time, vel=1) {
   // Sub bass body
@@ -8790,370 +8211,9 @@ function _synthRide(actx, time, bell=false, vel=1) {
 }
 
 // ── Playback engine ────────────────────────────
-let progNodes = [];   // AudioScheduledSourceNodes created during playback
-let progGainNodes = []; // GainNodes for fade-out on stop
-let progStartTime = 0;
-let progTotalBeats = 0;
-let progReverbNode = null; // shared ConvolverNode for current play session
 let progSwing = 0;         // swing offset in %, 0 = straight, 50 = full swing
 let _wakeLock = null;
-let progMasterBus = null; // DynamicsCompressor — master limiter to prevent clipping
-
-// Build algorithmic reverb IR and return the ConvolverNode (the send point).
-// Wet gain is tracked so progStop() silences it immediately via gain fade.
-function createProgReverb(ctx) {
-  const sr  = ctx.sampleRate;
-  const len = Math.ceil(sr * 2.0);
-  const ir  = ctx.createBuffer(2, len, sr);
-  for (let ch = 0; ch < 2; ch++) {
-    const d = ir.getChannelData(ch);
-    for (let i = 0; i < len; i++) {
-      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
-    }
-  }
-  const conv = ctx.createConvolver();
-  conv.buffer = ir;
-  const wet = ctx.createGain();
-  wet.gain.value = 0.18;
-  conv.connect(wet);
-  wet.connect(progMasterBus || ctx.destination);
-  return conv;
-}
-
-function progGetBpm()   { const el = document.getElementById('prog-bpm');   return Math.max(40, Math.min(240, parseInt(el ? el.value : 0) || 90)); }
-function progGetBeats() { const el = document.getElementById('prog-beats'); return parseInt(el ? el.value : 0) || 4; }
-function progGetSound() { const el = document.getElementById('prog-sound'); return el ? el.value : 'piano'; }
-
-function progPlay() {
-  if (!progression.length) return;
-  progStop();
-  const myGen = _progPlayGen;   // progStop() bumped the counter; a later stop/play invalidates this run
-
-  // On mobile the AudioContext may still be suspended even after _unlockAudio.
-  // We must resume it and wait before scheduling any nodes.
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-  const doPlay = () => { try {
-    const bpm     = progGetBpm();
-    const sound   = progGetSound();
-    const beatDur = 60 / bpm;
-
-    const schedule = [];
-    let t = 0;
-    progression.forEach(ch => {
-      const beats    = ch.beats || progGetBeats();
-      const duration = beats * beatDur;
-      schedule.push({ t, duration });
-      t += duration;
-    });
-    const totalDur = t;
-
-    const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -18; comp.knee.value = 10;
-    comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.18;
-    comp.connect(ctx.destination);
-    progMasterBus = comp;
-
-    progReverbNode = createProgReverb(ctx);
-    _acquireWakeLock();
-    progStartTime  = ctx.currentTime + 0.1; // slightly larger offset for mobile
-    progPlaying    = true;
-    progCurrentIdx = 0;
-
-    const _pplay = document.getElementById('prog-play'); if (_pplay) _pplay.classList.add('playing');
-    const _pstop = document.getElementById('prog-stop'); if (_pstop) _pstop.disabled = false;
-
-  // ── scheduleIteration: schedule one full pass starting at audioT ──
-  // Collects all created nodes into progNodes/progGainNodes for stop().
-  // ── scheduleIteration ──
-  function scheduleIteration(audioT) {
-    const _origOsc  = ctx.createOscillator.bind(ctx);
-    const _origBuf  = ctx.createBufferSource.bind(ctx);
-    const _origGain = ctx.createGain.bind(ctx);
-    ctx.createOscillator  = () => { const n=_origOsc();  if (progPlaying) progNodes.push(n);     return n; };
-    ctx.createBufferSource= () => { const n=_origBuf();  if (progPlaying) progNodes.push(n);     return n; };
-    ctx.createGain        = () => { const n=_origGain(); if (progPlaying) progGainNodes.push(n); return n; };
-
-    try {
-      progression.forEach((ch, i) => {
-        const st = audioT + schedule[i].t;
-        const dur = schedule[i].duration;
-        if (ch.playMode === 'arp') {
-          _progScheduleArp(ch.pcs, st, dur, ch.noteVal || 4, beatDur, ch.arpPattern);
-        } else if ((ch.noteVal || 4) !== 4) {
-          _progScheduleFull(ctx, ch.pcs, st, dur, ch.noteVal, beatDur);
-        } else {
-          playChordAt(ctx, ch.pcs, st, dur, sound);
-        }
-        if (metronomeEnabled) {
-          const beats = ch.beats || progGetBeats();
-          playDrumMeasure(ctx, st, beats, beatDur);
-        }
-      });
-    } finally {
-      ctx.createOscillator   = _origOsc;
-      ctx.createBufferSource = _origBuf;
-      ctx.createGain         = _origGain;
-    }
-
-    return audioT + totalDur;
-  }
-
-  _ensureSamplerConnected();   // progStop() may have disconnected the shared sampler
-  let iterationEnd = scheduleIteration(progStartTime);
-  let nextLoopScheduled = false;
-
-  const playhead = document.getElementById('prog-playhead');
-
-  function tick() {
-    if (!progPlaying) return;
-    const now     = ctx.currentTime;
-    const elapsed = now - progStartTime;
-    const cycleElapsed = totalDur > 0 ? elapsed % totalDur : 0;
-
-    if (progLoop && !nextLoopScheduled && (iterationEnd - now) < 0.25) {
-      iterationEnd = scheduleIteration(iterationEnd);
-      nextLoopScheduled = true;
-      setTimeout(() => { if (progPlaying && myGen === _progPlayGen) nextLoopScheduled = false; }, 150);
-    }
-
-    if (!progLoop && elapsed >= totalDur) {
-      progStop(); return;
-    }
-
-    if (playhead) playhead.style.width = (Math.min(cycleElapsed / totalDur, 1) * 100) + '%';
-
-    let curIdx = schedule.length - 1;
-    for (let i = 0; i < schedule.length; i++) {
-      if (cycleElapsed < schedule[i].t + schedule[i].duration) { curIdx = i; break; }
-    }
-    if (curIdx !== progCurrentIdx) {
-      progCurrentIdx = curIdx;
-      document.querySelectorAll('.prog-slot').forEach((s, i) =>
-        s.classList.toggle('playing', i === progCurrentIdx));
-      document.querySelectorAll('.zoom-slot').forEach((s, i) =>
-        s.classList.toggle('playing', i === progCurrentIdx));
-    }
-
-    progScheduler = requestAnimationFrame(tick);
-  }
-
-  progScheduler = requestAnimationFrame(tick);
-  } catch(err) { alert('Audio error: ' + err.message); progStop(); }
-  }; // end doPlay
-
-  const startPlayback = () => setTimeout(() => { if (myGen === _progPlayGen) doPlay(); }, 200);
-  Tone.start().then(startPlayback).catch(startPlayback);
-}
-
-function progStop() {
-  progPlaying = false;
-  _progPlayGen++;   // invalidate any deferred start or queued loop iteration
-  try { progReverbNode?.disconnect(); } catch(e){}
-  progReverbNode = null;
-  try { progMasterBus?.disconnect(); } catch(e){}
-  progMasterBus = null;
-  // The progression schedules its whole pass up front via sampler.triggerAttackRelease().
-  // releaseAll() only releases sounding voices, not future-scheduled ones — so briefly
-  // disconnect the shared sampler to silence everything still queued. Reconnected on next play.
-  if (sampler) {
-    try { sampler.releaseAll(); } catch(e){}
-    if (!compIsPlaying) {
-      const _s = sampler;
-      setTimeout(() => { if (!compIsPlaying && !progPlaying) { try { _s.disconnect(); } catch(e){} } }, 60);
-    }
-  }
-  _releaseWakeLock();
-  if (progScheduler) { cancelAnimationFrame(progScheduler); progScheduler = null; }
-  progCurrentIdx = -1;
-  const _pp = document.getElementById('prog-play'); if (_pp) _pp.classList.remove('playing');
-  const _ps = document.getElementById('prog-stop'); if (_ps) _ps.disabled = true;
-  document.querySelectorAll('.prog-slot').forEach(s => s.classList.remove('playing'));
-  document.querySelectorAll('.zoom-slot').forEach(s => s.classList.remove('playing'));
-  const ph = document.getElementById('prog-playhead');
-  if (ph) ph.style.width = '0';
-  const zpb = document.getElementById('zoom-playhead-bar');
-  if (zpb) zpb.style.width = '0';
-  // Immediately silence all scheduled nodes via a fast gain fade, then stop them
-  const ctx = progAudioCtx;
-  if (!ctx) { progNodes = []; progGainNodes = []; return; }
-  const now = ctx.currentTime;
-  progGainNodes.forEach(g => {
-    try { g.gain.cancelScheduledValues(now); g.gain.setTargetAtTime(0, now, 0.015); } catch(e){}
-  });
-  const stopAt = now + 0.06;
-  const staleNodes = progNodes;
-  const staleGains = progGainNodes;
-  progNodes = [];
-  progGainNodes = [];
-  staleNodes.forEach(n => { try { n.stop(stopAt); } catch(e){} });
-  setTimeout(() => { staleNodes.length = 0; staleGains.length = 0; }, 70);
-}
-
-// ── Slots rendering ─────────────────────────────
-function renderProgSlots() {
-  const wrap  = document.getElementById('prog-slots');
-  if (!wrap) return;
-  const hint  = document.getElementById('prog-hint');
-  const playhead = wrap.querySelector('.prog-playhead') || (() => {
-    const ph = document.createElement('div'); ph.className='prog-playhead'; ph.id='prog-playhead';
-    return ph;
-  })();
-
-  // Clear except playhead
-  wrap.innerHTML = '';
-  wrap.appendChild(playhead);
-
-  if (!progression.length) {
-    const h = document.createElement('div');
-    h.className = 'prog-empty-hint'; h.id = 'prog-hint';
-    h.textContent = '← Hover a chord card and click + to add it here';
-    wrap.appendChild(h);
-    const _pb = document.getElementById('prog-play'); if (_pb) _pb.disabled = true;
-    return;
-  }
-
-  const _pb2 = document.getElementById('prog-play'); if (_pb2) _pb2.disabled = false;
-
-  progression.forEach((ch, i) => {
-    if (!ch.beats || ch.beats < 1 || isNaN(ch.beats)) ch.beats = progGetBeats();
-
-    const slot = document.createElement('div');
-    slot.className = 'prog-slot';
-    slot.draggable = true;
-    slot.dataset.idx = i;
-    const noteList = (ch.notes || []).join(' · ');
-    const isFirst = i === 0, isLast = i === progression.length - 1;
-    const slotMode = ch.playMode || 'full';
-    const slotNv   = ch.noteVal  || 4;
-    slot.innerHTML = `
-      <div class="prog-slot-name">${ch.name}<sup>${ch.sym}</sup></div>
-      <div class="prog-slot-roman">${ch.roman}</div>
-      <div class="prog-slot-notes">${noteList}</div>
-      <div class="prog-slot-beats-ctrl">
-        <button class="slot-beat-btn slot-beat-dec" title="Fewer beats">−</button>
-        <span class="prog-slot-beats">${ch.beats}b</span>
-        <button class="slot-beat-btn slot-beat-inc" title="More beats">+</button>
-      </div>
-      <div class="chord-ctrl-row" style="margin-top:3px">
-        <button class="chord-ctrl-btn${slotMode==='full'?' c-active':''}" data-sc="mode-full" title="Full chord">F</button>
-        <button class="chord-ctrl-btn${slotMode==='arp'?' c-arp':''}" data-sc="mode-arp" title="Arpeggio">A</button>
-      </div>
-      <select class="comp-nv-select" data-sc="nv" style="margin-top:2px;width:100%">
-        <option value="1"${slotNv===1?' selected':''}>Whole</option>
-        <option value="2"${slotNv===2?' selected':''}>Half</option>
-        <option value="4"${slotNv===4?' selected':''}>Quarter</option>
-        <option value="8"${slotNv===8?' selected':''}>Eighth</option>
-        <option value="16"${slotNv===16?' selected':''}>16th</option>
-      </select>
-      <select class="comp-nv-select comp-arp-select${slotMode!=='arp'?' comp-hidden':''}" data-sc="arp-pattern" style="margin-top:2px;width:100%">
-        <option value="up"${(ch.arpPattern||'up')==='up'?' selected':''}>↑ Up</option>
-        <option value="down"${ch.arpPattern==='down'?' selected':''}>↓ Down</option>
-        <option value="updown"${ch.arpPattern==='updown'?' selected':''}>↑↓ Up-Down</option>
-        <option value="downup"${ch.arpPattern==='downup'?' selected':''}>↓↑ Down-Up</option>
-      </select>
-      <div style="display:flex;gap:3px;margin-top:3px">
-        <button class="slot-beat-btn slot-move-left" title="Move left" ${isFirst?'disabled':''} style="opacity:${isFirst?.3:1}">◀</button>
-        <button class="slot-beat-btn slot-move-right" title="Move right" ${isLast?'disabled':''} style="opacity:${isLast?.3:1}">▶</button>
-      </div>
-      <div class="prog-slot-sub" title="Substitution ideas" data-idx="${i}">≈</div>
-      <div class="prog-slot-del" title="Remove">×</div>`;
-
-    slot.querySelector('.prog-slot-del').addEventListener('click', e => {
-      e.stopPropagation();
-      progression.splice(i, 1);
-      if (progPlaying) progStop();
-      renderProgSlots();
-    });
-
-    slot.querySelector('.prog-slot-sub').addEventListener('click', e => {
-      e.stopPropagation();
-      showSlotSubPopover(e.currentTarget, ch, i);
-    });
-
-    slot.querySelector('.slot-beat-dec').addEventListener('click', e => {
-      e.stopPropagation();
-      ch.beats = Math.max(1, (ch.beats || 4) - 1);
-      if (progPlaying) { progStop(); progPlay(); } else renderProgSlots();
-    });
-
-    slot.querySelector('.slot-beat-inc').addEventListener('click', e => {
-      e.stopPropagation();
-      ch.beats = Math.min(16, (ch.beats || 4) + 1);
-      if (progPlaying) { progStop(); progPlay(); } else renderProgSlots();
-    });
-
-    slot.querySelector('.slot-move-left').addEventListener('click', e => {
-      e.stopPropagation();
-      if (i === 0) return;
-      [progression[i-1], progression[i]] = [progression[i], progression[i-1]];
-      if (progPlaying) progStop();
-      renderProgSlots();
-    });
-
-    slot.querySelector('.slot-move-right').addEventListener('click', e => {
-      e.stopPropagation();
-      if (i === progression.length - 1) return;
-      [progression[i+1], progression[i]] = [progression[i], progression[i+1]];
-      if (progPlaying) progStop();
-      renderProgSlots();
-    });
-
-    slot.querySelectorAll('[data-sc]').forEach(btn => {
-      const evType = btn.tagName === 'SELECT' ? 'change' : 'click';
-      btn.addEventListener(evType, e => {
-        e.stopPropagation();
-        const sc = btn.dataset.sc;
-        if (sc === 'mode-full') {
-          ch.playMode = 'full';
-          slot.querySelectorAll('[data-sc^="mode"]').forEach(b => b.classList.remove('c-active','c-arp'));
-          slot.querySelector('[data-sc="mode-full"]').classList.add('c-active');
-          slot.querySelector('[data-sc="arp-pattern"]')?.classList.add('comp-hidden');
-          if (progPlaying) { progStop(); progPlay(); }
-        } else if (sc === 'mode-arp') {
-          ch.playMode = 'arp';
-          slot.querySelectorAll('[data-sc^="mode"]').forEach(b => b.classList.remove('c-active','c-arp'));
-          slot.querySelector('[data-sc="mode-arp"]').classList.add('c-arp');
-          slot.querySelector('[data-sc="arp-pattern"]')?.classList.remove('comp-hidden');
-          if (progPlaying) { progStop(); progPlay(); }
-        } else if (sc === 'nv') {
-          ch.noteVal = parseInt(btn.value);
-          if (progPlaying) { progStop(); progPlay(); }
-        } else if (sc === 'arp-pattern') {
-          ch.arpPattern = btn.value;
-          if (progPlaying) { progStop(); progPlay(); }
-        }
-      });
-    });
-
-    // Drag-to-reorder
-    slot.addEventListener('dragstart', e => {
-      progDragIdx = i;
-      slot.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    slot.addEventListener('dragend', () => {
-      slot.classList.remove('dragging');
-      document.querySelectorAll('.prog-slot').forEach(s => s.classList.remove('drag-over'));
-    });
-    slot.addEventListener('dragover', e => {
-      e.preventDefault();
-      slot.classList.add('drag-over');
-    });
-    slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
-    slot.addEventListener('drop', e => {
-      e.preventDefault();
-      slot.classList.remove('drag-over');
-      if (progDragIdx === null || progDragIdx === i) return;
-      const moved = progression.splice(progDragIdx, 1)[0];
-      progression.splice(i, 0, moved);
-      if (progPlaying) progStop();
-      renderProgSlots();
-    });
-
-    wrap.appendChild(slot);
-  });
-}
+let progMasterBus = null; // DynamicsCompressor - master limiter to prevent clipping
 
 // ── Add chord to active composition ────────────────────
 function addToProgression(name, sym, roman, notes, quality) {
@@ -9182,38 +8242,6 @@ function addToProgression(name, sym, roman, notes, quality) {
       compRenderList();
     }
   }
-}
-
-// ── Wire chord cards — no-op, add-to-prog now handled by + button on each card ─
-function wireChordCards() {}
-
-// ── Zoom view renderer ──────────────────────────
-function renderProgZoom() {
-  const wrap = document.getElementById('zoom-slots');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  if (!progression.length) {
-    wrap.innerHTML = '<div class="zoom-empty">Add chords from the main view first</div>';
-    return;
-  }
-  progression.forEach((ch, i) => {
-    const slot = document.createElement('div');
-    slot.className = 'zoom-slot';
-    slot.dataset.idx = i;
-    const notePills = (ch.notes || []).map(n => `<span class="zoom-note-pill">${n}</span>`).join('');
-    slot.innerHTML = `
-      <div class="zoom-slot-name">${ch.name}<sup>${ch.sym}</sup></div>
-      <div class="zoom-slot-roman">${ch.roman}</div>
-      <div class="zoom-slot-notes">${notePills}</div>
-      <div class="zoom-slot-del" title="Remove">×</div>`;
-    slot.querySelector('.zoom-slot-del').addEventListener('click', e => {
-      e.stopPropagation();
-      progression.splice(i, 1);
-      renderProgSlots();
-      renderProgZoom();
-    });
-    wrap.appendChild(slot);
-  });
 }
 
 // ── Preset progressions ─────────────────────────
@@ -9600,28 +8628,6 @@ const STRUM_PATTERNS = {
 
 let activeStrum = 'Straight';
 
-function renderStrumSelector() {
-  const container = document.getElementById('strum-patterns');
-  if (!container) return;
-  container.innerHTML = '';
-  Object.keys(STRUM_PATTERNS).forEach(name => {
-    const btn = document.createElement('button');
-    btn.className = 'strum-btn' + (name === activeStrum ? ' active' : '');
-    btn.textContent = name;
-    btn.onclick = () => {
-      activeStrum = name;
-      renderStrumSelector();
-      // Keep zoom strum panel in sync
-      const zc = document.getElementById('zoom-strum-patterns');
-      if (zc) {
-        zc.querySelectorAll('.strum-btn').forEach(b => b.classList.toggle('active', b.textContent === name));
-      }
-      if (progPlaying) { progStop(); progPlay(); }
-    };
-    container.appendChild(btn);
-  });
-  // (strum arrow visualisation removed)
-}
 
 const SWING_PRESETS = [
   { label: 'Straight', value: 0  },
@@ -9675,23 +8681,6 @@ const DRUM_PATTERNS = {
   ]},
 };
 
-function renderSwingSelector(containerId = 'swing-btns') {
-  const c = document.getElementById(containerId);
-  if (!c) return;
-  c.innerHTML = '';
-  SWING_PRESETS.forEach(({ label, value }) => {
-    const btn = document.createElement('button');
-    btn.className = 'strum-btn' + (progSwing === value ? ' active' : '');
-    btn.textContent = label;
-    btn.onclick = () => {
-      progSwing = value;
-      renderSwingSelector('swing-btns');
-      renderSwingSelector('zoom-swing-btns');
-      if (progPlaying) { progStop(); progPlay(); }
-    };
-    c.appendChild(btn);
-  });
-}
 
 function getStrumDurations(durationSecs, beatsPerChord) {
   const pat = STRUM_PATTERNS[activeStrum] || STRUM_PATTERNS['Straight'];
@@ -10055,8 +9044,6 @@ function renderSubstitutions(scaleNotes, scaleData) {
   html += `</div></div>`;
   container.innerHTML = html;
 }
-
-
 
 
 // ══════════════════════════════════════════════
@@ -10459,7 +9446,7 @@ function showSlotSubPopover(triggerEl, ch, slotIdx, onAdd) {
     const relSym  = isMaj ? 'm' : '';
     subs.push({
       arrow: `${relName}${relSym} (relative ${isMaj ? 'minor' : 'major'})`,
-      desc: `Diatonic swap — shares all notes with ${rootName}${sym}.`,
+      desc: `Diatonic swap - shares two of its three notes with ${rootName}${sym}.`,
       rootPc: relPc, rootName: relName, newSym: relSym, newQual: isMaj ? 'Minor' : 'Major',
     });
   }
@@ -10503,14 +9490,14 @@ function showSlotSubPopover(triggerEl, ch, slotIdx, onAdd) {
   let inner = `<div class="slot-sub-popover-title">Substitutions for ${_escHtml(rootName)}${_escHtml(sym)}</div>
     <button class="slot-sub-close" title="Close">×</button>`;
   subs.forEach(s => {
-    inner += `<div class="slot-sub-row" data-rootpc="${s.rootPc}" data-sym="${s.newSym}" data-qual="${encodeURIComponent(s.newQual)}" data-root="${s.rootName}">
-      <div class="slot-sub-arrow">${s.arrow}</div>
-      <div class="slot-sub-desc">${s.desc}</div>
+    inner += `<div class="slot-sub-row" data-rootpc="${s.rootPc}" data-sym="${_escHtml(s.newSym)}" data-qual="${encodeURIComponent(s.newQual)}" data-root="${_escHtml(s.rootName)}">
+      <div class="slot-sub-arrow">${_escHtml(s.arrow)}</div>
+      <div class="slot-sub-desc">${_escHtml(s.desc)}</div>
     </div>`;
   });
   pop.innerHTML = inner;
 
-  // Click sub rows → add to progression right after current slot
+  // Click sub rows → insert the substitution right after the current chord
   pop.querySelectorAll('.slot-sub-row').forEach(row => {
     row.addEventListener('click', e => {
       e.stopPropagation();
@@ -10536,12 +9523,7 @@ function showSlotSubPopover(triggerEl, ch, slotIdx, onAdd) {
       const newPcs = subChordPcs(rpc, rsym);
       const newNotes = newPcs.map(p => NOTES_FROM_PC[p]);
       const newChord = { name: rname, sym: rsym, roman: '?', notes: newNotes, pcs: newPcs, quality: rqual };
-      if (onAdd) {
-        onAdd(newChord);
-      } else {
-        progression.splice(slotIdx + 1, 0, { ...newChord, beats: progGetBeats() });
-        renderProgSlots();
-      }
+      onAdd(newChord);
       closeSubPopover();
     });
   });
@@ -10582,29 +9564,6 @@ function initCollapsibles() {
   });
 }
 
-// Open a section programmatically (e.g. when adding chord to builder)
-function openSection(bodyId) {
-  const body = document.getElementById(bodyId);
-  const hdr  = document.querySelector(`[data-target="${bodyId}"]`);
-  if (body)  body.classList.add('open');
-  if (hdr)   { hdr.classList.add('open'); hdr.setAttribute('aria-expanded', 'true'); }
-}
-
-// ══════════════════════════════════════════════
-// METRONOME TOGGLE
-// ══════════════════════════════════════════════
-document.getElementById('metro-toggle')?.addEventListener('click', function() {
-  metronomeEnabled = !metronomeEnabled;
-  this.classList.toggle('active', metronomeEnabled);
-  this.innerHTML = metronomeEnabled
-    ? '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/><rect x="4.3" y="1.8" width="1.4" height="4" rx=".7" fill="currentColor"/><rect x="4.3" y="1.8" width="1.4" height="2" rx=".7" fill="currentColor" transform="rotate(45 5 5)"/></svg> Metronome On'
-    : '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/><rect x="4.3" y="1.8" width="1.4" height="4" rx=".7" fill="currentColor"/><rect x="4.3" y="1.8" width="1.4" height="2" rx=".7" fill="currentColor" transform="rotate(45 5 5)"/></svg> Metronome Off';
-  const ms = document.getElementById('metro-sound'); if (ms) ms.style.display = metronomeEnabled ? '' : 'none';
-});
-
-document.getElementById('metro-sound')?.addEventListener('change', function() {
-  metronomeSound = this.value === 'drums' ? 'kick+snare' : 'click';
-});
 
 // ══════════════════════════════════════════════
 // EVENTS
@@ -10649,7 +9608,6 @@ document.getElementById('neg-harmony-toggle').addEventListener('change', functio
   render();
 });
 
-const KEY_NAMES = ['C','C♯/D♭','D','D♯/E♭','E','F','F♯/G♭','G','G♯/A♭','A','A♯/B♭','B'];
 
 document.getElementById('sel-key').addEventListener('change',e=>{state.key=e.target.value;render();});
 document.getElementById('sel-scale').addEventListener('change',e=>{state.scale=e.target.value;render();});
@@ -10730,7 +9688,6 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   document.getElementById('mandolin-sub-tabs').style.display=isMandolin2?'flex':'none';
   document.getElementById('banjo-sub-tabs').style.display   =isBanjo2   ?'flex':'none';
   renderView(scaleNotes,scaleData);
-  wireChordCards();
 });
 
 document.getElementById('guitar-sub-tabs').addEventListener('click',e=>{
@@ -10743,7 +9700,6 @@ document.getElementById('guitar-sub-tabs').addEventListener('click',e=>{
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   renderView(scaleNotes,scaleData);
-  wireChordCards();
 });
 
 document.getElementById('mandolin-sub-tabs').addEventListener('click',e=>{
@@ -10756,7 +9712,6 @@ document.getElementById('mandolin-sub-tabs').addEventListener('click',e=>{
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   renderView(scaleNotes,scaleData);
-  wireChordCards();
 });
 
 document.getElementById('banjo-sub-tabs').addEventListener('click',e=>{
@@ -10769,7 +9724,6 @@ document.getElementById('banjo-sub-tabs').addEventListener('click',e=>{
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   renderView(scaleNotes,scaleData);
-  wireChordCards();
 });
 
 // (Progression panel buttons removed — composition tool is unified)
@@ -10778,12 +9732,11 @@ const backTop=document.getElementById('back-top');
 window.addEventListener('scroll',()=>backTop.classList.toggle('visible',window.scrollY>300));
 backTop.addEventListener('click',()=>document.getElementById('page-top').scrollIntoView({behavior:'smooth'}));
 
-// ── Patch renderView to always wire cards ──
+// ── Patch renderView to rebuild the composition presets for the new key ──
 const _origRenderView = renderView;
 renderView = function(scaleNotes, scaleData) {
   _origRenderView(scaleNotes, scaleData);
   buildPresets(scaleNotes, scaleData);
-  requestAnimationFrame(wireChordCards);
 };
 // Rebuild comp presets whenever we have fresh scale data
 function rebuildCompPresets() {
@@ -10913,7 +9866,6 @@ render = function() {
 };
 
 render();
-renderProgSlots();
 initCollapsibles();
 
 // ── Intervals toggle (event delegation — survives hero re-renders) ──
@@ -11080,7 +10032,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-section">
       <div class="tech-section-title">Stack &amp; Platform</div>
       <div class="tech-row"><span class="tech-key">Language</span><span class="tech-val">Vanilla HTML5 / CSS3 / ES2022 JavaScript - zero build tools, zero frameworks</span></div>
-      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~12 500 lines); no server, no network requests at runtime beyond Tone.js CDN and piano samples</span></div>
+      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~14 000 lines); no server, no network requests at runtime beyond Tone.js CDN and piano samples</span></div>
       <div class="tech-row"><span class="tech-key">Fonts (CDN)</span><span class="tech-val"><span class="tech-chip">Playfair Display</span><span class="tech-chip">IBM Plex Mono</span><span class="tech-chip">Cormorant Garamond</span><span class="tech-chip">EB Garamond</span> via Google Fonts</span></div>
       <div class="tech-row"><span class="tech-key">No frameworks</span><span class="tech-val">No React, Vue, jQuery, D3 — all UI and SVG written from scratch. <span class="tech-chip">Tone.js 14.8.49</span> used for Salamander Grand Piano sample playback only.</span></div>
     </div>
@@ -11104,7 +10056,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Shape search</span><span class="tech-val">Exhaustive permutation search over 4-string sets [1-4, 2-5, 3-6]; span ≤6 frets; scored by span × 8 + fret position penalty</span></div>
       <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val">Drop 2: 2nd-from-top voice lowered an octave. Drop 3: 3rd-from-top lowered. Both follow jazzguitar.be standard across all 4 inversions × 3 string sets. No open strings. Inversion shown in slash notation (e.g. Gmaj7/B).</span></div>
       <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Generated inline via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordDiagram()</code>; pitch-class labels on fret dots. Modal is persistent (single DOM element reused across navigations); inner panel fades at 80 ms; prev/next chord names shown as context labels.</span></div>
-      <div class="tech-row"><span class="tech-key">Alt. Dom tab</span><span class="tech-val">Dedicated <em>Alt. Dom</em> sub-tab under Guitar showing altered dominant shapes for the V7 and secondary dominants of the current key. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">ALT_DOM_VOICINGS</code> constant (12 chord types, 27 shapes) + <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">computeVoicingFromTemplate(rootPc, template)</code> derives frets6/pcs6 from semitone-offset templates; enforces ascending pitch per string and hard span ≤ 4 frets. TOC chips + IntersectionObserver sticky header shows current category and tritone substitution. Reference: Dirk Laukens <em>Dominant Chords For Jazz Guitar</em>.</span></div>
+      <div class="tech-row"><span class="tech-key">Alt. Dom tab</span><span class="tech-val">Dedicated <em>Alt. Dom</em> sub-tab under Guitar showing altered dominant shapes for the V7 and secondary dominants of the current key. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">ALT_DOM_VOICINGS</code> constant (12 chord types, 27 shapes) + <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">computeVoicingFromTemplate(rootPc, template)</code> derives frets6/pcs6 from semitone-offset templates; enforces ascending pitch per string and hard span ≤ 4 frets. Each dominant gets its own section with its tritone substitution. Reference: Dirk Laukens <em>Dominant Chords For Jazz Guitar</em>.</span></div>
     </div>
 
     <div class="tech-section">
@@ -11150,14 +10102,14 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Piano samples</span><span class="tech-val">Salamander Grand Piano — real mp3 samples via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> (tonejs.github.io/audio/salamander/). Loads on page init. "⟳ loading…" indicator while pending.</span></div>
       <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val">nbrosowsky acoustic guitar — 36 real mp3 samples (nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/). Tone.js pitch-shifts between recorded notes. Loaded lazily when Guitar sound is selected.</span></div>
       <div class="tech-row"><span class="tech-key">Chord card playback</span><span class="tech-val">Strummed chord (notes staggered 8 ms) then ascending arpeggio at +1.2 s; all via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.triggerAttackRelease()</code>. Always piano regardless of composition sound setting.</span></div>
-      <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button inside the staff SVG (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code>); notes scheduled via sampler at 350 ms/note.</span></div>
+      <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button inside the staff SVG (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code>); notes queued one by one at 380 ms, pitches taken from the scale intervals; pause clears the queue and releases the sampler.</span></div>
       <div class="tech-row"><span class="tech-key">Composition player</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Transport</code>-based scheduling — enables accurate loop, stop, and live update. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_compPlayGen</code> counter cancels stale callbacks after stop. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compPendingRestart</code> flag triggers seamless loop restart when chords change during playback.</span></div>
       <div class="tech-row"><span class="tech-key">Note value / timing</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">stepDur = beatDur × 4 / noteVal</code>. Arp mode: fixed step interval at noteVal rate with swing offset on odd steps. Full mode: strum rate at noteVal, velocity from strum pattern (cycling).</span></div>
       <div class="tech-row"><span class="tech-key">Strum patterns</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">STRUM_PATTERNS</code> object — each pattern defines beat arrays with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{d, a, g}</code> flags (downstroke, accent, ghost). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations(dur, beats)</code> converts to hit objects with velocity (accent=1.0, normal=0.72, up=0.48, ghost=0.22).</span></div>
       <div class="tech-row"><span class="tech-key">Drums</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DRUM_PATTERNS</code> — 9 styles (Rock/Funk/Jazz/Bossa/Waltz/Ballad/Reggae/HiHat/Click), each with bpm+subdiv+beat arrays. Synthesised entirely via Web Audio API: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthKick</code> (sub+punch), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthSnare</code> (dual bandpass), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthHihat</code> (HP 8.5 kHz), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthRide</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthClap</code> (3 layered bursts). Auto mode maps strum pattern name to matching drum style.</span></div>
       <div class="tech-row"><span class="tech-key">Improv suggestions</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getImprovSuggestions(chord)</code> — quality-first regex matching against <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> output strings. No degree-based lookup — scale choice is determined by chord type (dom7→Mixolydian/Altered, Δ7→Ionian/Lydian, m7→Dorian, ø7→Locrian/Locrian♯2, etc.).</span></div>
       <div class="tech-row"><span class="tech-key">MusicXML import</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compImportMusicXML()</code> — imports a Guitar Pro / partwise MusicXML export into a composition with chords + <em>exact groove</em>. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseMusicXMLDoc()</code> walks measures via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DOMParser</code> (no library), tracking divisions/backup/forward for onset times. Each onset becomes a per-chord <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">rhythm:[{at,dur,vel,midis}]</code> capturing the <em>actual notes</em> played (preserving bass/chord alternation), played back by a dedicated branch in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">scheduleChords</code>. Duplicate TAB staff skipped; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">octave-change</code> transpose applied; consecutive identical chords merged. Percussion part parsed into an absolute-beat <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">drumTrack</code> (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseDrumTrack</code> → GP instrument names mapped to kick/snare/hat/ride synths). Multi-part exports (drums/solo/bass/comp) show a part chooser — <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_pickBestPartId()</code> defaults to the most chordal pitched part and excludes <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;unpitched&gt;</code> drum tracks. Chords from <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;harmony&gt;</code> labels used verbatim; otherwise detected per half-bar by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_matchChordFromPcs()</code> — a pool scorer (over <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildAllKeysChordPool()</code>) tolerant of omitted 5ths, so altered guitar voicings like G7♭9♭13 (no 5th) name correctly.</span></div>
-      <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> — assigns minimum octave keeping notes strictly ascending from C3.</span></div>
+      <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> - stacks the chord upward from its root in the C3 octave, so chord cards sound in root position.</span></div>
       <div class="tech-row"><span class="tech-key">iOS/PWA unlock</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.start()</code> on first user gesture; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.releaseAll()</code> on stop.</span></div>
     </div>
 
@@ -11170,13 +10122,13 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Scale relationships</span><span class="tech-val">Relative (shared pitch set, different root); Parallel (same root, ≥4 shared notes); Closely related (adjacent root, ≥n-1 shared); enharmonic names use PREFER_FLAT_PC set (Db/Eb/Ab/Bb)</span></div>
       <div class="tech-row"><span class="tech-key">Jazz impro hints</span><span class="tech-val">IMPRO_MAP quality→scale lookup on each 7th-chord card; clicking a scale pill navigates to that scale at the chord root via state update + render()</span></div>
       <div class="tech-row"><span class="tech-key">Theme</span><span class="tech-val">Dark mode only; CSS custom properties on <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">:root</code>; CoF SVG uses hardcoded dark-palette colours</span></div>
-      <div class="tech-row"><span class="tech-key">Responsive</span><span class="tech-val">Breakpoints at 1400 px / 900 px / 560 px; landscape-mobile at max-height: 500 px; zoom reset to 1 on ≤560 px; user-scalable=no viewport</span></div>
+      <div class="tech-row"><span class="tech-key">Responsive</span><span class="tech-val">Whole UI rendered at zoom 1.25 above 700 px, zoom 1 below; two-column layout from 1125 px; composition modal switches to its mobile layout at 600 px; landscape-mobile at max-height: 500 px; pinch-zoom allowed</span></div>
     </div>
 
     <div class="tech-section">
       <div class="tech-section-title">Jazz Resources Hub</div>
-      <div class="tech-row"><span class="tech-key">Content</span><span class="tech-val">Curated collection of jazz guitar resources across 6 categories: Jazz Licks &amp; Vocabulary, Chord Melody, Walking Bass, Improvisation Concepts, Comping, and general resource sites.</span></div>
-      <div class="tech-row"><span class="tech-key">Embed</span><span class="tech-val">Click any resource card to open it in an embedded iframe viewer within the app. Fallback to "open in new tab" if the page blocks framing (X-Frame-Options / CSP).</span></div>
+      <div class="tech-row"><span class="tech-key">Content</span><span class="tech-val">Curated collection of 38 jazz guitar resources across 9 categories: Jazz Licks &amp; Vocabulary, Bebop, Chord Melody, Walking Bass, Improvisation Concepts, Jazz Guitar Comping, Learning Jazz Standards, Bossa Nova, Gypsy Jazz. Reading status (Unread / In progress / Done) saved in localStorage.</span></div>
+      <div class="tech-row"><span class="tech-key">Links</span><span class="tech-val">Each resource card opens its page in a new tab (window.open with noopener).</span></div>
       <div class="tech-row"><span class="tech-key">Sources</span><span class="tech-val">Jens Larsen (jenslarsen.nl), Jazz Guitar BE (jazzguitar.be), Jazz Guitar Licks (jazzguitarlicks.com), Matt Warnock Guitar (mattwarnockguitar.com).</span></div>
     </div>
 
@@ -11420,12 +10372,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <li><a class="guide-toc-link" href="#g-views">Chord Views</a></li>
         <li><a class="guide-toc-link" href="#g-relationships">Scale Relationships</a></li>
         <li><a class="guide-toc-link" href="#g-cadences">Cadence Suggester</a></li>
-        <li><a class="guide-toc-link" href="#g-progression">Progression Builder</a></li>
         <li><a class="guide-toc-link" href="#g-composition">Composition &amp; Improvisation</a></li>
         <li><a class="guide-toc-link" href="#g-neg">Negative Harmony</a></li>
         <li><a class="guide-toc-link" href="#g-compare">Scale Comparison</a></li>
         <li><a class="guide-toc-link" href="#g-tips">Pro Tips</a></li>
-        <li><a class="guide-toc-link" href="#g-licks">Jazz Lick Library</a></li>
+        <li><a class="guide-toc-link" href="#g-licks">Jazz Resources</a></li>
         <li><a class="guide-toc-link" href="#g-sources">Sources &amp; References</a></li>
       </ol>
     </nav>
@@ -11441,11 +10392,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Overview</div>
         </div>
       </div>
-      <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar voicings, a circle of fifths, scale relationships, a cadence suggester, and a playable chord progression builder.</p>
-      <p class="guide-p">The tool covers <strong>35 scales</strong> across six families: Major Modes, Harmonic Minor, Melodic Minor, Exotic Scales (inc. Hirajoshi, Whole Tone, Arabian, Phrygian Bebop, Bebop Dominant), Pentatonic (Major, Minor, Blues) and Symmetric diminished (Half-Whole, Whole-Half). Every scale is presented in all 12 keys. Chord tones are always spelled with correct enharmonic names (e.g. B♭ not A♯ in F major). Where a diatonic Maj7 chord has a ♯11 available in the scale, a Δ7♯11 (Lydian chord) is shown as an alternative voicing.</p>
+      <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar, mandolin and banjo diagrams, a circle of fifths, scale relationships, a cadence suggester, and a composition tool that plays your progressions back.</p>
+      <p class="guide-p">The tool covers <strong>37 scales</strong> across seven families: Major Modes, Harmonic Minor, Melodic Minor, Bebop (Dominant, Major, Dorian, Phrygian), Pentatonic (Major, Minor, Blues), Symmetric (Half-Whole, Whole-Half) and Exotic (Neapolitan Minor, Hungarian Minor, Byzantine, Hirajoshi, Whole Tone, Arabian). Every scale is presented in all 12 keys. Notes are spelled the way a musician reads them: one letter per degree (B♭ not A♯ in F major), each note named after the degree it stands for in pentatonic and bebop scales (E major pentatonic is E F♯ G♯ B C♯), and the simpler of two enharmonic tonics (C♯ minor, not D♭ minor). Where a diatonic Maj7 chord has a ♯11 available in the scale, a Δ7♯11 (Lydian chord) is shown as an alternative voicing.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">💡</span>
-        <span class="guide-tip-text">The left column holds reference tools (CoF, scale relationships, cadences, progression builder). The right column always shows the chord view. Both scroll independently.</span>
+        <span class="guide-tip-text">The left column holds reference tools (circle of fifths, scale relationships, cadences, substitutions, pivot chords, ear training). The right column always shows the chord view.</span>
       </div>
     </section>
 
@@ -11460,12 +10411,12 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Choosing Key &amp; Scale</div>
         </div>
       </div>
-      <p class="guide-p">Use the two dropdowns at the top: <strong>Root Key</strong> (all 12 chromatic notes) and <strong>Scale / Mode</strong>. The scale list is grouped by family. Switching either selector instantly updates every panel.</p>
+      <p class="guide-p">Set the <strong>Root Key</strong> with the ▼ ▲ buttons (one semitone at a time) and pick the <strong>Scale / Mode</strong> from the list, grouped by family; type in the filter box to narrow it. Every panel updates instantly.</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Root Key</span>
         <span class="guide-kv-val">Sets the tonic of the scale. All note names and chord roots adjust automatically with correct spelling.</span>
         <span class="guide-kv-key">Scale / Mode</span>
-        <span class="guide-kv-val">Selects from 35 scales across 6 families. Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
+        <span class="guide-kv-val">Selects from 37 scales across 7 families. Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
@@ -11569,24 +10520,28 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Chord Views</div>
         </div>
       </div>
-      <p class="guide-p">Three tabs above the right panel switch the display mode for all chords:</p>
+      <p class="guide-p">Four tabs above the right panel switch the display mode for all chords:</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Chord List</span>
         <span class="guide-kv-val">Default view. Each degree shows one card with the chord symbol, quality, note names, and interval stack (e.g. 1 · ♭3 · 5 · ♭7).</span>
         <span class="guide-kv-key">Guitar</span>
-        <span class="guide-kv-val">Four sub-tabs for guitar-specific views:</span>
+        <span class="guide-kv-val">Seven sub-tabs for guitar-specific views:</span>
       </div>
       <div class="guide-kv" style="margin-left:18px">
         <span class="guide-kv-key">Basic</span>
-        <span class="guide-kv-val">SVG fretboard diagrams for each chord. The algorithm prioritises the <strong>root as bass note</strong> (lowest sounding pitch). Shapes requiring a barre are shown with a purple bar across the relevant strings and a small <strong>B</strong> marker. Gold dot = root, purple = other chord tones.</span>
+        <span class="guide-kv-val">A chord diagram for each chord. Triads and 7ths come in <strong>open position</strong> first, the way a guitarist learns them (C = x32010, G = 320003, E7 = 020100); a triad with no open shape takes the lowest barre shape (C♯m = x46654). The <strong>root is always the bass note</strong>. Shapes requiring a barre are shown with a purple bar across the relevant strings and a small <strong>B</strong> marker. Gold dot = root, purple = other chord tones.</span>
         <span class="guide-kv-key">Arpeggios</span>
-        <span class="guide-kv-val">Horizontal fretboard diagrams showing ascending arpeggio shapes for 7th chords across the CAGED system (E, A, D, G, C forms). Each shape covers a compact 5-fret window with the root on a specific string. Notes ascend in R–3–5–7 order. Only available in 7th chord modes.</span>
+        <span class="guide-kv-val">Horizontal fretboard diagrams showing ascending arpeggio shapes for 7th chords across the CAGED system (E, A, D, G, C forms). Each shape covers a compact window; the root the form is named after is circled in gold. Only available in 7th chord modes.</span>
+        <span class="guide-kv-key">Scale</span>
+        <span class="guide-kv-val">The whole scale on a 15-fret fretboard, then the five CAGED positions. A chord-tone overlay highlights the tones of any degree's chord; Notes / Degrees switches the labels.</span>
+        <span class="guide-kv-key">Shell</span>
+        <span class="guide-kv-val">Guide-tone voicings (root, 3rd, 7th) on adjacent and skipped string sets, the comping shapes of jazz guitar.</span>
         <span class="guide-kv-key">Drop 2</span>
         <span class="guide-kv-val">Jazz voicing: the 2nd-highest note of a close-position chord dropped one octave. Shows all 4 inversions × 3 string sets (E-A-D-G, A-D-G-B, D-G-B-e). No open strings. Inversion label shown as slash notation, e.g. <strong>Gmaj7/B</strong> for 1st inversion.</span>
         <span class="guide-kv-key">Drop 3</span>
         <span class="guide-kv-val">Jazz voicing: the 3rd-highest note dropped one octave. Wider, more open voicings on non-adjacent string sets. Same 4 inversions × 3 sets. Used in big-band arranging. Click any diagram to zoom.</span>
         <span class="guide-kv-key">Alt. Dom</span>
-        <span class="guide-kv-val">Altered dominant voicings for all dominant chords in the current key (V7, secondary dominants). Covers <strong>9 chord types</strong>: 7♭9, 7♯9, 7♯11, 7♭13, 7♭9♭13, 7♭5♭9, 7♭5♯9, 7♯5♭9, 7♯5♯9. Each shows up to 3 moveable shapes (E-str., A-str., D-str.) with the root on a different string. Shapes are compact (span ≤ 4 frets). A tritone-substitution note is shown for each root. Only appears when the scale contains dominant chords.</span>
+        <span class="guide-kv-val">Altered dominant voicings for all dominant chords in the current key (V7, secondary dominants). Covers <strong>12 chord types</strong>: 7♭9, 7♯9, 7sus4♭9, 13♭9, 13♯9, 7♯11, 7♭13, 7♭9♭13, 7♭5♭9, 7♭5♯9, 7♯5♭9, 7♯5♯9. Each shows up to 3 moveable shapes (E-str., A-str., D-str.) with the root on a different string. Shapes are compact (span ≤ 4 frets). A tritone-substitution note is shown for each root. Only appears when the scale contains dominant chords.</span>
       </div>
       <div class="guide-kv">
         <span class="guide-kv-key">Mandolin</span>
@@ -11622,7 +10577,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🖥️</span>
-        <span class="guide-tip-text"><strong>Two-column chord list:</strong> on screens ≥ 900 px wide, the Chord List view arranges degree sections in two columns for a more compact overview.</span>
+        <span class="guide-tip-text"><strong>Two-column chord list:</strong> on screens ≥ 1125 px wide, the Chord List view arranges degree sections in two columns for a more compact overview.</span>
       </div>
     </section>
 
@@ -11659,7 +10614,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Cadence Suggester</div>
         </div>
       </div>
-      <p class="guide-p">Seven common cadences pre-built from your scale's actual chords. The final (resolving) chord of each cadence is highlighted in gold. Click any chord chip to add it to the Progression Builder.</p>
+      <p class="guide-p">Seven common cadences pre-built from your scale's actual chords. The final (resolving) chord of each cadence is highlighted in gold. Click any chord chip to add it to the active composition (one is created if none is open).</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Perfect V–I</span><span class="guide-kv-val">Strongest closure in tonal music. Dominant to tonic.</span>
         <span class="guide-kv-key">Plagal IV–I</span><span class="guide-kv-val">The "Amen" cadence. Soft, hymnal, conclusive.</span>
@@ -11671,42 +10626,6 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
     </section>
 
-    <!-- 9. PROGRESSION BUILDER -->
-    <section class="guide-section" id="g-progression">
-      <div class="guide-section-hdr">
-        <div class="guide-section-icon">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="5" width="3" height="9" rx="1" fill="currentColor" opacity=".8"/><rect x="6" y="3" width="3" height="11" rx="1" fill="currentColor" opacity=".6"/><rect x="11" y="7" width="3" height="7" rx="1" fill="currentColor" opacity=".8"/><rect x="16" y="4" width="3" height="10" rx="1" fill="currentColor" opacity=".6"/></svg>
-        </div>
-        <div>
-          <div class="guide-section-num">09</div>
-          <div class="guide-section-title">Progression Builder</div>
-        </div>
-      </div>
-      <p class="guide-p">Build and play chord progressions with the Salamander Grand Piano sampler. The builder is collapsed by default and <strong>opens automatically</strong> the first time you add a chord.</p>
-      <div class="guide-kv">
-        <span class="guide-kv-key">Adding chords</span>
-        <span class="guide-kv-val">Hover any chord card and click the <strong>+</strong> button, or click any chord chip in the Cadence Suggester. Chords are added as slots to the strip.</span>
-        <span class="guide-kv-key">Reordering</span>
-        <span class="guide-kv-val">Drag slots left or right to reorder, or use the <strong>◀ ▶</strong> arrow buttons on each slot for one-step moves — useful on mobile where drag-and-drop is tricky.</span>
-        <span class="guide-kv-key">Per-chord duration</span>
-        <span class="guide-kv-val">Each slot has independent <strong>− / +</strong> controls to set how many beats that chord lasts (1–16). The global Beats/chord sets the default for new additions but you can override any slot independently.</span>
-        <span class="guide-kv-key">BPM</span>
-        <span class="guide-kv-val">Tempo from 40 to 240 BPM. Changes take effect at the next playback.</span>
-        <span class="guide-kv-key">Rhythm</span>
-        <span class="guide-kv-val">Six strum patterns (Straight, Folk, Rock, Ballad, Bossa, Waltz) shape the rhythmic feel within each chord — from simple block chords to syncopated arpeggiation. The pattern applies to all chords in the progression.</span>
-        <span class="guide-kv-key">Substitutions</span>
-        <span class="guide-kv-val">Each chord slot shows a <strong>≈</strong> button on hover. Clicking it opens a context-aware menu — sus chords, relative major/minor, tritone sub (for dom7), augmented and diminished alternatives, and half-step approach chords.</span>
-        <span class="guide-kv-key">Metronome</span>
-        <span class="guide-kv-val">Toggle a click track or kick+snare drum pattern alongside playback.</span>
-        <span class="guide-kv-key">Loop</span>
-        <span class="guide-kv-val">Cycle the progression indefinitely until you press Stop. The Loop button lights up gold when active.</span>
-        <span class="guide-kv-key">Presets</span>
-        <span class="guide-kv-val">Load classic progressions (I–IV–V–I, ii–V–I, etc.) instantly transposed to your current key.</span>
-        <span class="guide-kv-key">Expand</span>
-        <span class="guide-kv-val">The expand button opens a fullscreen overlay with larger chord slots, a progress bar, and all transport controls mirrored.</span>
-      </div>
-    </section>
-
     <!-- COMPOSITION & IMPROVISATION -->
     <section class="guide-section" id="g-composition">
       <div class="guide-section-hdr">
@@ -11714,7 +10633,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><ellipse cx="6" cy="14" rx="3" ry="2" transform="rotate(-15 6 14)"/><rect x="8.6" y="3.5" width="1.4" height="10" rx=".7"/><path d="M10 3.5 C13.5 4.5 15 8 12 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
         </div>
         <div>
-          <div class="guide-section-num" style="color:var(--accent2)">09b</div>
+          <div class="guide-section-num" style="color:var(--accent2)">09</div>
           <div class="guide-section-title">Composition &amp; Improvisation</div>
         </div>
       </div>
@@ -11722,12 +10641,18 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
       <p class="guide-p" style="margin-bottom:6px"><strong>Building a progression</strong></p>
       <div class="guide-kv">
+        <span class="guide-kv-key">From the cards</span>
+        <span class="guide-kv-val">Hover any chord card and click its <strong>+</strong>, or click a chord chip in the Cadence Suggester: the chord goes to the active composition, which opens (one is created if needed).</span>
         <span class="guide-kv-key">+ New</span>
         <span class="guide-kv-val">Creates a blank composition. Give it a title by clicking the name field.</span>
+        <span class="guide-kv-key">Presets</span>
+        <span class="guide-kv-val">I–V–vi–IV, I–IV–V, I–vi–IV–V, ii–V–I and others, built from the current key. A preset replaces the chords of the composition.</span>
         <span class="guide-kv-key">Search bar</span>
-        <span class="guide-kv-val">Type any chord name (e.g. "Cm7", "Fmaj7", "G7") to find and add chords. Results are filtered live.</span>
-        <span class="guide-kv-key">↙ Import</span>
-        <span class="guide-kv-val">Copies the current progression builder into the composition instantly.</span>
+        <span class="guide-kv-val">Type any chord name (e.g. "Cm7", "Fmaj7", "F#7b13") to find and add chords, in or out of the key.</span>
+        <span class="guide-kv-key">⇪ Share / ⇩ Import</span>
+        <span class="guide-kv-val">Share copies the composition as a text code; Import pastes one back, on this device or another.</span>
+        <span class="guide-kv-key">♫ MusicXML</span>
+        <span class="guide-kv-val">Imports a Guitar Pro or MusicXML export: chord symbols (or chords detected from the notes), the exact rhythm of the part, and its drum track.</span>
         <span class="guide-kv-key">◀ ▶</span>
         <span class="guide-kv-val">Reorder chords within the composition without stopping playback.</span>
         <span class="guide-kv-key">≈ Substitutions</span>
@@ -11743,7 +10668,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-key">Arp pattern</span>
         <span class="guide-kv-val">↑ Up · ↓ Down · ↑↓ Up-Down · ↓↑ Down-Up. Visible only in Arp mode.</span>
         <span class="guide-kv-key">− / +</span>
-        <span class="guide-kv-val">Beat count for this chord (1–16 beats).</span>
+        <span class="guide-kv-val">Beat count for this chord.</span>
       </div>
 
       <p class="guide-p" style="margin-bottom:6px"><strong>Global controls (All row)</strong></p>
@@ -11758,33 +10683,23 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="guide-kv">
         <span class="guide-kv-key">BPM</span><span class="guide-kv-val">40–240. Changes take effect at the next loop cycle.</span>
         <span class="guide-kv-key">Loop</span><span class="guide-kv-val">Cycles indefinitely. Adding, removing, or reordering chords during playback takes effect at the next cycle — no need to stop.</span>
-        <span class="guide-kv-key">Strum</span><span class="guide-kv-val">Rhythmic feel for the whole composition — Straight, Folk, Ballad, Pop, Jazz, Funk, Reggae, Bossa, Waltz…</span>
+        <span class="guide-kv-key">Strum</span><span class="guide-kv-val">Rhythmic feel for the whole composition: Straight, Folk, Rock, Ballad, Bossa, Waltz, Funk, Reggae.</span>
         <span class="guide-kv-key">Swing</span><span class="guide-kv-val">Straight / Light / Medium / Hard — delays off-beat notes to create swing or shuffle feel.</span>
-        <span class="guide-kv-key">Drums</span><span class="guide-kv-val">Synthesized drum pattern (Web Audio API). Style selector: Auto (matches strum pattern), Rock, Funk, Jazz, Bossa, Waltz, Ballad, Reggae, HiHat, Click.</span>
+        <span class="guide-kv-key">Drums</span><span class="guide-kv-val">Synthesized drum pattern (Web Audio API). Style selector: Auto (matches strum pattern), Rock, Funk, Jazz, Bossa, Waltz, Ballad, Reggae, Hi-hat, Click, plus Imported for a MusicXML drum track.</span>
         <span class="guide-kv-key">Sound</span><span class="guide-kv-val"><strong>Piano</strong> — Salamander Grand Piano samples. <strong>Guitar</strong> — real acoustic guitar samples (loads on first use).</span>
       </div>
 
-      <p class="guide-p" style="margin-bottom:6px"><strong>♪ Improvise — the overlay</strong></p>
-      <p class="guide-p">Open the Improvise view during playback to see the current chord in full-screen focus. This is designed for <em>playing along in real time</em>.</p>
+      <p class="guide-p" style="margin-bottom:6px"><strong>▶ Play tab</strong></p>
+      <p class="guide-p">The second tab of the composition tool is for <em>playing along in real time</em>. On a phone, turn it sideways for a full-width fretboard.</p>
       <div class="guide-kv">
-        <span class="guide-kv-key">Chord name</span><span class="guide-kv-val">Large chord symbol and Roman numeral highlight what's playing right now.</span>
-        <span class="guide-kv-key">Note bubbles</span><span class="guide-kv-val">All notes of the chord displayed as pills — use them as anchor tones when improvising.</span>
-        <span class="guide-kv-key">What to play</span><span class="guide-kv-val">Quality-based scale suggestions — determined by the chord type, not the key degree:<br>
-          <strong>Δ7</strong> → Ionian, Lydian, Major Pentatonic<br>
-          <strong>dom7</strong> → Mixolydian, Lydian Dominant (#11)<br>
-          <strong>dom7b9 / altered</strong> → Altered scale (b9 #9 #11 b13)<br>
-          <strong>m7</strong> → Dorian, Aeolian, Minor Pentatonic<br>
-          <strong>ø7</strong> → Locrian, Locrian ♯2<br>
-          <strong>dim7</strong> → Diminished (H-W) or (W-H)<br>
-          <strong>aug</strong> → Whole Tone, Lydian Augmented
-        </span>
-        <span class="guide-kv-key">Next chord</span><span class="guide-kv-val">Preview of the upcoming chord so you can prepare your line.</span>
-        <span class="guide-kv-key">Timeline</span><span class="guide-kv-val">Animated playhead showing your position within the loop. Segments proportional to chord beat counts.</span>
-        <span class="guide-kv-key">⏸ Pause</span><span class="guide-kv-val">Large circular button (top-right of overlay) — pause and resume without leaving the improv view. Touch-friendly on mobile.</span>
+        <span class="guide-kv-key">Current chord</span><span class="guide-kv-val">Large chord symbol, its notes as pills (anchor tones for a solo) and the next chord, so you can prepare the change.</span>
+        <span class="guide-kv-key">Play over it</span><span class="guide-kv-val">Scale suggestions chosen so every chord tone is in the scale (Δ7: Major, Lydian; dom7: Mixolydian, Lydian Dominant; m7: Dorian, Aeolian; ø7: Locrian, Locrian ♮2; dim7: Whole-Half...). Pick another root or scale from the two lists to override.</span>
+        <span class="guide-kv-key">Fretboard</span><span class="guide-kv-val">The chosen scale on the neck, chord root in red.</span>
+        <span class="guide-kv-key">Sequence</span><span class="guide-kv-val">Every chord of the composition: click one to jump there. <strong>⟳ loop</strong> repeats a chord; click another chord's loop to extend it into a phrase, click a looping chord to release it.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
-        <span class="guide-tip-text">Workflow: set up a ii–V–I loop, switch to Guitar sound, open Improvise, and use the scale suggestions to practise over each chord change in real time. The next-chord preview gives you one bar to prepare your phrase.</span>
+        <span class="guide-tip-text">Workflow: load the ii–V–I preset, switch Sound to Guitar, open the ▶ Play tab and practise each change with the suggested scale.</span>
       </div>
     </section>
 
@@ -11801,9 +10716,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <p class="guide-p">Popularised by Jacob Collier (from Ernst Levy's theory). Every note of a chord is <strong>mirrored</strong> around an axis between the tonic and its perfect fifth. The result inverts the harmonic polarity: major chords become minor, dominant 7ths become half-diminished.</p>
       <div class="guide-chord-ex">
-        <span class="guide-chord-pill">C maj → C min (neg)</span>
-        <span class="guide-chord-pill">G7 → Cø7 (neg)</span>
-        <span class="guide-chord-pill">Am → F (neg)</span>
+        <span class="guide-chord-pill">C → Cm (neg)</span>
+        <span class="guide-chord-pill">G7 → Dø7 (neg)</span>
+        <span class="guide-chord-pill">Am → E♭ (neg)</span>
       </div>
       <p class="guide-p">The axis is shown as a <strong style="color:#e05050">red dashed line</strong> on the Circle of Fifths, with arcs connecting mirrored pitch pairs. Only available in Ionian (Major) mode. When active, the Circle of Fifths shows only the mirror arcs (diatonic highlights are suppressed).</p>
       <div class="guide-kv">
@@ -11816,7 +10731,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🪞</span>
-        <span class="guide-tip-text">Use negative harmony to find unexpected chord substitutions — the negative of a ii–V–I in C major is a iii–II–I progression, giving a completely different colour with the same functional logic.</span>
+        <span class="guide-tip-text">Use negative harmony to find unexpected chord substitutions — the negative of ii–V–I in C (Dm7–G7–CΔ7) is Gm7–Dø7–A♭Δ7: the same pull toward C, in a darker colour.</span>
       </div>
     </section>
 
@@ -11845,11 +10760,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Pro Tips</div>
         </div>
       </div>
-      <div class="guide-tip"><span class="guide-tip-icon">🔁</span><span class="guide-tip-text"><strong>Modal interchange:</strong> stay in C Major but click a Dorian or Mixolydian scale chip from Scale Relationships - you can drag their chords into the Progression Builder to borrow modal colour.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">🔁</span><span class="guide-tip-text"><strong>Modal interchange:</strong> stay in C Major but click a Dorian or Mixolydian scale chip from Scale Relationships - add their chords to your composition with the + button to borrow modal colour.</span></div>
       <div class="guide-tip"><span class="guide-tip-icon">🎯</span><span class="guide-tip-text"><strong>Finding pivot chords:</strong> use Compare mode to put your current key and target key side by side - the SHARED chords are your pivot candidates for a smooth modulation.</span></div>
-      <div class="guide-tip"><span class="guide-tip-icon">🎷</span><span class="guide-tip-text"><strong>Jazz voicing workflow:</strong> switch to 7ths mode → use Drop 2 view to find voicings → add the chords to the builder → switch to Guitar Diagrams to check fingering.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">🎷</span><span class="guide-tip-text"><strong>Jazz voicing workflow:</strong> switch to 7ths mode → use the Drop 2 view to find voicings → add the chords to a composition → play it back with the Guitar sound.</span></div>
       <div class="guide-tip"><span class="guide-tip-icon">🌐</span><span class="guide-tip-text"><strong>Circle of Fifths navigation:</strong> hover adjacent segments to hear (visually) how close two chords are - gold + purple neighbours make the smoothest voice-leading moves.</span></div>
-      <div class="guide-tip"><span class="guide-tip-icon">⚡</span><span class="guide-tip-text"><strong>Quick progressions:</strong> click a Cadence Suggester row chord-by-chord to assemble a full cadence in the builder, then hit Play to audition it instantly.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">⚡</span><span class="guide-tip-text"><strong>Quick progressions:</strong> click a Cadence Suggester row chord by chord to assemble a full cadence in the active composition, then hit Play to audition it.</span></div>
     </section>
 
     <!-- JAZZ LICK LIBRARY -->
@@ -11860,31 +10775,19 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         </div>
         <div>
           <div class="guide-section-num" style="color:var(--gold)">13</div>
-          <div class="guide-section-title">Jazz Lick Library</div>
+          <div class="guide-section-title">Jazz Resources</div>
         </div>
       </div>
-      <p class="guide-p">The <strong>&#9835; Jazz Licks</strong> button (top-left in the header toolbar row) opens a slide-in side panel containing a curated library of 18 classic jazz guitar licks over common progressions.</p>
+      <p class="guide-p">The <strong>&#9835;</strong> button (top-right) opens <strong>Jazz Resources</strong>: 38 hand-picked lessons and articles from jazz guitar teachers, to go further than the app.</p>
       <div class="guide-kv">
-        <span class="guide-kv-key">Progressions</span>
-        <span class="guide-kv-val">Filter by progression type: ii-V-I (Major), ii-V-i (Minor), I-vi-ii-V (Turnaround), Blues, or show All.</span>
-        <span class="guide-kv-key">Difficulty</span>
-        <span class="guide-kv-val">Licks are grouped into three tiers: <strong>Beginner</strong> (essential jazz devices — enclosures, guide tones, octave displacement, double stops, classic motifs), <strong>Intermediate</strong> (bebop vocabulary), and <strong>Advanced</strong> (substitutions &amp; chromaticism). No straight arpeggios — every lick teaches a real melodic technique.</span>
-        <span class="guide-kv-key">Tab notation</span>
-        <span class="guide-kv-val">Each lick shows guitar tablature with colour-coded notes: <strong style="color:var(--gold)">gold = root notes</strong>, <strong style="color:#7090c0">blue = approach/chromatic tones</strong>, white = other chord tones.</span>
-        <span class="guide-kv-key">Chord bar</span>
-        <span class="guide-kv-val">Colour-coded progression bar above each tab: purple = m7, orange = dom7, gold = maj7, blue = half-dim, red = tritone sub.</span>
-        <span class="guide-kv-key">Play / Slow</span>
-        <span class="guide-kv-val">Hear each lick at written tempo or at 60% speed using the Salamander Grand Piano sampler. Notes are mapped from guitar tab positions to MIDI.</span>
-        <span class="guide-kv-key">Concept note</span>
-        <span class="guide-kv-val">A short theory explanation below each tab describing the harmonic idea behind the lick.</span>
-        <span class="guide-kv-key">Source links</span>
-        <span class="guide-kv-val">Each lick links to an external jazz guitar education site (jazzguitar.be, jazzadvice.com, learnjazzstandards.com, mattwarnockguitar.com, YouTube) for further study.</span>
-        <span class="guide-kv-key">Standalone</span>
-        <span class="guide-kv-val">Licks stay in their original key — they are <em>not</em> tied to the current scale/key selection. This is a reference library, not a transposing tool.</span>
-      </div>
-      <div class="guide-tip">
-        <span class="guide-tip-icon">🎸</span>
-        <span class="guide-tip-text">Close the panel with the <strong>✕</strong> button, by clicking the dimmed overlay, or by pressing <strong>Escape</strong>.</span>
+        <span class="guide-kv-key">Categories</span>
+        <span class="guide-kv-val">Jazz licks &amp; vocabulary, bebop, chord melody, walking bass, improvisation concepts, comping, learning jazz standards, bossa nova, gypsy jazz.</span>
+        <span class="guide-kv-key">Search</span>
+        <span class="guide-kv-val">Filters the list as you type.</span>
+        <span class="guide-kv-key">Reading status</span>
+        <span class="guide-kv-val">Mark each resource Unread, In progress or Done, and filter by status. Saved in this browser.</span>
+        <span class="guide-kv-key">Links</span>
+        <span class="guide-kv-val">Each card opens its page in a new tab.</span>
       </div>
     </section>
 
@@ -11997,14 +10900,10 @@ function unlockScroll() {
       // Only release the scroll lock when this handler actually closes one of its
       // own modals — otherwise it stomps the lock held by another open overlay.
       const guideEl = document.getElementById('guide-modal');
-      const _pzo = document.getElementById('prog-zoom-overlay');
-      const closedSomething = guideEl.classList.contains('open')
-        || techModal.classList.contains('open')
-        || (_pzo && _pzo.classList.contains('open'));
+      const closedSomething = guideEl.classList.contains('open') || techModal.classList.contains('open');
       if (!closedSomething) return;
       guideEl.classList.remove('open');
       techModal.classList.remove('open');
-      if (_pzo) _pzo.classList.remove('open');
       unlockScroll();
     }
   });
@@ -12081,23 +10980,58 @@ function _haDecodeComp(code) {
   const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-function compImportCode(code) {
-  let p;
-  try { p = _haDecodeComp(code); } catch (e) { return null; }
-  if (!p || !Array.isArray(p.chords)) return null;
-  const comp = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-    title: p.title || 'Imported',
-    text: p.text || '',
-    chords: p.chords,
-    bpm: p.bpm || 90,
+// A share code is written by someone else: keep only the fields the app reads,
+// with the types and ranges it expects, so nothing in it reaches innerHTML as markup
+// and no malformed chord can break the editor.
+function _clampNum(v, lo, hi, dflt) { const n = +v; return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : dflt; }
+function _shortStr(v, max) { return typeof v === 'string' ? v.slice(0, max) : ''; }
+function _sanitizeChord(ch) {
+  if (!ch || typeof ch !== 'object') return null;
+  const notes = Array.isArray(ch.notes) ? ch.notes.filter(n => noteNameToPc(n) >= 0).slice(0, 8) : [];
+  let pcs = Array.isArray(ch.pcs) ? ch.pcs.map(Number).filter(p => Number.isInteger(p) && p >= 0 && p < 12).slice(0, 12) : [];
+  if (!pcs.length) pcs = notes.map(noteNameToPc);
+  const name = noteNameToPc(ch.name) >= 0 ? ch.name : (notes[0] || '');
+  if (!name || !pcs.length) return null;
+  const out = {
+    name, sym: _shortStr(ch.sym, 24), roman: _shortStr(ch.roman, 24), notes, pcs,
+    quality: _shortStr(ch.quality, 60), beats: _clampNum(ch.beats, 0.25, 64, 4),
+    noteVal: [1, 2, 4, 8, 16].includes(+ch.noteVal) ? +ch.noteVal : 4,
+    playMode: ch.playMode === 'arp' ? 'arp' : 'full',
+    arpPattern: ['up', 'down', 'updown', 'downup'].includes(ch.arpPattern) ? ch.arpPattern : 'up',
+  };
+  if (ch.category) out.category = _shortStr(ch.category, 24);
+  if (Array.isArray(ch.rhythm)) out.rhythm = ch.rhythm.filter(h => h && typeof h === 'object').slice(0, 512).map(h => {
+    const r = { at: _clampNum(h.at, 0, 64, 0), dur: _clampNum(h.dur, 0.01, 64, 1), vel: _clampNum(h.vel, 0, 1, 0.7) };
+    if (Array.isArray(h.midis)) r.midis = h.midis.map(Number).filter(m => Number.isInteger(m) && m >= 0 && m < 128).slice(0, 12);
+    return r;
+  });
+  return out;
+}
+function _sanitizeComp(p) {
+  if (!p || typeof p !== 'object' || !Array.isArray(p.chords)) return null;
+  const word = (v, dflt) => typeof v === 'string' && /^[\w -]{1,24}$/.test(v) ? v : dflt;
+  return {
+    title: _shortStr(p.title, 120) || 'Imported',
+    text: _shortStr(p.text, 5000),
+    chords: p.chords.slice(0, 256).map(_sanitizeChord).filter(Boolean),
+    bpm: Math.round(_clampNum(p.bpm, 40, 240, 90)),
     loop: !!p.loop,
     drums: !!p.drums,
-    drumsStyle: p.drumsStyle || 'auto',
-    drumTrack: p.drumTrack || undefined,
-    sound: p.sound || 'piano',
-    strum: p.strum || 'Straight',
-    swing: p.swing ?? 0,
+    drumsStyle: word(p.drumsStyle, 'auto'),
+    drumTrack: Array.isArray(p.drumTrack) ? p.drumTrack.filter(h => h && /^[a-z]{2,12}$/.test(h.type)).slice(0, 8192)
+      .map(h => ({ at: _clampNum(h.at, 0, 100000, 0), type: h.type, vel: _clampNum(h.vel, 0, 1, 0.7) })) : undefined,
+    sound: p.sound === 'guitar' ? 'guitar' : 'piano',
+    strum: Object.hasOwn(STRUM_PATTERNS, p.strum) ? p.strum : 'Straight',
+    swing: _clampNum(p.swing, 0, 100, 0),
+  };
+}
+function compImportCode(code) {
+  let p;
+  try { p = _sanitizeComp(_haDecodeComp(code)); } catch (e) { return null; }
+  if (!p) return null;
+  const comp = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+    ...p,
     createdAt: Date.now(),
   };
   const comps = compLoad();
@@ -13099,7 +12033,7 @@ function compMobRenderStrip(comp) {
     card.className = 'mob-sc' + (inLoop ? ' loop-one' : '');
     card.dataset.idx = i;
     card.innerHTML = `<div class="mob-sc-name">${_escHtml(name)}</div>
-      <div class="mob-sc-beats">${ch.beats || 4}b</div>
+      <div class="mob-sc-beats">${_escHtml(ch.beats || 4)}b</div>
       <button class="mob-sc-loop" title="Loop this chord. Click another chord's loop to extend the loop into a phrase; click a looping chord to release and play on.">⟳ loop</button>`;
     card.addEventListener('click', () => { compMobSetTab('play'); compStartPlayback(compActiveId, i); });
     card.querySelector('.mob-sc-loop').addEventListener('click', e => {
@@ -13266,7 +12200,7 @@ function compRenderDetail(comp) {
       <button class="comp-stop-btn" disabled>
         <svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="1" width="6" height="6" rx=".5" fill="currentColor"/></svg>Stop
       </button>
-      <input class="comp-bpm-input" type="number" min="40" max="240" value="${comp.bpm || 90}">
+      <input class="comp-bpm-input" type="number" min="40" max="240" value="${_escHtml(comp.bpm || 90)}">
       <span style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace">BPM</span>
       <button class="comp-loop-btn${comp.loop?' active':''}" title="Loop playback">
         <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 3.5Q1 1 4 1h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M7 0l2 1.5L7 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11 6.5Q11 9 8 9H3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M5 10.5l-2-1.5 2-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
@@ -13608,7 +12542,7 @@ function compRenderChordRow(comp) {
     card.className = 'comp-chord-card';
     const mode  = ch.playMode   || 'full';
     const nv    = ch.noteVal    || 4;
-    const beats = ch.beats      || 4;
+    const beats = _clampNum(ch.beats, 0.25, 64, 4);
     const ap    = ch.arpPattern || 'up';
     const noteList = (ch.pcs || []).map(p => pcToName(((p % 12) + 12) % 12)).join(' · ');
     const nvLabels  = {1:'Whole',2:'Half',4:'Quarter',8:'Eighth',16:'16th'};
@@ -13965,7 +12899,7 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
     // Route the drum synths through the same compressor/limiter as the chords
     // so the combined peak is what gets tamed, not just the piano on its own.
     progMasterBus = ensureCompMasterBus();
-    _ensureSamplerConnected();   // a prior progStop() may have disconnected the shared sampler
+    _ensureSamplerConnected();   // a prior stop may have disconnected the shared sampler
 
     const bpm     = comp.bpm || 90;
     const beatDur = 60 / bpm;
@@ -13978,7 +12912,8 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
       srcComp.chords.forEach((ch, chordIdx) => {
         const chDur  = (ch.beats || 4) * beatDur;
         const pcs    = ch.pcs || [];
-        const voiced = spreadChordOctaves([...new Set(pcs.map(p=>((p%12)+12)%12))].sort((a,b)=>a-b));
+        // Chord order (root first), not pitch-class order, so the chord sounds in root position.
+        const voiced = spreadChordOctaves([...new Set(pcs.map(p=>((p%12)+12)%12))]);
 
         // Schedule chord highlight + improv overlay update
         Tone.Transport.schedule(time => {
@@ -14356,8 +13291,8 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     Tone.getContext().rawContext.resume().catch(() => {});
     Tone.start().catch(() => {});
-    if (progPlaying || compIsPlaying) _acquireWakeLock();
-  } else if (!progPlaying && !compIsPlaying) {
+    if (compIsPlaying) _acquireWakeLock();
+  } else if (!compIsPlaying) {
     // Only suspend when idle — suspending mid-playback freezes the clock and cuts audio.
     Tone.getContext().rawContext.suspend().catch(() => {});
   }

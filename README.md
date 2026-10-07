@@ -114,7 +114,7 @@ alien tone, no wrong-way stretch, nothing clipped off the diagram, none out of r
 Features:
 - **Search bar** — instant filtering with match highlighting across titles, descriptions, tags, and site names
 - **Category TOC** — icon pills with resource counts, click to filter by category
-- **Embedded viewer** — click a card to open the article in an iframe; graceful fallback with "Open in new tab" when the site blocks framing
+- **Reading status** — mark each resource Unread / In progress / Done (saved in `localStorage`); cards open the article in a new tab
 - **Domain badges** — each card shows source site and domain
 
 ### Composition tool (purple ♩ button, top-right)
@@ -122,8 +122,11 @@ Features:
 Draft and save multi-chord compositions with full playback and improvisation support:
 
 - **+ New** — creates a new composition (stored in `localStorage`)
-- **↙ Import progression** — copies the current scale's diatonic chords into the composition
+- **+** on any chord card, or a Cadence Suggester chip, adds that chord to the active composition
+- **Presets** (I–V–vi–IV, ii–V–I...) built from the current key; a preset replaces the chords
 - Chord search bar — type to find any chord and add it
+- **⇪ Share / ⇩ Import** — a composition as a text code, to move it to another device
+- **♫ MusicXML** — import a Guitar Pro / MusicXML export (chords + exact groove + drum track)
 
 **Per-chord controls:**
 - **F / A** toggle — Full (strummed) or Arpeggio mode
@@ -140,7 +143,7 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 **Playback:**
 - **Play / Stop** — Transport-based playback (supports reliable loop + live updates)
 - **BPM** input, **Loop** toggle
-- **Strum** pattern selector (Straight / Folk / Ballad / Pop / Jazz / etc.)
+- **Strum** pattern selector (Straight / Folk / Rock / Ballad / Bossa / Waltz / Funk / Reggae)
 - **Swing** selector (Straight / Light / Medium / Hard)
 - **Drums** toggle + style selector (Auto / Rock / Funk / Jazz / Bossa / Waltz / Ballad / Reggae / HiHat / Click) — synthesized kick, snare, hi-hat, ride, clap via Web Audio API; Auto maps strum pattern to a matching drum style
 - **Sound** selector — Piano (Salamander Grand) or Guitar (real acoustic guitar samples, nbrosowsky)
@@ -148,19 +151,12 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 
 **Compact view** toggle — collapses all cards to chord name + degree only; individual cards expand on tap.
 
-**♪ Improvise button** — opens the improvisation overlay:
-- Large chord name + Roman numeral
-- All chord tones shown as note bubbles
-- **Scale suggestions** — quality-based, musically correct recommendations:
-  - Maj7 / Δ7 → Ionian, Lydian, Major Pentatonic
-  - Dom7 / 9 / altered → Mixolydian, Altered, Lydian Dominant, Blues
-  - Min7 → Dorian, Aeolian, Minor Pentatonic, Phrygian
-  - Half-dim / ø7 → Locrian, Locrian ♯2
-  - Dim7 → Diminished (H-W), Diminished (W-H)
-  - Aug → Whole Tone, Lydian Augmented
-- **Next chord** preview
-- **Timeline bar** with animated playhead showing position in the loop
-- **⏸ Pause / Resume** button — pauses/resumes playback without leaving the overlay
+**▶ Play tab** — for playing along in real time:
+- Large chord name, its notes as pills, and the next chord
+- **Play over it** — scale suggestions that contain every chord tone (Δ7 → Major, Lydian; dom7 → Mixolydian, Lydian Dominant; m7 → Dorian, Aeolian; ø7 → Locrian, Locrian ♮2...), with root / scale lists to override
+- Fretboard of the chosen scale
+- **Sequence** strip — click a chord to jump to it; **⟳ loop** repeats a chord or a span of chords
+- Full-width fretboard when a phone is turned sideways
 
 ---
 
@@ -182,13 +178,12 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 
 ```
 harmonic-atlas/
-├── index.html          ← The entire app (HTML + CSS + JS, ~10 000 lines)
+├── index.html          ← The entire app (HTML + CSS + JS, ~14 000 lines)
 ├── manifest.json       ← PWA config (name, icon, theme)
 ├── sw.js               ← Service worker (network-first HTML, cache-first own assets,
 │                          stale-while-revalidate for Tone.js and the audio samples)
 ├── dev-server.js       ← Local dev server with live-reload
 ├── start.bat           ← Windows launcher (double-click)
-├── start.sh            ← Mac/Linux launcher
 └── icons/
     ├── icon-192.png
     ├── icon-512.png
