@@ -6,6 +6,7 @@ const RUNTIME = 'harmonic-atlas-runtime';           // third-party audio, surviv
 
 const ASSETS = ['./index.html', './manifest.json',
   './icons/icon-192.png','./icons/icon-512.png',
+  './icons/icon-maskable-192.png','./icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png','./icons/favicon-32.png'];
 
 // Cross-origin hosts worth keeping offline: Tone.js itself, the Salamander piano
@@ -45,15 +46,25 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
 
-  // HTML: network-first so a deploy is picked up immediately.
+  // HTML: network-first so a deploy is picked up immediately, but on a weak
+  // connection (a rehearsal room) the cached app answers after 3 s instead of
+  // the launch hanging until the network gives up. The fetch keeps going and
+  // refreshes the cache for next time.
   if (req.mode === 'navigate') {
-    e.respondWith(
-      fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(req, copy));
-        return res;
-      }).catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
-    );
+    const network = fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(req, copy));
+      return res;
+    });
+    const cached = () => caches.match(req).then(r => r || caches.match('./index.html'));
+    e.respondWith(new Promise(resolve => {
+      let done = false;
+      const finish = r => { if (!done && r) { done = true; resolve(r); } };
+      const timer = setTimeout(() => cached().then(finish), 3000);
+      network.then(r => { clearTimeout(timer); finish(r); })
+             .catch(() => { clearTimeout(timer); cached().then(r => r ? finish(r) : finish(Response.error())); });
+    }));
+    e.waitUntil(network.catch(() => {}));
     return;
   }
 

@@ -1,8 +1,9 @@
 // ══════════════════════════════════════════════════════════════
 // Harmonic Atlas — Live-reload dev server
-// Usage: node dev-server.js
+// Usage: node dev-server.js          (this PC only)
+//        node dev-server.js --lan    (also reachable from a phone on the same WiFi)
 // Then open: http://localhost:3000  (PC)
-//       or:  http://YOUR_LOCAL_IP:3000  (phone on same WiFi)
+//       or:  http://YOUR_LOCAL_IP:3000  (phone, with --lan)
 // ══════════════════════════════════════════════════════════════
 
 const http = require('http');
@@ -12,6 +13,7 @@ const os   = require('os');
 
 const PORT = 3000;
 const DIR  = __dirname;
+const LAN  = process.argv.includes('--lan');
 
 // ── MIME types ──
 const MIME = {
@@ -29,6 +31,7 @@ let sseClients = [];
 // ── Watch all files in this folder and sub-folders ──
 function watchDir(dir) {
   fs.readdirSync(dir).forEach(f => {
+    if (f === '.git' || f === 'node_modules') return;
     const full = path.join(dir, f);
     if (fs.statSync(full).isDirectory()) { watchDir(full); return; }
     fs.watch(full, () => {
@@ -57,13 +60,16 @@ const server = http.createServer((req, res) => {
   }
 
   // Serve files
-  let filePath = path.join(DIR, req.url === '/' ? 'index.html' : req.url);
-  // Strip query strings
-  filePath = filePath.split('?')[0];
+  // Strip the query string, decode, and refuse anything that resolves outside the
+  // project folder (GET /../../.ssh/id_rsa used to be served to the whole LAN).
+  let urlPath;
+  try { urlPath = decodeURIComponent(req.url.split('?')[0]); } catch (e) { res.writeHead(400); res.end(); return; }
+  const filePath = path.resolve(DIR, '.' + (urlPath === '/' ? '/index.html' : urlPath));
+  if (filePath !== DIR && !filePath.startsWith(DIR + path.sep)) { res.writeHead(403); res.end('Forbidden'); return; }
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      res.writeHead(404); res.end('Not found: ' + req.url); return;
+      res.writeHead(404); res.end('Not found'); return;
     }
     const ext  = path.extname(filePath);
     const mime = MIME[ext] || 'application/octet-stream';
@@ -88,7 +94,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, LAN ? '0.0.0.0' : '127.0.0.1', () => {
   // Find local IP for phone access
   const nets = os.networkInterfaces();
   let localIp = 'YOUR_LOCAL_IP';
@@ -100,7 +106,7 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log('║   🎵  Harmonic Atlas — Dev Server         ║');
   console.log('╠══════════════════════════════════════════╣');
   console.log(`║  PC:    http://localhost:${PORT}              ║`);
-  console.log(`║  Phone: http://${localIp}:${PORT}      ║`);
+  console.log(LAN ? `║  Phone: http://${localIp}:${PORT}      ║` : '║  Phone: restart with --lan               ║');
   console.log('╠══════════════════════════════════════════╣');
   console.log('║  Watching files… save to auto-reload      ║');
   console.log('║  Ctrl+C to stop                           ║');

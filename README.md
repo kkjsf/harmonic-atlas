@@ -99,12 +99,12 @@ alien tone, no wrong-way stretch, nothing clipped off the diagram, none out of r
 
 ### Jazz Resources Hub (♫ button, header)
 
-38 curated links across 9 categories, sourced from Jens Larsen, Jazz Guitar BE, Jazz Guitar Licks, and Matt Warnock Guitar:
+37 curated links across 9 categories, sourced from Jens Larsen, Jazz Guitar BE, Jazz Guitar Licks, and Matt Warnock Guitar:
 
 - **Jazz Licks & Vocabulary** (4) — enclosures, chromatic approaches, arpeggios
 - **Bebop** (7) — bebop scales (dominant, major, minor/Dorian), classic licks, Charlie Parker vocabulary
 - **Chord Melody** (3) — arranging melody and harmony simultaneously
-- **Walking Bass** (5) — bass lines with chord voicings, Joe Pass style
+- **Walking Bass** (4) — bass lines with chord voicings, Joe Pass style
 - **Improvisation Concepts** (3) — phrasing, target notes, jazz blues
 - **Jazz Guitar Comping** (3) — voicings and rhythmic patterns
 - **Learning Jazz Standards** (5) — memorization methods, repertoire guides, tune breakdowns

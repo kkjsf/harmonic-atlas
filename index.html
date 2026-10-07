@@ -6,11 +6,17 @@
 <meta name="description" content="Interactive music theory reference: scales, chords, guitar, mandolin and banjo voicings, negative harmony, and a composition tool with playback.">
 <title>Harmonic Atlas - Scale Chord Explorer</title>
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" id="meta-theme-color" content="#12101c">
+<meta name="theme-color" content="#0b0d0f">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+<!-- Fonts load without blocking the first paint (the page shows in its fallback
+     faces, then swaps). Weights match what the CSS uses: Playfair 700 italic and
+     Plex Mono 600/700 were used but never requested, so they were faked. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:wght@400;600&display=swap"></noscript>
+<script defer src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -176,7 +182,7 @@
     opacity: .88;
   }
   .scale-hero-desc-inline { display: none; }
-  @media(max-width:700px) {
+  @media(max-width:875px) {   /* 700 effective px under the 1.25 zoom */
     .scale-hero-body { flex-direction: column; gap: 16px; }
     .scale-hero-right { display: none; }
     .scale-hero-desc-inline { display: block; margin-bottom: 10px; }
@@ -1767,7 +1773,7 @@
   #mob-fret-wrap svg { display:block; }
 
   /* ══ Desktop tab system ══ */
-  @media (min-width:601px) {
+  @media (min-width:751px) {
     /* Tab bar visible on desktop as top navigation */
     #comp-mob-tabbar {
       display:flex; flex-shrink:0; border-bottom:1px solid var(--border2);
@@ -1812,7 +1818,7 @@
     #comp-modal.mob-tab-play #mob-loop-btn { display:flex !important; }
   }
 
-  @media (max-width:600px) {
+  @media (max-width:750px) {
     #comp-mob-tabbar { display:flex; }
     #comp-layout { display:flex !important; flex-direction:column; overflow:hidden; }
     #comp-detail-panel { padding:10px 12px; gap:8px; }
@@ -1881,12 +1887,78 @@
     white-space:nowrap;
   }
   .comp-style-toggle.open { border-color:var(--accent2); color:var(--accent2); }
-  @media (max-width:600px) {
+  @media (max-width:750px) {
     #comp-transport { display:none !important; }
     #comp-style-panel { display:none !important; }
   }
-  @media (min-width:601px) {
+  @media (min-width:751px) {
     #comp-settings-section { display:none !important; }
+  }
+
+  /* ══════════════════════════════════════
+     v77 INTERFACE FIXES
+  ══════════════════════════════════════ */
+  :root { color-scheme: dark; }   /* native scrollbars, spinners and selects in dark */
+
+  /* The music starts higher: a tighter header and control panel. */
+  header { padding: 26px 0 18px; margin-bottom: 20px; }
+  .controls { padding: 20px; margin-bottom: 18px; }
+
+  /* Below the two-column width the chord views come first and the circle of
+     fifths and the side tools after them (the first chord sat 2.6 screens down
+     on a phone). */
+  @media (max-width: 1124px) {
+    .main-layout { display: flex; flex-direction: column; }
+    .main-layout > .right-panel { order: -1; }
+  }
+
+  /* A chord alone in its degree takes the whole width: the second column only
+     ever held the occasional alt voicing, and the card overflowed by up to 102 px. */
+  .chords-grid > :only-child { grid-column: 1 / -1; }
+  .impro-pill { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
+
+  /* Keyboard focus shows the card buttons (they only appeared on hover), and so
+     does a touch screen, which has no hover at all. */
+  .chord-card:focus-within .chord-play-btn,
+  .chord-card:focus-within .chord-arp-btn,
+  .chord-card:focus-within .chord-add-btn,
+  .neg-card:focus-within .chord-play-btn,
+  .neg-card:focus-within .chord-arp-btn,
+  .neg-card:focus-within .chord-add-btn { opacity: 1; }
+  @media (hover: none) {
+    .chord-play-btn, .chord-arp-btn, .chord-add-btn { opacity: 1; }
+  }
+
+  /* A closed panel leaves the tab order too (its chips and selects were still
+     reachable with Tab while invisible). */
+  .collapsible-body { visibility: hidden; transition: max-height .28s cubic-bezier(.4,0,.2,1), opacity .22s, visibility 0s linear .28s; }
+  .collapsible-body.open { visibility: visible; transition: max-height .28s cubic-bezier(.4,0,.2,1), opacity .22s, visibility 0s; }
+
+  /* Touch targets: at least 24 px for the smallest marks, 30 px for controls. */
+  @media (pointer: coarse) {
+    .tip-badge { min-width: 24px; min-height: 24px; display: inline-flex; align-items: center; justify-content: center; }
+    .cc-gear, .comp-beat-btn, .comp-card-mv, .comp-card-sub, .comp-chord-del,
+    .chord-play-btn, .chord-arp-btn, .chord-add-btn, .res-card-status, .transpose-btn { min-width: 30px; min-height: 30px; }
+    .strum-btn, .preset-btn, .comp-chip, .comp-chip-new, .ct-btn, .guitar-sub-tab, .view-tab,
+    .cad-chord, .rel-chip, .comp-share-btn, .comp-del-comp-btn { min-height: 30px; }
+    .chord-arp-btn { right: 42px; }
+    .chord-add-btn { right: 76px; }
+  }
+
+  /* The reading-status circle no longer covers the source badge. */
+  .res-card-top { padding-right: 26px; }
+  .shared-badge { font-size: 9px !important; }
+
+  /* On a phone the round tool buttons scroll away with the header instead of
+     covering the scale title; the composition tool stays at hand, bottom left. */
+  @media (max-width: 700px) {
+    /* One card per row: two narrow cards put their buttons over the chord name. */
+    .chords-grid { grid-template-columns: 1fr; }
+    /* The four chromatic modes on two rows instead of four. */
+    .mode-group-chromatic .chord-types { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .mode-group-chromatic .ct-btn { white-space: normal; text-align: left; line-height: 1.25; }
+    #guide-btn, #tech-btn, #lick-lib-btn { position: absolute; }
+    #comp-btn { top: auto; bottom: 18px; right: auto; left: 14px; width: 44px; height: 44px; }
   }
 </style>
 </head>
@@ -1924,10 +1996,10 @@
       <div class="ctrl-key-block">
         <div class="ctrl-label has-tip" style="display:flex;align-items:center;white-space:nowrap">Root Key<span class="tip-badge" tabindex="0">?</span><div class="tip-popup"><span class="tip-title">Root Key</span>The tonic - the home pitch class of your scale. All scale degrees and chord names are computed relative to this note.</div></div>
         <div class="transpose-row">
-          <button class="transpose-btn" id="transpose-dn" title="Transpose down 1 semitone">▼</button>
-          <div class="key-big-display" id="key-display">C</div>
+          <button class="transpose-btn" id="transpose-dn" title="Transpose down 1 semitone" aria-label="Root key down a semitone">▼</button>
+          <div class="key-big-display" id="key-display" aria-live="polite">C</div>
           <select id="sel-key" style="display:none" aria-label="Root key"></select>
-          <button class="transpose-btn" id="transpose-up" title="Transpose up 1 semitone">▲</button>
+          <button class="transpose-btn" id="transpose-up" title="Transpose up 1 semitone" aria-label="Root key up a semitone">▲</button>
         </div>
       </div>
       <div class="ctrl-scale-block">
@@ -1988,7 +2060,6 @@
 
   <div class="main-layout">
   <div class="left-panel">
-  <div class="scale-info" id="scale-info"></div>
 
   <div class="cof-section">
     <div class="cof-eyebrow" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
@@ -2115,7 +2186,7 @@
 
   <!-- hint: hover chord cards and click + to add to the active composition -->
   <div style="padding:8px 0 4px">
-    <span id="sampler-loading" style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;display:none">⟳ loading samples…</span>
+    <span id="sampler-loading" aria-live="polite" style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;display:none">⟳ loading samples…</span>
     <span id="guitar-sampler-loading" style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;display:none;margin-left:8px">⟳ loading guitar…</span>
   </div>
 
@@ -2166,7 +2237,7 @@
 </div><!-- end main-layout -->
 
   <footer>Harmonic Atlas · All 12 keys · 37 scales · Major modes · Harmonic &amp; melodic minor · Bebop · Pentatonic · Symmetric · Exotic
-    <span style="display:block;margin-top:8px"><button id="reset-prefs-btn" style="background:none;border:none;color:var(--muted);font-family:inherit;font-size:9px;letter-spacing:.1em;cursor:pointer;text-decoration:underline dotted;padding:0" title="Clears theme, history and toggle preferences">Reset preferences</button></span>
+    <span style="display:block;margin-top:8px"><button id="reset-prefs-btn" style="background:none;border:none;color:var(--muted);font-family:inherit;font-size:9px;letter-spacing:.1em;cursor:pointer;text-decoration:underline dotted;padding:0" title="Clears the history and the toggle preferences">Reset preferences</button></span>
   </footer>
 </main><!-- end wrap -->
 
@@ -2179,8 +2250,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v76';
-window.APP_DEPLOYED = '2026-10-07 09:39';
+window.APP_VERSION = 'v77';
+window.APP_DEPLOYED = '2026-10-07 16:21';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -2211,7 +2282,6 @@ const PREFER_FLAT_PC = new Set([1,3,8,10]); // Db Eb Ab Bb - preferred over C# D
 // ── Scale playback ──────────────────────────────
 
 
-function letterOf(name) { return name[0]; }
 function letterIndex(name) { return LETTERS.indexOf(name[0]); }
 
 // Degree (letter offset from the root) each semitone usually takes in a scale that
@@ -2410,6 +2480,13 @@ function scaleFormula(intervals) {
 const SCALE_FAMILIES = ['Major Modes','Harmonic Minor','Melodic Minor','Exotic Scales','Bebop','Pentatonic','Symmetric'];
 
 const DEGREE_NAMES_7 = ['Tonic','Supertonic','Mediant','Subdominant','Dominant','Submediant','Leading Tone'];
+// Name each degree from the interval it sits on, not its position in the list:
+// a b7 is the subtonic (leading tone only when it is a semitone below the tonic),
+// and minor pentatonic's second note is a mediant, not "II".
+function degreeNames(intervals) {
+  const BY_SEMI = ['Tonic','Supertonic','Supertonic','Mediant','Mediant','Subdominant','Tritone','Dominant','Submediant','Submediant','Subtonic','Leading Tone'];
+  return intervals.map(iv => BY_SEMI[((iv % 12) + 12) % 12]);
+}
 const DEGREE_NAMES_5 = ['Tonic','II','III','IV','V'];
 const DEGREE_NAMES_6 = ['Tonic','II','III','IV','V','VI'];
 const ROMAN_BASE_7   = ['I','II','III','IV','V','VI','VII'];
@@ -2517,8 +2594,8 @@ function iName(s){
   const names = {
     0:'1', 1:'♭9', 2:'2', 3:'♭3', 4:'3', 5:'4', 6:'♭5', 7:'5',
     8:'♯5', 9:'6', 10:'♭7', 11:'7',
-    12:'(8)', 13:'♭9', 14:'9', 15:'♯9', 16:'♭10', 17:'11', 18:'♯11',
-    19:'d5+oct', 20:'♭13', 21:'13', 22:'♭14'
+    12:'(8)', 13:'♭9', 14:'9', 15:'♯9', 16:'♭11', 17:'11', 18:'♯11',
+    19:'5', 20:'♭13', 21:'13', 22:'♭7'
   };
   return names[s] !== undefined ? names[s] : (s + 'st');
 }
@@ -2527,7 +2604,18 @@ function iName(s){
 function iNameCtx(s, iv) {
   if (s === 8 && iv.includes(7)) return '♭6';
   if (s === 6 && iv.includes(7)) return '♯11';
+  // The seventh of a diminished seventh chord is a double-flat 7th, not a 6th.
+  if (s === 9 && iv.includes(3) && iv.includes(6) && !iv.includes(10) && !iv.includes(11)) return '𝄫7';
+  // 16 above the root in a stack that already has its third is the flat 11th.
+  if (s === 16) return (iv.includes(3) || iv.includes(4)) ? '♭11' : '3';
   return iName(s);
+}
+
+// Append an extension to a symbol. A bare number after a symbol that already ends
+// in a number or an alteration is put in parentheses: Δ11♯5(13), not Δ11♯513.
+function _glueExt(base, ext) {
+  if (!ext) return base;
+  return /[\d)]$/.test(base) && /^\d/.test(ext) ? base + '(' + ext + ')' : base + ext;
 }
 
 function classifyChord(iv){
@@ -2608,6 +2696,8 @@ function classifyChord(iv){
       else            { sym='dim7(9)';         qual='Dim 7th add9' }
     } else if (b.sym === 'Δ7♯5') {
       if      (nat9)  { sym='Δ9♯5';         qual='Aug Maj 9th' }
+      else if (shp9)  { sym='Δ7♯5♯9';       qual='Aug Maj 7th ♯9' }
+      else if (flt9)  { sym='Δ7♯5♭9';       qual='Aug Maj 7th ♭9' }
       else            { sym='Δ7♯5(9)';       qual='Aug Maj 7th add9' }
     } else if (b.sym === '7♯5') {
       if      (nat9)  { sym='9♯5';             qual='Aug Dom 9th' }
@@ -2618,8 +2708,11 @@ function classifyChord(iv){
       else if (flt9)  { sym='7♭9♭5';           qual='Dom 7th ♭9♭5' }
       else            { sym='7♭5(9)';           qual='Dom 7♭5 add9' }
     } else {
-      const l = flt9?'♭9' : shp9?'♯9' : nat9?'' : '(9)';
-      sym = b.sym + l; qual = b.qual + (l?' '+l:'');
+      // Not a ninth on top of a tertian base (pentatonic stacks give C E A D G):
+      // name the whole set from its content instead of tacking "(9)" on a fifth.
+      if (!(nat9 || flt9 || shp9) || b.sym.indexOf('no') >= 0) return classifyNonTertian(iv);
+      const l = flt9?'♭9' : shp9?'♯9' : '';
+      sym = _glueExt(b.sym, l); qual = b.qual + (l?' '+l:'');
     }
 
   // ── 11th Chords ─────────────────────────────────────────
@@ -2661,18 +2754,22 @@ function classifyChord(iv){
       else if (nat11) { sym='ø11';               qual='Half-Dim 11th' }
       else            { sym='ø9(11)';            qual='Half-Dim 9th add11' }
     } else if (b.sym === 'dim9') {
-      sym='dim11'; qual='Diminished 11th';
+      if (nat11) { sym='dim11'; qual='Diminished 11th'; } else { sym=_glueExt('dim9', shp11?'♯11':'♭11'); qual='Diminished 9th ' + (shp11?'♯11':'♭11'); }
     } else if (b.sym === 'Δ9♯5') {
-      sym='Δ11♯5'; qual='Aug Maj 11th';
+      if      (shp11) { sym='Δ9♯5♯11';       qual='Aug Maj 9th ♯11 (Lydian augmented)' }
+      else if (nat11) { sym='Δ11♯5';         qual='Aug Maj 11th' }
+      else            { sym='Δ9♯5';          qual='Aug Maj 9th' }
     } else if (b.sym === '9♯5') {
-      sym='11♯5'; qual='Aug Dom 11th';
+      if      (shp11) { sym='9♯5♯11';        qual='Aug Dom 9th ♯11' }
+      else if (nat11) { sym='11♯5';          qual='Aug Dom 11th' }
+      else            { sym='9♯5';           qual='Aug Dom 9th' }
     } else if (b.sym === 'Δ7♭9') {
       if      (shp11) { sym='Δ7♭9♯11';       qual='Maj 7th ♭9♯11' }
       else if (nat11) { sym='Δ7♭9(11)';       qual='Maj 7th ♭9 11' }
       else            { sym='Δ7♭9';            qual='Maj 7th ♭9' }
     } else {
-      const l = shp11?'♯11' : nat11?'(11)' : '';
-      sym = b.sym + l; qual = b.qual + (l?' '+l:'');
+      const l = shp11?'♯11' : nat11?'11' : e11===16?'♭11' : '';
+      sym = _glueExt(b.sym, l); qual = b.qual + (l?' '+l:'');
     }
 
   // ── 13th Chords ─────────────────────────────────────────
@@ -2736,7 +2833,7 @@ function classifyChord(iv){
       sym='dim13'; qual='Diminished 13th';
     } else {
       const l = flt13?'♭13' : nat13?'13' : '';
-      sym = b.sym + (l?l:''); qual = b.qual + (l?' '+l:'');
+      sym = _glueExt(b.sym, l); qual = b.qual + (l?' '+l:'');
     }
   }
   // Not a tertian stack (non-heptatonic scale): name it from its interval content.
@@ -2761,6 +2858,10 @@ function classifyNonTertian(iv) {
   iv.forEach(sRaw => {
     const sv = Math.round(sRaw);
     if (sv <= 0) return;
+    // A fifth or a root an octave up is still a fifth or a root (a pentatonic
+    // stack C E A D G puts the G at 19): only real tensions stay compound.
+    if (sv === 19) { core.add(7); return; }
+    if (sv === 12 || sv === 24) return;
     if (sv < 12) core.add(sv); else ext.push(sv);
   });
   const takeCore = v => { const had = core.has(v); core.delete(v); return had; };
@@ -2864,8 +2965,10 @@ function buildOtherChords(scaleNotes, scaleIntervals, degree){
     const from=scaleIntervals[degree%n],to=scaleIntervals[(degree+6)%n];
     let d=(to-from+12)%12;if(d===0)d=12;return d;
   })();
-  const add9iv=(iv2>=1&&iv2<=2)?iv2+12:null;
-  const add11iv=(iv4>=5&&iv4<=6)?iv4+12:null;
+  // add9 / add11 mean the natural 9th and 11th: a b9 or #11 is not an add9 / add11
+  // (C major's IV gave "add11 = F A C B").
+  const add9iv=iv2===2?14:null;
+  const add11iv=iv4===5?17:null;
   const chords=[];
 
   // sus2, sus4
@@ -2894,10 +2997,12 @@ function buildOtherChords(scaleNotes, scaleIntervals, degree){
   if(iv5===7)                               chords.push({sym:'5',     qual:'Power chord', notes:[root,fifth],                  iv:[0,iv5]});
 
   // 7sus4, Maj7sus4
-  if(iv4===5&&iv5===7&&iv7!==null)          chords.push({sym:iv7===11?'Maj7sus4':'7sus4', qual:iv7===11?'Maj7 sus4':'Dom 7 sus4', notes:[root,fourth,fifth,seventh||root], iv:[0,iv4,iv5,iv7]});
+  // Only on seven-note scales, where the 7th note is the 7th degree (on an 8-note
+  // bebop scale it is the 6th and "7sus4" came out C F G A).
+  if(n===7&&iv4===5&&iv5===7&&(iv7===10||iv7===11)) chords.push({sym:iv7===11?'Maj7sus4':'7sus4', qual:iv7===11?'Maj7 sus4':'Dom 7 sus4', notes:[root,fourth,fifth,seventh], iv:[0,iv4,iv5,iv7]});
 
   // sus2 with 7th
-  if(iv2===2&&iv5===7&&iv7!==null&&iv7===10) chords.push({sym:'7sus2', qual:'Dom 7 sus2', notes:[root,step2,fifth,seventh], iv:[0,iv2,iv5,iv7]});
+  if(n===7&&iv2===2&&iv5===7&&iv7===10) chords.push({sym:'7sus2', qual:'Dom 7 sus2', notes:[root,step2,fifth,seventh], iv:[0,iv2,iv5,iv7]});
 
   return chords;
 }
@@ -2951,7 +3056,7 @@ function computeCofHighlights(rootPc, scaleIntervals){
     const iv5 = iv5raw <= iv3 ? iv5raw+12 : iv5raw;
     if(iv3===4&&iv5===7)       majSet.add(rootNote); // major
     else if(iv3===3&&iv5===7)  minSet.add(rootNote); // minor
-    else if(iv5===6)           dimSet.add(rootNote); // diminished (includes aug2+dim5)
+    else if(iv3===3&&iv5===6)  dimSet.add(rootNote); // diminished (a major 3rd over a b5, C E Gb, is not)
     // other qualities: don't highlight (aug, sus, etc.)
   }
   return{majSet,minSet,dimSet};
@@ -3157,19 +3262,26 @@ function drawCoF(rootPc, scaleIntervals){
   const cofTarget = e => e.target.closest ? e.target.closest('.cof-slice')
     : (e.target.classList && e.target.classList.contains('cof-slice') ? e.target : null);
 
-  svg.addEventListener('mouseover', e=>{ const sl = cofTarget(e); if (sl) cofShow(sl); });
+  // The SVG element outlives every redraw: wire its listeners once and let them
+  // call the current redraw's show/hide (they used to pile up, one set per key).
+  svg._cofShow = cofShow;
+  svg._cofHide = cofHide;
+  if (svg._cofWired) return;
+  svg._cofWired = true;
+
+  svg.addEventListener('mouseover', e=>{ const sl = cofTarget(e); if (sl) svg._cofShow(sl); });
 
   // Keyboard: only the diatonic slices (the ones carrying data-deg) join the tab
   // order, so the circle is a handful of stops rather than 36.
   svg.addEventListener('focusin', e=>{
     const sl = cofTarget(e);
     if (!sl) return;
-    cofShow(sl);
+    svg._cofShow(sl);
     const r = sl.getBoundingClientRect();
     tooltip.style.left = Math.min(r.right + 8, window.innerWidth - (tooltip.offsetWidth || 120) - 8) + 'px';
     tooltip.style.top  = Math.max(4, r.top - 8) + 'px';
   });
-  svg.addEventListener('focusout', cofHide);
+  svg.addEventListener('focusout', () => svg._cofHide());
 
   svg.addEventListener('mousemove', e=>{
     const tx = e.clientX + 14;
@@ -3180,7 +3292,7 @@ function drawCoF(rootPc, scaleIntervals){
     tooltip.style.top  = Math.max(4, Math.min(ty, window.innerHeight - th - 4)) + 'px';
   });
 
-  svg.addEventListener('mouseleave', cofHide);
+  svg.addEventListener('mouseleave', () => svg._cofHide());
 }
 
 // ══════════════════════════════════════════════
@@ -3196,7 +3308,7 @@ const A11Y_NATIVE = ['BUTTON','A','SELECT','INPUT','TEXTAREA','LABEL','SUMMARY',
 // Clickable containers. Children that merely inherit cursor:pointer are left
 // alone - focusing the container is what matters.
 const A11Y_SELECTORS = [
-  '.chord-card', '.diag-card', '.drop-card', '.comp-chord-card', '.mob-sc-card',
+  '.diag-card', '.drop-card', '.comp-chord-card', '.mob-sc',
   '.rel-chip', '.cad-chord', '.impro-pill', '.comp-chip', '.pivot-chip',
   '.hero-note-item', '.note-item', '.collapse-hdr',
   '.neg-toggle-track', '.res-card', '.lick-card', '.scale-full-board',
@@ -3289,12 +3401,24 @@ document.addEventListener('keydown', e => {
 });
 
 // Only childList is observed, so setting attributes above cannot re-trigger this.
+// It tags only around what was added, and ignores the circle-of-fifths tooltip,
+// whose text changes on every hover (each change used to rescan the whole page).
 (function watchForNewClickables() {
   let queued = false;
-  new MutationObserver(() => {
-    if (queued) return;
+  const pending = new Set();
+  new MutationObserver(records => {
+    for (const r of records) {
+      if (r.target.id === 'cof-tooltip') continue;
+      r.addedNodes.forEach(n => { if (n.nodeType === 1) pending.add(n.parentElement || document); });
+    }
+    if (!pending.size || queued) return;
     queued = true;
-    requestAnimationFrame(() => { queued = false; a11yTagClickables(document); });
+    requestAnimationFrame(() => {
+      queued = false;
+      const roots = [...pending];
+      pending.clear();
+      roots.forEach(r => { if (r === document || r.isConnected) a11yTagClickables(r); });
+    });
   }).observe(document.body, { childList: true, subtree: true });
   a11yTagClickables(document);
 })();
@@ -3367,9 +3491,6 @@ function scaleIdentity(intervals, scaleData) {
 }
 
 function renderScaleInfo(scaleNotes, scaleData){
-  // Keep old scale-info hidden (it now just gets display:none via CSS)
-  const old=document.getElementById('scale-info');
-  if(old) old.innerHTML='';
 
   const hero = document.getElementById('scale-hero');
   const romans = computeAllRomans(scaleData.intervals, scaleData);
@@ -3754,12 +3875,14 @@ function isMajorMode(scaleName) { return MAJOR_MODE_NAMES.includes(scaleName); }
 // ══════════════════════════════════════════════
 // TRITONE SUB GUIDE TONES
 // ══════════════════════════════════════════════
-function tritonSubGuide(domRootPc, rootName) {
+// The guide tones are named as the card spells them (G# in E7, not Ab), and the
+// substitute's root sits a diminished fifth above, four letters up (E7 -> Bb7).
+function tritonSubGuide(domRootPc, rootName, chordNotes) {
   const tritPc = (domRootPc + 6) % 12;
-  const tritName = chromaticPcName(tritPc, PREFER_FLAT_PC.has(tritPc));
-  const third  = chromaticPcName((domRootPc + 4) % 12, PREFER_FLAT_PC.has((domRootPc + 4) % 12));
-  const seven  = chromaticPcName((domRootPc + 10) % 12, PREFER_FLAT_PC.has((domRootPc + 10) % 12));
-  return { tritName, tritPc, guide: `3rd ${third} = ♭7 of ${tritName}7 · ♭7 ${seven} = 3rd of ${tritName}7` };
+  const tritName = rootName ? rootOnLetter(rootName, 4, tritPc) : chromaticPcName(tritPc, PREFER_FLAT_PC.has(tritPc));
+  const third  = chordNotes && chordNotes[1] ? chordNotes[1] : chromaticPcName((domRootPc + 4) % 12, PREFER_FLAT_PC.has((domRootPc + 4) % 12));
+  const seven  = chordNotes && chordNotes[3] ? chordNotes[3] : chromaticPcName((domRootPc + 10) % 12, PREFER_FLAT_PC.has((domRootPc + 10) % 12));
+  return { tritName, tritPc, guide: `guide tones ${third} and ${seven} trade places: they are the ♭7 and the 3rd of ${tritName}7` };
 }
 
 // ─────────────────────────────────────────────
@@ -3804,13 +3927,10 @@ function addCardPlayBtn(card, notes) {
   fullBtn.innerHTML = '<svg width="9" height="10" viewBox="0 0 9 10"><polygon points="1,1 8,5 1,9" fill="currentColor"/></svg>';
   fullBtn.addEventListener('click', e => {
     e.stopPropagation();
+    if (typeof Tone === 'undefined') return;
     Tone.start().then(() => {
-      if (!samplerReady) return;
       const voiced = spreadChordOctaves(pcs);
-      const now = Tone.now() + 0.02;
-      voiced.forEach((v, i) => {
-        sampler.triggerAttackRelease(midiToNoteName(v.midi), 2.0, now + i * 0.008);
-      });
+      voiced.forEach((v, i) => playMidiNote(v.midi, 2.0, i * 0.008));
       fullBtn.classList.add('playing');
       setTimeout(() => fullBtn.classList.remove('playing'), voiced.length * 8 + 2000);
     }).catch(() => {});
@@ -3824,14 +3944,11 @@ function addCardPlayBtn(card, notes) {
   arpBtn.innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9"><circle cx="1.5" cy="7.5" r="1.2" fill="currentColor"/><circle cx="4.5" cy="4.5" r="1.2" fill="currentColor"/><circle cx="7.5" cy="1.5" r="1.2" fill="currentColor"/></svg>';
   arpBtn.addEventListener('click', e => {
     e.stopPropagation();
+    if (typeof Tone === 'undefined') return;
     Tone.start().then(() => {
-      if (!samplerReady) return;
       const voiced = spreadChordOctaves(pcs);
-      const now = Tone.now() + 0.02;
       const arpStep = 0.22;
-      voiced.forEach((v, i) => {
-        sampler.triggerAttackRelease(midiToNoteName(v.midi), 1.6, now + i * arpStep);
-      });
+      voiced.forEach((v, i) => playMidiNote(v.midi, 1.6, i * arpStep));
       arpBtn.classList.add('playing');
       setTimeout(() => arpBtn.classList.remove('playing'), voiced.length * arpStep * 1000 + 1600);
     }).catch(() => {});
@@ -3873,7 +3990,8 @@ const IMPRO_MAP = [
   { match: q => q.includes('Diminished 7th'),                 scales: ['Whole-Half Diminished'] },
   { match: q => q.includes('Augmented Δ'),                    scales: ['Lydian Augmented'] },
   { match: q => q.includes('Augmented'),                      scales: ['Whole Tone', 'Lydian Augmented'] },
-  { match: q => q.includes('Major 7') && q.includes('♯11'),   scales: ['Lydian'] },
+  { match: q => (q.includes('Major 7') || /^Maj\b/.test(q)) && q.includes('♯11'), scales: ['Lydian'] },
+  { match: q => /^Maj\b/.test(q),                            scales: ['Major (Ionian)', 'Lydian'] },
   { match: q => q.includes('Major 7') || q.includes('Δ'),     scales: ['Major (Ionian)', 'Lydian'] },
   { match: q => q.includes('Major 6'),                        scales: ['Major (Ionian)', 'Major Pentatonic'] },
   { match: q => q.includes('Minor'),                          scales: ['Dorian', 'Aeolian (Natural Minor)'] },
@@ -3904,10 +4022,11 @@ function findCoveringScale(chordPcSet) {
 }
 
 function makeImproDiv(quality, chordRootPc, chordIv) {
-  const entry = IMPRO_MAP.find(e => e.match(quality));
-  if (!entry) return null;
+  // A quality the table does not know still gets a suggestion: the fullest
+  // scale that contains every chord tone (findCoveringScale) fills the gap.
+  const entry = IMPRO_MAP.find(e => e.match(quality)) || { scales: [] };
   let scales = entry.scales.filter(s => SCALES[s]);
-  if (!scales.length) return null;
+  if (!scales.length && !Array.isArray(chordIv)) return null;
 
   // Ensure the default (first) scale contains ALL the chord's notes.
   const chordPcSet = Array.isArray(chordIv)
@@ -3922,6 +4041,7 @@ function makeImproDiv(quality, chordRootPc, chordIv) {
       scales = fb ? [fb, ...nonCov] : scales;
     }
   }
+  if (!scales.length) return null;
 
   const div = document.createElement('div');
   div.className = 'chord-impro';
@@ -3982,7 +4102,7 @@ function renderChords(scaleNotes, scaleData){
   const container=document.getElementById('all-degrees');
   container.innerHTML='';
   const scaleLen=scaleNotes.length;
-  const DNAMES=scaleLen===5?DEGREE_NAMES_5:scaleLen===6?DEGREE_NAMES_6:DEGREE_NAMES_7;
+  const DNAMES=degreeNames(scaleData.intervals);
   const romans=computeAllRomans(scaleData.intervals, scaleData);
   const rootPc=parseInt(state.key);
   const mode=state.mode;
@@ -4259,10 +4379,10 @@ function renderChords(scaleNotes, scaleData){
           if (rPc >= 0) card.appendChild(makeAltPillsDiv(rPc, chordNotes[0]));
           // Tritone sub guide tones
           if (rPc >= 0) {
-            const tsg = tritonSubGuide(rPc, chordNotes[0]);
+            const tsg = tritonSubGuide(rPc, chordNotes[0], chordNotes);
             const tDiv = document.createElement('div');
             tDiv.className = 'trit-detail';
-            tDiv.innerHTML = `Tritone sub: <strong>${tsg.tritName}7</strong> — <span class="trit-guide">${tsg.guide}</span>`;
+            tDiv.innerHTML = `Tritone sub: <strong>${tsg.tritName}7</strong> · <span class="trit-guide">${tsg.guide}</span>`;
             card.appendChild(tDiv);
           }
         }
@@ -4309,7 +4429,7 @@ function syncKeyDisplay() {
   el.textContent = KEY_SHORT[((parseInt(state.key)%12)+12)%12] || 'C';
 }
 
-function render(){
+function renderCore(){
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
   if (!scaleData) return;
@@ -4349,8 +4469,10 @@ function render(){
     const tv = t.dataset.view;
     const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv==='banjo' ? isBanjo : tv===state.view;
     t.classList.toggle('active', isActive);
+    t.setAttribute('aria-pressed', isActive);
   });
-  document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
+  document.querySelectorAll('.guitar-sub-tab').forEach(t => { t.classList.toggle('active', t.dataset.view===state.view); t.setAttribute('aria-pressed', t.dataset.view===state.view); });
+  document.querySelectorAll('.ct-btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.n === state.mode));
   document.getElementById('guitar-sub-tabs').style.display   = isGuitar   ? 'flex' : 'none';
   document.getElementById('mandolin-sub-tabs').style.display = isMandolin ? 'flex' : 'none';
   document.getElementById('banjo-sub-tabs').style.display    = isBanjo    ? 'flex' : 'none';
@@ -4385,9 +4507,6 @@ function render(){
 function goToAltDomTab(domRootPc) {
   state.view = 'altdom';
   state.lastGuitarView = 'altdom';
-  const rootPc = parseInt(state.key);
-  const scaleData = SCALES[state.scale];
-  const scaleNotes = spellScale(rootPc, scaleData.intervals, scaleData);
   render();
   requestAnimationFrame(() => {
     const target = document.querySelector('[data-altdom-root="' + domRootPc + '"]');
@@ -4402,6 +4521,9 @@ function goToAltDomTab(domRootPc) {
 // computeVoicingFromTemplate ensures ascending pitches and span ≤ 4.
 // ivs = semitone offsets from root (mod 12 pc). Template strings: 0=E2,1=A2,2=D3,3=G3,4=B3,5=e4.
 // Shapes verified for G root (pc=7): all ascending, span≤4.
+// Every shape here is movable (no open string) and takes four fingers at most;
+// the E-string 7b5b9 / 7b5#9 and the A-string 7#5#9 forms needed five on every
+// root and were dropped.
 const ALT_DOM_VOICINGS = [
   { sym:'7♭9',    label:'R · M3 · ♭7 · ♭9',              enharmonic:null,                   sharpIvs:[],
     iv:[0,4,10,1], shapes:[
@@ -4448,12 +4570,10 @@ const ALT_DOM_VOICINGS = [
   ]},
   { sym:'7♭5♭9',  label:'R · M3 · ♭5 · ♭7 · ♭9',         enharmonic:'♭5 = ♯11 (tritone)',   sharpIvs:[],
     iv:[0,4,6,10,1], shapes:[
-    { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,4,6,1] },
     { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,1,6] },
   ]},
   { sym:'7♭5♯9',  label:'R · M3 · ♭5 · ♭7 · ♯9',         enharmonic:'♭5=♯11 · ♯9=♭3',      sharpIvs:[3],
     iv:[0,4,6,10,3], shapes:[
-    { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,4,6,3] },
     { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,3,6] },
   ]},
   { sym:'7♯5♭9',  label:'R · M3 · ♭7 · ♯5 · ♭9',         enharmonic:'♯5 = ♭13 (aug 5th)',   sharpIvs:[8],
@@ -4464,7 +4584,6 @@ const ALT_DOM_VOICINGS = [
   { sym:'7♯5♯9',  label:'R · M3 · ♭7 · ♯5 · ♯9',         enharmonic:'♯5=♭13 · ♯9=♭3',      sharpIvs:[3,8],
     iv:[0,4,8,10,3], shapes:[
     { name:'E str.',  strings:[0,2,3,4,5], ivs:[0,10,3,8,4] },
-    { name:'A str.',  strings:[1,2,3,4,5], ivs:[0,4,10,3,8] },
   ]},
 ];
 
@@ -4484,6 +4603,20 @@ function altDomSharpPcs(rootPc, sharpIvs) {
 // Instead, choose each fret as the octave-equivalent CLOSEST to the shape's window
 // while still ascending in pitch, and try the root both at its base fret and an
 // octave up. Same shapes as before wherever the old code succeeded; the 26 gaps fill in.
+// Fingers a template shape needs: one per note, except that the notes on the
+// lowest fret share one barre, which may lie under higher fretted notes and over
+// a string that is not played (C13b9 = x-3-2-3-2-5: index across D to B).
+function templateFingers(strings, frets) {
+  const lo = Math.min(...frets);
+  const at = strings.filter((s, i) => frets[i] === lo).sort((a, b) => a - b);
+  let barre = at.length >= 2;
+  for (let st = at[0]; barre && st <= at[at.length - 1]; st++) {
+    const i = strings.indexOf(st);
+    if (i >= 0 && frets[i] < lo) barre = false;
+  }
+  return barre ? frets.length - at.length + 1 : frets.length;
+}
+
 function computeVoicingFromTemplate(rootPc, template) {
   const S = template.strings, IV = template.ivs;
   const targetPc = i => ((rootPc + IV[i]) % 12 + 12) % 12;
@@ -4492,17 +4625,20 @@ function computeVoicingFromTemplate(rootPc, template) {
   let best = null;
   for (const bump of [0, 12]) {
     const frets = [basePos(0) + bump];
+    // These are movable shapes: no open string, the root included.
+    if (frets[0] === 0) continue;
     let ok = true;
     for (let i = 1; i < S.length; i++) {
       const prevPitch = GUITAR_MIDI[S[i-1]] + frets[i-1];
       const cands = [basePos(i) - 12, basePos(i), basePos(i) + 12, basePos(i) + 24]
-        .filter(f => f >= 0 && GUITAR_MIDI[S[i]] + f > prevPitch)
+        .filter(f => f >= 1 && GUITAR_MIDI[S[i]] + f > prevPitch)
         .sort((a, b) => Math.abs(a - frets[0]) - Math.abs(b - frets[0]));
       if (!cands.length) { ok = false; break; }
       frets.push(cands[0]);
     }
     if (!ok) continue;
     if (Math.max(...frets) - Math.min(...frets) > 4) continue;
+    if (templateFingers(S, frets) > 4) continue;
     // Prefer the lowest playable position.
     if (!best || Math.max(...frets) < Math.max(...best)) best = frets;
   }
@@ -4641,7 +4777,7 @@ function renderAltDomTab(scaleNotes, scaleData) {
   });
 }
 
-function renderView(scaleNotes,scaleData){
+function renderViewCore(scaleNotes,scaleData){
   document.getElementById('all-degrees').className = state.view === 'list' ? 'chord-list-view' : '';
   if(state.view==='list')           renderChords(scaleNotes,scaleData);
   else if(state.view==='diagrams')  renderDiagrams(scaleNotes,scaleData);
@@ -4962,13 +5098,17 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140, forceSharpPcs=null) {
   const played = frets6.filter(f => f > 0);
   const minPlayed = played.length ? Math.min(...played) : 0;
   const maxPlayed = played.length ? Math.max(...played) : 0;
-  const startFret = minPlayed <= 1 ? 0 : minPlayed - 1;
+  // An open-position shape keeps the nut in view (Em7 = 0-2-0-0-0-0), rather than a
+  // window from fret 2 with open strings floating above it.
+  const hasOpen = frets6.some(f => f === 0);
+  const startFret = (minPlayed <= 1 || (hasOpen && maxPlayed <= 4)) ? 0 : minPlayed - 1;
   // Need enough fret slots so the highest note fits: dispFr = maxPlayed - startFret
   const NUM_FRET = played.length ? Math.max(4, maxPlayed - startFret) : 4;
 
-  const padL = 22, padR = 22, padT = 22, padB = 20;
+  // Room for the "Nfr" label so it never sits under a dot on the low E string.
+  const padL = startFret > 0 ? 30 : 22, padR = 22, padT = 22, padB = 20;
   const strGap = (w - padL - padR) / (NUM_STR - 1);
-  const fretH  = Math.round((w - padL - padR) * 0.38);
+  const fretH  = Math.round((w - 44) * 0.38);
   const gridH  = NUM_FRET * fretH;
   const h      = padT + gridH + padB;
 
@@ -4984,7 +5124,7 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140, forceSharpPcs=null) {
   if (startFret === 0) {
     g.push(`<rect x="${padL-1}" y="${padT-4}" width="${strGap*5+2}" height="5" rx="1.5" fill="#b8b0a0"/>`);
   } else {
-    g.push(`<text x="2" y="${padT + fretH*0.6}" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#6b7280" dominant-baseline="middle">${startFret+1}fr</text>`);
+    g.push(`<text x="2" y="${padT + fretH*0.6}" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8b93a3" dominant-baseline="middle">${startFret+1}fr</text>`);
   }
 
   // Fret lines
@@ -5109,7 +5249,7 @@ function showDiagramModal(frets6, pcs6, rootPc, title, navList, navIdx) {
       <div style="flex:1;min-width:0;text-align:right;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${prevTitle}">${prevTitle}</div>
       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
         <button id="dm-prev" style="background:none;border:1px solid ${hasPrev?'#3e4a5a':'#1e2530'};color:${hasPrev?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasPrev?'pointer':'default'};font-size:14px;line-height:1;">◀</button>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6878;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8b93a3;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
         <button id="dm-next" style="background:none;border:1px solid ${hasNext?'#3e4a5a':'#1e2530'};color:${hasNext?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasNext?'pointer':'default'};font-size:14px;line-height:1;">▶</button>
       </div>
       <div style="flex:1;min-width:0;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
@@ -5120,7 +5260,7 @@ function showDiagramModal(frets6, pcs6, rootPc, title, navList, navIdx) {
     <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#f0e8d8">${cur.title}</div>
     <div style="max-width:100%;overflow:hidden;">${makeChordDiagram(cur.frets6, cur.pcs6, cur.rootPc, diagSize, cur.forceSharpPcs||null)}</div>
     ${navHtml}
-    <div style="font-size:9px;color:#4a5566;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">${hasNav?'← swipe or arrows →  ·  ':''}click anywhere to close</div>`;
+    <div style="font-size:9px;color:#8b93a3;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">${hasNav?'← swipe or arrows →  ·  ':''}click anywhere to close</div>`;
 
   function bindNavBtns() {
     if (!hasNav) return;
@@ -5213,7 +5353,7 @@ function renderDiagrams(scaleNotes, scaleData) {
   if (isChromatic) {
     // Chromatic modes: show diagram cards grouped by source degree
     const scaleLen = scaleNotes.length;
-    const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+    const DNAMES   = degreeNames(scaleData.intervals);
     const romans   = computeAllRomans(scaleData.intervals, scaleData);
     const items =
       state.mode==='secdom'  ? buildSecondaryDominants(rootPc,scaleData.intervals,romans)  :
@@ -5252,7 +5392,7 @@ function renderDiagrams(scaleNotes, scaleData) {
 
   // Diatonic modes
   const scaleLen = scaleNotes.length;
-  const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const DNAMES   = degreeNames(scaleData.intervals);
   const romans   = computeAllRomans(scaleData.intervals, scaleData);
   const isOthers = state.mode === 'others';
   const n        = Math.min(isOthers ? 3 : (parseInt(state.mode)||3), scaleLen);
@@ -5345,6 +5485,29 @@ function renderDiagrams(scaleNotes, scaleData) {
 // RENDER: SHELL VOICINGS VIEW
 // ══════════════════════════════════════════════
 
+// Shell, Drop and arpeggio shapes are drawn as R-3-5-7. A chord stacked from a
+// pentatonic or exotic scale may have no third or no seventh (Hirajoshi gives
+// C F Ab Db): it is named under the list instead of being drawn under a wrong label.
+function keepSeventhChords(entries, container) {
+  const skipped = [];
+  const kept = entries.filter(e => {
+    const pcs = (e.chord4pcs || e.pcs || []).filter(p => p >= 0);
+    const r = pcs[0];
+    const iv = pcs.map(p => ((p - r) % 12 + 12) % 12);
+    const ok = iv.length === 4 && [3, 4].includes(iv[1]) && [6, 7, 8].includes(iv[2]) && [9, 10, 11].includes(iv[3]);
+    if (!ok) skipped.push((e.chordNotes ? e.chordNotes[0] : '') + (e.sym || ''));
+    return ok;
+  });
+  if (skipped.length) {
+    const note = document.createElement('div');
+    note.className = 'empty-msg';
+    note.style.cssText = 'padding:14px 0;font-size:11px;color:var(--muted)';
+    note.textContent = `Not drawn here: ${skipped.join(', ')} - no third or no seventh, so there is no R-3-5-7 shape for it.`;
+    container.appendChild(note);
+  }
+  return kept;
+}
+
 function renderShellVoicings(scaleNotes, scaleData) {
   const container = document.getElementById('all-degrees');
   container.innerHTML = '';
@@ -5384,7 +5547,7 @@ function renderShellVoicings(scaleNotes, scaleData) {
     });
   } else {
     const scaleLen = scaleNotes.length;
-    const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+    const DNAMES   = degreeNames(scaleData.intervals);
     const romans   = computeAllRomans(scaleData.intervals, scaleData);
     scaleNotes.forEach((_, di) => {
       const chordNotes = buildChord(scaleNotes, di, 4);
@@ -5400,6 +5563,7 @@ function renderShellVoicings(scaleNotes, scaleData) {
     });
   }
 
+  chordEntries = keepSeventhChords(chordEntries, container);
   chordEntries.forEach(({degIdx, sectionId, headerHtml, chordNotes, sym, chRootPc, chord4pcs, labelBadge}) => {
     const sec = document.createElement('div');
     sec.className = 'degree-section'; sec.id = sectionId;
@@ -5539,7 +5703,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
     });
   } else {
     const scaleLen = scaleNotes.length;
-    const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+    const DNAMES   = degreeNames(scaleData.intervals);
     const romans   = computeAllRomans(scaleData.intervals, scaleData);
     scaleNotes.forEach((_, di) => {
       const chordNotes = buildChord(scaleNotes, di, 4);
@@ -5555,6 +5719,7 @@ function renderDropVoicings(scaleNotes, scaleData, dropNum) {
     });
   }
 
+  chordEntries = keepSeventhChords(chordEntries, container);
   chordEntries.forEach(({degIdx, sectionId, headerHtml, chordNotes, sym, chRootPc, chord4pcs, labelBadge}) => {
     const sec = document.createElement('div');
     sec.className = 'degree-section'; sec.id = sectionId;
@@ -5695,7 +5860,10 @@ function buildArpeggioShape(chordPcs, rootPc, anchorStr) {
   for (const c of candidates) {
     if (c.pitch <= prevPitch) continue;
     const cnt = strCount[c.str] || 0;
-    if (cnt >= 2) continue;
+    // Two notes per string, unless this pitch has nowhere else to go: a third
+    // note beats skipping a chord tone (maj7#5 used to lose its root that way).
+    const elsewhere = candidates.some(o => o.pitch === c.pitch && o.str !== c.str && (strCount[o.str] || 0) < 2);
+    if (cnt >= 3 || (cnt >= 2 && elsewhere)) continue;
     notes.push(c);
     strCount[c.str] = cnt + 1;
     prevPitch = c.pitch;
@@ -5759,7 +5927,7 @@ function makeArpeggioDiagram(notes, rootPc, w=440, pcNameMap=null, anchorStr=nul
 
   // Fret number label — placed below the diagram, left-aligned
   if (startFret > 0) {
-    svg += `<text x="${padL}" y="${padT+strGap*5+12}" text-anchor="start" font-size="9.5" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.45)">${startFret}fr</text>`;
+    svg += `<text x="${padL}" y="${padT+strGap*5+12}" text-anchor="start" font-size="9.5" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.45)">${startFret + 1}fr</text>`;
   }
 
   // Lowest root on the anchor string - the dot the CAGED form is named after.
@@ -5798,7 +5966,7 @@ function renderArpeggios(scaleNotes, scaleData) {
   const isSecDom = state.mode === 'secdom';
   const isSecDim = state.mode === 'secdim';
   const scaleLen = scaleNotes.length;
-  const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const DNAMES   = degreeNames(scaleData.intervals);
   const showDegreeNames = state.scale==='Major (Ionian)' || state.scale==='Aeolian (Natural Minor)';
   const romans   = computeAllRomans(scaleData.intervals, scaleData);
 
@@ -5837,6 +6005,7 @@ function renderArpeggios(scaleNotes, scaleData) {
   }
 
   let delay = 0;
+  chordEntries = keepSeventhChords(chordEntries, container);
   chordEntries.forEach(({ degIdx, headerHtml, chordNotes, sym, chRootPc, pcs }) => {
     const sec = document.createElement('div');
     sec.className = 'degree-section'; sec.id = `deg-${degIdx}`;
@@ -5978,7 +6147,7 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
 
   // Start-fret label
   if (startFret > 0) {
-    svg += `<text x="${padL}" y="${(strBottom + 13).toFixed(1)}" text-anchor="start" font-size="9" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.38)">${startFret}fr</text>`;
+    svg += `<text x="${padL}" y="${(strBottom + 13).toFixed(1)}" text-anchor="start" font-size="9" font-family="IBM Plex Mono,monospace" fill="rgba(255,255,255,0.38)">${startFret + 1}fr</text>`;
   }
 
   // Chord overlay colors
@@ -5986,7 +6155,7 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
 
   function dotColor(sem) {
     if (chordOverlay) {
-      if (sem === 0) return SC_ROOT_COL;
+      if (sem === chordOverlay.rootSem) return SC_ROOT_COL;
       if (chordOverlay.chordSems.has(sem)) return CO_CHORD;
       if (chordOverlay.tensionSems.has(sem)) return CO_TENS;
       return CO_DIM;
@@ -5996,7 +6165,7 @@ function makeScaleFretboardSVG(intervals, rootPc, charSemitones, startFret, endF
     return SC_NOTE_COL;
   }
   function dotOp(sem) {
-    if (chordOverlay && sem !== 0 && !chordOverlay.chordSems.has(sem) && !chordOverlay.tensionSems.has(sem)) return '0.35';
+    if (chordOverlay && !chordOverlay.chordSems.has(sem) && !chordOverlay.tensionSems.has(sem)) return '0.35';
     return '0.85';
   }
 
@@ -6055,10 +6224,11 @@ function computeScalePositions(intervals, rootPc) {
     }
     if (rootFret < 0) continue;
 
-    // Window: startFret (left fret line) and endFret (right fret line)
-    // We want the root in ~the second slot, so startFret = rootFret - 1 (clamped to 0)
-    const startFret = Math.max(0, rootFret - 1);
-    const endFret   = startFret + 4;  // 4 fret slots
+    // Window: startFret (left fret line) and endFret (right fret line). Slot 1 is
+    // fret startFret + 1, so the root lands in the second slot and the fret below
+    // it (where the E shape of C has its B, E, A, D and B) stays in the shape.
+    const startFret = Math.max(0, rootFret - 2);
+    const endFret   = startFret + 5;  // 5 fret slots
 
     // Skip duplicate windows
     if (positions.some(p => p.startFret === startFret)) continue;
@@ -6097,7 +6267,7 @@ function showSvgModal(svgHtml, title, landscape = false) {
   inner.innerHTML = `
     <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);flex-shrink:0">${title}</div>
     <div style="overflow:auto;width:100%;display:flex;align-items:flex-start;justify-content:center">${svgHtml}</div>
-    <div style="font-size:10px;color:#3a4556;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;flex-shrink:0">CLICK ANYWHERE TO CLOSE</div>`;
+    <div style="font-size:10px;color:#8b93a3;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;flex-shrink:0">CLICK ANYWHERE TO CLOSE</div>`;
   const svgEl = inner.querySelector('svg');
   if (svgEl) {
     svgEl.style.width = '100%'; svgEl.style.height = 'auto'; svgEl.style.display = 'block';
@@ -6219,26 +6389,27 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
 
   // ── Chord-tone targeting overlay (major modes, heptatonic) ──
   const canOverlay = isMajorMode(state.scale) && intervals.length === 7;
+  // The chosen degree lives in state, so switching Notes / Degrees (which
+  // re-renders this tab) keeps the overlay instead of resetting it.
+  if (state.overlayScale !== state.scale) { state.overlayDeg = -1; state.overlayScale = state.scale; }
   let activeOverlay = null;
   let posGrid = null;
 
   function buildOverlay(degIdx) {
     if (degIdx < 0) return null;
     const n = intervals.length;
+    // Semitones measured from the SCALE root, the same reference the fretboard
+    // colours its dots with (they were measured from the chord root, so every
+    // degree but I lit the wrong notes).
     const chordSems = new Set();
     const tensionSems = new Set();
-    for (let i = 0; i < 4; i++) {
-      const idx = (degIdx + i * 2) % n;
-      const sem = ((intervals[idx] - intervals[degIdx]) + 12) % 12;
-      chordSems.add(sem);
-    }
+    for (let i = 0; i < 4; i++) chordSems.add(intervals[(degIdx + i * 2) % n] % 12);
     for (let i = 0; i < n; i++) {
-      const sem = ((intervals[i] - intervals[degIdx]) + 12) % 12;
-      // every non-root scale tone that isn't a chord tone is an available tension
-      // (the old sem<7?sem+12:sem test wrongly excluded the 13th)
-      if (sem !== 0 && !chordSems.has(sem)) tensionSems.add(sem);
+      const sem = intervals[i] % 12;
+      // every scale tone that isn't a chord tone is an available tension
+      if (!chordSems.has(sem)) tensionSems.add(sem);
     }
-    return { chordSems, tensionSems };
+    return { chordSems, tensionSems, rootSem: intervals[degIdx] % 12 };
   }
 
   function reRenderBoards() {
@@ -6270,6 +6441,7 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
     }).join('');
     sel.addEventListener('change', () => {
       const di = parseInt(sel.value);
+      state.overlayDeg = di;
       activeOverlay = di >= 0 ? buildOverlay(di) : null;
       legendDiv.style.display = activeOverlay ? 'flex' : 'none';
       defaultLegend.style.display = activeOverlay ? 'none' : '';
@@ -6286,6 +6458,12 @@ function renderScaleTabFor(container, scaleNotes, scaleData, instrument, openPCs
     bar.appendChild(legendDiv);
     container.appendChild(bar);
     const defaultLegend = titleBlock.querySelector('.scale-legend');
+    if (state.overlayDeg >= 0 && state.overlayDeg < intervals.length) {
+      sel.value = String(state.overlayDeg);
+      activeOverlay = buildOverlay(state.overlayDeg);
+      legendDiv.style.display = 'flex';
+      if (defaultLegend) defaultLegend.style.display = 'none';
+    }
   }
 
   // ── Full fretboard ────────────────────────────────────
@@ -6582,7 +6760,9 @@ function findGripShapes(instr, ivArray) {
         // A stretch beyond four frets only works one way round: the hand
         // angles so the pinky reaches up the neck on the bass side while the
         // index sits back on the treble side. The mirror image is not a grip.
-        if (span > 4 && !(g.indexOf(hi) < n / 2 && g.indexOf(lo) >= n / 2)) continue;
+        // Every course on the top fret must be on the bass side and every course on
+        // the bottom fret on the treble side (indexOf only looked at the first one).
+        if (span > 4 && !g.every((f, i) => (f !== hi || i < n / 2) && (f !== lo || i >= n / 2))) continue;
         const off  = g.map(f => f === MUTE ? MUTE : f - lo);
         const fing = gripFingerCount(off);
         if (fing > 4) continue;
@@ -6635,7 +6815,17 @@ function getGrips(instr, rootPc, ivArray, opts) {
     if (tones.some(t => t !== MUTE && tset.indexOf(t) < 0)) continue;
 
     const pos = Math.min.apply(null, frets.filter(f => f !== MUTE));
-    all.push(Object.assign({}, sh, { base, frets, tones, pos, rootStr: tones.indexOf(0),
+    let span = sh.span, fingers = sh.fingers, score = sh.score;
+    if (base === 0) {
+      // Open strings cost no finger and no stretch: re-measure on the fretted ones
+      // (D7 = 4-2-1-0 takes three fingers, not four) and put these first-position
+      // shapes first on the tab that allows them (C = 2-0-1-2 before 5-5-5-5).
+      const fr = frets.filter(f => f > 0);
+      span = fr.length ? Math.max.apply(null, fr) - Math.min.apply(null, fr) : 0;
+      fingers = gripFingerCount(frets.map(f => f === 0 ? MUTE : f));
+      score = sh.score - (sh.span - span) * 3 - (sh.fingers - fingers) * 0.5 - 3;
+    }
+    all.push(Object.assign({}, sh, { base, frets, tones, pos, span, fingers, score, rootStr: tones.indexOf(0),
       name: sh.named ? sh.named.n : null }));
   }
 
@@ -6704,7 +6894,8 @@ function gripFingering(frets) {
 function droneState(cfg, frets, rootPc, tset) {
   if (!cfg.drone) return null;
   const rootN = ((rootPc % 12) + 12) % 12;
-  const tone  = f => ((((cfg.drone.midi + f) - rootN) % 12) + 12) % 12;
+  // The 5th string's nut sits at fret 5: fretted at f it sounds f - 5 above g, not f.
+  const tone  = f => ((((cfg.drone.midi + (f > 0 ? f - cfg.drone.nut : 0)) - rootN) % 12) + 12) % 12;
   const on = frets.filter(f => f !== MUTE);
   const lo = Math.min.apply(null, on), hi = Math.max.apply(null, on);
   for (let f = Math.max(cfg.drone.nut + 1, lo); f <= hi; f++)
@@ -6778,13 +6969,13 @@ function makeGripDiagram(instr, grip, rootPc, w, opts) {
   }
 
   for (let s = 0; s < cfg.midi.length; s++)
-    g.push(`<text x="${colX(s + off)}" y="${padT + gridH + 13}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#5a6475" text-anchor="middle">${cfg.names[s]}</text>`);
+    g.push(`<text x="${colX(s + off)}" y="${padT + gridH + 13}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#8b93a3" text-anchor="middle">${cfg.names[s]}</text>`);
   if (drone)
-    g.push(`<text x="${colX(0)}" y="${padT + gridH + 13}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#5a6475" text-anchor="middle">${cfg.drone.name}</text>`);
+    g.push(`<text x="${colX(0)}" y="${padT + gridH + 13}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#8b93a3" text-anchor="middle">${cfg.drone.name}</text>`);
 
   if (showFing) {
     for (let s = 0; s < cfg.midi.length; s++)
-      g.push(`<text x="${colX(s + off)}" y="${padT + gridH + 26}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#4a5262" text-anchor="middle">${fing[s] || ''}</text>`);
+      g.push(`<text x="${colX(s + off)}" y="${padT + gridH + 26}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#8b93a3" text-anchor="middle">${fing[s] || ''}</text>`);
   }
 
   const dr = Math.min(Math.max(5.5, fretH * 0.34), strGap * 0.46, padR - 1);
@@ -6886,7 +7077,7 @@ function renderGripTab(instr, scaleNotes, scaleData, cfgUI) {
 
   const rootPc   = parseInt(state.key);
   const scaleLen = scaleNotes.length;
-  const DNAMES   = scaleLen === 5 ? DEGREE_NAMES_5 : scaleLen === 6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const DNAMES   = degreeNames(scaleData.intervals);
   const romans   = computeAllRomans(scaleData.intervals, scaleData);
 
   scaleNotes.forEach((_, di) => {
@@ -7024,12 +7215,12 @@ function showGripModal(navList, idx) {
     ${makeGripDiagram(cur.instr, cur.grip, cur.rootPc, 260, { label: state.gripLabel, chordTones: cur.iv.map(x => ((x % 12) + 12) % 12) })}
     <div style="display:flex;align-items:center;gap:10px">
       <span id="gm-prev">${btn(hasPrev, '◀')}</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6878;letter-spacing:.1em">${idx + 1} / ${navList.length}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8b93a3;letter-spacing:.1em">${idx + 1} / ${navList.length}</span>
       <span id="gm-next">${btn(hasNext, '▶')}</span>
     </div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#5a6878;text-align:center;line-height:1.6">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8b93a3;text-align:center;line-height:1.6">
       ${cfg.label} ${cfg.tuning}<br>span ${cur.grip.span} fret${cur.grip.span === 1 ? '' : 's'} · ${cur.grip.fingers} finger${cur.grip.fingers > 1 ? 's' : ''}<br>
-      <span style="color:#3a4556">← swipe or arrows → · click anywhere to close</span>
+      <span style="color:#8b93a3">← swipe or arrows → · click anywhere to close</span>
     </div>`;
 
   let inner = modal.querySelector('#gm-inner');
@@ -7462,7 +7653,7 @@ function makeMandoDiagram(frets4, pcs4, rootPc, w) {
   if (startF===0) {
     g.push(`<rect x="${padL-1}" y="${padT-4}" width="${strGap*3+2}" height="5" rx="1.5" fill="#b8b0a0"/>`);
   } else {
-    g.push(`<text x="2" y="${padT+fretH*0.6}" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#6b7280">${startF+1}fr</text>`);
+    g.push(`<text x="2" y="${padT+fretH*0.6}" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8b93a3">${startF+1}fr</text>`);
   }
   for (let f=0; f<=NUM_FRET; f++) {
     const y=padT+f*fretH;
@@ -7554,7 +7745,7 @@ function showMandoDiagramModal(frets4, pcs4, rootPc, title, navList, navIdx) {
       <div style="flex:1;min-width:0;text-align:right;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${prevTitle}">${prevTitle}</div>
       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
         <button id="dm-prev" style="background:none;border:1px solid ${hasPrev?'#3e4a5a':'#1e2530'};color:${hasPrev?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasPrev?'pointer':'default'};font-size:14px;line-height:1;">◀</button>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6878;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8b93a3;letter-spacing:.1em;">${idx+1} / ${navList.length}</span>
         <button id="dm-next" style="background:none;border:1px solid ${hasNext?'#3e4a5a':'#1e2530'};color:${hasNext?'#8a9bb0':'#2e3440'};padding:5px 16px;border-radius:3px;cursor:${hasNext?'pointer':'default'};font-size:14px;line-height:1;">▶</button>
       </div>
       <div style="flex:1;min-width:0;font-size:12px;color:#8fa8c8;font-family:'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${nextTitle}">${nextTitle}</div>
@@ -7564,7 +7755,7 @@ function showMandoDiagramModal(frets4, pcs4, rootPc, title, navList, navIdx) {
     <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8">${cur.title}</div>
     ${makeMandoDiagram(cur.frets4, cur.pcs4, cur.rootPc, 240)}
     ${navHtml}
-    <div style="font-size:9px;color:#4a5566;font-family:'IBM Plex Mono',monospace">Mandolin G · D · A · E${hasNav?' · ← swipe or arrows →':''} · click to close</div>`;
+    <div style="font-size:9px;color:#8b93a3;font-family:'IBM Plex Mono',monospace">Mandolin G · D · A · E${hasNav?' · ← swipe or arrows →':''} · click to close</div>`;
 
   function bindNavBtns() {
     if (!hasNav) return;
@@ -7603,7 +7794,7 @@ function renderMandolin(scaleNotes, scaleData) {
   const rootPc  = parseInt(state.key);
   const isChromatic = ['secdom','secdim','secsub','chromed'].includes(state.mode);
   const scaleLen = scaleNotes.length;
-  const DNAMES   = scaleLen===5 ? DEGREE_NAMES_5 : scaleLen===6 ? DEGREE_NAMES_6 : DEGREE_NAMES_7;
+  const DNAMES   = degreeNames(scaleData.intervals);
   const romans   = computeAllRomans(scaleData.intervals, scaleData);
   const isOthers = state.mode === 'others';
   const n        = Math.min(isOthers ? 3 : (parseInt(state.mode)||3), scaleLen);
@@ -7801,6 +7992,8 @@ function getDrop3Voicings(chord4pcs, chordNotes) {
 let progAudioCtx  = null;
 let sampler       = null;
 let samplerReady  = false;
+let samplerFailed = false;
+let guitarSamplerFailed = false;
 let _samplerReadyCbs = [];
 
 // ── Tone.js Sampler (Salamander Grand Piano) ────
@@ -7865,7 +8058,10 @@ function initSampler() {
       _samplerReadyCbs = [];
     },
     onerror: () => {
-      if (loading) { loading.style.display = 'inline'; loading.textContent = '⚠ samples failed to load — using synth fallback'; }
+      samplerFailed = true;
+      if (loading) { loading.style.display = 'inline'; loading.textContent = '⚠ piano samples unavailable (offline?) - chord buttons use a synth piano'; }
+      _samplerReadyCbs.forEach(f => f());
+      _samplerReadyCbs = [];
     }
   }).connect(ensureCompMasterBus());
 }
@@ -7900,8 +8096,9 @@ function initGuitarSampler() {
       if (gl) gl.style.display = 'none';
     },
     onerror: () => {
+      guitarSamplerFailed = true;
       const gl = document.getElementById('guitar-sampler-loading');
-      if (gl) { gl.style.display = 'inline'; gl.textContent = '⚠ guitar samples failed to load'; }
+      if (gl) { gl.style.display = 'inline'; gl.textContent = '⚠ guitar samples unavailable - piano used instead'; }
     }
   }).connect(ensureCompMasterBus());
 }
@@ -7911,15 +8108,28 @@ function getAudioCtx() {
   try { return Tone.getContext().rawContext; } catch(e) { return null; }
 }
 
-// PWA audio unlock — Tone.start() is required on iOS before any audio.
+// PWA audio unlock - Tone.start() is required on iOS before any audio. Once the
+// context runs, the listeners go away instead of firing on every touch.
 function _unlockAudio() {
+  if (typeof Tone === 'undefined') return;
   Tone.start().then(() => {
     progAudioCtx = Tone.getContext().rawContext;
+    if (progAudioCtx.state === 'running')
+      ['touchstart','touchend','mousedown','keydown'].forEach(ev => document.removeEventListener(ev, _unlockAudio));
   }).catch(() => {});
 }
 ['touchstart','touchend','mousedown','keydown'].forEach(ev =>
   document.addEventListener(ev, _unlockAudio, { passive: true })
 );
+
+// One note on the piano: the samples once loaded, the synth piano before that or
+// when they failed, nothing when Tone.js itself is missing.
+function playMidiNote(midi, dur, delay) {
+  if (typeof Tone === 'undefined') return;
+  if (samplerReady) { sampler.triggerAttackRelease(midiToNoteName(midi), dur, Tone.now() + 0.02 + delay); return; }
+  const ctx = getAudioCtx();
+  if (ctx) makePianoNote(ctx, 440 * Math.pow(2, (midi - 69) / 12), ctx.currentTime + 0.02 + delay, dur, 0.13);
+}
 
 // ── Note frequency ─────────────────────────────
 
@@ -8101,6 +8311,11 @@ function _arpIndex(s, n, pattern) {
 
 
 
+// Drums share the chords' compressor + limiter when it lives on the same context,
+// so the combined peak is what gets tamed (they went straight to the speakers).
+function _drumOut(actx) {
+  return (compMasterBus && compMasterBus.context === actx) ? compMasterBus : actx.destination;
+}
 function _synthKick(actx, time, vel=1) {
   // Sub bass body
   const sub = actx.createOscillator();
@@ -8108,9 +8323,9 @@ function _synthKick(actx, time, vel=1) {
   sub.type = 'sine';
   sub.frequency.setValueAtTime(90, time);
   sub.frequency.exponentialRampToValueAtTime(28, time + 0.18);
-  subG.gain.setValueAtTime(1.5 * vel, time);
+  subG.gain.setValueAtTime(0.8 * vel, time);   // was 1.5: clipped on every kick
   subG.gain.exponentialRampToValueAtTime(0.001, time + 0.55);
-  sub.connect(subG); subG.connect(actx.destination);
+  sub.connect(subG); subG.connect(_drumOut(actx));
   sub.start(time); sub.stop(time + 0.6);
   // Punch transient
   const clk = actx.createOscillator();
@@ -8120,7 +8335,7 @@ function _synthKick(actx, time, vel=1) {
   clk.frequency.exponentialRampToValueAtTime(55, time + 0.04);
   clkG.gain.setValueAtTime(1.0 * vel, time);
   clkG.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
-  clk.connect(clkG); clkG.connect(actx.destination);
+  clk.connect(clkG); clkG.connect(_drumOut(actx));
   clk.start(time); clk.stop(time + 0.06);
   // Noise click for attack
   const nBuf = actx.createBuffer(1, Math.floor(actx.sampleRate * 0.008), actx.sampleRate);
@@ -8128,7 +8343,7 @@ function _synthKick(actx, time, vel=1) {
   for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
   const nSrc = actx.createBufferSource(); nSrc.buffer = nBuf;
   const nG2 = actx.createGain();
-  nSrc.connect(nG2); nG2.connect(actx.destination);
+  nSrc.connect(nG2); nG2.connect(_drumOut(actx));
   nG2.gain.setValueAtTime(0.5 * vel, time);
   nG2.gain.exponentialRampToValueAtTime(0.001, time + 0.008);
   nSrc.start(time); nSrc.stop(time + 0.01);
@@ -8144,14 +8359,14 @@ function _synthSnare(actx, time, vel=1) {
   const bp  = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2400; bp.Q.value = 0.6;
   const hp2 = actx.createBiquadFilter(); hp2.type = 'highpass'; hp2.frequency.value = 1200;
   const nG  = actx.createGain();
-  src.connect(bp); bp.connect(hp2); hp2.connect(nG); nG.connect(actx.destination);
+  src.connect(bp); bp.connect(hp2); hp2.connect(nG); nG.connect(_drumOut(actx));
   nG.gain.setValueAtTime(0.75 * vel, time);
   nG.gain.exponentialRampToValueAtTime(0.001, time + 0.20);
   src.start(time); src.stop(time + 0.24);
   // Tonal snap
   const body = actx.createOscillator(); body.type = 'sine'; body.frequency.value = 200;
   const bG   = actx.createGain();
-  body.connect(bG); bG.connect(actx.destination);
+  body.connect(bG); bG.connect(_drumOut(actx));
   bG.gain.setValueAtTime(0.35 * vel, time);
   bG.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
   body.start(time); body.stop(time + 0.07);
@@ -8167,7 +8382,7 @@ function _synthHihat(actx, time, open, vel=1) {
   const hp  = actx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 8500;
   const bp2 = actx.createBiquadFilter(); bp2.type = 'peaking'; bp2.frequency.value = 11000; bp2.gain.value = 6;
   const hG  = actx.createGain();
-  src.connect(hp); hp.connect(bp2); bp2.connect(hG); hG.connect(actx.destination);
+  src.connect(hp); hp.connect(bp2); bp2.connect(hG); hG.connect(_drumOut(actx));
   hG.gain.setValueAtTime(0.30 * vel, time);
   hG.gain.exponentialRampToValueAtTime(0.001, time + dur);
   src.start(time); src.stop(time + dur + 0.01);
@@ -8187,7 +8402,7 @@ function _synthClap(actx, time, vel=1) {
     const src = actx.createBufferSource(); src.buffer = buf;
     const bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1100; bp.Q.value = 0.4;
     const g = actx.createGain();
-    src.connect(bp); bp.connect(g); g.connect(actx.destination);
+    src.connect(bp); bp.connect(g); g.connect(_drumOut(actx));
     g.gain.setValueAtTime(0.55 * vel, time + offset);
     g.gain.exponentialRampToValueAtTime(0.001, time + offset + dur);
     src.start(time + offset); src.stop(time + offset + dur + 0.01);
@@ -8204,7 +8419,7 @@ function _synthRide(actx, time, bell=false, vel=1) {
   const bp = actx.createBiquadFilter(); bp.type = 'bandpass';
   bp.frequency.value = bell ? 3400 : 6000; bp.Q.value = bell ? 5 : 1.2;
   const g = actx.createGain();
-  src.connect(bp); bp.connect(g); g.connect(actx.destination);
+  src.connect(bp); bp.connect(g); g.connect(_drumOut(actx));
   g.gain.setValueAtTime((bell ? 0.4 : 0.22) * vel, time);
   g.gain.exponentialRampToValueAtTime(0.001, time + dur);
   src.start(time); src.stop(time + dur + 0.01);
@@ -8245,13 +8460,17 @@ function addToProgression(name, sym, roman, notes, quality) {
 }
 
 // ── Preset progressions ─────────────────────────
+// Diatonic presets are built on the current scale's degrees and only offered when
+// the scale really yields those numerals (no "I-IV-V" giving C6 G6sus4 A7sus4 on a
+// pentatonic). The last two borrow chords, so they are spelled explicitly from the
+// tonic: [semitones, letter steps, quality].
 const PROG_PRESETS = [
   { label: 'I–V–vi–IV',    degrees: [0,4,5,3] },
   { label: 'I–IV–V',       degrees: [0,3,4]   },
   { label: 'I–vi–IV–V',    degrees: [0,5,3,4] },
   { label: 'ii–V–I',       degrees: [1,4,0]   },
-  { label: 'i–VII–VI–VII', degrees: [0,6,5,6] },
-  { label: 'I–III–IV–iv',  degrees: [0,2,3,3] },
+  { label: 'i–♭VII–♭VI–♭VII', chords: [[0,0,'m'],[10,6,''],[8,5,''],[10,6,'']] },
+  { label: 'I–III–IV–iv',  chords: [[0,0,''],[4,2,''],[5,3,''],[5,3,'m']] },
 ];
 
 function buildPresets(scaleNotes, scaleData) {
@@ -8261,28 +8480,47 @@ function buildPresets(scaleNotes, scaleData) {
   if (!wrap) return;
   wrap.innerHTML = '';
 
+  const size = Math.min(parseInt(state.mode) || 3, 4);
+  const tonicPc = noteNameToPc(scaleNotes[0]);
   PROG_PRESETS.forEach(preset => {
-    if (preset.degrees.some(d => d >= n)) return;
+    let chords;
+    if (preset.degrees) {
+      if (n !== 7 || preset.degrees.some(d => d >= n)) return;
+      // Offered only when the scale gives exactly these numerals.
+      if (preset.degrees.map(di => romans[di]).join('–') !== preset.label) return;
+      chords = preset.degrees.map(di => {
+        const notes = buildChord(scaleNotes, di, size);
+        const iv    = chordIntervals(scaleData.intervals, di, size);
+        const {sym, quality} = getChordSymbol(notes[0], iv);
+        return { name: notes[0], sym, roman: romans[di], notes, quality };
+      });
+    } else {
+      chords = preset.chords.map(([semi, letters, q], i) => {
+        const pc = (tonicPc + semi) % 12;
+        const name = rootOnLetter(scaleNotes[0], letters, pc);
+        const notes = spellChordFromRoot(pc, name, q === 'm' ? [0,3,7] : [0,4,7]);
+        return { name, sym: q, roman: preset.label.split('–')[i], notes, quality: q === 'm' ? 'Minor' : 'Major' };
+      });
+    }
     const btn = document.createElement('button');
     btn.className   = 'preset-btn';
     btn.textContent = preset.label;
     btn.addEventListener('click', () => {
-      if (compIsPlaying) compStopPlayback();
-      // Clear current composition chords and replace with preset
       const comps = compLoad();
-      let comp = comps.find(c => c.id === compActiveId);
+      const comp = comps.find(c => c.id === compActiveId);
       if (!comp) return;
-      comp.chords = [];
-      preset.degrees.forEach(di => {
-        const chordNotes = buildChord(scaleNotes, di, parseInt(state.mode) || 3);
-        const iv         = chordIntervals(scaleData.intervals, di, parseInt(state.mode) || 3);
-        const {sym, quality} = getChordSymbol(chordNotes[0], iv);
-        const pcs = chordNotes.map(n => noteNameToPc(n)).filter(p => p >= 0 && p <= 11);
-        comp.chords.push({ name: chordNotes[0], sym, roman: romans[di], notes: chordNotes, pcs, quality, beats: 4, noteVal: 4, playMode: 'full', arpPattern: 'up' });
-      });
-      compSave(comps);
-      compRenderChordRow(comp);
-      compRenderList();
+      const apply = () => {
+        if (compIsPlaying) compStopPlayback();
+        const fresh = compLoad(), target = fresh.find(c => c.id === compActiveId);
+        if (!target) return;
+        target.chords = chords.map(ch => ({ ...ch, pcs: ch.notes.map(noteNameToPc).filter(p => p >= 0), beats: 4, noteVal: 4, playMode: 'full', arpPattern: 'up' }));
+        compSave(fresh);
+        compRenderChordRow(target);
+        compRenderList();
+      };
+      // A preset replaces the chords: ask first when there is something to lose.
+      if (comp.chords.length) showCompConfirm(`Replace the ${comp.chords.length} chord${comp.chords.length > 1 ? 's' : ''} of "${comp.title || 'Untitled'}" with ${preset.label}?`, 'Replace', apply);
+      else apply();
     });
     wrap.appendChild(btn);
   });
@@ -8405,6 +8643,23 @@ function buildNegTransformText(di) {
 function buildNegChord(origNotes, tonicPc) {
   const srcPcs = origNotes.map(n => noteNameToPc(n)).filter(p => p >= 0);
   if (!srcPcs.length) return null;
+
+  // Five notes and more (9ths, 11ths, 13ths): the mirror of a stack of thirds is
+  // a stack of thirds read downward, so it is named from the mirror of its top
+  // note (CΔ9 mirrors to Fm9). The rotation search below only knows 3-4 notes.
+  if (srcPcs.length > 4) {
+    const rev = srcPcs.map(p => negMirrorPcCoF(p, tonicPc)).reverse();
+    const ivs = [0];
+    for (let i = 1; i < rev.length; i++) {
+      let iv = ((rev[i] - rev[0]) % 12 + 12) % 12;
+      while (iv <= ivs[i - 1]) iv += 12;
+      ivs.push(iv);
+    }
+    const named = classifyChord(ivs);
+    const notes = ivs.map(iv => { const pc = (rev[0] + iv) % 12, c = PITCH_CANDIDATES[pc];
+      return (PREFER_FLAT_PC.has(pc) && c.length > 1) ? c[1] : c[0]; });
+    return { root: notes[0], sym: named.sym, qual: named.qual, notes, iv: ivs };
+  }
 
   const mirrored = srcPcs.map(p => negMirrorPcCoF(p, tonicPc));
   const best = bestRootForNeg(mirrored);
@@ -8734,6 +8989,21 @@ function findScaleRelationships(rootPc, scaleName) {
 
   const relative = [], parallel = [], closely = [];
 
+  // Closely related: one note apart, on any other root (only roots 1-2 semitones
+  // away were scanned, so C major never listed G or F major). Exact overlaps are
+  // the relative group.
+  function addClosely(name, data) {
+    for (let delta = 1; delta < 12; delta++) {
+      const r2 = (rootPc + delta) % 12;
+      const sh = countSharedNotes(ivA, data.intervals, rootPc, r2);
+      if (sh !== totalNotes - 1) continue;
+      const lbl = spellScale(r2, data.intervals, data)[0] + ' ' + name;
+      if (!closely.find(x => x.label === lbl))
+        closely.push({ label: lbl, key: r2, scale: name, shared: sh, same: name === scaleName,
+                       fifths: Math.min(((delta * 7) % 12), 12 - ((delta * 7) % 12)) });
+    }
+  }
+
   // ── Always include the canonical parallel pair ──
   // Ionian (Major) <-> Aeolian (Natural Minor) share the same root but different modes
   const parallelPairs = {
@@ -8754,8 +9024,10 @@ function findScaleRelationships(rootPc, scaleName) {
   }
 
   Object.entries(SCALES).forEach(([name, data]) => {
-    if (name === scaleName) return;
     if (data.intervals.length !== totalNotes) return; // skip different cardinality
+    // The same scale on another root is the first thing a "closely related" list
+    // must show (G and F major for C major); only the self-comparisons are skipped.
+    if (name === scaleName) { addClosely(name, data); return; }
 
     // Relative: same pitches, different root
     for (let r = 0; r < 12; r++) {
@@ -8779,26 +9051,14 @@ function findScaleRelationships(rootPc, scaleName) {
       }
     }
 
-    // Closely related: 1-2 semitones away root, near-total overlap (exclude perfect overlaps, those are relative)
-    for (let delta of [-1,1,-2,2]) {
-      const r2 = (rootPc + delta + 12) % 12;
-      const sh = countSharedNotes(ivA, data.intervals, rootPc, r2);
-      if (sh >= totalNotes) continue; // already in relative
-      if (sh >= totalNotes - 1) {
-        const nn = PREFER_FLAT_PC.has(r2) && PITCH_CANDIDATES[r2].length > 1 ? PITCH_CANDIDATES[r2][1] : PITCH_CANDIDATES[r2][0];
-        const lbl = nn + ' ' + name;
-        if (!closely.find(x => x.label === lbl)) {
-          closely.push({ label: lbl, key: r2, scale: name, shared: sh });
-        }
-        break;
-      }
-    }
+    addClosely(name, data);
   });
 
   return {
     relative: relative.slice(0, 6),
     parallel: parallel.sort((a,b) => (b.pinned?1:0)-(a.pinned?1:0) || b.shared-a.shared).slice(0, 7),
-    closely:  closely.sort((a,b)=>b.shared-a.shared).slice(0, 5),
+    // Same scale type first (the neighbouring keys), then nearest on the circle of fifths.
+    closely:  closely.sort((a,b) => (b.same?1:0)-(a.same?1:0) || a.fifths-b.fifths).slice(0, 5),
   };
 }
 
@@ -8834,10 +9094,9 @@ function renderScaleRelationships() {
       const targPcs = targetData.intervals.map(iv=>(rootPc+iv)%12);
       const shared = currPcs.filter(p => targPcs.includes(p)).length;
       const diff = Math.max(currentLen, targetData.intervals.length) - shared;
-      const diffNotes = targPcs.filter(p => !currPcs.includes(p)).map(p => {
-        const cands = PITCH_CANDIDATES[p];
-        return cands ? cands[0] : '';
-      }).filter(Boolean);
+      // Named as the target scale spells them: C Aeolian alters Eb, Ab, Bb (not D#, G#, A#).
+      const targNames = spellScale(rootPc, targetData.intervals, targetData);
+      const diffNotes = targPcs.map((p, i) => currPcs.includes(p) ? '' : targNames[i]).filter(Boolean);
       if (diff === 0) return 'Same root, same notes';
       const diffStr = diffNotes.length ? ` (${diffNotes.join(', ')} altered)` : '';
       return `Same root, ${diff} note${diff>1?'s':''} different${diffStr}`;
@@ -8849,7 +9108,8 @@ function renderScaleRelationships() {
       const targPcs = targetData.intervals.map(iv=>(item.key+iv)%12);
       const shared  = currPcs.filter(p => targPcs.includes(p)).length;
       const keyName = PITCH_CANDIDATES[item.key]?.[0] || '';
-      return `${shared}/${currentLen} shared notes · root a ${item.key > rootPc ? (item.key-rootPc) : (12+item.key-rootPc)} semitone${(item.key>rootPc?item.key-rootPc:12+item.key-rootPc)>1?'s':''} away`;
+      const up = ((item.key - rootPc) % 12 + 12) % 12, signed = up > 6 ? up - 12 : up;
+      return `${shared}/${currentLen} shared notes · root ${Math.abs(signed)} semitone${Math.abs(signed) > 1 ? 's' : ''} ${signed > 0 ? 'up' : 'down'}`;
     }
     return '';
   }
@@ -8893,8 +9153,11 @@ function renderCadenceSuggester(scaleNotes, scaleData) {
   const container = document.getElementById('cad-content');
   if (!container) return;
   const ivs = scaleData.intervals;
-  const n = Math.min(ivs.length, 7);
-  if (n < 5) { container.innerHTML = '<span class="cad-na">Cadences require a heptatonic scale.</span>'; return; }
+  const n = ivs.length;
+  // Cadences are defined on degrees of a seven-note scale; on a pentatonic or an
+  // eight-note scale the same indices land on other degrees (Major Pentatonic gave
+  // "Perfect (V-I): VI A7sus4 -> I").
+  if (n !== 7) { container.innerHTML = '<span class="cad-na">Cadences are built on seven-note scales.</span>'; return; }
 
   const rootPc = parseInt(state.key);
   const romans = computeAllRomans(ivs, scaleData);
@@ -8919,17 +9182,25 @@ function renderCadenceSuggester(scaleNotes, scaleData) {
     { name: 'vi–IV–I–V',       seq: [5, 3, 0, 4], desc: '"Axis" progression. Used in thousands of pop songs.' },
   ];
 
+  // In a mode whose fifth degree is minor there is no leading tone: v-i is a
+  // modal close, not the "strongest resolution" (Aeolian, Dorian, Phrygian...).
+  const vMinor = /^m(?!aj)/.test(degChord(4).name.replace(scaleNotes[4], ''));
   let html = '';
   CADENCES.forEach(cad => {
     const chords = cad.seq.map(di => di < n ? degChord(di) : null).filter(Boolean);
     if (chords.length < cad.seq.length) return; // scale too short
+    let name = cad.name, desc = cad.desc;
+    if (vMinor && cad.seq.includes(4)) {
+      name = name.replace(/\(([^)]*)\)/, () => '(' + chords.map(c => c.roman).join('–') + ')');
+      if (cad.name.startsWith('Perfect')) { name = name.replace('Perfect', 'Modal'); desc = 'No leading tone here: a softer, modal close. For a strong V-i, borrow V7 from harmonic minor.'; }
+    }
 
-    html += `<div class="cad-row" title="${cad.desc}">`;
-    html += `<span class="cad-name">${cad.name}</span>`;
+    html += `<div class="cad-row" title="${desc}">`;
+    html += `<span class="cad-name">${name}</span>`;
     html += `<div class="cad-chords">`;
     chords.forEach((ch, ci) => {
       const isTarget = ci === chords.length - 1;
-      html += `<span class="cad-chord${isTarget ? ' cad-target' : ''}" data-di="${ch.di}" title="Add to progression">${ch.roman} <span style="opacity:.6;font-size:9px">${ch.name}</span></span>`;
+      html += `<span class="cad-chord${isTarget ? ' cad-target' : ''}" data-di="${ch.di}" title="Add to the composition">${ch.roman} <span style="opacity:.6;font-size:9px">${ch.name}</span></span>`;
       if (ci < chords.length - 1) html += `<span class="cad-arrow">→</span>`;
     });
     html += `</div></div>`;
@@ -9120,6 +9391,8 @@ let _earState = { score: 0, total: 0, current: null, dir: 'ascending' };
 function renderEarTraining() {
   const container = document.getElementById('ear-content');
   if (!container) return;
+  // A question asked in the previous scale can have no answer button in this one.
+  _earState.current = null;
   const scaleData = SCALES[state.scale];
   if (!scaleData || scaleData.intervals.length < 5) {
     container.innerHTML = '<span style="font-size:10px;color:var(--muted)">Ear training requires a scale with 5+ notes.</span>';
@@ -9345,7 +9618,7 @@ function renderComparison() {
   function renderCol(container, rootPc, scaleData, scaleNotes, otherPcs, keyLabel, isB) {
     const ivs = scaleData.intervals;
     const n = Math.min(ivs.length, 7);
-    const romans = computeAllRomans(ivs);
+    const romans = computeAllRomans(ivs, scaleData);   // without scaleData, minor pentatonic read I ♯II IV V ♯VI
     const scaleName = Object.keys(SCALES).find(k => SCALES[k] === scaleData) || '';
     let colHtml = `<div class="compare-col-hdr ${isB?'b':''}">${scaleNotes[0]} ${scaleName}</div>`;
 
@@ -9391,8 +9664,12 @@ document.getElementById('compare-toggle-btn')?.addEventListener('click', () => {
   const viewHdr = document.getElementById('view-tabs').previousElementSibling;
   if (viewHdr) viewHdr.style.display = compareActive ? 'none' : '';
   if (compareActive) {
+    // The instrument sub-tabs would otherwise stay clickable and re-render the hidden list.
+    ['guitar-sub-tabs','mandolin-sub-tabs','banjo-sub-tabs'].forEach(id => { document.getElementById(id).style.display = 'none'; });
     initCompareSelects();
     renderComparison();
+  } else {
+    render();   // brings back the sub-tab row of the current view
   }
 });
 
@@ -9647,12 +9924,18 @@ document.getElementById('transpose-up').addEventListener('click',()=>{
       });
       selEl.appendChild(g);
     });
-    // If current scale not visible, switch to first visible
-    const allOpts = Array.from(selEl.options);
-    if (!allOpts.find(o => o.value === state.scale) && allOpts.length) {
-      state.scale = allOpts[0].value;
-      render();
+    if (!selEl.options.length) {
+      const o = document.createElement('option');
+      o.disabled = true; o.selected = true; o.textContent = 'No scale matches "' + searchEl.value.trim() + '"';
+      selEl.appendChild(o);
     }
+  });
+  // Typing only filters; Enter opens the first match (each keystroke used to switch
+  // scale and fill the History strip with scales nobody picked).
+  searchEl.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const first = Array.from(selEl.options).find(o => !o.disabled);
+    if (first && first.value !== state.scale) { state.scale = first.value; selEl.value = first.value; render(); }
   });
   // Style: focus border
   searchEl.addEventListener('focus', () => searchEl.style.borderColor = 'var(--gold)');
@@ -9688,6 +9971,7 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   document.getElementById('mandolin-sub-tabs').style.display=isMandolin2?'flex':'none';
   document.getElementById('banjo-sub-tabs').style.display   =isBanjo2   ?'flex':'none';
   renderView(scaleNotes,scaleData);
+  syncUrl();
 });
 
 document.getElementById('guitar-sub-tabs').addEventListener('click',e=>{
@@ -9700,6 +9984,7 @@ document.getElementById('guitar-sub-tabs').addEventListener('click',e=>{
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   renderView(scaleNotes,scaleData);
+  syncUrl();
 });
 
 document.getElementById('mandolin-sub-tabs').addEventListener('click',e=>{
@@ -9712,6 +9997,7 @@ document.getElementById('mandolin-sub-tabs').addEventListener('click',e=>{
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   renderView(scaleNotes,scaleData);
+  syncUrl();
 });
 
 document.getElementById('banjo-sub-tabs').addEventListener('click',e=>{
@@ -9724,6 +10010,7 @@ document.getElementById('banjo-sub-tabs').addEventListener('click',e=>{
   const scaleData=SCALES[state.scale];
   const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
   renderView(scaleNotes,scaleData);
+  syncUrl();
 });
 
 // (Progression panel buttons removed — composition tool is unified)
@@ -9732,12 +10019,12 @@ const backTop=document.getElementById('back-top');
 window.addEventListener('scroll',()=>backTop.classList.toggle('visible',window.scrollY>300));
 backTop.addEventListener('click',()=>document.getElementById('page-top').scrollIntoView({behavior:'smooth'}));
 
-// ── Patch renderView to rebuild the composition presets for the new key ──
-const _origRenderView = renderView;
-renderView = function(scaleNotes, scaleData) {
-  _origRenderView(scaleNotes, scaleData);
+// The chord views, then the composition presets for the new key. (This used to
+// be a reassignment of renderView at the end of the script.)
+function renderView(scaleNotes, scaleData) {
+  renderViewCore(scaleNotes, scaleData);
   buildPresets(scaleNotes, scaleData);
-};
+}
 // Rebuild comp presets whenever we have fresh scale data
 function rebuildCompPresets() {
   const rootPc = parseInt(state.key);
@@ -9756,21 +10043,25 @@ function encodeHash(st) {
     '&m=' + encodeURIComponent(st.mode) +
     '&v=' + encodeURIComponent(st.view);
 }
+// URLSearchParams already decodes: a second decodeURIComponent threw on "%25" and
+// blanked the page. Anything unknown falls back to the default instead.
+const HASH_MODES = ['3','4','5','6','7','others','secdom','secdim','secsub','chromed'];
+const HASH_VIEWS = ['list','diagrams','arpeggio','scale','shell','drop2','drop3','altdom',
+  'mandolin','mandolin-scale','mandolin-chop','banjo','banjo-scale','banjo-moveable'];
 function decodeHash(hash) {
   if (!hash || hash.length < 3) return null;
-  const p = new URLSearchParams(hash.replace(/^#/, ''));
-  const s = p.get('s') ? decodeURIComponent(p.get('s')) : null;
-  const k = p.get('k');
-  const m = p.get('m') ? decodeURIComponent(p.get('m')) : null;
-  const v = p.get('v') ? decodeURIComponent(p.get('v')) : null;
-  const keyInt = parseInt(k);
-  if (k === null || isNaN(keyInt) || keyInt < 0 || keyInt > 11 || !s || !SCALES[s]) return null;
-  return {
-    key:   keyInt,
-    scale: s,
-    mode:  m || '4',
-    view:  v || 'list',
-  };
+  try {
+    const p = new URLSearchParams(hash.replace(/^#/, ''));
+    const s = p.get('s'), k = p.get('k'), m = p.get('m'), v = p.get('v');
+    const keyInt = Number(k);
+    if (k === null || !Number.isInteger(keyInt) || keyInt < 0 || keyInt > 11 || !s || !Object.hasOwn(SCALES, s)) return null;
+    return {
+      key:   keyInt,
+      scale: s,
+      mode:  HASH_MODES.includes(m) ? m : '4',
+      view:  HASH_VIEWS.includes(v) ? v : 'list',
+    };
+  } catch (e) { return null; }
 }
 
 // Apply hash state on load (shared link support)
@@ -9857,13 +10148,13 @@ function renderHistory() {
   });
 }
 
-// Patch render() to update hash + history on every navigation
-const _origRender = render;
-render = function() {
-  _origRender();
-  history.replaceState(null, '', encodeHash(state));
+// Every navigation: redraw, keep the shareable URL in step, remember the key + scale.
+function render() {
+  renderCore();
+  syncUrl();
   historyPush(state.key, state.scale);
-};
+}
+function syncUrl() { history.replaceState(null, '', encodeHash(state)); }
 
 render();
 initCollapsibles();
@@ -9886,7 +10177,7 @@ initCollapsibles();
 
 // ── Reset preferences ──
 document.getElementById('reset-prefs-btn')?.addEventListener('click', () => {
-  if (!confirm('Clear all saved preferences (theme, history, toggles)?')) return;
+  if (!confirm('Clear the saved history and toggle preferences? Compositions are kept.')) return;
   ['harmonic-history','harmonic-show-intervals'].forEach(k => localStorage.removeItem(k));
   location.reload();
 });
@@ -10056,7 +10347,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Shape search</span><span class="tech-val">Exhaustive permutation search over 4-string sets [1-4, 2-5, 3-6]; span ≤6 frets; scored by span × 8 + fret position penalty</span></div>
       <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val">Drop 2: 2nd-from-top voice lowered an octave. Drop 3: 3rd-from-top lowered. Both follow jazzguitar.be standard across all 4 inversions × 3 string sets. No open strings. Inversion shown in slash notation (e.g. Gmaj7/B).</span></div>
       <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Generated inline via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordDiagram()</code>; pitch-class labels on fret dots. Modal is persistent (single DOM element reused across navigations); inner panel fades at 80 ms; prev/next chord names shown as context labels.</span></div>
-      <div class="tech-row"><span class="tech-key">Alt. Dom tab</span><span class="tech-val">Dedicated <em>Alt. Dom</em> sub-tab under Guitar showing altered dominant shapes for the V7 and secondary dominants of the current key. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">ALT_DOM_VOICINGS</code> constant (12 chord types, 27 shapes) + <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">computeVoicingFromTemplate(rootPc, template)</code> derives frets6/pcs6 from semitone-offset templates; enforces ascending pitch per string and hard span ≤ 4 frets. Each dominant gets its own section with its tritone substitution. Reference: Dirk Laukens <em>Dominant Chords For Jazz Guitar</em>.</span></div>
+      <div class="tech-row"><span class="tech-key">Alt. Dom tab</span><span class="tech-val">Dedicated <em>Alt. Dom</em> sub-tab under Guitar showing altered dominant shapes for the V7 and secondary dominants of the current key. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">ALT_DOM_VOICINGS</code> constant (12 chord types, 24 shapes, all movable and four-finger) + <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">computeVoicingFromTemplate(rootPc, template)</code> derives frets6/pcs6 from semitone-offset templates; enforces ascending pitch per string and hard span ≤ 4 frets. Each dominant gets its own section with its tritone substitution. Reference: Dirk Laukens <em>Dominant Chords For Jazz Guitar</em>.</span></div>
     </div>
 
     <div class="tech-section">
@@ -10127,7 +10418,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
     <div class="tech-section">
       <div class="tech-section-title">Jazz Resources Hub</div>
-      <div class="tech-row"><span class="tech-key">Content</span><span class="tech-val">Curated collection of 38 jazz guitar resources across 9 categories: Jazz Licks &amp; Vocabulary, Bebop, Chord Melody, Walking Bass, Improvisation Concepts, Jazz Guitar Comping, Learning Jazz Standards, Bossa Nova, Gypsy Jazz. Reading status (Unread / In progress / Done) saved in localStorage.</span></div>
+      <div class="tech-row"><span class="tech-key">Content</span><span class="tech-val">Curated collection of 37 jazz guitar resources across 9 categories: Jazz Licks &amp; Vocabulary, Bebop, Chord Melody, Walking Bass, Improvisation Concepts, Jazz Guitar Comping, Learning Jazz Standards, Bossa Nova, Gypsy Jazz. Reading status (Unread / In progress / Done) saved in localStorage.</span></div>
       <div class="tech-row"><span class="tech-key">Links</span><span class="tech-val">Each resource card opens its page in a new tab (window.open with noopener).</span></div>
       <div class="tech-row"><span class="tech-key">Sources</span><span class="tech-val">Jens Larsen (jenslarsen.nl), Jazz Guitar BE (jazzguitar.be), Jazz Guitar Licks (jazzguitarlicks.com), Matt Warnock Guitar (mattwarnockguitar.com).</span></div>
     </div>
@@ -10149,7 +10440,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
 <!-- ══════ COMPOSITIONS OVERLAY ══════ -->
 <div id="comp-overlay">
-  <div id="comp-modal">
+  <div id="comp-modal" role="dialog" aria-modal="true" aria-label="Compositions" tabindex="-1">
     <div id="comp-modal-header">
       <span id="comp-modal-title">Compositions</span>
       <button id="comp-new-btn">+ New</button>
@@ -10345,7 +10636,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
   background: rgba(201,168,76,.08); border: 1px solid rgba(201,168,76,.25);
   border-radius: 3px; color: var(--gold2); letter-spacing: .04em;
 }
-@media(max-width:620px) {
+@media(max-width:775px) {   /* 620 effective px under the 1.25 zoom */
   #guide-panel { padding: 32px 22px 48px; }
   .guide-toc ol { grid-template-columns: 1fr; }
   .guide-title { font-size: 26px; }
@@ -10778,7 +11069,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Jazz Resources</div>
         </div>
       </div>
-      <p class="guide-p">The <strong>&#9835;</strong> button (top-right) opens <strong>Jazz Resources</strong>: 38 hand-picked lessons and articles from jazz guitar teachers, to go further than the app.</p>
+      <p class="guide-p">The <strong>&#9835;</strong> button (top-right) opens <strong>Jazz Resources</strong>: 37 hand-picked lessons and articles from jazz guitar teachers, to go further than the app.</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Categories</span>
         <span class="guide-kv-val">Jazz licks &amp; vocabulary, bebop, chord melody, walking bass, improvisation concepts, comping, learning jazz standards, bossa nova, gypsy jazz.</span>
@@ -10837,7 +11128,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
 <!-- ══════ JAZZ RESOURCES HUB ══════ -->
 <div id="lick-overlay"></div>
-<div id="lick-panel">
+<div id="lick-panel" role="dialog" aria-modal="true" aria-label="Jazz Resources">
   <div class="res-header">
     <div class="res-header-title">Jazz <em>Resources</em></div>
     <button class="lick-close-btn" id="lick-close" aria-label="Close">&#x2715;</button>
@@ -10929,8 +11220,66 @@ function _escHtml(s) {
 function compLoad() {
   try { return JSON.parse(localStorage.getItem(COMP_KEY) || '[]'); } catch(e) { return []; }
 }
+// localStorage holds ~5 MB shared with the other apps on this origin, and an
+// imported MusicXML piece can weigh a megabyte: a failed write is reported, not
+// swallowed. The first save also asks the browser to keep this storage (Safari
+// otherwise clears it after a week without a visit, for a site not installed).
+let _compPersistAsked = false;
 function compSave(comps) {
-  localStorage.setItem(COMP_KEY, JSON.stringify(comps));
+  try {
+    localStorage.setItem(COMP_KEY, JSON.stringify(comps));
+  } catch (e) {
+    _compToast('Not saved: browser storage is full. Use Export all to keep a copy, then delete a large composition.', true);
+    return false;
+  }
+  if (!_compPersistAsked && navigator.storage && navigator.storage.persist) {
+    _compPersistAsked = true;
+    navigator.storage.persist().catch(() => {});
+  }
+  return true;
+}
+
+// Backup of every composition as one JSON file, and the way back.
+function compExportAll() {
+  const comps = compLoad();
+  if (!comps.length) { _compToast('Nothing to export yet.'); return; }
+  const blob = new Blob([JSON.stringify({ app: 'harmonic-atlas', v: 1, exported: new Date().toISOString(), compositions: comps }, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'harmonic-atlas-compositions-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  _compToast(comps.length + ' composition' + (comps.length > 1 ? 's' : '') + ' exported.');
+}
+function compImportAllPrompt() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.addEventListener('change', () => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    if (f.size > 20e6) { _compToast('This file is too large for a backup.', true); return; }
+    f.text().then(txt => {
+      let data;
+      try { data = JSON.parse(txt); } catch (e) { _compToast('Not a Harmonic Atlas backup (invalid JSON).', true); return; }
+      const list = Array.isArray(data) ? data : (data && data.compositions);
+      if (!Array.isArray(list)) { _compToast('Not a Harmonic Atlas backup.', true); return; }
+      const comps = compLoad();
+      const known = new Set(comps.map(c => JSON.stringify([c.title, c.chords])));
+      let added = 0;
+      list.forEach(raw => {
+        const p = _sanitizeComp(raw);
+        if (!p) return;
+        if (known.has(JSON.stringify([p.title, p.chords]))) return;   // already here
+        comps.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2), ...p, createdAt: Date.now() });
+        added++;
+      });
+      if (added && compSave(comps)) { compRenderList(); _compToast(added + ' composition' + (added > 1 ? 's' : '') + ' restored.'); }
+      else if (!added) _compToast('Nothing new in this backup.');
+    });
+  });
+  input.click();
 }
 function compCreate() {
   const comp = { id: Date.now().toString(36) + Math.random().toString(36).slice(2), title: 'Untitled', text: '', chords: [], bpm: 90, createdAt: Date.now() };
@@ -10965,6 +11314,7 @@ function _haEncodeComp(comp) {
     drums: !!comp.drums,
     drumsStyle: comp.drumsStyle || 'auto',
     drumTrack: comp.drumTrack || undefined,
+    drumShift: comp.drumShift || 0,
     sound: comp.sound || 'piano',
     strum: comp.strum || 'Straight',
     swing: comp.swing ?? 0,
@@ -11020,6 +11370,7 @@ function _sanitizeComp(p) {
     drumsStyle: word(p.drumsStyle, 'auto'),
     drumTrack: Array.isArray(p.drumTrack) ? p.drumTrack.filter(h => h && /^[a-z]{2,12}$/.test(h.type)).slice(0, 8192)
       .map(h => ({ at: _clampNum(h.at, 0, 100000, 0), type: h.type, vel: _clampNum(h.vel, 0, 1, 0.7) })) : undefined,
+    drumShift: _clampNum(p.drumShift, 0, 100000, 0),
     sound: p.sound === 'guitar' ? 'guitar' : 'piano',
     strum: Object.hasOwn(STRUM_PATTERNS, p.strum) ? p.strum : 'Straight',
     swing: _clampNum(p.swing, 0, 100, 0),
@@ -11156,7 +11507,9 @@ function _matchChordFromPcs(pcs, preferRoot) {
       if ((pc - rootPc + 12) % 12 === 7) return;                 // a played 5th never hurts
       score -= 1.6;
     });
-    if (pref != null && rootPc === pref) score += 4;
+    // The bass note breaks ties (Am7 vs C6) but must not outvote a complete triad:
+    // at +4, C over E came out "Em" and G over B "Bm".
+    if (pref != null && rootPc === pref) score += 1.5;
     score -= Math.abs(cps.length - played.size) * 0.05;          // prefer tidy fit
     if (score > bestScore) { bestScore = score; best = cand; }
   }
@@ -11199,6 +11552,7 @@ function _mxmlHarmony(el) {
   const rootPc = (((stepPc + (ra ? parseInt(ra.textContent) || 0 : 0)) % 12) + 12) % 12;
   const kindEl = el.getElementsByTagName('kind')[0];
   const kindTxt = (kindEl?.textContent || '').trim().toLowerCase();
+  if (kindTxt === 'none') return null;   // N.C. ("no chord"), it was read as a major triad
   let ivs = (_MXML_KIND_IV[kindTxt] || [0,4,7]).slice();
   [...el.getElementsByTagName('degree')].forEach(d => {
     const v  = parseInt(d.getElementsByTagName('degree-value')[0]?.textContent);
@@ -11321,7 +11675,7 @@ function _parseMusicXMLDoc(doc, partId) {
   const snd = [...doc.getElementsByTagName('sound')].find(s => s.getAttribute('tempo'));
   if (snd) bpm = parseFloat(snd.getAttribute('tempo'));
   if (!bpm) bpm = parseFloat(doc.getElementsByTagName('per-minute')[0]?.textContent);
-  bpm = Math.round(bpm) || 90;
+  bpm = Math.min(240, Math.max(40, Math.round(bpm) || 90));   // the app's tempo range
 
   // Choose the part to import. If a partId is given (from the picker) use it;
   // otherwise auto-pick the most chordal part (the comp), never the drums.
@@ -11356,7 +11710,8 @@ function _parseMusicXMLDoc(doc, partId) {
         }
         case 'harmony': {
           const h = _mxmlHarmony(el);
-          if (h) harms.push({ at: pos, root: h.root, pcs: h.pcs });   // pos is in beats
+          const off = (parseInt(el.getElementsByTagName('offset')[0]?.textContent) || 0) / divisions;
+          if (h) harms.push({ at: pos + off, root: h.root, pcs: h.pcs });   // pos is in beats
           break;
         }
         case 'note': {
@@ -11365,7 +11720,9 @@ function _parseMusicXMLDoc(doc, partId) {
           const dur     = parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0;
           const onset   = isChord ? lastAt : pos;
           const staff   = el.getElementsByTagName('staff')[0]?.textContent?.trim();
-          if (!isRest && !(staff && tabStaves.has(staff))) {   // skip TAB-staff duplicates
+          // Grace and cue notes are ornaments or reminders, not chord tones.
+          const ornament = el.getElementsByTagName('grace').length > 0 || el.getElementsByTagName('cue').length > 0;
+          if (!isRest && !ornament && !(staff && tabStaves.has(staff))) {   // skip TAB-staff duplicates
             const raw = _mxmlNoteMidi(el);
             if (raw != null) {
               const midi = raw + 12 * octaveChange;            // sounding pitch
@@ -11387,7 +11744,38 @@ function _parseMusicXMLDoc(doc, partId) {
       }
     }
   }
+  // Chord symbols often sit on the melody part, not on the comp part chosen above.
+  if (!harms.length) parts.filter(p => p !== part).some(p => {
+    const found = _mxmlPartHarmonies(p);
+    if (found.length) harms.push(...found);
+    return found.length > 0;
+  });
   return { title, bpm, notes, harms, barQ: Math.max(1, beats * 4 / beatType) };
+}
+
+// Positions (in beats) of the <harmony> elements of one part.
+function _mxmlPartHarmonies(part) {
+  const out = [];
+  let divisions = 1, pos = 0;
+  for (const measure of [...part.children].filter(c => c.localName === 'measure')) {
+    for (const el of [...measure.children]) {
+      if (el.localName === 'attributes') {
+        const d = el.getElementsByTagName('divisions')[0];
+        if (d) divisions = parseInt(d.textContent) || divisions;
+      } else if (el.localName === 'harmony') {
+        const h = _mxmlHarmony(el);
+        const off = (parseInt(el.getElementsByTagName('offset')[0]?.textContent) || 0) / divisions;
+        if (h) out.push({ at: pos + off, root: h.root, pcs: h.pcs });
+      } else if (el.localName === 'note') {
+        if (!el.getElementsByTagName('chord').length) pos += (parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0) / divisions;
+      } else if (el.localName === 'backup') {
+        pos -= (parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0) / divisions;
+      } else if (el.localName === 'forward') {
+        pos += (parseInt(el.getElementsByTagName('duration')[0]?.textContent) || 0) / divisions;
+      }
+    }
+  }
+  return out;
 }
 
 function compImportMusicXML(doc, filename, partId) {
@@ -11466,6 +11854,9 @@ function compImportMusicXML(doc, filename, partId) {
     title: title || (filename || '').replace(/\.[^.]+$/, '') || 'Imported',
     text: '', chords, bpm, loop: true,
     drums: !!drumTrack, drumsStyle: drumTrack ? 'imported' : 'auto', drumTrack: drumTrack || undefined,
+    // Beat where the first chord starts in the file: the drum hits are absolute
+    // (pickup bars included), the chords start at 0.
+    drumShift: segs.length ? segs[0].start : 0,
     sound: 'guitar', strum: 'Straight', swing: 0, createdAt: Date.now(),
   };
   const comps = compLoad();
@@ -11484,6 +11875,7 @@ function compImportMusicXMLPrompt() {
     const file = inp.files && inp.files[0];
     inp.remove();
     if (!file) return;
+    if (file.size > 5e6) { _compToast('This file is over 5 MB: export just the parts you need from Guitar Pro.', true); return; }
     const reader = new FileReader();
     reader.onload = () => {
       try {
@@ -11561,8 +11953,11 @@ function _compToast(msg, isError) {
   t._timer = setTimeout(() => { t.style.opacity = '0'; }, 5000);
 }
 
+let _compReturnFocus = null;
 function openCompositions() {
+  _compReturnFocus = document.activeElement;
   document.getElementById('comp-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('comp-modal')?.focus(), 0);
   document.getElementById('comp-btn').classList.add('active');
   lockScroll();
   compRenderList();
@@ -11584,7 +11979,14 @@ function closeCompositions() {
   compStopPlayback();
   if (screen.orientation?.unlock) screen.orientation.unlock();
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  if (_compReturnFocus && _compReturnFocus.focus) _compReturnFocus.focus();
 }
+// Escape closes the tool, unless a dialog of its own (confirm, code, popover) is on top.
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape' || !document.getElementById('comp-overlay').classList.contains('open')) return;
+  if (document.querySelector('[role=alertdialog], .slot-sub-popover, #comp-chord-edit-pop')) return;
+  closeCompositions();
+});
 
 function compSelectId(id) {
   compActiveId = id;
@@ -11627,6 +12029,18 @@ function compRenderChipBar(comps) {
   xmlChip.title = 'Import a Guitar Pro / MusicXML file — chords + exact rhythm';
   xmlChip.addEventListener('click', compImportMusicXMLPrompt);
   bar.appendChild(xmlChip);
+  const exportChip = document.createElement('button');
+  exportChip.className = 'comp-chip-new';
+  exportChip.textContent = '⇪ Export all';
+  exportChip.title = 'Download every composition as one backup file';
+  exportChip.addEventListener('click', compExportAll);
+  bar.appendChild(exportChip);
+  const restoreChip = document.createElement('button');
+  restoreChip.className = 'comp-chip-new';
+  restoreChip.textContent = '⇩ Restore';
+  restoreChip.title = 'Add the compositions of a backup file (nothing is overwritten)';
+  restoreChip.addEventListener('click', compImportAllPrompt);
+  bar.appendChild(restoreChip);
 }
 
 // Full chromatic chord library — every common quality on all 12 roots,
@@ -11779,6 +12193,9 @@ function showChordEditPopover(triggerEl, compId, i) {
         const slot = c.chords[i];
         slot.name = ch.name; slot.sym = ch.sym; slot.roman = ch.roman;
         slot.notes = ch.notes; slot.pcs = ch.pcs; slot.quality = ch.quality;
+        // An imported groove replays the notes captured from the file; keep its timing
+        // but drop those notes, or the corrected chord would still sound the old one.
+        if (Array.isArray(slot.rhythm)) slot.rhythm = slot.rhythm.map(({ at, dur, vel }) => ({ at, dur, vel }));
         compSave(comps);
         const row = document.getElementById('comp-chord-row');
         const wasCompact = row?.classList.contains('compact-mode');
@@ -12139,6 +12556,8 @@ function showCompConfirm(message, label, onConfirm) {
   const overlay = document.createElement('div');
   overlay.style.cssText = `position:fixed;inset:0;z-index:calc(var(--z-top) + 10);background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;`;
   const box = document.createElement('div');
+  box.setAttribute('role', 'alertdialog');
+  box.setAttribute('aria-modal', 'true');
   box.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;padding:22px 26px;max-width:340px;width:90vw;display:flex;flex-direction:column;gap:18px;box-shadow:0 8px 40px rgba(0,0,0,.6);`;
   const msg = document.createElement('div');
   msg.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text);line-height:1.65;`;
@@ -12153,7 +12572,9 @@ function showCompConfirm(message, label, onConfirm) {
   confirmBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 14px;border-radius:3px;border:1px solid #e06060;background:rgba(224,96,96,.12);color:#e06060;cursor:pointer;transition:all .12s;`;
   const close = () => { overlay.remove(); document.removeEventListener('keydown', onKey); };
   const confirm_ = () => { close(); onConfirm(); };
-  const onKey = e => { if (e.key === 'Escape') close(); else if (e.key === 'Enter') confirm_(); };
+  // Enter activates the focused button (the browser does that), so tabbing to
+  // Cancel and pressing Enter cancels instead of deleting.
+  const onKey = e => { if (e.key === 'Escape') close(); };
   cancelBtn.addEventListener('click', close);
   confirmBtn.addEventListener('click', confirm_);
   overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
@@ -12386,6 +12807,17 @@ function compRenderDetail(comp) {
   compRenderTransport(comp);
 }
 
+// The tool lays itself out for phone or desktop when a composition opens. Crossing
+// 600 px (turning a phone, resizing) re-renders it, so Play / Stop / BPM never vanish;
+// during playback the re-render waits for Stop.
+let _compRelayout = false;
+window.matchMedia('(max-width: 750px)').addEventListener('change', () => {
+  if (!compActiveId || !document.getElementById('comp-overlay')?.classList.contains('open')) return;
+  if (compIsPlaying) { _compRelayout = true; return; }
+  const comp = compLoad().find(c => c.id === compActiveId);
+  if (comp) compRenderDetail(comp);
+});
+
 function compRenderTransport(comp) {
   const t  = document.getElementById('comp-transport');
   const sp = document.getElementById('comp-style-panel');
@@ -12394,7 +12826,7 @@ function compRenderTransport(comp) {
   if (t)  t.innerHTML  = '';
   if (sp) sp.innerHTML = '';
 
-  if (window.innerWidth <= 600) return;
+  if (window.innerWidth <= 750) return;   // same switch as the CSS (600 effective px)
 
   const settingsEl = document.getElementById('comp-settings-section');
   if (!t || !settingsEl) return;
@@ -12519,14 +12951,6 @@ function _compChordParts(ch) {
 }
 
 // Spell out a scale ("A Dorian") as space-separated notes with the root highlighted.
-function _compScaleNotesHtml(scaleStr) {
-  const p = _parseImprovScale(scaleStr);
-  if (!p) return '';
-  return p.ivls.map((iv, i) => {
-    const nm = _escHtml(pcToName((p.rootPc + iv) % 12));
-    return i === 0 ? `<span class="cc-sc-root">${nm}</span>` : nm;
-  }).join(' ');
-}
 
 function compRenderChordRow(comp) {
   const row = document.getElementById('comp-chord-row');
@@ -12863,36 +13287,46 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
   const playComp = loopOn ? { ...comp, chords: comp.chords.slice(loopRange.start, loopRange.end + 1), loop: true } : comp;
   const realIdx = ci => loopOn ? loopRange.start + ci : ci;
   startIdx = loopOn ? 0 : Math.max(0, Math.min(startIdx | 0, comp.chords.length - 1));
-  const needsGuitar = comp.sound === 'guitar';
+  if (typeof Tone === 'undefined') { _compToast('Audio unavailable: Tone.js could not be loaded.'); return; }
+  if (samplerFailed) { _compToast('Piano samples could not be loaded (offline?). Playback needs them once.'); return; }
+  const needsGuitar = comp.sound === 'guitar' && !guitarSamplerFailed;
   if (needsGuitar) initGuitarSampler();
+  // Taken before waiting for the samples, so a Stop (or closing the tool) while
+  // they load cancels the deferred start instead of letting it play unseen.
+  const gen = ++_compPlayGen;
   const waitingForSampler = !samplerReady || (needsGuitar && !guitarSamplerReady);
   if (waitingForSampler) {
     const playBtn = document.getElementById('comp-play-btn');
+    const resetBtn = () => { if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; } };
     if (playBtn && !playBtn.dataset.waiting) {
       playBtn.dataset.waiting = '1';
       playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Loading…';
     }
     const retry = () => {
-      if (samplerReady && (!needsGuitar || guitarSamplerReady)) {
-        if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; }
+      if (_compPlayGen !== gen) { resetBtn(); return; }
+      if (samplerFailed) { resetBtn(); _compToast('Piano samples could not be loaded (offline?).'); return; }
+      if (samplerReady && (!needsGuitar || guitarSamplerReady || guitarSamplerFailed)) {
+        resetBtn();
         compStartPlayback(id, startIdx, loopRange);
       }
     };
     if (!samplerReady) _samplerReadyCbs.push(retry);
     if (needsGuitar && !guitarSamplerReady) {
-      const checkGuitar = setInterval(() => {
-        if (guitarSamplerReady) { clearInterval(checkGuitar); retry(); }
+      clearInterval(_compWaitTimer);
+      _compWaitTimer = setInterval(() => {
+        if (_compPlayGen !== gen) { clearInterval(_compWaitTimer); resetBtn(); return; }
+        if (guitarSamplerReady || guitarSamplerFailed) { clearInterval(_compWaitTimer); retry(); }
       }, 100);
     }
     return;
   }
-  const gen = ++_compPlayGen;
 
   // Sync strum/swing from this composition
   activeStrum = comp.strum || activeStrum || 'Straight';
   progSwing   = comp.swing ?? progSwing ?? 0;
 
   Tone.start().then(() => {
+    if (_compPlayGen !== gen) return;   // stopped while the audio context was resuming
     Tone.Transport.stop();
     Tone.Transport.cancel(0);
 
@@ -12904,8 +13338,9 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
     const bpm     = comp.bpm || 90;
     const beatDur = 60 / bpm;
     Tone.Transport.bpm.value = bpm;
-    const activeSampler = (comp.sound === 'guitar' && guitarSampler) ? guitarSampler : sampler;
-    const activeReady   = () => comp.sound === 'guitar' ? guitarSamplerReady : samplerReady;
+    const useGuitar     = comp.sound === 'guitar' && guitarSampler && guitarSamplerReady;
+    const activeSampler = useGuitar ? guitarSampler : sampler;
+    const activeReady   = () => useGuitar ? guitarSamplerReady : samplerReady;
 
     function scheduleChords(srcComp) {
       let tOffset = 0;
@@ -12939,12 +13374,17 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
         const swingRatio = progSwing > 0 ? progSwing / 200 : 0;
         const strumHits  = getStrumDurations(chDur, beats); // still used for velocity feel
 
+        // Swing delays the off-beat eighth only, like the drums: applied to every
+        // other step it pushed beats 2 and 4 of quarter-note comping behind the snare.
+        const swingAt = st => {
+          const pos = ((st * stepDur) % beatDur) / beatDur;
+          return Math.abs(pos - 0.5) < 0.01 ? (beatDur / 2) * swingRatio : 0;
+        };
         if (mode === 'arp') {
           for (let s = 0; s < nSteps; s++) {
             const v = voiced[_arpIndex(s, voiced.length, arpPat)];
             if (!v) continue;
-            const isOff   = s % 2 === 1;
-            const swingOff = isOff ? stepDur * swingRatio : 0;
+            const swingOff = swingAt(s);
             const t        = tOffset + s * stepDur + swingOff;
             const noteDur  = Math.min(stepDur * 1.5, 2.0);
             const beatPos  = s % Math.max(1, nv / 4);
@@ -13022,11 +13462,37 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
               }
             }
           }
+        } else if (nv === 4 && activeStrum !== 'Straight' && STRUM_PATTERNS[activeStrum]) {
+          // A strum pattern at the default note value plays its own rhythm, rests
+          // and up-strokes included, bar after bar (it only changed accents before).
+          const pat    = STRUM_PATTERNS[activeStrum];
+          const barDur = pat.bpb * beatDur;
+          const oneBar = getStrumDurations(barDur, pat.bpb);
+          for (let bar = 0; bar * barDur < chDur - 1e-3; bar++) {
+            oneBar.forEach((hit, hi) => {
+              const at = bar * barDur + hit.offset;
+              if (at >= chDur - 0.02) return;
+              const t = tOffset + at;
+              const noteDur = Math.max(0.2, Math.min(hit.dur, chDur - at) + 0.1);
+              const notesOrdered = hit.up ? [...voiced].reverse() : voiced;
+              notesOrdered.forEach((v, ni) => {
+                Tone.Transport.schedule(time => {
+                  if (_compPlayGen !== gen || !activeReady()) return;
+                  activeSampler.triggerAttackRelease(midiToNoteName(v.midi), noteDur, time + ni * 0.008, hit.velocity);
+                }, t);
+              });
+              if (hi === 0 && voiced.length > 0 && voiced[0].midi - 12 >= 28) {
+                Tone.Transport.schedule(time => {
+                  if (_compPlayGen !== gen || !activeReady()) return;
+                  activeSampler.triggerAttackRelease(midiToNoteName(voiced[0].midi - 12), noteDur + 0.3, time, hit.velocity * 0.7);
+                }, t);
+              }
+            });
+          }
         } else {
           for (let s = 0; s < nSteps; s++) {
             const hit  = strumHits[s % strumHits.length] || { velocity: 0.72, up: false, isFirst: s === 0 };
-            const isOff = s % 2 === 1;
-            const swingOff = isOff ? stepDur * swingRatio : 0;
+            const swingOff = swingAt(s);
             const t        = tOffset + s * stepDur + swingOff;
             const noteDur  = Math.max(0.2, stepDur * 1.4 + 0.15);
             const notesOrdered = hit.up ? [...voiced].reverse() : voiced;
@@ -13058,8 +13524,15 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
       // Active when the style is "imported"; pick a preset style to override it.
       if (srcComp.drumTrack && srcComp.drumTrack.length && (srcComp.drumsStyle === 'imported' || !srcComp.drumsStyle)) {
         const dctx = Tone.getContext().rawContext;
+        // Line the hits up with the chords actually played: skip the file's lead-in,
+        // and for a looped span keep only that stretch of the drum part.
+        const spanStart = loopOn ? comp.chords.slice(0, loopRange.start).reduce((t, c) => t + (c.beats || 4), 0) : 0;
+        const playLen   = srcComp.chords.reduce((t, c) => t + (c.beats || 4), 0);
+        const shift     = (comp.drumShift || 0) + spanStart;
         srcComp.drumTrack.forEach(h => {
-          const t = (h.at || 0) * beatDur;
+          const at = (h.at || 0) - shift;
+          if (at < -1e-6 || at >= playLen - 1e-6) return;
+          const t = at * beatDur;
           const v = h.vel || 0.7;
           Tone.Transport.schedule(time => {
             if (_compPlayGen !== gen) return;
@@ -13182,7 +13655,8 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
           if (timeLeft < 0.22 && timeLeft >= 0) {
             compPendingRestart = false;
             setTimeout(() => {
-              if (compIsPlaying && _compPlayGen === gen) compStartPlayback(id, startIdx, loopRange);
+              // The next pass starts the loop over, not at the chord the first pass started on.
+              if (compIsPlaying && _compPlayGen === gen) compStartPlayback(id, 0, loopRange);
             }, Math.max(0, timeLeft * 1000 - 20));
             return;
           }
@@ -13190,13 +13664,16 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
         _compTickRaf = requestAnimationFrame(tick);
       })();
     } else {
-      setTimeout(() => { if (_compPlayGen === gen) compStopPlayback(); }, (totalDur + 0.5) * 1000);
+      // On the Transport clock, so a paused phone or a mid-piece start still ends on the last chord.
+      Tone.Transport.scheduleOnce(() => { setTimeout(() => { if (_compPlayGen === gen) compStopPlayback(); }, 0); }, totalDur + 0.3);
     }
   }).catch(() => {});
 }
 
+let _compWaitTimer = null;
 function compStopPlayback() {
   _compPlayGen++;
+  clearInterval(_compWaitTimer);
   compPendingRestart = false;
   compIsPaused = false;
   if (_compTickRaf) { cancelAnimationFrame(_compTickRaf); _compTickRaf = null; }
@@ -13221,6 +13698,11 @@ function compStopPlayback() {
   compMobUpdatePlayIcon(false);
   compMobUpdateStage(null, -1);
   document.getElementById('comp-modal')?.classList.remove('comp-playing');
+  if (_compRelayout) {
+    _compRelayout = false;
+    const comp = compLoad().find(c => c.id === compActiveId);
+    if (comp) setTimeout(() => compRenderDetail(comp), 0);
+  }
 }
 
 // Mobile comp transport + tabs (static listeners, use compActiveId at call time)
@@ -13281,13 +13763,18 @@ document.getElementById('comp-new-btn').addEventListener('click', () => {
 // ── Wake lock: keep screen on during playback ──────────────────────────────
 async function _acquireWakeLock() {
   if (!('wakeLock' in navigator)) return;
-  try { _wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+  try {
+    const lock = await navigator.wakeLock.request('screen');
+    _releaseWakeLock();   // a second start must not leak the first lock
+    _wakeLock = lock;
+  } catch(e){}
 }
 function _releaseWakeLock() {
   if (_wakeLock) { _wakeLock.release().catch(()=>{}); _wakeLock = null; }
 }
 // Re-acquire if page becomes visible while playing (lock is auto-released on hide)
 document.addEventListener('visibilitychange', () => {
+  if (typeof Tone === 'undefined') return;
   if (document.visibilityState === 'visible') {
     Tone.getContext().rawContext.resume().catch(() => {});
     Tone.start().catch(() => {});
@@ -13447,13 +13934,6 @@ window.addEventListener('resize', () => {
           site: 'Jens Larsen',
           desc: 'Walking bass lines with chord accompaniment over a 12-bar blues in Bb. How to construct basslines from chord tones and add shell voicings on top.',
           tags: ['Blues', 'Getting Started', 'Chords']
-        },
-        {
-          title: 'Walking Bass Lines for Jazz Guitar',
-          url: 'https://www.jazzguitar.be/blog/walking-bass-lines/',
-          site: 'Jazz Guitar BE',
-          desc: 'Walking bass patterns by chord type (major, minor, dominant, half-diminished). Learn to improvise walking lines over jazz standards like Autumn Leaves.',
-          tags: ['Walking Bass', 'ii-V-I', 'Intermediate']
         },
         {
           title: 'What ANY Jazz Guitarist Can Learn from Joe Pass',
@@ -13887,7 +14367,7 @@ window.addEventListener('resize', () => {
 // registration down with the audio.
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js?v=' + window.APP_VERSION).then(reg => {
-    reg.update(); // check for SW updates on every page load
+    if (reg.active) reg.update().catch(() => {}); // check for SW updates on every later load
     reg.addEventListener('updatefound', () => {
       const nw = reg.installing;
       nw && nw.addEventListener('statechange', () => {
@@ -13906,12 +14386,19 @@ if ('serviceWorker' in navigator) {
 // ── Sampler init ───────────────────────────────────────────────────────────
 // Tone.js is a CDN script, so it can be missing (offline, blocked, proxy). Guard
 // the call and tell the user rather than throwing on load.
-if (typeof Tone === 'undefined') {
-  audioUnavailable('Audio needs Tone.js, which could not be loaded.');
-} else {
+// Tone.js is deferred so it does not hold up the first paint (2.0 s instead of
+// 0.35 s on a slow mobile connection). Deferred scripts run before
+// DOMContentLoaded, so that is when audio starts - or reports it cannot.
+function _startAudio() {
+  if (typeof Tone === 'undefined') {
+    audioUnavailable('Audio needs Tone.js, which could not be loaded.');
+    return;
+  }
   try { initSampler(); }
   catch (err) { console.warn('Sampler init failed:', err); audioUnavailable('Audio failed to start.'); }
 }
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _startAudio);
+else _startAudio();
 
 function audioUnavailable(msg) {
   const loading = document.getElementById('sampler-loading');
