@@ -2250,8 +2250,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v77';
-window.APP_DEPLOYED = '2026-10-07 16:21';
+window.APP_VERSION = 'v78';
+window.APP_DEPLOYED = '2026-10-08 11:50';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -6603,7 +6603,9 @@ const GRIP_INSTR = {
     // That is how the small chop gets its reach down: G is 4-5-2-✕. Only the
     // TOP course: damping the G is the opposite of what a chop wants, since
     // the bark comes off the bass side.
-    muteStr: 3
+    muteStr: 3,
+    // Weight of gripBassBias in the score: the chop's bark comes off the bass side.
+    bassBias: 0.5
   },
   banjo: {
     label:  'Banjo',
@@ -6620,8 +6622,22 @@ const GRIP_INSTR = {
     maxTop: 14,
     // Longer scale and the moveable grips are compact by tradition (barre,
     // F, D), and a roll strikes every string, so no stretch and no muting.
-    maxSpan: 4,
-    muteStr: -1
+    // The hand covers four frets at most (fretted strings 3 apart): five
+    // (C maj7 = 5-4-1-2, ~13 cm at the nut) is not a banjo grip.
+    maxSpan: 3,
+    // Open strings take no part in that reach, so a shape whose lowest strings
+    // are open at the nut is measured on the others (D7 = 4-2-1-0, 5-5-0-2),
+    // as long as the hand stays in first position: fretted notes up to fret 5.
+    // (G as 12-12-0-0 rings, but it is not a chord chart's G.)
+    openReach: 5,
+    // A full four-fret reach is the normal hand when each fret takes one finger
+    // (D7 = 4-2-1-0, Ebm7 = 4-3-2-1, C7 = 5-5-5-8). It becomes a stretch when a
+    // fret needs two separate fingers, pushing another one off its own fret: then
+    // it loses to a compact grip a couple of frets away (Ebm 4-3-4-4, not 4-3-4-1).
+    fullReachCost: 4,
+    muteStr: -1,
+    // A roll strikes every string the same way: no reason to favour the bass side.
+    bassBias: 0
   }
 };
 
@@ -6691,6 +6707,31 @@ function gripFingerCount(off) {
   return n;
 }
 
+// Across a full reach the hand only works one finger per fret, index barring
+// the lowest. It is a stretch when a fret needs two separate fingers (one gets
+// pushed off its own fret) or when a finger other than the index has to barre
+// (C = 2-5-5-5: a ring-finger barre three frets above the index). Strings on
+// the lowest fret count as one when nothing open or damped sits between them.
+function gripFullReachStretch(frets) {
+  const on = frets.filter(f => f > 0);
+  if (!on.length) return false;
+  const lo = Math.min.apply(null, on);
+  const a = frets.indexOf(lo), b = frets.lastIndexOf(lo);
+  const barre = frets.slice(a, b + 1).every(f => f >= lo);
+  const groups = {};
+  for (let i = 0; i < frets.length; i++) {
+    const f = frets[i];
+    if (f <= 0) continue;                          // open, or damped (MUTE)
+    if (f === lo && barre && i > a) continue;      // under the index barre
+    if (i > 0 && frets[i - 1] === f) {             // same run as the string before
+      if (f !== lo) return true;
+      continue;
+    }
+    groups[f] = (groups[f] || 0) + 1;
+  }
+  return Object.keys(groups).some(f => groups[f] > 1);
+}
+
 // "Most of the chop comes from the G and D strings fingered higher on the
 // board" — weight on the bass side is what gives the grip its bark, and it
 // also lets you aim the strike. Positive when the low courses are fretted
@@ -6702,7 +6743,7 @@ function gripBassBias(off) {
   return bass - treble;
 }
 
-function gripScore(off, tones, span, fingers, named, tset) {
+function gripScore(off, tones, span, fingers, named, tset, bassBias) {
   const count = {};
   for (const t of tones) if (t !== MUTE) count[t] = (count[t] || 0) + 1;
   let dbl = 0;
@@ -6722,7 +6763,7 @@ function gripScore(off, tones, span, fingers, named, tset) {
   // A named chop grip is one the tradition already selected; on a tab about
   // chopping it should lead whenever it is in reach, even at five frets wide.
   return span * 3 + dbl + fingers * 0.5 + muted + no5
-       - gripBassBias(off) * 0.5 - (named && named.chop ? named.chop : 0);
+       - gripBassBias(off) * bassBias - (named && named.chop ? named.chop : 0);
 }
 
 // Relative shapes for one interval set, cached: the tab asks for the same
@@ -6756,22 +6797,30 @@ function findGripShapes(instr, ivArray) {
         const lo   = Math.min.apply(null, fretted);
         const hi   = Math.max.apply(null, fretted);
         const span = hi - lo;
-        if (span > maxSpan) continue;
+        // Too wide for the hand, unless the strings on the lowest fret can be
+        // open strings at the nut and the rest fit: such a shape only exists open.
+        let openOnly = false;
+        if (span > maxSpan) {
+          const up = fretted.filter(f => f !== lo);
+          if (!cfg.openReach || !up.length || hi - lo > cfg.openReach ||
+              Math.max.apply(null, up) - Math.min.apply(null, up) > maxSpan) continue;
+          openOnly = true;
+        }
         // A stretch beyond four frets only works one way round: the hand
         // angles so the pinky reaches up the neck on the bass side while the
         // index sits back on the treble side. The mirror image is not a grip.
         // Every course on the top fret must be on the bass side and every course on
         // the bottom fret on the treble side (indexOf only looked at the first one).
-        if (span > 4 && !g.every((f, i) => (f !== hi || i < n / 2) && (f !== lo || i >= n / 2))) continue;
+        if (!openOnly && span > 4 && !g.every((f, i) => (f !== hi || i < n / 2) && (f !== lo || i >= n / 2))) continue;
         const off  = g.map(f => f === MUTE ? MUTE : f - lo);
-        const fing = gripFingerCount(off);
+        const fing = gripFingerCount(openOnly ? off.map(o => o === 0 ? MUTE : o) : off);
         if (fing > 4) continue;
         const key = off.join(',');
         if (seen.has(key)) continue;
         seen.add(key);
         const named = GRIP_NAMES[instr][key + '|' + combo.join(',')] || null;
-        out.push({ off, tones: combo.slice(), span, fingers: fing, named,
-                   score: gripScore(off, combo, span, fing, named, tset) });
+        out.push({ off, tones: combo.slice(), span, fingers: fing, named, openOnly,
+                   score: gripScore(off, combo, span, fing, named, tset, cfg.bassBias) });
       }
       return;
     }
@@ -6804,9 +6853,10 @@ function getGrips(instr, rootPc, ivArray, opts) {
     let base = (((rootN + sh.tones[a] - cfg.midi[a] - sh.off[a]) % 12) + 12) % 12;
     while (base < minBase) base += 12;
     if (base + Math.max.apply(null, sh.off) > maxTop) continue;
+    if (sh.openOnly && base !== 0) continue;
     // A five-fret stretch needs the frets to have closed up a little; down at
     // the nut it is not a grip, it is a wish.
-    if (sh.span > 4 && base < 2) continue;
+    if (!sh.openOnly && sh.span > 4 && base < 2) continue;
 
     const frets = sh.off.map(o => o === MUTE ? MUTE : base + o);
     // Derive the intervals from the sounding pitches rather than trusting the
@@ -6824,7 +6874,11 @@ function getGrips(instr, rootPc, ivArray, opts) {
       span = fr.length ? Math.max.apply(null, fr) - Math.min.apply(null, fr) : 0;
       fingers = gripFingerCount(frets.map(f => f === 0 ? MUTE : f));
       score = sh.score - (sh.span - span) * 3 - (sh.fingers - fingers) * 0.5 - 3;
+      // Reaching up from the nut costs too, or G = 5-0-0-0 (root doubled)
+      // would beat the open G, 0-0-0-0, which only doubles the fifth.
+      if (fr.length) score += 0.5 * Math.max.apply(null, fr);
     }
+    if (cfg.fullReachCost && span === cfg.maxSpan && gripFullReachStretch(frets)) score += cfg.fullReachCost;
     all.push(Object.assign({}, sh, { base, frets, tones, pos, span, fingers, score, rootStr: tones.indexOf(0),
       name: sh.named ? sh.named.n : null }));
   }
@@ -6898,7 +6952,10 @@ function droneState(cfg, frets, rootPc, tset) {
   const tone  = f => ((((cfg.drone.midi + (f > 0 ? f - cfg.drone.nut : 0)) - rootN) % 12) + 12) % 12;
   const on = frets.filter(f => f !== MUTE);
   const lo = Math.min.apply(null, on), hi = Math.max.apply(null, on);
-  for (let f = Math.max(cfg.drone.nut + 1, lo); f <= hi; f++)
+  // Fretting the drone takes a finger of its own: a grip that already uses
+  // all four leaves it open or out of the roll, never a fifth finger.
+  const free = gripFingerCount(frets.map(f => f === 0 ? MUTE : f)) < 4;
+  if (free) for (let f = Math.max(cfg.drone.nut + 1, lo); f <= hi; f++)
     if (tset.indexOf(tone(f)) >= 0) return { fret: f, tone: tone(f) };
   if (tset.indexOf(tone(0)) >= 0) return { fret: 0, tone: tone(0) };
   return { fret: -1, tone: -1 };
@@ -7260,7 +7317,7 @@ function renderBanjo(scaleNotes, scaleData) {
     title:    'Banjo Chords',
     subtitle: 'open G tuning, open strings allowed',
     allowOpen: true,
-    blurb:    'Chord shapes in open G tuning (gDGBD), open strings included, so the familiar first-position G, C and D grips show up where you expect them. The 5th string is a fixed g drone with its nut at fret 5 — it is drawn open when G belongs to the chord, fretted when the grip reaches past fret 5, and crossed out when it clashes and should stay out of the roll.'
+    blurb:    'Chord shapes in open G tuning (gDGBD), open strings included, so the familiar first-position G, C and D grips show up where you expect them. The 5th string is a fixed g drone with its nut at fret 5, and it is drawn open when G belongs to the chord, fretted when the grip reaches past fret 5 and leaves a finger free, and crossed out when it clashes and should stay out of the roll. No grip asks the hand to cover more than four frets.'
   });
 }
 
@@ -10376,7 +10433,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-section-title">Closed-Grip Engine <span style="color:var(--muted);font-weight:400">— mandolin Chop · banjo Moveable</span></div>
       <div class="tech-row"><span class="tech-key">Why closed</span><span class="tech-val">A chop speaks because the whole grip lifts off at once. One open string keeps ringing and the percussive snap is gone, so the search only ever returns voicings with every string fretted - which is also what makes the shapes moveable to any root.</span></div>
       <div class="tech-row"><span class="tech-key">Search</span><span class="tech-val">Exhaustive over which chord tone lands on which string, then over every per-string octave shift. Shapes are cached per interval set, so exotic scales get real grips instead of a fallback table.</span></div>
-      <div class="tech-row"><span class="tech-key">Playability filter</span><span class="tech-val">≤4 fingers, counting one finger per maximal run of <em>adjacent</em> strings on the same fret (non-adjacent strings sharing a fret each cost a finger; a damped course breaks the run and costs none). Span ≤4 frets on banjo, <strong>≤5 on mandolin</strong> — the traditional chops stretch that far, and a four-fret cap silently deletes them.</span></div>
+      <div class="tech-row"><span class="tech-key">Playability filter</span><span class="tech-val">≤4 fingers, counting one finger per maximal run of <em>adjacent</em> strings on the same fret (non-adjacent strings sharing a fret each cost a finger; a damped course breaks the run and costs none). On banjo the fretted strings sit at most 3 frets apart (the hand covers four frets; open strings do not count, and an open-position grip stays at or below fret 5). A four-fret reach that breaks one-finger-per-fret (two separate fingers on one fret, or a barre by any finger but the index) ranks after a compact grip nearby, and the 5th string is fretted only when a finger is free. <strong>Span ≤5 on mandolin</strong>: the traditional chops stretch that far, and a four-fret cap silently deletes them.</span></div>
       <div class="tech-row"><span class="tech-key">Five-fret stretch</span><span class="tech-val">Allowed one way round only: the highest fret on the bass side and the lowest on the treble side, which is how the hand angles (pinky reaching up the neck, index sitting back). The mirror image is not a grip. Also needs to sit at the 2nd fret or above, where the frets have closed up.</span></div>
       <div class="tech-row"><span class="tech-key">Damped course</span><span class="tech-val">Mandolin only, and only the top course: a fretting-hand mute you simply do not strike. It is how the small chop gets its reach down. Damping the G would throw away the bass weight the chop lives on, so it is never offered.</span></div>
       <div class="tech-row"><span class="tech-key">Required tones</span><span class="tech-val">Root, third (or the sus tone) and any altered fifth / sixth / seventh must sound. The perfect fifth may be dropped — the documented D chop 7-4-5-2 is D F♯ D F♯ and has none — but it costs points, so ordinary voicings still prefer the whole chord.</span></div>

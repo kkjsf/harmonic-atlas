@@ -136,6 +136,22 @@ check('banjo drone fretted at 7 sounds A (g + 2)', () => {
   eq(run(`droneState(GRIP_INSTR.banjo, [7,7,7,7], 9, [0,4,7])`).tone, 0);
 });
 
+const banjo = (r, iv) => run(`(g => g[g.best || 0].frets.join('-'))(getGrips('banjo', ${r}, ${JSON.stringify(iv)}, { allowOpen: true, limit: 4 }))`);
+check('banjo G is the open G', () => eq(banjo(7, M), '0-0-0-0'));
+check('banjo D7 opens on 0-2-1-4', () => eq(banjo(2, D7), '0-2-1-4'));
+check('banjo Ebm is the compact 4-3-4-4, not the stretched 4-3-4-1', () => eq(banjo(3, m), '4-3-4-4'));
+check('no banjo grip reaches past four frets, and the drone never needs a fifth finger', () => {
+  eq(run(`(() => { let bad = 0; for (const s of Object.keys(SCALES)) { const iv0 = SCALES[s].intervals;
+    for (let k = 0; k < 12; k++) for (let d = 0; d < iv0.length; d++) for (const n of [3, 4]) { if (n > iv0.length) continue;
+      const iv = chordIntervals(iv0, d, n), root = (k + iv0[d]) % 12, tset = [...new Set(iv.map(x => ((x % 12) + 12) % 12))];
+      for (const open of [true, false]) for (const g of getGrips('banjo', root, iv, { allowOpen: open, limit: 4 })) {
+        const fr = g.frets.filter(f => f > 0);
+        if (fr.length && Math.max(...fr) - Math.min(...fr) > 3) bad++;
+        const dr = droneState(GRIP_INSTR.banjo, g.frets, root, tset);
+        if (dr && dr.fret > 0 && gripFingerCount(g.frets.map(f => f === 0 ? MUTE : f)) >= 4) bad++;
+      } } } return bad; })()`), 0);
+});
+
 // ── Shared links and share codes ──
 check('a malformed link is ignored, not fatal', () => eq(run(`[decodeHash('#k=0&s=%25'), decodeHash('#k=0&s=constructor')].join(',')`), ','));
 check('a link keeps known values only', () => eq(run(`JSON.stringify(decodeHash('#k=2&s=Dorian&m=99&v=zzz'))`), '{"key":2,"scale":"Dorian","mode":"4","view":"list"}'));

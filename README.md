@@ -80,7 +80,14 @@ every per-string octave shift, then filters to what a hand can hold and what the
 - **Fingers** ≤ 4, one per maximal run of *adjacent* strings on the same fret. Non-adjacent
   strings sharing a fret cost a finger each (a barre cannot skip over a lower fret); a damped
   course breaks the run and costs none.
-- **Span** ≤ 4 frets on banjo, **≤ 5 on mandolin** — the traditional chops stretch that far, and
+- **Banjo reach**: the fretted strings sit at most 3 frets apart, so the hand covers four frets
+  (D7 = 0-2-1-4). Measured once the grip is on the neck, so open strings never count, and an
+  open-position grip keeps its fretted notes at or below fret 5. A full four-fret reach is fine
+  one finger per fret, index barring the lowest (C7 = 5-5-5-8); when a fret needs two separate
+  fingers, or a finger other than the index has to barre, it ranks after a compact grip nearby
+  (Ebm = 4-3-4-4, not 4-3-4-1). The 5th string is fretted only when the grip leaves a finger
+  free. No bass-side bonus on banjo: a roll strikes every string alike.
+- **Span** ≤ 5 on mandolin - the traditional chops stretch that far, and
   a four-fret cap silently deletes them. A five-fret stretch is allowed one way round only: the
   highest fret on the bass side, the lowest on the treble side, which is how the hand angles.
   It also has to sit at the 2nd fret or above, where the frets have closed up.
