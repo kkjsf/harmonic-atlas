@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Interactive music theory reference: scales, chords, guitar, mandolin and banjo voicings, negative harmony, and a composition tool with playback.">
+<meta name="description" content="Interactive music theory reference: scales, chords, guitar, mandolin, banjo and piano voicings with fingering and sound, negative harmony, and a composition tool with playback.">
 <title>Harmonic Atlas - Scale Chord Explorer</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#0b0d0f">
@@ -450,6 +450,12 @@
   .chord-arp-btn:hover { background:rgba(201,168,76,.25); color:var(--cream); }
   .chord-arp-btn.playing { opacity:1; background:rgba(201,168,76,.35); color:var(--cream); }
   .chord-add-btn:hover { background:rgba(124,111,160,.25); color:var(--cream); }
+  /* Sound buttons under every instrument diagram: always visible, a touch screen has no hover. */
+  .snd-bar { display:flex; gap:5px; justify-content:center; flex-wrap:wrap; margin-top:2px; }
+  .snd-btn { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; background:rgba(201,168,76,.06); border:1px solid rgba(201,168,76,.22); border-radius:11px; color:var(--gold2); font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:background .15s, color .15s; line-height:1; }
+  .snd-btn:hover { background:rgba(201,168,76,.2); color:var(--cream); }
+  .snd-btn.playing { background:rgba(201,168,76,.34); color:var(--cream); }
+  .piano-card { gap:6px; }
   .chord-add-btn.just-added { opacity:1; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:none} }
   .chord-card { animation:fadeUp .24s ease both; }
@@ -1939,6 +1945,7 @@
     .tip-badge { min-width: 24px; min-height: 24px; display: inline-flex; align-items: center; justify-content: center; }
     .cc-gear, .comp-beat-btn, .comp-card-mv, .comp-card-sub, .comp-chord-del,
     .chord-play-btn, .chord-arp-btn, .chord-add-btn, .res-card-status, .transpose-btn { min-width: 30px; min-height: 30px; }
+    .snd-btn { min-height: 30px; padding: 4px 11px; }
     .strum-btn, .preset-btn, .comp-chip, .comp-chip-new, .ct-btn, .guitar-sub-tab, .view-tab,
     .cad-chord, .rel-chip, .comp-share-btn, .comp-del-comp-btn { min-height: 30px; }
     .chord-arp-btn { right: 42px; }
@@ -2197,7 +2204,7 @@
     <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Scale &amp; Chord Views</span>
     <span class="has-tip" style="display:inline-flex;align-items:center">
       <span class="tip-badge" tabindex="0">?</span>
-      <div class="tip-popup" style="left:auto;right:0;transform:none"><span class="tip-title">Scale &amp; Chord Views</span>Switch between different ways to display the harmonised chords. Chord List shows all notes and intervals. Guitar, Mandolin and Banjo tabs each include a Scale view showing the full fretboard. Drop 2 and Drop 3 are jazz voicing techniques that redistribute chord tones across strings for smoother voice-leading. Mandolin Chop and Banjo Moveable show closed grips with no open strings, so every shape slides to any root.</div>
+      <div class="tip-popup" style="left:auto;right:0;transform:none"><span class="tip-title">Scale &amp; Chord Views</span>Switch between different ways to display the harmonised chords. Chord List shows all notes and intervals. Guitar, Mandolin and Banjo tabs each include a Scale view showing the full fretboard. Drop 2 and Drop 3 are jazz voicing techniques that redistribute chord tones across strings for smoother voice-leading. Mandolin Chop and Banjo Moveable show closed grips with no open strings, so every shape slides to any root. Piano shows each chord on a keyboard with right- and left-hand fingering: One hand for close position and inversions, Two hands for left-hand bass plus right-hand chord. Every diagram has Strum (Chord on piano) and Arp buttons that play exactly what it draws.</div>
     </span>
   </div>
   <div class="view-tabs" id="view-tabs" style="align-items:center">
@@ -2205,6 +2212,7 @@
     <button class="view-tab" data-view="guitar" id="tab-guitar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="9" r="1.2" fill="currentColor"/></svg>Guitar</button>
     <button class="view-tab" data-view="mandolin" id="tab-mandolin"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><ellipse cx="6.5" cy="8" rx="3.5" ry="4.5" stroke="currentColor" stroke-width="1.1" fill="none"/><line x1="6.5" y1="1" x2="6.5" y2="3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.5" y1="4" x2="8.5" y2="4" stroke="currentColor" stroke-width="1" opacity=".6"/><circle cx="6.5" cy="8" r="1" fill="currentColor" opacity=".4"/></svg>Mandolin</button>
     <button class="view-tab" data-view="banjo" id="tab-banjo"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.1" fill="none"/><circle cx="6.5" cy="8.5" r="1.7" stroke="currentColor" stroke-width=".8" fill="none" opacity=".5"/><line x1="6.5" y1="1" x2="6.5" y2="4.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.9" y1="3.4" x2="4.9" y2="4.9" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".7"/></svg>Banjo</button>
+    <button class="view-tab" data-view="piano" id="tab-piano"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="9" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"/><line x1="4.7" y1="2" x2="4.7" y2="11" stroke="currentColor" stroke-width=".8"/><line x1="8.3" y1="2" x2="8.3" y2="11" stroke="currentColor" stroke-width=".8"/><rect x="3.6" y="2" width="2.2" height="5" fill="currentColor"/><rect x="7.2" y="2" width="2.2" height="5" fill="currentColor"/></svg>Piano</button>
   </div>
   <div class="guitar-sub-tabs" id="guitar-sub-tabs" style="display:none">
     <button class="guitar-sub-tab active" data-view="diagrams" id="tab-diagrams">Basic</button>
@@ -2224,6 +2232,10 @@
     <button class="guitar-sub-tab active" data-view="banjo" id="tab-banjo-chords">Chords</button>
     <button class="guitar-sub-tab" data-view="banjo-scale" id="tab-banjo-scale">Scale</button>
     <button class="guitar-sub-tab" data-view="banjo-moveable" id="tab-banjo-moveable">Moveable</button>
+  </div>
+  <div class="guitar-sub-tabs" id="piano-sub-tabs" style="display:none">
+    <button class="guitar-sub-tab active" data-view="piano" id="tab-piano-one">One hand</button>
+    <button class="guitar-sub-tab" data-view="piano-two" id="tab-piano-two">Two hands</button>
   </div>
   <div id="compare-panel" style="display:none">
     <div class="compare-cols" id="compare-cols">
@@ -2250,8 +2262,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v78';
-window.APP_DEPLOYED = '2026-10-08 11:50';
+window.APP_VERSION = 'v79';
+window.APP_DEPLOYED = '2026-10-15 11:53';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -3427,7 +3439,7 @@ document.addEventListener('keydown', e => {
 // STATE & RENDERING
 // ══════════════════════════════════════════════
 
-let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastGuitarView:'diagrams',lastMandolinView:'mandolin',lastBanjoView:'banjo',scaleLabelMode:'notes',gripLabel:'intervals'};
+let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastGuitarView:'diagrams',lastMandolinView:'mandolin',lastBanjoView:'banjo',lastPianoView:'piano',scaleLabelMode:'notes',gripLabel:'intervals'};
 
 function buildSelectors(){
   // Key selector: show both enharmonic names for ambiguous keys
@@ -4464,10 +4476,11 @@ function renderCore(){
   const isGuitar   = ['diagrams','arpeggio','scale','shell','drop2','drop3','altdom'].includes(state.view);
   const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
   const isBanjo    = ['banjo','banjo-scale','banjo-moveable'].includes(state.view);
+  const isPiano    = ['piano','piano-two'].includes(state.view);
 
   document.querySelectorAll('.view-tab').forEach(t => {
     const tv = t.dataset.view;
-    const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv==='banjo' ? isBanjo : tv===state.view;
+    const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv==='banjo' ? isBanjo : tv==='piano' ? isPiano : tv===state.view;
     t.classList.toggle('active', isActive);
     t.setAttribute('aria-pressed', isActive);
   });
@@ -4476,6 +4489,7 @@ function renderCore(){
   document.getElementById('guitar-sub-tabs').style.display   = isGuitar   ? 'flex' : 'none';
   document.getElementById('mandolin-sub-tabs').style.display = isMandolin ? 'flex' : 'none';
   document.getElementById('banjo-sub-tabs').style.display    = isBanjo    ? 'flex' : 'none';
+  document.getElementById('piano-sub-tabs').style.display    = isPiano    ? 'flex' : 'none';
 
   // Debounce the heavy DOM rebuild with a smooth fade+slide transition
   if (_renderTimer) clearTimeout(_renderTimer);
@@ -4751,6 +4765,8 @@ function renderAltDomTab(scaleNotes, scaleData) {
         svgWrap.innerHTML = makeChordDiagram(v.frets6, v.pcs6, domPc, 155, fsp);
         svgWrap.addEventListener('click', () => showDiagramModal(null, null, null, null, rootNavList, ni));
         cell.appendChild(svgWrap);
+        cell._voicing = { frets6: v.frets6, pcs6: v.pcs6 };
+        cell.dataset.snd = '1';
         shapesRow.appendChild(cell);
       });
 
@@ -4793,6 +4809,9 @@ function renderViewCore(scaleNotes,scaleData){
   else if(state.view==='banjo')          renderBanjo(scaleNotes,scaleData);
   else if(state.view==='banjo-scale')    renderBanjoScale(scaleNotes,scaleData);
   else if(state.view==='banjo-moveable') renderBanjoMoveable(scaleNotes,scaleData);
+  else if(state.view==='piano')          renderPiano(scaleNotes,scaleData);
+  else if(state.view==='piano-two')      renderPianoTwo(scaleNotes,scaleData);
+  attachSoundBars(document.getElementById('all-degrees'));
 }
 
 // ══════════════════════════════════════════════
@@ -5259,10 +5278,13 @@ function showDiagramModal(frets6, pcs6, rootPc, title, navList, navIdx) {
   const contentHtml = `
     <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#f0e8d8">${cur.title}</div>
     <div style="max-width:100%;overflow:hidden;">${makeChordDiagram(cur.frets6, cur.pcs6, cur.rootPc, diagSize, cur.forceSharpPcs||null)}</div>
+    <div id="dm-snd"></div>
     ${navHtml}
     <div style="font-size:9px;color:#8b93a3;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em">${hasNav?'← swipe or arrows →  ·  ':''}click anywhere to close</div>`;
 
   function bindNavBtns() {
+    const bar = makeSoundBar(() => cur);
+    if (bar) modal.querySelector('#dm-snd')?.replaceWith(bar);
     if (!hasNav) return;
     modal.querySelector('#dm-prev')?.addEventListener('click', e => { e.stopPropagation(); if (hasPrev) showDiagramModal(null,null,null,null,navList,idx-1); });
     modal.querySelector('#dm-next')?.addEventListener('click', e => { e.stopPropagation(); if (hasNext) showDiagramModal(null,null,null,null,navList,idx+1); });
@@ -6037,6 +6059,8 @@ function renderArpeggios(scaleNotes, scaleData) {
         card.addEventListener('click', () =>
           showSvgModal(makeArpeggioDiagram(pos.notes, chRootPc, 680, pcNameMap, pos.anchorStr), `${chordNotes[0]}<sup>${sym}</sup> — ${pos.label}`, true)
         );
+        card._voicing = { arp: pos.notes.map(nt => GUITAR_MIDI[0] + nt.pitch) };
+        card.dataset.snd = '1';
         grid.appendChild(card);
       });
       sec.appendChild(grid);
@@ -7270,6 +7294,7 @@ function showGripModal(navList, idx) {
   const html = `
     <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8;text-align:center">${cur.title}</div>
     ${makeGripDiagram(cur.instr, cur.grip, cur.rootPc, 260, { label: state.gripLabel, chordTones: cur.iv.map(x => ((x % 12) + 12) % 12) })}
+    <div id="gm-snd"></div>
     <div style="display:flex;align-items:center;gap:10px">
       <span id="gm-prev">${btn(hasPrev, '◀')}</span>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8b93a3;letter-spacing:.1em">${idx + 1} / ${navList.length}</span>
@@ -7290,6 +7315,8 @@ function showGripModal(navList, idx) {
     modal.appendChild(inner);
   }
   inner.innerHTML = html;
+  const bar = makeSoundBar(() => cur);
+  if (bar) inner.querySelector('#gm-snd').replaceWith(bar);
   inner.querySelector('#gm-prev').addEventListener('click', e => { e.stopPropagation(); if (hasPrev) showGripModal(navList, idx - 1); });
   inner.querySelector('#gm-next').addEventListener('click', e => { e.stopPropagation(); if (hasNext) showGripModal(navList, idx + 1); });
 }
@@ -7333,6 +7360,596 @@ function renderBanjoScale(scaleNotes, scaleData) {
   renderScaleTabFor(container, scaleNotes, scaleData, 'Banjo',
     BANJO_OPEN_PC, BANJO_STR_TOP, 12, false);
   container.insertBefore(note, container.firstChild);
+}
+
+// ══════════════════════════════════════════════════════
+// PIANO ENGINE - one-hand chords and inversions, two-hand voicings, fingering
+//
+// Fingering follows the ergonomic model of Parncutt, Sloboda, Clarke, Raekallio
+// & Desain (1997): every pair of fingers has a relaxed, a comfortable and a
+// practical span, and a fingering pays for each semitone it stretches or
+// squeezes beyond them. Applied to every pair of notes of a block chord, with
+// the hand resting on its outer fingers (thumb at the bottom of the right hand,
+// little finger at the bottom of the left), it gives the textbook fingerings
+// that pianochord.org prints: C, C/E, C/G = RH 1-3-5, 1-2-5, 1-3-5 and LH
+// 5-3-1, 5-3-1, 5-2-1; Cmaj7 and C7 = RH 1-2-3-5, LH 5-3-2-1.
+//
+// What one hand holds: up to four notes in close position, with every
+// inversion. Past four notes a chord is either rootless in one hand (the bass
+// plays the root - the jazz A and B forms) or split between the hands: left
+// hand root plus fifth, seventh, third or octave, right hand the colour tones.
+// Two omissions are conventional and applied: the perfect fifth goes first,
+// and a natural 11th never sits over a major third - an 11 chord drops the
+// third, a 13 chord drops the 11th.
+// ══════════════════════════════════════════════════════
+
+// [MinPrac, MinComf, MinRel, MaxRel, MaxComf, MaxPrac] in semitones (Parncutt et al. 1997,
+// table 1). One change: the table measures legato melody, where index and middle
+// relax within a tone; over a block chord they sit a major third apart without
+// strain (Dm7 = 1-2-3-5, as every chord chart prints it, not 1-2-4-5).
+const PIANO_SPAN = {
+  '1-2': [-5, -3, 1, 5, 8, 10], '1-3': [-4, -2, 3, 7, 10, 12], '1-4': [-3, -1, 5, 9, 12, 14],
+  '1-5': [-1, 1, 7, 10, 13, 15], '2-3': [1, 1, 1, 4, 4, 5],    '2-4': [1, 1, 3, 4, 5, 7],
+  '2-5': [2, 2, 5, 6, 8, 10],    '3-4': [1, 1, 1, 2, 2, 4],    '3-5': [1, 1, 3, 4, 5, 7],
+  '4-5': [1, 1, 1, 2, 3, 5]
+};
+// Lowest comfortable bottom note (MIDI) for each interval under an octave: below
+// it a close interval turns to mud (the arranger's "low interval limits").
+const PIANO_LIL = [0, 52, 51, 48, 46, 46, 47, 34, 43, 41, 41, 41];
+const PIANO_BLACK = [1, 3, 6, 8, 10];
+const pianoIsBlack = m => PIANO_BLACK.indexOf(((m % 12) + 12) % 12) >= 0;
+
+// Cost of a block-chord fingering; `midis` ascending, `fingers` aligned with them.
+// Right-hand fingers rise with pitch, left-hand fingers fall, so the left hand
+// measures every span the other way round (Parncutt's mirror rule).
+function pianoFingerCost(midis, fingers, hand) {
+  let cost = 0;
+  for (let i = 0; i < midis.length; i++) for (let j = i + 1; j < midis.length; j++) {
+    const lo = Math.min(fingers[i], fingers[j]), hi = Math.max(fingers[i], fingers[j]);
+    const mLo = fingers[i] === lo ? midis[i] : midis[j], mHi = fingers[i] === lo ? midis[j] : midis[i];
+    const d = hand === 'R' ? mHi - mLo : mLo - mHi;
+    const [minP, minC, minR, maxR, maxC, maxP] = PIANO_SPAN[lo + '-' + hi];
+    if (d < minP || d > maxP) return Infinity;
+    const k = lo === 1 ? 1 : 2;
+    if (d > maxC) cost += 2 * (d - maxC);
+    if (d < minC) cost += 2 * (minC - d);
+    if (d > maxR) cost += k * (d - maxR);
+    if (d < minR) cost += k * (minR - d);
+    cost += 0.02 * Math.abs(d - (minR + maxR) / 2);
+  }
+  return cost;
+}
+
+// Best fingering for one hand on a block chord (`midis` ascending). The bottom
+// note always takes the anchor finger (RH 1, LH 5), and a chord a fourth wide
+// or more (a dyad: a tritone) closes the hand on the other outer finger.
+function pianoFingering(midis, hand) {
+  const n = midis.length;
+  if (!n || n > 5) return null;
+  if (n === 1) return { fingers: [hand === 'R' ? 1 : 5], cost: 0 };
+  const span = midis[n - 1] - midis[0];
+  let best = null;
+  (function pick(start, acc) {
+    if (acc.length === n) {
+      const fingers = hand === 'R' ? acc.slice() : acc.slice().reverse();
+      if (fingers[0] !== (hand === 'R' ? 1 : 5)) return;
+      if (span >= (n > 2 ? 5 : 6) && fingers[n - 1] !== (hand === 'R' ? 5 : 1)) return;
+      const cost = pianoFingerCost(midis, fingers, hand);
+      if (cost < Infinity && (!best || cost < best.cost)) best = { fingers, cost };
+      return;
+    }
+    for (let f = start; f <= 5; f++) { acc.push(f); pick(f + 1, acc); acc.pop(); }
+  })(1, []);
+  return best;
+}
+
+// Chord tones in chord order, one per pitch class, as intervals from the root.
+function pianoChordTones(iv) {
+  const seen = new Set(), out = [];
+  iv.forEach(x => { const p = ((x % 12) + 12) % 12; if (!seen.has(p)) { seen.add(p); out.push(x); } });
+  return out;
+}
+
+// How much a tone matters once a voicing has to leave something out.
+function pianoToneRank(x, iv) {
+  const hasThird = iv.some(y => y === 3 || y === 4);
+  if (x === 0) return 11;
+  if (x === 3 || x === 4) return 10;
+  if ((x === 2 || x === 5) && !hasThird) return 10;          // the sus tone stands in for the third
+  if (x >= 9 && x <= 11) return 10;                          // seventh, or the sixth of a 6 chord
+  if (x === 6 || x === 8) return 9;                          // altered fifth
+  if (x === 7) return 2;                                     // perfect fifth: first to go
+  if (x >= 12) {
+    if (x === Math.max.apply(null, iv)) return 8;            // the extension that names the chord
+    if ([13, 15, 18, 20].indexOf(x) >= 0) return 7;          // altered extensions
+    return x === 14 ? 6 : 5;                                 // natural 9, then 11
+  }
+  return 4;
+}
+
+// Tones a full voicing keeps: a natural 11th over a major third is a minor
+// ninth apart, so an 11 chord loses its third and a 13 chord its 11th.
+function pianoKeptTones(iv) {
+  const tones = pianoChordTones(iv);
+  const hasSeventh = tones.some(x => x === 10 || x === 11);
+  if (hasSeventh && tones.indexOf(4) >= 0 && tones.indexOf(17) >= 0) {
+    const drop = tones.some(x => x === 20 || x === 21) ? 17 : 4;
+    return tones.filter(x => x !== drop);
+  }
+  return tones;
+}
+
+// Close position over `bassMidi`: the other tones stacked inside the octave above.
+function pianoCloseStack(rootPc, tones, bassMidi) {
+  const bassPc = ((bassMidi % 12) + 12) % 12;
+  const above = tones.map(x => (rootPc + x) % 12).filter(p => p !== bassPc)
+    .map(p => bassMidi + ((p - bassPc + 12) % 12));
+  return [bassMidi].concat(above.sort((a, b) => a - b));
+}
+
+const PIANO_INV = ['Root position', '1st inversion', '2nd inversion', '3rd inversion'];
+
+// One hand. Up to four notes: close position with each chord tone in the bass
+// (bass between C4 and B4). Past four: the rootless four-note voicing, A from
+// the third and B from the seventh where the chord has them.
+function pianoOneHand(rootPc, iv) {
+  const tones = pianoChordTones(iv);
+  rootPc = ((rootPc % 12) + 12) % 12;
+  if (tones.length <= 4) {
+    return tones.filter(x => x < 12).map((x, k) => {
+      const midis = pianoCloseStack(rootPc, tones, 60 + (rootPc + x) % 12);
+      return { kind: 'inv', label: PIANO_INV[k], pill: ['Root', '1st', '2nd', '3rd'][k],
+               rh: midis, lh: [], fingRH: pianoFingering(midis, 'R').fingers, fingLH: pianoFingering(midis, 'L').fingers,
+               omit: [] };
+    });
+  }
+  const kept = pianoKeptTones(iv).filter(x => x !== 0);
+  const four = kept.slice().sort((a, b) => pianoToneRank(b, iv) - pianoToneRank(a, iv) || a - b).slice(0, 4);
+  const omit = pianoChordTones(iv).filter(x => x !== 0 && four.indexOf(x) < 0);
+  const third = four.find(x => x === 3 || x === 4), seventh = four.find(x => x >= 9 && x <= 11);
+  const starts = [third, seventh].filter(x => x !== undefined);
+  four.forEach(x => { if (starts.indexOf(x) < 0) starts.push(x); });
+  const out = [];
+  starts.forEach(x => {
+    if (out.length >= 2) return;
+    const bassPc = (rootPc + x) % 12;
+    let bass = 48 + bassPc;                     // bottom between D3 and C#4
+    if (bass < 50) bass += 12;
+    const midis = pianoCloseStack(rootPc, four, bass);
+    const name = x === third ? 'A' : x === seventh ? 'B' : null;
+    out.push({ kind: 'rootless', label: 'Rootless' + (name ? ' ' + name : ''), pill: name || '', from: x,
+               rh: midis, lh: [], fingRH: pianoFingering(midis, 'R').fingers, fingLH: pianoFingering(midis, 'L').fingers,
+               omit: [0].concat(omit) });
+  });
+  return out;
+}
+
+// Two hands: the left hand takes the root - alone, doubled at the octave, or
+// with the fifth, the seventh or the third - and the right hand the remaining
+// tones in close position, at most four, at least three (doubling the root,
+// then the fifth, then the third when a triad leaves it short). One voicing per
+// left-hand pattern, best first.
+function pianoTwoHand(rootPc, iv) {
+  rootPc = ((rootPc % 12) + 12) % 12;
+  const tones = pianoChordTones(iv);
+  const kept = pianoKeptTones(iv);
+  const r = 41 + ((rootPc - 5 + 12) % 12);             // root between F2 and E3
+  const find = test => kept.find(test);
+  const fifth = find(x => x === 7) !== undefined ? 7 : find(x => x === 6 || x === 8);
+  const seventh = find(x => x >= 9 && x <= 11);
+  const third = find(x => x === 3 || x === 4);
+  const lhPats = [{ key: 'R', lh: [0] }, { key: '8', lh: [0, 12] }];
+  if (fifth !== undefined) lhPats.push({ key: '5', lh: [0, fifth] });
+  if (seventh !== undefined) lhPats.push({ key: '7', lh: [0, seventh] });
+  if (third !== undefined) lhPats.push({ key: '3', lh: [0, third] });
+  const pref = { '7': 0, '5': 0.3, '8': 0.4, '3': 0.5, 'R': 0.8 };
+
+  const out = [];
+  lhPats.forEach(pat => {
+    const lh = pat.lh.map(x => r + x);
+    const lhPcs = new Set(pat.lh.map(x => (rootPc + x) % 12));
+    const rhT = kept.filter(x => !lhPcs.has((rootPc + x) % 12))
+      .sort((a, b) => pianoToneRank(b, iv) - pianoToneRank(a, iv) || a - b).slice(0, 4);
+    if (!rhT.length) return;
+    // A right hand short of three notes takes doublings: whichever chord tones
+    // sound best there (a root doubled over a major seventh grates, so every
+    // choice is scored rather than fixed).
+    const pool = [0, fifth, third, seventh].filter(x => x !== undefined && rhT.indexOf(x) < 0);
+    const sets = [];
+    (function fill(set, from) {
+      if (set.length >= 3) { sets.push(set); return; }
+      for (let i = from; i < pool.length; i++) fill(set.concat([pool[i]]), i + 1);
+    })(rhT, 0);
+    if (rhT.length === 2) sets.push(rhT);
+    if (!sets.length) sets.push(rhT.concat(pool));
+    if (sets[0].length < 2) return;
+    let best = null;
+    sets.forEach(set => set.forEach(bx => {
+      const bpc = (rootPc + bx) % 12;
+      let b0 = lh[lh.length - 1] + 1;
+      b0 += ((bpc - b0) % 12 + 12) % 12;
+      if (b0 < 53) b0 += 12 * Math.ceil((53 - b0) / 12);
+      [b0, b0 + 12].forEach(bass => {
+        const rh = pianoCloseStack(rootPc, set, bass);
+        const s = pianoTwoHandScore(rootPc, iv, lh, rh);
+        if (s === null) return;
+        const total = s + pref[pat.key] + (set.length < 3 ? 0.6 : 0);
+        if (!best || total < best.score) best = { score: total, lh, rh, set };
+      });
+    }));
+    if (!best) return;
+    const played = new Set(pat.lh.concat(best.set).map(x => (rootPc + x) % 12));
+    out.push({ kind: 'two', key: pat.key, lhIv: pat.lh, rhIv: best.set,
+      lh: best.lh, rh: best.rh, score: best.score,
+      fingLH: pianoFingering(best.lh, 'L').fingers, fingRH: pianoFingering(best.rh, 'R').fingers,
+      omit: tones.filter(x => !played.has((rootPc + x) % 12)) });
+  });
+  return out.sort((a, b) => a.score - b.score);
+}
+
+function pianoTwoHandScore(rootPc, iv, lh, rh) {
+  const all = lh.concat(rh);
+  if (rh[rh.length - 1] > 88) return null;
+  for (let i = 1; i < all.length; i++) {
+    const d = all[i] - all[i - 1];
+    if (d > 0 && d < 12 && all[i - 1] < PIANO_LIL[d]) return null;
+  }
+  const fl = pianoFingering(lh, 'L'), fr = pianoFingering(rh, 'R');
+  if (!fl || !fr) return null;
+  let s = 0.3 * (fl.cost + fr.cost);
+  const top = rh[rh.length - 1];
+  if (top < 67) s += (67 - top) * 0.5;
+  if (top > 79) s += (top - 79) * 0.5;
+  const gap = rh[0] - lh[lh.length - 1];
+  if (gap > 12) s += (gap - 12) * 0.3;
+  if (gap === 1) s += 1.5;                                   // the hands a semitone apart
+  const wantsB9 = iv.indexOf(13) >= 0;
+  for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
+    const d = all[j] - all[i];
+    if ((d === 13 || d === 25) && !(wantsB9 && ((all[i] - rootPc) % 12 + 12) % 12 === 0)) s += 2;
+  }
+  const topIv = ((top - rootPc) % 12 + 12) % 12;
+  if (topIv === 0 || topIv === 7) s += 0.6;
+  return s;
+}
+
+
+// ── Piano rendering ───────────────────────────────────
+
+// Interval name of a chord tone on the keys: R, ♭3, 5, ♭7, 9, ♯11, 13...
+function pianoIvName(x, iv) {
+  return x === 0 ? 'R' : iNameCtx(x, iv);
+}
+
+// The chord tone a key plays, as { x: interval, name: spelled note }.
+function pianoKeyTone(m, chord) {
+  const pc = ((m % 12) + 12) % 12;
+  const k = chord.iv.findIndex(x => (chord.rootPc + x) % 12 === pc);
+  return k < 0 ? { x: (pc - chord.rootPc + 12) % 12, name: dotName(pc) }
+               : { x: chord.iv[k], name: chord.notes[k] || dotName(pc) };
+}
+
+// Bottom-to-top interval spelling of a group of keys: "3–5–R".
+function pianoIvLine(midis, chord) {
+  return midis.map(m => pianoIvName(pianoKeyTone(m, chord).x, chord.iv)).join('–');
+}
+
+// Keyboard window: one hand gets two octaves from the C below the bass, so the
+// cards line up; two hands get whatever C or F to B or E covers both.
+function pianoWindow(opt) {
+  const keys = opt.lh.concat(opt.rh);
+  const lo0 = Math.min.apply(null, keys), hi0 = Math.max.apply(null, keys);
+  if (opt.kind !== 'two') { const lo = lo0 - (((lo0 % 12) + 12) % 12); return { lo, hi: lo + 23 }; }
+  const lo = Math.max(lo0 - (((lo0 % 12) + 12) % 12), lo0 - ((((lo0 - 5) % 12) + 12) % 12));
+  const hi = Math.min(hi0 + (11 - (((hi0 % 12) + 12) % 12)), hi0 + ((((4 - hi0) % 12) + 12) % 12));
+  return { lo, hi };
+}
+
+// Keyboard diagram with the chord's keys coloured (root gold, other tones
+// violet) and two rows of finger numbers under it: right hand, then left. One
+// hand: both rows under the same keys - the shape is the same in either hand,
+// the fingering is not. Two hands: each row under its own hand's keys.
+function makeKeyboardDiagram(opt, chord, w, labelMode) {
+  const { lo, hi } = pianoWindow(opt);
+  const whites = [];
+  for (let m = lo; m <= hi; m++) if (!pianoIsBlack(m)) whites.push(m);
+  const z = Math.min(1.6, Math.max(1, w / 300));          // type grows with the modal
+  const padL = Math.round(19 * z), padR = 3, padT = Math.round(12 * z);
+  const ww = (w - padL - padR) / whites.length;
+  const kh = Math.round(Math.min(Math.max(ww * 4.3, 50), 170));
+  const bw = ww * 0.6, bh = Math.round(kh * 0.62);
+  const rowH = Math.round(Math.min(15 * z, Math.max(11, ww * 0.95)));
+  const h = padT + kh + 5 + rowH * 2;
+  const wx = m => padL + whites.indexOf(m) * ww;
+  const cx = m => pianoIsBlack(m) ? wx(m - 1) + ww : wx(m) + ww / 2;
+
+  const lit = new Map();
+  opt.lh.concat(opt.rh).forEach(m => lit.set(m, pianoKeyTone(m, chord)));
+  const rows = opt.kind === 'two'
+    ? [opt.rh.map((m, i) => [m, opt.fingRH[i]]), opt.lh.map((m, i) => [m, opt.fingLH[i]])]
+    : [opt.rh.map((m, i) => [m, opt.fingRH[i]]), opt.rh.map((m, i) => [m, opt.fingLH[i]])];
+
+  const label = t => labelMode === 'notes' ? t.name : pianoIvName(t.x, chord.iv);
+  const fs = (lbl, room) => Math.min(9.5 * z, room * (lbl.length > 2 ? 0.5 : lbl.length > 1 ? 0.62 : 0.75)).toFixed(1);
+  const names = opt.lh.concat(opt.rh).map(m => lit.get(m).name + (Math.floor(m / 12) - 1));
+  const aria = `Piano: ${names.join(' ')}; right hand ${rows[0].map(r => r[1]).join(' ')}; left hand ${rows[1].map(r => r[1]).join(' ')}`;
+  const g = [`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${aria}" style="display:block;max-width:100%;height:auto">`];
+
+  whites.forEach(m => {
+    const t = lit.get(m), x = wx(m);
+    const fill = !t ? '#e6e1d4' : t.x === 0 ? '#c9a84c' : '#8a7cc4';
+    g.push(`<rect x="${x.toFixed(2)}" y="${padT}" width="${(ww - 0.8).toFixed(2)}" height="${kh}" rx="1.6" fill="${fill}" stroke="#0e1116" stroke-width=".8"/>`);
+    if (m % 12 === 0)
+      g.push(`<text x="${(x + 1).toFixed(2)}" y="${padT - 3}" font-family="IBM Plex Mono,monospace" font-size="${(7 * z).toFixed(1)}" fill="${m === 60 ? '#c9a84c' : '#7c8798'}">C${m / 12 - 1}</text>`);
+    if (t) {
+      const lbl = label(t);
+      g.push(`<text x="${cx(m).toFixed(2)}" y="${padT + kh - Math.max(6, ww * 0.42)}" font-family="IBM Plex Mono,monospace" font-size="${fs(lbl, ww)}" font-weight="600" fill="${t.x === 0 ? '#141820' : '#fff'}" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
+    }
+  });
+  for (let m = lo; m <= hi; m++) {
+    if (!pianoIsBlack(m) || m === lo) continue;
+    const t = lit.get(m), x = cx(m) - bw / 2;
+    const fill = !t ? '#1b1f27' : t.x === 0 ? '#c9a84c' : '#6a5f90';
+    g.push(`<rect x="${x.toFixed(2)}" y="${padT}" width="${bw.toFixed(2)}" height="${bh}" rx="1.2" fill="${fill}" stroke="#0e1116" stroke-width=".8"/>`);
+    if (t) {
+      const lbl = label(t);
+      g.push(`<text x="${cx(m).toFixed(2)}" y="${padT + bh - Math.max(5, bw * 0.55)}" font-family="IBM Plex Mono,monospace" font-size="${fs(lbl, bw * 1.15)}" font-weight="600" fill="${t.x === 0 ? '#141820' : '#fff'}" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
+    }
+  }
+
+  const rowCol = ['#c9a84c', '#8fa8c8'];
+  ['RH', 'LH'].forEach((name, r) => {
+    const y = padT + kh + 5 + rowH * r + rowH * 0.62;
+    g.push(`<text x="0" y="${y.toFixed(1)}" font-family="IBM Plex Mono,monospace" font-size="${(7.5 * z).toFixed(1)}" fill="${rowCol[r]}" opacity=".8" dominant-baseline="middle">${name}</text>`);
+    rows[r].forEach(([m, f]) =>
+      g.push(`<text x="${cx(m).toFixed(2)}" y="${y.toFixed(1)}" font-family="IBM Plex Mono,monospace" font-size="${Math.min(10 * z, Math.max(8, ww * 0.7)).toFixed(1)}" font-weight="600" fill="${rowCol[r]}" text-anchor="middle" dominant-baseline="middle">${f}</text>`));
+  });
+  g.push('</svg>');
+  return g.join('');
+}
+
+const PIANO_LH_ORDER = ['7', '5', '3', '8', 'R'];
+
+// Pill and caption text for one voicing.
+function pianoPill(opt, chord) {
+  if (opt.kind === 'inv') return opt.pill;
+  if (opt.kind === 'rootless') return opt.pill.length === 1 ? opt.pill : 'from ' + pianoIvName(opt.from, chord.iv);
+  return opt.key === 'R' ? 'LH R' : opt.key === '8' ? 'LH 8ve' : 'LH R·' + pianoIvName(opt.lhIv[1], chord.iv);
+}
+function pianoCaption(opt, chord) {
+  if (opt.kind === 'inv') {
+    const bass = pianoKeyTone(opt.rh[0], chord);
+    return `${opt.label}${bass.x ? ' · ' + chord.title + '/' + bass.name : ''} · ${pianoIvLine(opt.rh, chord)}`;
+  }
+  if (opt.kind === 'rootless')
+    return `${opt.label} · ${pianoIvLine(opt.rh, chord)} · bass plays ${chord.notes[0]}`;
+  return `LH ${opt.key === '8' ? 'R–8ve' : pianoIvLine(opt.lh, chord)} · RH ${pianoIvLine(opt.rh, chord)}`;
+}
+function pianoOmitText(opt, chord) {
+  const omit = opt.omit.filter(x => x !== 0);
+  return omit.length ? 'no ' + omit.map(x => pianoIvName(x, chord.iv)).join(', no ') : '';
+}
+
+// The chords a tab shows for the current mode: diatonic stacks, "Others", or
+// one of the chromatic families - the same lists the other instruments draw.
+function chordsForView(scaleNotes, scaleData) {
+  const rootPc   = parseInt(state.key);
+  const romans   = computeAllRomans(scaleData.intervals, scaleData);
+  const isOthers = state.mode === 'others';
+  const n        = Math.min(isOthers ? 3 : (parseInt(state.mode) || 3), scaleNotes.length);
+  if (['secdom', 'secdim', 'secsub', 'chromed'].includes(state.mode)) {
+    const items =
+      state.mode === 'secdom' ? buildSecondaryDominants(rootPc, scaleData.intervals, romans) :
+      state.mode === 'secdim' ? buildSecondaryDiminished(rootPc, scaleData.intervals, romans, scaleNotes) :
+      state.mode === 'secsub' ? buildSecondarySubdominants(rootPc, scaleData.intervals, romans) :
+                                buildChromaticMediants(rootPc, scaleData.intervals, romans);
+    return items.map(item => ({ degIdx: item.degIdx, chords: [item.chord], label: item.label }));
+  }
+  return scaleNotes.map((_, di) => ({
+    degIdx: di, label: null,
+    chords: isOthers ? buildOtherChords(scaleNotes, scaleData.intervals, di)
+      : (() => { const notes = buildChord(scaleNotes, di, n), iv = chordIntervals(scaleData.intervals, di, n);
+                 const { sym, quality } = getChordSymbol(notes[0], iv); return [{ notes, sym, qual: quality, iv }]; })()
+  }));
+}
+
+function renderPianoTab(scaleNotes, scaleData, hands) {
+  const container = document.getElementById('all-degrees');
+  container.innerHTML = '';
+
+  const hRow = document.createElement('div');
+  hRow.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;';
+  hRow.innerHTML = `
+    <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-family:'IBM Plex Mono',monospace;font-weight:600">${hands === 1 ? 'Piano · One Hand' : 'Piano · Two Hands'}</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)">${hands === 1 ? 'close position, every inversion' : 'left hand bass, right hand chord'}</span>`;
+  const labelBtn = document.createElement('button');
+  labelBtn.style.cssText = `margin-left:auto;padding:4px 10px;background:transparent;border:1px solid var(--border);border-radius:2px;
+    color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;
+    text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s`;
+  labelBtn.textContent = state.gripLabel === 'notes' ? 'Show intervals' : 'Show notes';
+  labelBtn.addEventListener('click', () => {
+    state.gripLabel = state.gripLabel === 'notes' ? 'intervals' : 'notes';
+    const sd = SCALES[state.scale];
+    renderView(spellScale(parseInt(state.key), sd.intervals, sd), sd);
+  });
+  hRow.appendChild(labelBtn);
+  container.appendChild(hRow);
+
+  const desc = document.createElement('div');
+  desc.style.cssText = 'font-size:9px;color:var(--muted);margin-bottom:14px;line-height:1.6;max-width:600px;font-family:"IBM Plex Mono",monospace;letter-spacing:.03em;border-left:2px solid var(--border2);padding-left:10px';
+  desc.innerHTML = hands === 1
+    ? 'Every chord of up to four notes in close position, with each of its inversions one tap away, fingered for either hand as chord charts print them (C = RH 1-3-5, LH 5-3-1). One hand cannot hold five notes or more in close position: those chords are shown <em>rootless</em>, the four colour tones a jazz pianist keeps when the bass player has the root - A from the third, B from the seventh.'
+    : 'How you play the chord with both hands: the left hand takes the root, alone or with the fifth, seventh, third or octave, and the right hand the colour tones in close position around middle C. Big chords lose what pianists leave out: the fifth first, and an 11th never sits over a major third (an 11 chord drops the third, a 13 chord the 11th).';
+  container.appendChild(desc);
+
+  const legend = document.createElement('div');
+  legend.style.cssText = 'display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:20px;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--muted)';
+  legend.innerHTML = `
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#c9a84c;display:inline-block"></span>Root</span>
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#8a7cc4;display:inline-block"></span>Chord tone</span>
+    <span><span style="color:#c9a84c">RH</span> / <span style="color:#8fa8c8">LH</span> rows = fingers: 1 thumb · 2 index · 3 middle · 4 ring · 5 little</span>`;
+  container.appendChild(legend);
+
+  const scaleLen = scaleNotes.length;
+  const DNAMES   = degreeNames(scaleData.intervals);
+  const romans   = computeAllRomans(scaleData.intervals, scaleData);
+  const tag      = { 3: 'Triad', 4: '7th', 5: '9th', 6: '11th', 7: '13th' }[state.mode];
+
+  chordsForView(scaleNotes, scaleData).forEach(({ degIdx, chords, label }) => {
+    const sec = document.createElement('div');
+    sec.className = 'degree-section';
+    sec.id = `piano-deg-${degIdx}`;
+    const hdr = document.createElement('div');
+    hdr.className = 'degree-header';
+    hdr.innerHTML = `<span class="degree-num">${romans[degIdx]}</span><span class="degree-name-label">${DNAMES[degIdx] || ''}</span>`;
+    sec.appendChild(hdr);
+    const grid = document.createElement('div');
+    grid.className = 'chords-grid';
+
+    chords.forEach((ch, ci) => {
+      const chRootPc = noteNameToPc(ch.notes[0]);
+      const chord = { rootPc: chRootPc, iv: ch.iv, notes: ch.notes, title: ch.notes[0] + ch.sym };
+      const opts = hands === 1 ? pianoOneHand(chRootPc, ch.iv) : pianoTwoHand(chRootPc, ch.iv);
+      const shown = hands === 1 ? opts
+        : PIANO_LH_ORDER.map(k => opts.find(o => o.key === k)).filter(Boolean);
+
+      const card = document.createElement('div');
+      card.className = 'diag-card piano-card';
+      card.style.animationDelay = `${ci * 0.05}s`;
+      card.innerHTML = `
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">${label || tag || ''}</div>
+        <div class="diag-chord-name">${ch.notes[0]}<sup>${ch.sym}</sup></div>
+        <div class="diag-quality">${ch.qual}</div>`;
+
+      if (!shown.length) {
+        card.insertAdjacentHTML('beforeend', `<div style="color:var(--muted);font-size:9px;padding:26px 4px;text-align:center;font-family:'IBM Plex Mono',monospace">No voicing</div>`);
+      } else {
+        const diagWrap = document.createElement('div');
+        diagWrap.style.cssText = 'width:100%;display:flex;justify-content:center';
+        const capWrap = document.createElement('div');
+        capWrap.style.cssText = "font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--gold2);letter-spacing:.04em;text-align:center;line-height:1.5";
+        const pillWrap = document.createElement('div');
+        pillWrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;justify-content:center';
+        const notesDiv = document.createElement('div');
+        notesDiv.className = 'diag-notes';
+
+        let sel = hands === 1 ? 0 : Math.max(0, shown.indexOf(opts[0]));
+        const paint = () => {
+          const opt = shown[sel];
+          diagWrap.innerHTML = withChordSpelling(ch.notes, () => makeKeyboardDiagram(opt, chord, 300, state.gripLabel));
+          capWrap.textContent = pianoCaption(opt, chord);
+          const omit = pianoOmitText(opt, chord);
+          notesDiv.innerHTML = ch.notes.join(' · ') + (omit ? `<span style="opacity:.55"> (${omit})</span>` : '');
+          pillWrap.querySelectorAll('button').forEach((b, i) => {
+            b.style.color       = i === sel ? 'var(--gold2)' : 'var(--muted)';
+            b.style.borderColor = i === sel ? 'var(--gold)'  : 'var(--border)';
+            b.setAttribute('aria-pressed', i === sel);
+          });
+          card._voicing = { piano: opt.lh.concat(opt.rh), pianoOpt: opt, chord,
+                            title: `${chord.title} - ${pianoCaption(opt, chord)}` };
+        };
+        shown.forEach((opt, i) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = pianoPill(opt, chord);
+          b.style.cssText = `padding:2px 7px;background:transparent;border:1px solid var(--border);border-radius:2px;
+            font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.04em;cursor:pointer;
+            color:var(--muted);transition:color .12s,border-color .12s`;
+          b.title = pianoCaption(opt, chord);
+          b.addEventListener('click', e => { e.stopPropagation(); sel = i; paint(); });
+          pillWrap.appendChild(b);
+        });
+        card.appendChild(diagWrap);
+        card.appendChild(capWrap);
+        if (shown.length > 1) card.appendChild(pillWrap);
+        card.appendChild(notesDiv);
+        paint();
+
+        card.style.cursor = 'pointer';
+        card.dataset.navCard = 'piano';
+        card.addEventListener('click', () => {
+          const all = Array.from(document.querySelectorAll('[data-nav-card="piano"]'));
+          showPianoModal(all.map(c => c._voicing).filter(Boolean), Math.max(0, all.indexOf(card)));
+        });
+      }
+      grid.appendChild(card);
+    });
+
+    sec.appendChild(grid);
+    if (degIdx < scaleLen - 1) { const dv = document.createElement('div'); dv.className = 'section-divider'; sec.appendChild(dv); }
+    container.appendChild(sec);
+  });
+}
+
+function renderPiano(scaleNotes, scaleData)    { renderPianoTab(scaleNotes, scaleData, 1); }
+function renderPianoTwo(scaleNotes, scaleData) { renderPianoTab(scaleNotes, scaleData, 2); }
+
+// Same modal frame as the grips: the keyboard at full size, arrows or swipe
+// to step through the tab, and the sound buttons.
+function showPianoModal(navList, idx) {
+  const cur = navList[idx];
+  if (!cur) return;
+  const hasPrev = idx > 0, hasNext = idx < navList.length - 1;
+
+  function onKey(e) {
+    const m = document.getElementById('diag-modal');
+    if (!m) { document.removeEventListener('keydown', onKey); return; }
+    if (e.key === 'Escape') { m.remove(); document.removeEventListener('keydown', onKey); }
+    if (e.key === 'ArrowLeft'  && m._nav.idx > 0)                      showPianoModal(m._nav.list, m._nav.idx - 1);
+    if (e.key === 'ArrowRight' && m._nav.idx < m._nav.list.length - 1) showPianoModal(m._nav.list, m._nav.idx + 1);
+  }
+
+  let modal = document.getElementById('diag-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'diag-modal';
+    modal.style.cssText = `position:fixed;inset:0;z-index:var(--z-top);background:rgba(8,10,12,.9);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;padding:20px;box-sizing:border-box`;
+    modal.addEventListener('click', () => { modal.remove(); document.removeEventListener('keydown', onKey); });
+    let tx = 0;
+    modal.addEventListener('touchstart', e => { tx = e.changedTouches[0].clientX; }, { passive: true });
+    modal.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx, s = modal._nav;
+      if (!s) return;
+      if (dx >  55 && s.idx > 0)                 showPianoModal(s.list, s.idx - 1);
+      if (dx < -55 && s.idx < s.list.length - 1) showPianoModal(s.list, s.idx + 1);
+    });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(modal);
+  }
+  modal._nav = { list: navList, idx };
+
+  const btn = (on, ch) => `<button ${on ? '' : 'disabled'} style="background:none;border:1px solid ${on ? '#3e4a5a' : '#1e2530'};
+    color:${on ? '#8a9bb0' : '#2e3440'};padding:5px 16px;border-radius:3px;cursor:${on ? 'pointer' : 'default'};font-size:14px;line-height:1">${ch}</button>`;
+  const w = Math.max(280, Math.min(640, window.innerWidth - 80));
+  const opt = cur.pianoOpt, omit = pianoOmitText(opt, cur.chord);
+  const html = `
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8;text-align:center">${cur.chord.title}</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c9a84c;text-align:center">${pianoCaption(opt, cur.chord)}</div>
+    ${withChordSpelling(cur.chord.notes, () => makeKeyboardDiagram(opt, cur.chord, w, state.gripLabel))}
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8b93a3;text-align:center">${cur.chord.notes.join(' · ')}${omit ? ' (' + omit + ')' : ''}</div>
+    <div id="pm-snd"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="pm-prev">${btn(hasPrev, '◀')}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8b93a3;letter-spacing:.1em">${idx + 1} / ${navList.length}</span>
+      <span id="pm-next">${btn(hasNext, '▶')}</span>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8b93a3;text-align:center">← swipe or arrows → · click anywhere to close</div>`;
+
+  let inner = modal.querySelector('#pm-inner');
+  if (!inner) {
+    inner = document.createElement('div');
+    inner.id = 'pm-inner';
+    inner.style.cssText = `background:#141820;border:1px solid #2e3440;border-radius:4px;padding:22px 26px;
+      display:flex;flex-direction:column;align-items:center;gap:12px;cursor:default;max-width:94vw;max-height:92vh;overflow:auto;box-sizing:border-box`;
+    inner.addEventListener('click', e => e.stopPropagation());
+    modal.appendChild(inner);
+  }
+  inner.innerHTML = html;
+  const bar = makeSoundBar(() => cur);
+  if (bar) inner.querySelector('#pm-snd').replaceWith(bar);
+  inner.querySelector('#pm-prev').addEventListener('click', e => { e.stopPropagation(); if (hasPrev) showPianoModal(navList, idx - 1); });
+  inner.querySelector('#pm-next').addEventListener('click', e => { e.stopPropagation(); if (hasNext) showPianoModal(navList, idx + 1); });
 }
 
 // Drop 2: close position = 1-3-5-7, drop 2nd-from-top (5) one octave
@@ -7811,10 +8428,13 @@ function showMandoDiagramModal(frets4, pcs4, rootPc, title, navList, navIdx) {
   const contentHtml = `
     <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f0e8d8">${cur.title}</div>
     ${makeMandoDiagram(cur.frets4, cur.pcs4, cur.rootPc, 240)}
+    <div id="dm-snd"></div>
     ${navHtml}
     <div style="font-size:9px;color:#8b93a3;font-family:'IBM Plex Mono',monospace">Mandolin G · D · A · E${hasNav?' · ← swipe or arrows →':''} · click to close</div>`;
 
   function bindNavBtns() {
+    const bar = makeSoundBar(() => cur);
+    if (bar) modal.querySelector('#dm-snd')?.replaceWith(bar);
     if (!hasNav) return;
     modal.querySelector('#dm-prev')?.addEventListener('click', e => { e.stopPropagation(); if (hasPrev) showMandoDiagramModal(null,null,null,null,navList,idx-1); });
     modal.querySelector('#dm-next')?.addEventListener('click', e => { e.stopPropagation(); if (hasNext) showMandoDiagramModal(null,null,null,null,navList,idx+1); });
@@ -7948,6 +8568,7 @@ function renderMandolin(scaleNotes, scaleData) {
           let altDisplayNotes = altNotes;
           if (altVoicing) {
             altDiagHTML = makeMandoDiagram(altVoicing.frets4, altVoicing.pcs4, chRootPc, 116);
+            altCard._voicing = { frets4: altVoicing.frets4 };
             const voicedPcs = new Set(altVoicing.pcs4.filter(p=>p!==-1).map(p=>((p%12)+12)%12));
             const filtered = altNotes.filter(n => voicedPcs.has(((noteNameToPc(n))%12+12)%12));
             if (filtered.length) altDisplayNotes = filtered;
@@ -8186,6 +8807,214 @@ function playMidiNote(midi, dur, delay) {
   if (samplerReady) { sampler.triggerAttackRelease(midiToNoteName(midi), dur, Tone.now() + 0.02 + delay); return; }
   const ctx = getAudioCtx();
   if (ctx) makePianoNote(ctx, 440 * Math.pow(2, (midi - 69) / 12), ctx.currentTime + 0.02 + delay, dur, 0.13);
+}
+
+// ══════════════════════════════════════════════
+// CHORD SOUND - strum, block chord and arpeggio for every diagram card
+//
+// Each card plays the voicing it draws, string by string or key by key: the
+// guitar on its acoustic samples, the piano on the Salamander grand. Mandolin
+// and banjo have no sample set, so they are plucked in software (extended
+// Karplus-Strong below), and so is the guitar until its samples have loaded.
+// ══════════════════════════════════════════════
+
+// strum = gap between strings on a downstroke, arp = one note to the next, ring = note length (s).
+const VOICE_FEEL = {
+  guitar:   { strum: .03,  arp: .17, ring: 2.8 },
+  mandolin: { strum: .018, arp: .14, ring: 1.8 },
+  banjo:    { strum: .022, arp: .12, ring: 1.6 },
+  piano:    { strum: 0,    arp: .16, ring: 2.6 }
+};
+
+// Extended Karplus-Strong (Jaffe & Smith 1983): one period of noise circulating
+// in a delay line, through a loss filter (s: higher = darker) that sets the
+// decay (t60) and an allpass that tunes the fractional part of the period. pick
+// = where along the string it is plucked (near the bridge = nasal), soft =
+// how rounded the attack is. Mandolin courses are pairs, struck 4 ms apart and
+// a few cents off each other, which is most of what makes a mandolin shimmer.
+const PLUCK_VOICE = {
+  guitar:   { t60: 3.4, s: .45, pick: .2,  soft: .5,  course: 0 },
+  mandolin: { t60: 2.0, s: .32, pick: .12, soft: .25, course: 4 },
+  banjo:    { t60: 1.5, s: .2,  pick: .09, soft: .08, course: 0 }
+};
+// Body: [filter type, frequency, Q, gain dB] in series.
+const PLUCK_BODY = {
+  guitar:   [['highpass', 75, .7, 0],  ['peaking', 210, 1.1, 3], ['peaking', 2600, 1, 2]],
+  mandolin: [['highpass', 170, .7, 0], ['peaking', 1150, 1.3, 3], ['peaking', 3400, 1.2, 2]],
+  banjo:    [['highpass', 190, .7, 0], ['peaking', 1700, 1.4, 5], ['peaking', 4200, 1, 3]]
+};
+const _pluckCache = new Map();
+const _pluckOut = {};
+let _plucking = [];
+
+function pluckBuffer(ctx, instr, midi) {
+  const key = instr + ':' + midi;
+  if (_pluckCache.has(key)) return _pluckCache.get(key);
+  const v = PLUCK_VOICE[instr], sr = ctx.sampleRate;
+  const len = Math.floor(sr * Math.min(3.6, v.t60 * 1.15));
+  const out = new Float32Array(len);
+  (v.course ? [-v.course / 2, v.course / 2] : [0]).forEach((cents, k) => {
+    const f = 440 * Math.pow(2, (midi - 69) / 12 + cents / 1200);
+    const N = sr / f, S = v.s;
+    const L = Math.floor(N - S - 0.1), P = N - S - L, C = (1 - P) / (1 + P);
+    // Decay per period for the fundamental to fall 60 dB in t60 (shorter up the
+    // neck), net of what the loss filter already takes off it at that pitch.
+    const w = 2 * Math.PI * f / sr;
+    const lossAtF = Math.sqrt((1 - S) * (1 - S) + S * S + 2 * S * (1 - S) * Math.cos(w));
+    const rho = Math.min(0.9999, Math.pow(10, -3 / (v.t60 * Math.pow(196 / f, 0.35) * f)) / lossAtF);
+    const exLen = Math.round(N), ex = new Float32Array(exLen);
+    let lp = 0;
+    for (let i = 0; i < exLen; i++) { lp += (1 - v.soft) * ((Math.random() * 2 - 1) - lp); ex[i] = lp; }
+    const pk = Math.max(1, Math.round(v.pick * N));
+    for (let i = exLen - 1; i >= pk; i--) ex[i] -= ex[i - pk];
+    const off = Math.round(k * sr * 0.004), y = new Float32Array(len - off);
+    let apx = 0, apy = 0;
+    for (let n = 0; n < y.length; n++) {
+      const a = n >= L ? y[n - L] : 0, b = n > L ? y[n - L - 1] : 0;
+      const loss = rho * ((1 - S) * a + S * b);
+      const ap = C * loss + apx - C * apy;
+      apx = loss; apy = ap;
+      y[n] = (n < exLen ? ex[n] : 0) + ap;
+    }
+    for (let n = 0; n < y.length; n++) out[n + off] += y[n];
+  });
+  let x1 = 0, y1 = 0, peak = 1e-9;
+  for (let n = 0; n < len; n++) { const d = out[n] - x1 + 0.995 * y1; x1 = out[n]; y1 = d; out[n] = d; peak = Math.max(peak, Math.abs(d)); }
+  const fade = Math.floor(sr * 0.05);
+  for (let n = 0; n < len; n++) out[n] *= (n > len - fade ? (len - n) / fade : 1) / peak;
+  const buf = ctx.createBuffer(1, len, sr);
+  buf.getChannelData(0).set(out);
+  _pluckCache.set(key, buf);
+  return buf;
+}
+
+function pluckOut(ctx, instr) {
+  if (_pluckOut[instr]) return _pluckOut[instr];
+  const chain = PLUCK_BODY[instr].map(([type, f, q, gain]) => {
+    const b = ctx.createBiquadFilter();
+    b.type = type; b.frequency.value = f; b.Q.value = q; b.gain.value = gain;
+    return b;
+  });
+  chain.reduce((a, b) => { a.connect(b); return b; }).connect(ensureCompMasterBus());
+  return (_pluckOut[instr] = chain[0]);
+}
+
+function pluckNote(ctx, instr, midi, when, gain) {
+  const src = ctx.createBufferSource(), g = ctx.createGain();
+  src.buffer = pluckBuffer(ctx, instr, midi);
+  g.gain.value = gain;
+  src.connect(g); g.connect(pluckOut(ctx, instr));
+  src.start(when);
+  const node = { src, g };
+  _plucking.push(node);
+  src.onended = () => { _plucking = _plucking.filter(n => n !== node); };
+}
+
+// A new strum damps the strings still ringing, as the hand does on the instrument.
+function dampPlucks(ctx) {
+  const t = ctx.currentTime;
+  _plucking.forEach(n => {
+    n.g.gain.cancelScheduledValues(t);
+    n.g.gain.setTargetAtTime(0, t, 0.02);
+    try { n.src.stop(t + 0.12); } catch (e) {}
+  });
+  _plucking = [];
+}
+
+// What a card plays, from the voicing it draws. notes = strum / chord order
+// (low string to high; banjo: the 5th-string drone first, as a brush goes),
+// arp = arpeggio order (banjo: the drone last, where the thumb comes back to it).
+function voicingSound(v) {
+  if (!v) return null;
+  const fretted = (frets, midi) => frets.map((f, s) => (f === null || f === undefined || f < 0) ? null : midi[s] + f).filter(m => m !== null);
+  if (v.piano) return { instr: 'piano', notes: v.piano.slice().sort((a, b) => a - b) };
+  if (v.arp)   return { instr: 'guitar', notes: v.arp, arpOnly: true };
+  if (v.frets6) return { instr: 'guitar', notes: fretted(v.frets6, GUITAR_MIDI) };
+  if (v.frets4) return { instr: 'mandolin', notes: fretted(v.frets4, MANDO_MIDI) };
+  if (v.grip) {
+    const cfg = GRIP_INSTR[v.instr];
+    const notes = fretted(v.grip.frets, cfg.midi);
+    if (!cfg.drone) return { instr: v.instr, notes };
+    const d = droneState(cfg, v.grip.frets, v.rootPc, v.iv.map(x => ((x % 12) + 12) % 12));
+    if (!d || d.fret < 0) return { instr: v.instr, notes };
+    const g = cfg.drone.midi + (d.fret > 0 ? d.fret - cfg.drone.nut : 0);
+    return { instr: v.instr, notes: [g].concat(notes), arp: notes.indexOf(g) >= 0 ? notes : notes.concat([g]) };
+  }
+  return null;
+}
+
+// Plays one voicing; returns how long it sounds, in ms. mode 'strum' = a
+// downstroke on strings, all keys at once on the piano; 'arp' = one note at a
+// time (up and back down for an arpeggio shape).
+function playVoicing(snd, mode) {
+  if (!snd || !snd.notes.length || typeof Tone === 'undefined') return 0;
+  const ctx = Tone.getContext().rawContext;
+  const feel = VOICE_FEEL[snd.instr];
+  const up = snd.arp || snd.notes;
+  const seq = mode === 'arp'
+    ? (snd.arpOnly ? up.concat(up.slice(0, -1).reverse()) : up).map((m, i) => ({ m, t: i * feel.arp }))
+    : snd.notes.map((m, i) => ({ m, t: i * feel.strum }));
+  const sampled = snd.instr === 'piano' || (snd.instr === 'guitar' && guitarSamplerReady);
+  if (snd.instr === 'guitar' && !guitarSampler && !guitarSamplerFailed) initGuitarSampler();
+  if (!sampled) {
+    dampPlucks(ctx);
+    seq.forEach(({ m }) => pluckBuffer(ctx, snd.instr, m));   // build first, so the strum keeps its timing
+  }
+  const gain = 0.55 / Math.sqrt(mode === 'arp' ? 2 : seq.length);
+  const t0 = ctx.currentTime + 0.04;
+  seq.forEach(({ m, t }, i) => {
+    const vel = mode === 'arp' ? 0.9 : 1 - i * 0.03;
+    if (snd.instr === 'piano') playMidiNote(m, feel.ring, t);
+    else if (sampled) guitarSampler.triggerAttackRelease(midiToNoteName(m), feel.ring, Tone.now() + 0.03 + t, 0.75 * vel);
+    else pluckNote(ctx, snd.instr, m, t0 + t, gain * vel * (0.95 + Math.random() * 0.1));
+  });
+  return (seq[seq.length - 1].t + Math.min(feel.ring, 1.4)) * 1000;
+}
+
+const SND_ICON = {
+  strum: '<svg width="8" height="9" viewBox="0 0 9 10" aria-hidden="true"><polygon points="1,1 8,5 1,9" fill="currentColor"/></svg>',
+  arp:   '<svg width="9" height="9" viewBox="0 0 9 9" aria-hidden="true"><circle cx="1.5" cy="7.5" r="1.2" fill="currentColor"/><circle cx="4.5" cy="4.5" r="1.2" fill="currentColor"/><circle cx="7.5" cy="1.5" r="1.2" fill="currentColor"/></svg>'
+};
+
+// The two sound buttons, reading the voicing at click time: a card whose pills
+// switch grips or inversions plays whichever one is showing.
+function makeSoundBar(getVoicing) {
+  const first = voicingSound(getVoicing());
+  if (!first || !first.notes.length) return null;
+  const bar = document.createElement('div');
+  bar.className = 'snd-bar';
+  const modes = first.arpOnly ? [['arp', 'Play', 'Play the arpeggio, up and back down']]
+    : [['strum', first.instr === 'piano' ? 'Chord' : 'Strum', first.instr === 'piano' ? 'Play every key at once' : 'Strum it, low string to high'],
+       ['arp', 'Arp', 'Arpeggio: one note at a time, low to high']];
+  modes.forEach(([mode, text, tip]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'snd-btn';
+    b.title = tip;
+    b.setAttribute('aria-label', tip);
+    b.innerHTML = SND_ICON[mode] + '<span>' + text + '</span>';
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      if (typeof Tone === 'undefined') return;
+      Tone.start().then(() => {
+        const ms = playVoicing(voicingSound(getVoicing()), mode);
+        b.classList.add('playing');
+        clearTimeout(b._playT);
+        b._playT = setTimeout(() => b.classList.remove('playing'), ms);
+      }).catch(() => {});
+    });
+    bar.appendChild(b);
+  });
+  return bar;
+}
+
+// Run after every chord view: any card that carries a voicing gets the buttons.
+function attachSoundBars(root) {
+  root.querySelectorAll('.diag-card, .drop-card, [data-snd]').forEach(el => {
+    if (!el._voicing || el.querySelector(':scope > .snd-bar')) return;
+    const bar = makeSoundBar(() => el._voicing);
+    if (bar) el.appendChild(bar);
+  });
 }
 
 // ── Note frequency ─────────────────────────────
@@ -9722,7 +10551,7 @@ document.getElementById('compare-toggle-btn')?.addEventListener('click', () => {
   if (viewHdr) viewHdr.style.display = compareActive ? 'none' : '';
   if (compareActive) {
     // The instrument sub-tabs would otherwise stay clickable and re-render the hidden list.
-    ['guitar-sub-tabs','mandolin-sub-tabs','banjo-sub-tabs'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+    ['guitar-sub-tabs','mandolin-sub-tabs','banjo-sub-tabs','piano-sub-tabs'].forEach(id => { document.getElementById(id).style.display = 'none'; });
     initCompareSelects();
     renderComparison();
   } else {
@@ -10012,6 +10841,7 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   if (tv==='guitar')   state.view = state.lastGuitarView   || 'diagrams';
   else if (tv==='mandolin') state.view = state.lastMandolinView || 'mandolin';
   else if (tv==='banjo')    state.view = state.lastBanjoView    || 'banjo';
+  else if (tv==='piano')    state.view = state.lastPianoView    || 'piano';
   else state.view = tv;
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
@@ -10019,14 +10849,16 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   const isGuitar2  =['diagrams','arpeggio','scale','shell','drop2','drop3','altdom'].includes(state.view);
   const isMandolin2=['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
   const isBanjo2   =['banjo','banjo-scale','banjo-moveable'].includes(state.view);
+  const isPiano2   =['piano','piano-two'].includes(state.view);
   document.querySelectorAll('.view-tab').forEach(t=>{
     const v=t.dataset.view;
-    t.classList.toggle('active', v==='guitar'?isGuitar2:v==='mandolin'?isMandolin2:v==='banjo'?isBanjo2:v===state.view);
+    t.classList.toggle('active', v==='guitar'?isGuitar2:v==='mandolin'?isMandolin2:v==='banjo'?isBanjo2:v==='piano'?isPiano2:v===state.view);
   });
   document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
   document.getElementById('guitar-sub-tabs').style.display  =isGuitar2  ?'flex':'none';
   document.getElementById('mandolin-sub-tabs').style.display=isMandolin2?'flex':'none';
   document.getElementById('banjo-sub-tabs').style.display   =isBanjo2   ?'flex':'none';
+  document.getElementById('piano-sub-tabs').style.display   =isPiano2   ?'flex':'none';
   renderView(scaleNotes,scaleData);
   syncUrl();
 });
@@ -10070,6 +10902,19 @@ document.getElementById('banjo-sub-tabs').addEventListener('click',e=>{
   syncUrl();
 });
 
+document.getElementById('piano-sub-tabs').addEventListener('click',e=>{
+  const tab = e.target.closest('.guitar-sub-tab');
+  if(!tab || tab.classList.contains('disabled')) return;
+  state.view = tab.dataset.view;
+  state.lastPianoView = tab.dataset.view;
+  document.querySelectorAll('#piano-sub-tabs .guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
+  const rootPc=parseInt(state.key);
+  const scaleData=SCALES[state.scale];
+  const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
+  renderView(scaleNotes,scaleData);
+  syncUrl();
+});
+
 // (Progression panel buttons removed — composition tool is unified)
 
 const backTop=document.getElementById('back-top');
@@ -10104,7 +10949,7 @@ function encodeHash(st) {
 // blanked the page. Anything unknown falls back to the default instead.
 const HASH_MODES = ['3','4','5','6','7','others','secdom','secdim','secsub','chromed'];
 const HASH_VIEWS = ['list','diagrams','arpeggio','scale','shell','drop2','drop3','altdom',
-  'mandolin','mandolin-scale','mandolin-chop','banjo','banjo-scale','banjo-moveable'];
+  'mandolin','mandolin-scale','mandolin-chop','banjo','banjo-scale','banjo-moveable','piano','piano-two'];
 function decodeHash(hash) {
   if (!hash || hash.length < 3) return null;
   try {
@@ -10445,11 +11290,28 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     </div>
 
     <div class="tech-section">
+      <div class="tech-section-title">Piano Engine</div>
+      <div class="tech-row"><span class="tech-key">Fingering</span><span class="tech-val">Ergonomic model of Parncutt, Sloboda, Clarke, Raekallio &amp; Desain (1997): each finger pair has a relaxed, comfortable and practical span, and a fingering pays per semitone outside them, applied to every pair of notes of the block chord. The bottom note takes the anchor finger (RH 1, LH 5) and a chord a fourth wide or more closes on the other outer finger. One change to the published table: index-middle relax over a major third in a chord (the table measures legato melody), so Dm7 comes out 1-2-3-5 as chord charts print it.</span></div>
+      <div class="tech-row"><span class="tech-key">Checked against</span><span class="tech-val">pianochord.org: C, C/E, C/G = RH 1-3-5, 1-2-5, 1-3-5 and LH 5-3-1, 5-3-1, 5-2-1; C7, Cmaj7, Dm7 = RH 1-2-3-5, LH 5-3-2-1; Bdim = 1-3-5 / 5-3-1; Csus4 = 1-4-5 / 5-2-1; Csus2 = 1-2-5 / 5-4-1. All asserted by name in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tests/engine.test.js</code>.</span></div>
+      <div class="tech-row"><span class="tech-key">One hand</span><span class="tech-val">Up to four notes: close position on each chord tone, bass between C4 and B4, a two-octave keyboard from the C below. Five notes or more: the rootless four-note voicing (the tones ranked third / seventh, altered fifth, the extension that names the chord, altered extensions, 9, 11, perfect fifth last), A from the third and B from the seventh, bottom note between D3 and C♯4.</span></div>
+      <div class="tech-row"><span class="tech-key">Two hands</span><span class="tech-val">Left-hand root between F2 and E3, with the fifth, seventh, third, octave or nothing; right hand = the remaining tones by rank, three or four, doubling a chord tone when a triad leaves it short. Each placement is scored: low-interval limits (no close interval below the arranger's floor, e.g. a minor third under C3), right-hand top note in A4-G5, no minor ninth between voices except a chord's own ♭9, hands not a semitone apart, plus both hands' fingering cost. One voicing per left-hand pattern; the best is shown first.</span></div>
+      <div class="tech-row"><span class="tech-key">Omissions</span><span class="tech-val">Perfect fifth first. A natural 11th over a major third is a minor ninth apart, so a chord with a seventh, a major third and an 11th drops the 11th when it has a 13th and the third when it does not - the usual 13 and 11 chord voicings. Whatever is left out is printed under the keyboard.</span></div>
+    </div>
+
+    <div class="tech-section">
+      <div class="tech-section-title">Chord Sound <span style="color:var(--muted);font-weight:400">- every diagram</span></div>
+      <div class="tech-row"><span class="tech-key">What plays</span><span class="tech-val">The voicing each card draws, read at click time (a pill that switches grip or inversion switches the sound): frets → MIDI per string, banjo 5th string from its own nut at fret 5, piano keys as drawn. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">attachSoundBars()</code> runs after every chord view and adds the buttons to any card carrying a <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_voicing</code>; the zoom modals get them too.</span></div>
+      <div class="tech-row"><span class="tech-key">Strum / Chord</span><span class="tech-val">Downstroke, low string to high: 30 ms between strings on guitar, 18 on mandolin, 22 on banjo (5th-string drone first, as a brush goes), slightly softer toward the top. Piano: every key at once. A new strum damps the strings still ringing.</span></div>
+      <div class="tech-row"><span class="tech-key">Arp</span><span class="tech-val">One note at a time, low to high: 170 ms guitar, 140 mandolin, 120 banjo (drone last, unless it doubles the 1st string), 160 piano (left hand, then right). Arpeggio shapes play up and back down.</span></div>
+      <div class="tech-row"><span class="tech-key">Voices</span><span class="tech-val">Guitar: the acoustic guitar samples (loaded on the first guitar click; synthesised until they arrive). Piano: the Salamander grand (synth piano if the samples fail). Mandolin and banjo: extended Karplus-Strong (Jaffe &amp; Smith 1983) - a noise burst in a delay line one period long, with a loss filter for brightness and decay, an allpass for exact tuning (within 2 cents, tested), a pick-position comb and a short decay that shortens up the neck. Mandolin courses are two strings 4 cents apart, struck 4 ms apart; banjo is plucked near the bridge with little damping. Each instrument has its own body filter before the master compressor and limiter.</span></div>
+    </div>
+
+    <div class="tech-section">
       <div class="tech-section-title">Audio Engine</div>
       <div class="tech-row"><span class="tech-key">Library</span><span class="tech-val">Tone.js 14.8.49 (CDN) — wraps Web Audio API. Two samplers: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler</code> (piano, loads on init) and <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">guitarSampler</code> (guitar, lazy-loaded on first use).</span></div>
       <div class="tech-row"><span class="tech-key">Piano samples</span><span class="tech-val">Salamander Grand Piano — real mp3 samples via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> (tonejs.github.io/audio/salamander/). Loads on page init. "⟳ loading…" indicator while pending.</span></div>
       <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val">nbrosowsky acoustic guitar — 36 real mp3 samples (nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/). Tone.js pitch-shifts between recorded notes. Loaded lazily when Guitar sound is selected.</span></div>
-      <div class="tech-row"><span class="tech-key">Chord card playback</span><span class="tech-val">Strummed chord (notes staggered 8 ms) then ascending arpeggio at +1.2 s; all via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.triggerAttackRelease()</code>. Always piano regardless of composition sound setting.</span></div>
+      <div class="tech-row"><span class="tech-key">Chord list playback</span><span class="tech-val">Chord List cards: ▶ plays the chord in root position (notes 8 ms apart), the arpeggio button plays it up at 220 ms a note; always piano, via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">playMidiNote()</code>. Instrument diagrams have their own buttons (Chord Sound above).</span></div>
       <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button inside the staff SVG (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code>); notes queued one by one at 380 ms, pitches taken from the scale intervals; pause clears the queue and releases the sampler.</span></div>
       <div class="tech-row"><span class="tech-key">Composition player</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Transport</code>-based scheduling — enables accurate loop, stop, and live update. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_compPlayGen</code> counter cancels stale callbacks after stop. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compPendingRestart</code> flag triggers seamless loop restart when chords change during playback.</span></div>
       <div class="tech-row"><span class="tech-key">Note value / timing</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">stepDur = beatDur × 4 / noteVal</code>. Arp mode: fixed step interval at noteVal rate with swing offset on odd steps. Full mode: strum rate at noteVal, velocity from strum pattern (cycling).</span></div>
@@ -10740,7 +11602,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Overview</div>
         </div>
       </div>
-      <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar, mandolin and banjo diagrams, a circle of fifths, scale relationships, a cadence suggester, and a composition tool that plays your progressions back.</p>
+      <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar, mandolin, banjo and piano diagrams - each one playable - a circle of fifths, scale relationships, a cadence suggester, and a composition tool that plays your progressions back.</p>
       <p class="guide-p">The tool covers <strong>37 scales</strong> across seven families: Major Modes, Harmonic Minor, Melodic Minor, Bebop (Dominant, Major, Dorian, Phrygian), Pentatonic (Major, Minor, Blues), Symmetric (Half-Whole, Whole-Half) and Exotic (Neapolitan Minor, Hungarian Minor, Byzantine, Hirajoshi, Whole Tone, Arabian). Every scale is presented in all 12 keys. Notes are spelled the way a musician reads them: one letter per degree (B♭ not A♯ in F major), each note named after the degree it stands for in pentatonic and bebop scales (E major pentatonic is E F♯ G♯ B C♯), and the simpler of two enharmonic tonics (C♯ minor, not D♭ minor). Where a diatonic Maj7 chord has a ♯11 available in the scale, a Δ7♯11 (Lydian chord) is shown as an alternative voicing.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">💡</span>
@@ -10914,6 +11776,20 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-val">Full fretboard map of the four melody strings. The 5th string is left off: it has its own nut, so it shares no fret grid with the others.</span>
         <span class="guide-kv-key">Moveable</span>
         <span class="guide-kv-val"><strong>Closed shapes</strong> — the three grips of bluegrass banjo (<em>barre</em>, <em>F shape</em>, <em>D shape</em>) plus whatever else a chord needs. No open strings, so they move to any root: this is how you get out of open G and up the neck.</span>
+      </div>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Piano</span>
+        <span class="guide-kv-val">Two sub-tabs, each chord on a keyboard (root gold, other tones violet) with two rows of finger numbers under the keys: right hand, then left (1 = thumb, 5 = little finger).</span>
+      </div>
+      <div class="guide-kv" style="margin-left:18px">
+        <span class="guide-kv-key">One hand</span>
+        <span class="guide-kv-val">Close position with every inversion on a pill (Root, 1st, 2nd, 3rd), fingered the way chord charts such as pianochord.org print it: C = RH 1-3-5, LH 5-3-1; C/G = RH 1-3-5, LH 5-2-1; C7 = RH 1-2-3-5, LH 5-3-2-1. A chord of five notes or more does not fit one hand in close position, so it is shown <strong>rootless</strong> - the four colour tones a jazz pianist keeps when the bass has the root: <em>A</em> starts on the third (G13 = B E F A), <em>B</em> on the seventh (F A B E).</span>
+        <span class="guide-kv-key">Two hands</span>
+        <span class="guide-kv-val">How you would accompany with the chord: the left hand takes the root, alone or with the fifth, seventh, third or octave (one pill each), and the right hand plays the colour tones in close position around middle C. Big chords leave out what pianists leave out: the fifth first, and an 11th never over a major third (an 11 chord drops the third, a 13 chord the 11th). What is left out is named under the keyboard.</span>
+      </div>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Sound</span>
+        <span class="guide-kv-val">Every diagram card and zoomed diagram, on every instrument, has two buttons. <strong>Strum</strong> plays the voicing as drawn, low string to high (a banjo brush starts on the 5th-string drone); on piano the button is <strong>Chord</strong> and plays every key at once. <strong>Arp</strong> plays it one note at a time. Arpeggio shapes get a single <strong>Play</strong>, up and back down. Guitar uses the acoustic samples once loaded, piano the grand piano samples; mandolin (with its doubled courses) and banjo are synthesised plucked strings.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>

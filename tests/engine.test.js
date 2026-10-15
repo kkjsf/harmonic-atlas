@@ -152,6 +152,73 @@ check('no banjo grip reaches past four frets, and the drone never needs a fifth 
       } } } return bad; })()`), 0);
 });
 
+// ── Piano ──
+// Fingerings as pianochord.org prints them: C, C/E, C/G, C7, Cmaj7, Dm7, Bdim, Csus4, Csus2.
+const NAMES = ['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+const pf = (r, iv, k) => run(`(o => o.fingRH.join('') + '/' + o.fingLH.join(''))(pianoOneHand(${r}, ${JSON.stringify(iv)})[${k}])`);
+const pkeys = arr => arr.map(m => NAMES[m % 12]).join(' ');
+check('piano C root position RH 1-3-5, LH 5-3-1', () => eq(pf(0, M, 0), '135/531'));
+check('piano C/E RH 1-2-5, LH 5-3-1', () => eq(pf(0, M, 1), '125/531'));
+check('piano C/G RH 1-3-5, LH 5-2-1', () => eq(pf(0, M, 2), '135/521'));
+check('piano C7, Cmaj7, Dm7 RH 1-2-3-5, LH 5-3-2-1', () => eq([pf(0, D7, 0), pf(0, M7, 0), pf(2, m7, 0)].join(' '), '1235/5321 1235/5321 1235/5321'));
+check('piano Cmaj7/E puts 4-5 on the B-C semitone', () => eq(pf(0, M7, 1).split('/')[0], '1245'));
+check('piano Bdim RH 1-3-5, LH 5-3-1', () => eq(pf(11, [0, 3, 6], 0), '135/531'));
+check('piano Csus4 RH 1-4-5, LH 5-2-1; Csus2 RH 1-2-5, LH 5-4-1', () => eq(pf(0, [0, 5, 7], 0) + ' ' + pf(0, [0, 2, 7], 0), '145/521 125/541'));
+check('piano G13 rootless A = B E F A, B = F A B E', () => {
+  const o = JSON.parse(run(`JSON.stringify(pianoOneHand(7, [0,4,7,10,14,17,21]))`));
+  eq(o.map(x => x.pill + ':' + pkeys(x.rh)).join(' | '), 'A:B E F A | B:F A B E');
+});
+check('piano Dm9 rootless A = F A C E', () => eq(pkeys(JSON.parse(run(`JSON.stringify(pianoOneHand(2, [0,3,7,10,14])[0].rh)`))), 'F A C E'));
+const two = (r, iv) => JSON.parse(run(`JSON.stringify(pianoTwoHand(${r}, ${JSON.stringify(iv)}))`));
+check('piano two hands: G13 keeps its third and loses the 11th', () => {
+  eq(two(7, [0, 4, 7, 10, 14, 17, 21]).every(o => { const k = pkeys(o.lh.concat(o.rh)); return k.includes('B') && !k.includes('C'); }), true);
+});
+check('piano two hands: G11 loses its third and keeps the 11th', () => {
+  eq(two(7, [0, 4, 7, 10, 14, 17]).every(o => { const k = pkeys(o.lh.concat(o.rh)).split(' '); return !k.includes('B') && k.includes('C'); }), true);
+});
+check('piano two hands: CΔ9 under R-7 is C B | G D E', () => {
+  const o = two(0, [0, 4, 7, 11, 14]).find(x => x.key === '7');
+  eq(pkeys(o.lh) + ' | ' + pkeys(o.rh), 'C B | G D E');
+});
+check('every piano voicing on every scale is fingered, in reach, and keeps its root and third', () => {
+  eq(run(`(() => { const bad = []; for (const s of Object.keys(SCALES)) { const sd = SCALES[s];
+    for (let k = 0; k < 12; k++) { const sn = spellScale(k, sd.intervals, sd), list = [];
+      for (const n of [3, 4, 5, 6, 7]) if (n <= sn.length) for (let d = 0; d < sn.length; d++) list.push({ r: noteNameToPc(buildChord(sn, d, n)[0]), iv: chordIntervals(sd.intervals, d, n) });
+      for (const c of list) { const all = pianoOneHand(c.r, c.iv).concat(pianoTwoHand(c.r, c.iv));
+        if (!all.length) bad.push('none');
+        for (const o of all) { const keys = o.lh.concat(o.rh), pcs = new Set(keys.map(m => m % 12));
+          if (o.fingRH.length !== o.rh.length || o.fingLH.length !== (o.kind === 'two' ? o.lh : o.rh).length) bad.push('fingers');
+          if (o.rh[o.rh.length - 1] - o.rh[0] > 12) bad.push('reach');
+          if (o.kind !== 'rootless' && !pcs.has(c.r)) bad.push('root');
+          const third = c.iv.find(x => x === 3 || x === 4);
+          // only the 11-over-major-third rule (checked by name above) may take the third out
+          if (third !== undefined && pianoKeptTones(c.iv).includes(third) && !pcs.has((c.r + third) % 12)) bad.push('third');
+        } } } } return bad.length; })()`), 0);
+});
+
+// ── Sound: each card plays the voicing it draws ──
+const snd = v => run(`(s => s.notes.map(midiToNoteName).join(' ') + (s.arp ? ' / ' + s.arp.map(midiToNoteName).join(' ') : ''))(voicingSound(${v}))`);
+check('guitar C (x32010) strums C3 E3 G3 C4 E4', () => eq(snd(`{ frets6: [-1, 3, 2, 0, 1, 0] }`), 'C3 E3 G3 C4 E4'));
+check('mandolin G (0-0-2-3) strums G3 D4 B4 G5', () => eq(snd(`{ frets4: [0, 0, 2, 3] }`), 'G3 D4 B4 G5'));
+check('banjo open G brushes the g drone first and ends the roll on it', () => {
+  eq(snd(`{ instr: 'banjo', grip: { frets: [0, 0, 0, 0] }, rootPc: 7, iv: [0, 4, 7] }`), 'G4 D3 G3 B3 D4 / D3 G3 B3 D4 G4');
+});
+check('banjo C barre at 5 leaves the drone out of the roll (unison with the 1st string)', () => {
+  eq(snd(`{ instr: 'banjo', grip: { frets: [5, 5, 5, 5] }, rootPc: 0, iv: [0, 4, 7] }`), 'G4 G3 C4 E4 G4 / G3 C4 E4 G4');
+});
+check('banjo C (2-0-1-2) rolls up to the drone', () => {
+  eq(snd(`{ instr: 'banjo', grip: { frets: [2, 0, 1, 2] }, rootPc: 0, iv: [0, 4, 7] }`), 'G4 E3 G3 C4 E4 / E3 G3 C4 E4 G4');
+});
+check('plucked strings are in tune (banjo D4, mandolin E5 within 2 cents)', () => {
+  const cents = run(`(() => { const sr = 48000, ctx = { sampleRate: sr, createBuffer: (c, n) => { const d = new Float32Array(n); return { getChannelData: () => d }; } };
+    return [['banjo', 62], ['mandolin', 76]].map(([i, m]) => { const d = pluckBuffer(ctx, i, m).getChannelData(0), f0 = 440 * Math.pow(2, (m - 69) / 12);
+      const r = lag => { let s = 0; for (let k = 4800; k < 9600; k++) s += d[k] * d[k + lag]; return s; };
+      let bl = 0, best = -Infinity; for (let lag = Math.floor(sr / f0 / 1.06); lag <= Math.ceil(sr / f0 * 1.06); lag++) { const v = r(lag); if (v > best) { best = v; bl = lag; } }
+      const y0 = r(bl - 1), y1 = r(bl), y2 = r(bl + 1), f = sr / (bl + 0.5 * (y0 - y2) / (y0 - 2 * y1 + y2));
+      return Math.abs(1200 * Math.log2(f / f0)) < 2; }).join(','); })()`);
+  eq(cents, 'true,true');
+});
+
 // ── Shared links and share codes ──
 check('a malformed link is ignored, not fatal', () => eq(run(`[decodeHash('#k=0&s=%25'), decodeHash('#k=0&s=constructor')].join(',')`), ','));
 check('a link keeps known values only', () => eq(run(`JSON.stringify(decodeHash('#k=2&s=Dorian&m=99&v=zzz'))`), '{"key":2,"scale":"Dorian","mode":"4","view":"list"}'));

@@ -1,6 +1,6 @@
 # 🎵 Harmonic Atlas
 
-Interactive music theory reference — scales, chords, guitar/mandolin/banjo voicings, composition tool with improvisation mode. Runs as an installable PWA (Progressive Web App) directly in the browser.
+Interactive music theory reference - scales, chords, guitar/mandolin/banjo/piano voicings (fingered, and playable from every diagram), composition tool with improvisation mode. Runs as an installable PWA (Progressive Web App) directly in the browser.
 
 **Live app:** https://kkjsf.github.io/harmonic-atlas
 
@@ -69,6 +69,44 @@ fret 5, so its first fretted note is fret 6 — it is drawn as a short column wi
 - **Scale** — the four melody strings. The 5th string is left off the map: with its own nut it
   shares no fret grid with the others.
 - **Moveable** — closed grips: *barre*, *F shape*, *D shape* and whatever else a chord needs.
+
+### Piano tab
+
+Each chord on a keyboard: the root key gold, the other chord tones violet, and two rows of
+finger numbers under the keys - right hand, then left (1 = thumb … 5 = little finger).
+
+- **One hand** - close position with every inversion on a pill (Root, 1st, 2nd, 3rd), fingered
+  as chord charts print it: C = RH 1-3-5, LH 5-3-1; C/E = 1-2-5 / 5-3-1; C/G = 1-3-5 / 5-2-1;
+  C7, Cmaj7, Dm7 = RH 1-2-3-5, LH 5-3-2-1 (checked against pianochord.org). Five notes or more
+  do not fit one hand in close position: those chords are shown **rootless**, the four colour
+  tones a jazz pianist keeps when the bass has the root - *A* from the third (G13 = B E F A),
+  *B* from the seventh (F A B E).
+- **Two hands** - left hand root between F2 and E3, alone or with the fifth, seventh, third or
+  octave (one pill each); right hand the colour tones in close position around middle C. The
+  fifth goes first when something has to, and an 11th never sits over a major third: an 11 chord
+  drops the third, a 13 chord the 11th. What is left out is named under the keyboard.
+
+Fingering follows the ergonomic model of Parncutt et al. (1997) - every pair of fingers has a
+relaxed, a comfortable and a practical span, and a fingering pays per semitone outside them -
+applied to every pair of notes of the chord, with the hand anchored on its outer fingers. One
+change: index and middle relax over a major third in a chord (the published table is for
+legato melody), which is what makes Dm7 1-2-3-5.
+
+### Sound on every diagram
+
+Every diagram card - guitar (all sub-tabs), mandolin, banjo, piano - and every zoomed diagram
+has two buttons that play exactly the voicing drawn:
+
+- **Strum** - a downstroke, low string to high (a banjo brush starts on the 5th-string drone).
+  On piano the button is **Chord**: every key at once.
+- **Arp** - one note at a time, low to high. Arpeggio shapes get a single **Play**, up and back
+  down.
+
+Guitar plays the acoustic samples (synthesised until they have loaded), piano the Salamander
+grand. Mandolin and banjo have no sample set, so they are synthesised plucked strings (extended
+Karplus-Strong): a noise burst in a delay line one period long, a loss filter for brightness and
+decay, an allpass that tunes it (within 2 cents), doubled courses 4 cents apart on mandolin, a
+bright pluck near the bridge and a short decay on banjo.
 
 ### Closed-grip engine (mandolin Chop · banjo Moveable)
 
@@ -246,7 +284,8 @@ git push
 
 | Path | Engine |
 |---|---|
-| Chord card play/arp buttons | `addCardPlayBtn` → `sampler.triggerAttackRelease` |
+| Chord card play/arp buttons | `addCardPlayBtn` → `playMidiNote` (piano) |
+| Instrument diagram Strum / Chord / Arp | `attachSoundBars` → `voicingSound` → `playVoicing`: guitar sampler, piano sampler, or `pluckNote` (Karplus-Strong) |
 | Scale staff playback | `Tone.Transport.schedule` → sampler |
 | Composition player | `Tone.Transport.schedule` → `activeSampler` (piano or guitar) |
 | Composition drums | Raw Web Audio API — `_synthKick`, `_synthSnare`, `_synthHihat`, `_synthRide`, `_synthClap` |
@@ -274,6 +313,10 @@ git push
 | `makeGripDiagram(instr, grip, rootPc, w, opts)` | Grip diagram for both instruments; draws the banjo drone as a short column with its nut at fret 5 |
 | `gripFingering(frets)` / `gripFingerCount(off)` | Suggested 1–4 fingering, one number per barre group |
 | `renderGripTab(instr, …)` | Shared renderer for mandolin Chop and banjo Moveable |
+| `pianoOneHand(rootPc, iv)` / `pianoTwoHand(rootPc, iv)` | Piano voicings: close position + inversions or rootless A/B; left-hand bass + right-hand chord, one per left-hand pattern |
+| `pianoFingering(midis, hand)` | Block-chord fingering (Parncutt span model, anchored on the outer fingers) |
+| `makeKeyboardDiagram(opt, chord, w, labelMode)` / `renderPianoTab(…, hands)` | Keyboard SVG with RH and LH finger rows; the two Piano sub-tabs |
+| `voicingSound(v)` / `playVoicing(snd, mode)` / `pluckBuffer(ctx, instr, midi)` | What a card plays (frets or keys to MIDI), how (strum, chord, arpeggio), and the plucked-string synthesis |
 | `computeVoicingFromTemplate(rootPc, template)` | Derives guitar frets/pcs from a semitone-offset template; enforces ascending pitch per string and span ≤ 4 frets |
 | `showDiagramModal(…, navList, navIdx)` | Zoom overlay with smooth in-place navigation (fade swap 80 ms, swipe, arrow keys, prev/next context labels) |
 | `renderBrowse()` | Renders jazz resource hub cards with search filtering and category grouping |
