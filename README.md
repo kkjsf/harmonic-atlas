@@ -142,7 +142,7 @@ every per-string octave shift, then filters to what a hand can hold and what the
 Verified across 37 scales × 5 keys × 3 views: 7650 grips, no open string on a closed tab, no
 alien tone, no wrong-way stretch, nothing clipped off the diagram, none out of reach.
 
-### Jazz Resources Hub (♫ button, header)
+### Jazz Resources Hub (saxophone button, header)
 
 37 curated links across 9 categories, sourced from Jens Larsen, Jazz Guitar BE, Jazz Guitar Licks, and Matt Warnock Guitar:
 

@@ -803,7 +803,6 @@
     color: var(--gold); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: all .2s; box-shadow: 0 2px 12px rgba(0,0,0,.4);
-    font-size: 18px; line-height: 1;
   }
   #lick-lib-btn:hover { border-color: var(--gold); background: var(--surface2); color: var(--gold2); }
 
@@ -1698,7 +1697,8 @@
     #comp-btn { width:30px; height:30px; right:12px; top:12px; }
     #guide-btn { width:30px; height:30px; right:50px; top:12px; }
     #tech-btn { width:30px; height:30px; right:88px; top:12px; }
-    #lick-lib-btn { width:30px; height:30px; right:126px; top:12px; font-size:15px; }
+    #lick-lib-btn { width:30px; height:30px; right:126px; top:12px; }
+    #lick-lib-btn svg { width:16px; height:16px; }
     #comp-overlay { padding: 0; }
     #comp-modal { max-height: 100vh; border-radius: 0; }
     #comp-layout { flex-direction: column; }    .mode-groups { flex-direction:column; gap:6px; }
@@ -1989,7 +1989,16 @@
     <path d="M14.2 3.5a3.5 3.5 0 00-4.7 4.7L3.8 14a1 1 0 001.4 1.4l5.8-5.7a3.5 3.5 0 004.7-4.7l-2.2 2.2-1.5-1.5 2.2-2.2z" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 </button>
-<button id="lick-lib-btn" title="Jazz Resources" aria-label="Open jazz resources">&#9835;</button>
+<button id="lick-lib-btn" title="Jazz Resources" aria-label="Open jazz resources">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M10.2 6.4C10.1 3.6 7.6 2.7 5.6 3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M5.9 3.7L3.3 5.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M9.2 6L11.2 6L12.4 16L9.3 16Z"/>
+    <path d="M10.85 15.4C10.85 21 16 21 16 15.4" fill="none" stroke="currentColor" stroke-width="3.1"/>
+    <path d="M14.4 16L14.6 12.2C14.6 10.7 13.8 9.6 12.6 8.7L21.4 8.7C20.1 9.7 18.6 10.7 18.4 12.2L17.6 16Z"/>
+    <circle cx="8.1" cy="8.8" r=".95"/><circle cx="8.2" cy="11.3" r=".95"/><circle cx="8.3" cy="13.8" r=".95"/>
+  </svg>
+</button>
 <div class="grain"></div>
 <main class="wrap">
   <header id="page-top">
@@ -2262,8 +2271,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v79';
-window.APP_DEPLOYED = '2026-10-15 11:53';
+window.APP_VERSION = 'v80';
+window.APP_DEPLOYED = '2026-10-15 14:25';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -12002,7 +12011,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Jazz Resources</div>
         </div>
       </div>
-      <p class="guide-p">The <strong>&#9835;</strong> button (top-right) opens <strong>Jazz Resources</strong>: 37 hand-picked lessons and articles from jazz guitar teachers, to go further than the app.</p>
+      <p class="guide-p">The <strong>saxophone</strong> button (top-right) opens <strong>Jazz Resources</strong>: 37 hand-picked lessons and articles from jazz guitar teachers, to go further than the app.</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Categories</span>
         <span class="guide-kv-val">Jazz licks &amp; vocabulary, bebop, chord melody, walking bass, improvisation concepts, comping, learning jazz standards, bossa nova, gypsy jazz.</span>
