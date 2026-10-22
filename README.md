@@ -142,6 +142,25 @@ every per-string octave shift, then filters to what a hand can hold and what the
 Verified across 37 scales × 5 keys × 3 views: 7650 grips, no open string on a closed tab, no
 alien tone, no wrong-way stretch, nothing clipped off the diagram, none out of reach.
 
+### Tuner (tuning-fork button, header)
+
+A microphone tuner for guitar, mandolin, 5-string banjo, or any note (Chromatic).
+
+- **Presets**: guitar Standard, Drop D, Half step down, DADGAD, Open G, Open D; mandolin
+  Standard, Cross A (AEAE), Cross G (GDGD); banjo Open G, Double C, G modal (Sawmill),
+  Standard C, Open D.
+- **Any string, any pitch**: ▲ ▼ move a string by a semitone (up to 7 from its preset), e.g. the
+  banjo drone from G to A♭. A tuning that matches a preset takes its name; otherwise it is
+  *Custom* with a *Reset* back to the preset. Saved in the browser.
+- **Reading**: a needle over ±50 cents (green within 3), the gap in cents or semitones + cents,
+  which way to turn the peg, the frequency heard and aimed at in Hz, and a ✓ on each string held
+  in tune. *Auto* aims at the closest string; tapping a string locks it. A4 from 430 to 450 Hz.
+- **Reference** plays the target pitch on the app's voices; **Demo** runs a simulated string
+  through the detector without a mic.
+- **Under the hood**: `getUserMedia` with the call-audio filters off, YIN pitch detection with an
+  octave check, ~30 readings a second. Needs HTTPS or localhost; the mic stops when the window
+  closes.
+
 ### Jazz Resources Hub (saxophone button, header)
 
 37 curated links across 9 categories, sourced from Jens Larsen, Jazz Guitar BE, Jazz Guitar Licks, and Matt Warnock Guitar:

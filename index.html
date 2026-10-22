@@ -805,6 +805,113 @@
     transition: all .2s; box-shadow: 0 2px 12px rgba(0,0,0,.4);
   }
   #lick-lib-btn:hover { border-color: var(--gold); background: var(--surface2); color: var(--gold2); }
+  #tuner-btn {
+    position: fixed; top: 16px; right: 200px;
+    z-index: var(--z-popover);
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--border2); background: var(--surface);
+    color: var(--gold); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; box-shadow: 0 2px 12px rgba(0,0,0,.4);
+  }
+  #tuner-btn:hover { border-color: var(--gold); background: var(--surface2); color: var(--gold2); }
+
+  /* ── Tuner ── */
+  #tuner-overlay {
+    display: none; position: fixed; inset: 0; z-index: var(--z-overlay);
+    background: rgba(0,0,0,.6); backdrop-filter: blur(3px);
+    align-items: flex-start; justify-content: center; padding: 6vh 16px 24px; overflow-y: auto;
+  }
+  #tuner-overlay.open { display: flex; }
+  #tuner-modal {
+    --tn-ok: #7fc99a; --tn-far: #e07a5f;
+    width: 100%; max-width: 430px; position: relative;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    box-shadow: 0 12px 48px rgba(0,0,0,.6);
+  }
+  #tuner-modal::before { content:''; position:absolute; top:0; left:18px; right:18px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+  #tuner-modal:focus { outline: none; }
+  .tn-head { display:flex; align-items:center; gap:10px; padding:14px 16px 10px; }
+  .tn-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--cream); }
+  .tn-pill { margin-left:auto; display:flex; align-items:center; gap:7px; font-size:10px; letter-spacing:.08em; color:var(--muted); border:1px solid var(--border2); border-radius:20px; padding:4px 10px; }
+  .tn-pill .tn-dot { width:7px; height:7px; border-radius:50%; background:var(--border2); flex:none; }
+  .tn-pill.on .tn-dot { background:var(--tn-ok); box-shadow:0 0 6px var(--tn-ok); }
+  .tn-pill.demo .tn-dot { background:var(--accent2); }
+  .tn-pill.err { color:var(--tn-far); border-color:rgba(224,122,95,.4); }
+  .tn-pill.err .tn-dot { background:var(--tn-far); }
+  .tn-level { width:38px; height:4px; background:var(--surface2); border-radius:2px; overflow:hidden; flex:none; }
+  .tn-level i { display:block; height:100%; width:0; background:var(--tn-ok); transition:width .08s; }
+  .tn-seg { display:flex; margin:0 16px; border:1px solid var(--border2); border-radius:4px; overflow:hidden; }
+  .tn-seg button { flex:1; background:none; border:0; border-right:1px solid var(--border2); color:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:8px 0; cursor:pointer; letter-spacing:.04em; }
+  .tn-seg button:last-child { border-right:0; }
+  .tn-seg button.active { background:rgba(201,168,76,.12); color:var(--gold2); }
+  .tn-row { display:flex; align-items:center; gap:10px; margin:12px 16px 0; flex-wrap:wrap; }
+  .tn-row[hidden] { display:none; }
+  .tn-lbl { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); }
+  .tn-row select, .tn-dev select { background-color:var(--surface2); border:1px solid var(--border2); color:var(--cream); font-family:'IBM Plex Mono',monospace; font-size:12px; padding:6px 30px 6px 10px; border-radius:3px; cursor:pointer; width:auto; background-position:right 10px center; }
+  .tn-a4 { margin-left:auto; display:flex; align-items:center; gap:4px; font-size:11px; color:var(--muted); }
+  .tn-a4 b { color:var(--cream); font-weight:400; min-width:28px; text-align:center; }
+  .tn-mini { background:var(--surface2); border:1px solid var(--border2); color:var(--muted); width:24px; height:24px; border-radius:3px; cursor:pointer; font-family:inherit; font-size:12px; line-height:1; }
+  .tn-mini:hover, .tn-step:hover { color:var(--gold2); }
+  .tn-tname { font-size:12px; color:var(--muted); letter-spacing:.12em; }
+  .tn-tname .m { color:var(--accent2); }
+  .tn-gauge { display:block; width:100%; max-width:330px; margin:14px auto 0; }
+  .tn-gauge .g-arc { fill:none; stroke:var(--border2); stroke-width:2; }
+  .tn-gauge .g-ok { fill:none; stroke:var(--tn-ok); stroke-width:9; opacity:.35; }
+  .tn-gauge .g-tick { stroke:var(--border2); stroke-width:1.5; }
+  .tn-gauge .g-tick.major { stroke:var(--muted); }
+  .tn-gauge .g-lab { fill:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:10px; text-anchor:middle; }
+  .tn-gauge .g-acc { fill:var(--dim); font-family:'Playfair Display',serif; font-size:18px; text-anchor:middle; }
+  #tn-needle { transform-origin:150px 160px; transition:opacity .4s; }
+  #tn-needle line { stroke-width:3; stroke-linecap:round; }
+  #tuner-modal.quiet #tn-needle { opacity:.25; }
+  .tn-readout { text-align:center; padding:2px 16px 0; }
+  .tn-note { font-family:'Playfair Display',serif; font-size:64px; line-height:1; color:var(--cream); transition:color .2s, opacity .3s; }
+  .tn-note sub { font-family:'IBM Plex Mono',monospace; font-size:16px; color:var(--muted); vertical-align:baseline; margin-left:2px; }
+  #tuner-modal.quiet .tn-note { opacity:.35; }
+  .tn-cents { margin-top:6px; font-size:13px; color:var(--text); min-height:18px; }
+  .tn-cents b { font-weight:500; }
+  .tn-hz { margin-top:4px; font-size:11px; color:var(--muted); min-height:16px; }
+  .tn-hz span { color:var(--text); }
+  .tn-shead { display:flex; align-items:center; gap:10px; margin:16px 16px 8px; }
+  .tn-shead[hidden], .tn-strings[hidden], .tn-any[hidden], .tn-dev[hidden], .tn-link[hidden] { display:none; }
+  .tn-auto { background:none; border:1px solid var(--border2); color:var(--muted); font-family:inherit; font-size:10px; letter-spacing:.08em; padding:3px 9px; border-radius:20px; cursor:pointer; }
+  .tn-auto.on { color:var(--gold2); border-color:var(--gold); background:rgba(201,168,76,.1); }
+  .tn-link { margin-left:auto; background:none; border:0; color:var(--muted); font-family:inherit; font-size:10px; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  .tn-strings { display:flex; gap:6px; margin:0 16px; }
+  .tn-str { flex:1; min-width:0; display:flex; flex-direction:column; align-items:stretch; border:1px solid var(--border2); border-radius:6px; background:var(--surface2); position:relative; transition:border-color .2s, box-shadow .2s; }
+  .tn-str .tn-num { font-size:9px; color:var(--muted); text-align:center; padding-top:4px; white-space:nowrap; }
+  .tn-step { background:none; border:0; color:var(--muted); height:24px; cursor:pointer; font-size:10px; }
+  .tn-str .tn-main { background:none; border:0; cursor:pointer; color:var(--cream); font-family:'Playfair Display',serif; font-size:21px; padding:2px 0 0; line-height:1.1; }
+  .tn-str .tn-main sub { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); }
+  .tn-str .tn-shz { font-size:9px; color:var(--muted); text-align:center; }
+  .tn-str.mod .tn-main { color:var(--accent2); }
+  .tn-str.mod::after { content:''; position:absolute; top:6px; right:6px; width:5px; height:5px; border-radius:50%; background:var(--accent2); }
+  .tn-str.active { border-color:var(--gold); }
+  .tn-str.locked { border-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold); background:rgba(201,168,76,.07); }
+  .tn-str .tn-chk { position:absolute; bottom:5px; left:6px; font-size:10px; color:var(--tn-ok); opacity:0; transition:opacity .3s; }
+  .tn-str.tuned .tn-chk { opacity:1; }
+  .tn-str.tuned .tn-main { color:var(--tn-ok); }
+  .tn-any { margin:16px 16px 0; font-size:11px; color:var(--muted); text-align:center; padding:14px 0; border:1px dashed var(--border2); border-radius:6px; }
+  .tn-foot { display:flex; gap:8px; padding:16px; align-items:center; }
+  .tn-btn { background:var(--surface2); border:1px solid var(--border2); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:9px 12px; border-radius:4px; cursor:pointer; letter-spacing:.04em; }
+  .tn-btn:hover { border-color:var(--gold); color:var(--gold2); }
+  .tn-btn.primary { background:var(--gold); border-color:var(--gold); color:#14110a; font-weight:500; flex:1; }
+  .tn-btn.primary:hover { background:var(--gold2); color:#14110a; }
+  .tn-btn.primary.stop { background:none; color:var(--gold2); }
+  .tn-dev { margin:0 16px 14px; display:flex; gap:8px; align-items:center; }
+  .tn-dev select { flex:1; min-width:0; font-size:11px; }
+  @media (max-width: 700px) {
+    #tuner-overlay { padding: 0; }
+    #tuner-modal { max-width: none; min-height: 100%; border-radius: 0; border: 0; }
+  }
+  @media (max-width: 480px) {
+    .tn-note { font-size:56px; }
+    .tn-strings { gap:4px; }
+    .tn-str .tn-main { font-size:18px; }
+    .tn-str .tn-drone { display:none; }
+  }
+
 
   /* ── Jazz Resources Hub ── */
   #lick-overlay {
@@ -1699,6 +1806,8 @@
     #tech-btn { width:30px; height:30px; right:88px; top:12px; }
     #lick-lib-btn { width:30px; height:30px; right:126px; top:12px; }
     #lick-lib-btn svg { width:16px; height:16px; }
+    #tuner-btn { width:30px; height:30px; right:164px; top:12px; }
+    #tuner-btn svg { width:16px; height:16px; }
     #comp-overlay { padding: 0; }
     #comp-modal { max-height: 100vh; border-radius: 0; }
     #comp-layout { flex-direction: column; }    .mode-groups { flex-direction:column; gap:6px; }
@@ -1964,9 +2073,12 @@
     /* The four chromatic modes on two rows instead of four. */
     .mode-group-chromatic .chord-types { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     .mode-group-chromatic .ct-btn { white-space: normal; text-align: left; line-height: 1.25; }
-    #guide-btn, #tech-btn, #lick-lib-btn { position: absolute; }
+    #guide-btn, #tech-btn, #lick-lib-btn, #tuner-btn { position: absolute; }
     #comp-btn { top: auto; bottom: 18px; right: auto; left: 14px; width: 44px; height: 44px; }
+    /* The tuner takes the corner the composition button leaves, clear of the eyebrow title. */
+    #tuner-btn { right: 16px; }
   }
+  @media (max-width: 480px) { #tuner-btn { right: 12px; } }
 </style>
 </head>
 <body>
@@ -1998,6 +2110,9 @@
     <path d="M14.4 16L14.6 12.2C14.6 10.7 13.8 9.6 12.6 8.7L21.4 8.7C20.1 9.7 18.6 10.7 18.4 12.2L17.6 16Z"/>
     <circle cx="8.1" cy="8.8" r=".95"/><circle cx="8.2" cy="11.3" r=".95"/><circle cx="8.3" cy="13.8" r=".95"/>
   </svg>
+</button>
+<button id="tuner-btn" title="Tuner" aria-label="Open the tuner">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M8.5 2.5v7.2a3.5 3.5 0 0 0 7 0V2.5"/><path d="M12 13.2v8.3"/></svg>
 </button>
 <div class="grain"></div>
 <main class="wrap">
@@ -2271,8 +2386,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v80';
-window.APP_DEPLOYED = '2026-10-15 14:25';
+window.APP_VERSION = 'v81';
+window.APP_DEPLOYED = '2026-10-22 11:24';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -9026,6 +9141,111 @@ function attachSoundBars(root) {
   });
 }
 
+// ══════════════════════════════════════════════
+// TUNER - tunings and pitch detection (the window is wired in the second script)
+//
+// Strings are MIDI numbers in the order the hand meets them: low to high, and on
+// the banjo the short 5th-string drone first, as its tuning is written (gDGBD).
+// ══════════════════════════════════════════════
+const TUNER_NAMES = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
+const TUNER_INSTR = {
+  guitar: { nums: [6, 5, 4, 3, 2, 1], presets: [
+    ['Standard', [40, 45, 50, 55, 59, 64]], ['Drop D', [38, 45, 50, 55, 59, 64]],
+    ['Half step down', [39, 44, 49, 54, 58, 63]], ['DADGAD', [38, 45, 50, 55, 57, 62]],
+    ['Open G', [38, 43, 50, 55, 59, 62]], ['Open D', [38, 45, 50, 54, 57, 62]] ] },
+  mandolin: { nums: [4, 3, 2, 1], presets: [
+    ['Standard', [55, 62, 69, 76]], ['Cross A (AEAE)', [57, 64, 69, 76]], ['Cross G (GDGD)', [55, 62, 67, 74]] ] },
+  banjo: { nums: [5, 4, 3, 2, 1], presets: [
+    ['Open G', [67, 50, 55, 59, 62]], ['Double C', [67, 48, 55, 60, 62]], ['G modal (Sawmill)', [67, 50, 55, 60, 62]],
+    ['Standard C', [67, 48, 55, 59, 62]], ['Open D', [66, 50, 54, 57, 62]] ] },
+  chromatic: { nums: [], presets: [] }
+};
+const TUNER_MAX_SHIFT = 7;   // semitones a string may move away from its preset
+const TUNER_IN_TUNE = 3;     // cents
+
+const tunerLabel = m => ({ n: TUNER_NAMES[((m % 12) + 12) % 12], o: Math.floor(m / 12) - 1 });
+const tunerHz = (m, a4) => a4 * Math.pow(2, (m - 69) / 12);
+const tunerPresetIndex = (instr, strings) => TUNER_INSTR[instr].presets.findIndex(p => p[1].every((m, i) => m === strings[i]));
+
+// Which string a pitch (fractional MIDI) is aimed at: the locked one, else the closest.
+function tunerTarget(strings, midiF, locked) {
+  if (!strings.length) return { idx: null, target: Math.round(midiF) };
+  const idx = locked !== null ? locked : strings.reduce((b, m, i) => Math.abs(midiF - m) < Math.abs(midiF - strings[b]) ? i : b, 0);
+  return { idx, target: strings[idx] };
+}
+
+// "−17¢", "+1 st 4¢", "−2 st": the gap to the target, in semitones past 99 cents.
+function tunerOffsetText(cents) {
+  const ac = Math.round(Math.abs(cents)), semis = Math.floor(ac / 100);
+  const amount = [semis ? semis + ' st' : '', ac % 100 || !semis ? ac % 100 + '¢' : ''].filter(Boolean).join(' ');
+  return (cents < 0 ? '−' : '+') + amount;
+}
+
+// YIN (de Cheveigné & Kawahara 2002): the cumulative-mean-normalised difference
+// function, the first dip under 0.15, then a parabola through the dip for the
+// fraction of a sample. minF/maxF bound the search, which is most of the cost:
+// a guitar needs ~900 lags, a mandolin ~370. A weak fundamental under a loud 2nd
+// harmonic (a phone mic on a low string, the banjo drone at the attack) also
+// dips at half the period, so the search steps down an octave while the dip
+// twice as far is clearly deeper.
+let _tunerYinBuf = new Float32Array(2048);
+function tunerYin(x, sr, minF, maxF) {
+  const minTau = Math.max(2, Math.floor(sr / maxF)), maxTau = Math.min(Math.ceil(sr / minF), x.length >> 1);
+  const top = maxTau + 3, W = Math.min(2048, x.length - top - 1);
+  if (_tunerYinBuf.length < top + 1) _tunerYinBuf = new Float32Array(top + 1);
+  const d = _tunerYinBuf;
+  d[0] = 1;
+  let run = 0;
+  for (let tau = 1; tau <= top; tau++) {
+    let s = 0;
+    for (let j = 0; j < W; j++) { const v = x[j] - x[j + tau]; s += v * v; }
+    run += s;
+    d[tau] = run ? s * tau / run : 1;
+  }
+  let tau = -1;
+  for (let t = minTau; t < maxTau; t++) {
+    if (d[t] < 0.15) { while (t + 1 < maxTau && d[t + 1] < d[t]) t++; tau = t; break; }
+  }
+  if (tau < 0) {
+    let best = minTau;
+    for (let t = minTau; t < maxTau; t++) if (d[t] < d[best]) best = t;
+    if (d[best] > 0.3) return null;
+    tau = best;
+  }
+  for (;;) {
+    const t2 = 2 * tau;
+    if (t2 + 2 > top) break;
+    let b = t2 - 2;
+    for (let t = t2 - 1; t <= t2 + 2; t++) if (d[t] < d[b]) b = t;
+    if (b > maxTau || !(d[tau] > 0.03 && d[b] < 0.5 * d[tau])) break;
+    tau = b;
+  }
+  const a = d[tau - 1], b = d[tau], c = d[tau + 1], den = a + c - 2 * b;
+  return { f: sr / (tau + (den ? (a - c) / (2 * den) : 0)), conf: 1 - b };
+}
+
+// The reference pitch, on the app's own voices: guitar samples (or the plucked
+// guitar until they load), plucked mandolin and banjo, the piano for chromatic.
+// Samples are pitched for A = 440, so another A4 plucks in software instead.
+function tunerReference(instr, midi, a4) {
+  if (typeof Tone === 'undefined') return;
+  Tone.start().then(() => {
+    const ctx = Tone.getContext().rawContext, at440 = midi + 12 * Math.log2(a4 / 440);
+    if (instr === 'chromatic') {
+      if (a4 === 440) playMidiNote(midi, 2.6, 0);
+      else makePianoNote(ctx, tunerHz(midi, a4), ctx.currentTime + 0.02, 2.6, 0.13);
+      return;
+    }
+    if (instr === 'guitar' && !guitarSampler && !guitarSamplerFailed) initGuitarSampler();
+    if (instr === 'guitar' && guitarSamplerReady && a4 === 440) {
+      guitarSampler.triggerAttackRelease(midiToNoteName(midi), 2.8, Tone.now() + 0.03, 0.8);
+      return;
+    }
+    dampPlucks(ctx);
+    pluckNote(ctx, instr, at440, ctx.currentTime + 0.04, 0.5);
+  }).catch(() => {});
+}
+
 // ── Note frequency ─────────────────────────────
 
 // Spread chord PCs across octaves so notes ascend smoothly (no clusters)
@@ -11316,6 +11536,14 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     </div>
 
     <div class="tech-section">
+      <div class="tech-section-title">Tuner <span style="color:var(--muted);font-weight:400">- tuning-fork button</span></div>
+      <div class="tech-row"><span class="tech-key">Microphone</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getUserMedia</code> with echo cancellation, noise suppression and auto gain off (call-audio filters that thin out a low string's fundamental), a 45 Hz high-pass, and its own AudioContext, created on Start and suspended on Stop, so the tuner works even when Tone.js did not load. Needs HTTPS or localhost. The mic stops when the window closes or the tab goes to the background; the screen stays awake while listening.</span></div>
+      <div class="tech-row"><span class="tech-key">Detection</span><span class="tech-val">YIN (de Cheveigné &amp; Kawahara 2002) on a 4096-sample window, ~30 times a second: the first dip under 0.15 of the normalised difference function, a parabola through it, then an octave check (a weak fundamental under a loud 2nd harmonic also dips at half the period). Search bounded by the tuning (lowest string × 0.66). Median of 5 readings, needle eased. Tested: within 1 cent from 65 Hz to 1.3 kHz, and 333/333 plucked guitar, mandolin and banjo notes read within 2 cents through a phone-like high-pass.</span></div>
+      <div class="tech-row"><span class="tech-key">Tunings</span><span class="tech-val">Guitar: Standard, Drop D, Half step down, DADGAD, Open G, Open D. Mandolin: Standard, Cross A (AEAE), Cross G (GDGD). Banjo: Open G, Double C, G modal (Sawmill), Standard C, Open D. Each string moves by semitones (up to 7 from its preset); a tuning that matches a preset takes its name. Auto targets the closest string, a tapped string stays the target. In tune = within 3 cents; a string held in tune for 0.4 s gets a ✓. A4 430-450 Hz. Saved in this browser.</span></div>
+      <div class="tech-row"><span class="tech-key">Reference</span><span class="tech-val">The target pitch on the app's own voices: guitar samples (plucked guitar until they load), plucked mandolin and banjo, the piano in Chromatic. Samples are pitched for A = 440, so another A4 plucks in software.</span></div>
+    </div>
+
+    <div class="tech-section">
       <div class="tech-section-title">Audio Engine</div>
       <div class="tech-row"><span class="tech-key">Library</span><span class="tech-val">Tone.js 14.8.49 (CDN) — wraps Web Audio API. Two samplers: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler</code> (piano, loads on init) and <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">guitarSampler</code> (guitar, lazy-loaded on first use).</span></div>
       <div class="tech-row"><span class="tech-key">Piano samples</span><span class="tech-val">Salamander Grand Piano — real mp3 samples via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> (tonejs.github.io/audio/salamander/). Loads on page init. "⟳ loading…" indicator while pending.</span></div>
@@ -11596,6 +11824,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <li><a class="guide-toc-link" href="#g-compare">Scale Comparison</a></li>
         <li><a class="guide-toc-link" href="#g-tips">Pro Tips</a></li>
         <li><a class="guide-toc-link" href="#g-licks">Jazz Resources</a></li>
+        <li><a class="guide-toc-link" href="#g-tuner">Tuner</a></li>
         <li><a class="guide-toc-link" href="#g-sources">Sources &amp; References</a></li>
       </ol>
     </nav>
@@ -12024,13 +12253,41 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
     </section>
 
+    <section class="guide-section" id="g-tuner">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M8.5 2.5v7.2a3.5 3.5 0 0 0 7 0V2.5"/><path d="M12 13.2v8.3"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num" style="color:var(--gold)">14</div>
+          <div class="guide-section-title">Tuner</div>
+        </div>
+      </div>
+      <p class="guide-p">The <strong>tuning-fork</strong> button (top-right) opens a tuner that listens through the microphone. Pick the instrument, press <strong>Start</strong>, allow the mic, and play a string: the needle shows how far you are, in cents, and the line under the note says which way to turn the peg.</p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Instruments</span>
+        <span class="guide-kv-val">Guitar, Mandolin, 5-string Banjo, or Chromatic (any note, the closest semitone is the target).</span>
+        <span class="guide-kv-key">Tunings</span>
+        <span class="guide-kv-val">Presets per instrument (Drop D, DADGAD, Open G, Double C, Sawmill...). ▲ ▼ move any string by a semitone, for instance the banjo drone from G to A♭: changed strings turn violet, and <em>Reset</em> goes back to the preset. A tuning that matches a preset takes its name.</span>
+        <span class="guide-kv-key">Auto / one string</span>
+        <span class="guide-kv-val"><em>Auto</em> aims at the closest string. Tap a string to aim at it alone, which helps when you start a semitone or more away (the gap then reads in semitones and cents). A ✓ marks each string held in tune.</span>
+        <span class="guide-kv-key">Hz</span>
+        <span class="guide-kv-val">The frequency heard and the frequency aimed at, under the note. A4 can be set from 430 to 450 Hz.</span>
+        <span class="guide-kv-key">Reference</span>
+        <span class="guide-kv-val">Plays the target pitch, to tune by ear.</span>
+        <span class="guide-kv-key">Demo</span>
+        <span class="guide-kv-val">A simulated string that starts flat and walks into tune, to see how it reads without a mic.</span>
+      </div>
+      <div class="guide-tip"><span class="guide-tip-icon">🎤</span><span class="guide-tip-text"><strong>Mic tips:</strong> works on phone and desktop (built-in mic, webcam, or an audio interface, picked from the <em>Mic</em> list when there are several). If the low string reads badly on a laptop mic, turn off the driver's audio enhancements in the Windows sound settings.</span></div>
+    </section>
+
     <section class="guide-section" id="g-sources">
       <div class="guide-section-hdr">
         <div class="guide-section-icon">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2h8l3 3v11a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M12 2v4h3M6 8h6M6 11h6M6 14h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         </div>
         <div>
-          <div class="guide-section-num">14</div>
+          <div class="guide-section-num">15</div>
           <div class="guide-section-title">Sources &amp; Further Reading</div>
         </div>
       </div>
@@ -12086,6 +12343,51 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="res-result-count" id="res-result-count"></div>
   </div>
   <div class="res-browse" id="res-browse"></div>
+</div>
+
+<!-- ══════ TUNER ══════ -->
+<div id="tuner-overlay">
+  <div id="tuner-modal" class="quiet" role="dialog" aria-modal="true" aria-label="Tuner" tabindex="-1">
+    <div class="tn-head">
+      <span class="tn-title">Tuner</span>
+      <span class="tn-pill" id="tn-pill"><span class="tn-dot"></span><span id="tn-pill-txt">Mic off</span><span class="tn-level"><i id="tn-level"></i></span></span>
+      <button class="lick-close-btn" id="tn-close" title="Close (stops the mic)" aria-label="Close the tuner">&#x2715;</button>
+    </div>
+    <div class="tn-seg" id="tn-seg">
+      <button type="button" data-instr="guitar">Guitar</button>
+      <button type="button" data-instr="mandolin">Mandolin</button>
+      <button type="button" data-instr="banjo">Banjo</button>
+      <button type="button" data-instr="chromatic">Chromatic</button>
+    </div>
+    <div class="tn-row">
+      <span class="tn-lbl" id="tn-preset-lbl">Tuning</span>
+      <select id="tn-preset" aria-label="Tuning preset"></select>
+      <span class="tn-a4">A4
+        <button type="button" class="tn-mini" id="tn-a4-dn" aria-label="Lower A4 by 1 Hz">−</button>
+        <b id="tn-a4">440</b>
+        <button type="button" class="tn-mini" id="tn-a4-up" aria-label="Raise A4 by 1 Hz">+</button> Hz</span>
+    </div>
+    <div class="tn-row" id="tn-tname-row"><span class="tn-tname" id="tn-tname"></span></div>
+    <svg class="tn-gauge" id="tn-gauge" viewBox="0 0 300 172" aria-hidden="true"></svg>
+    <div class="tn-readout">
+      <div class="tn-note" id="tn-note">-</div>
+      <div class="tn-cents" id="tn-cents">Press Start and play a string</div>
+      <div class="tn-hz" id="tn-hz"></div>
+    </div>
+    <div class="tn-shead" id="tn-shead">
+      <span class="tn-lbl">Strings</span>
+      <button type="button" class="tn-auto on" id="tn-auto" title="Target the closest string">Auto</button>
+      <button type="button" class="tn-link" id="tn-reset" hidden>Reset</button>
+    </div>
+    <div class="tn-strings" id="tn-strings"></div>
+    <div class="tn-any" id="tn-any" hidden>Any note - the closest semitone is the target</div>
+    <div class="tn-foot">
+      <button type="button" class="tn-btn primary" id="tn-start">Start</button>
+      <button type="button" class="tn-btn" id="tn-ref" title="Play the target pitch">♪ Reference</button>
+      <button type="button" class="tn-btn" id="tn-demo" title="A simulated string, no mic needed">Demo</button>
+    </div>
+    <div class="tn-dev" id="tn-dev" hidden><span class="tn-lbl">Mic</span><select id="tn-dev-sel" aria-label="Microphone"></select></div>
+  </div>
 </div>
 
 <script>
@@ -15295,6 +15597,303 @@ window.addEventListener('resize', () => {
       closeResPanel();
     }
   });
+})();
+
+// ── Tuner window ─────────────────────────────────────────────────────────────
+// The mic runs in its own AudioContext, created on Start: analysis needs none
+// of Tone's scheduling, and the tuner keeps working when Tone.js failed to load.
+(function() {
+  const STORE = 'ha-tuner-v1', TUNED_FRAMES = 12;
+  const st = { instr: 'guitar', a4: 440, tunings: {}, base: {}, device: '' };
+  ['guitar', 'mandolin', 'banjo'].forEach(k => { st.tunings[k] = TUNER_INSTR[k].presets[0][1].slice(); st.base[k] = 0; });
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE)) || {};
+    if (TUNER_INSTR[saved.instr]) st.instr = saved.instr;
+    if (saved.a4 >= 430 && saved.a4 <= 450) st.a4 = saved.a4;
+    if (typeof saved.device === 'string') st.device = saved.device;
+    ['guitar', 'mandolin', 'banjo'].forEach(k => {
+      const t = saved.tunings && saved.tunings[k], b = saved.base && saved.base[k];
+      if (Number.isInteger(b) && TUNER_INSTR[k].presets[b]) st.base[k] = b;
+      const base = TUNER_INSTR[k].presets[st.base[k]][1];
+      if (Array.isArray(t) && t.length === base.length && t.every((m, i) => Number.isInteger(m) && Math.abs(m - base[i]) <= TUNER_MAX_SHIFT)) st.tunings[k] = t;
+    });
+  } catch (e) {}
+  const save = () => { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) {} };
+
+  const $ = id => document.getElementById(id);
+  const overlay = $('tuner-overlay'), modal = $('tuner-modal');
+  const strings = () => st.tunings[st.instr] || [];
+  const noteHtml = m => { const l = tunerLabel(m); return `${l.n}<sub>${l.o}</sub>`; };
+  let locked = null, active = null, inTuneRun = 0, lastFocus = null;
+  const tuned = new Set();
+
+  // ── gauge: ±50 cents over ±60° ──
+  const CX = 150, CY = 160, R = 128;
+  const pt = (c, r) => { const a = c / 50 * 60 * Math.PI / 180; return [CX + r * Math.sin(a), CY - r * Math.cos(a)]; };
+  const arc = (c0, c1, r) => { const [x0, y0] = pt(c0, r), [x1, y1] = pt(c1, r); return `M${x0.toFixed(1)} ${y0.toFixed(1)}A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`; };
+  let g = `<path class="g-arc" d="${arc(-50, 50, R)}"/><path class="g-ok" d="${arc(-TUNER_IN_TUNE, TUNER_IN_TUNE, R)}"/>`;
+  for (let c = -50; c <= 50; c += 5) {
+    const major = c % 25 === 0, [x0, y0] = pt(c, R - (major ? 13 : 7)), [x1, y1] = pt(c, R);
+    g += `<line class="g-tick${major ? ' major' : ''}" x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}"/>`;
+    if (major) { const [lx, ly] = pt(c, R + 13); g += `<text class="g-lab" x="${lx.toFixed(1)}" y="${(ly + 3).toFixed(1)}">${c > 0 ? '+' + c : c < 0 ? '−' + -c : '0'}</text>`; }
+  }
+  const [fx, fy] = pt(-50, R - 30), [sx, sy] = pt(50, R - 30);
+  g += `<text class="g-acc" x="${fx.toFixed(1)}" y="${fy.toFixed(1)}">♭</text><text class="g-acc" x="${sx.toFixed(1)}" y="${sy.toFixed(1)}">♯</text>`;
+  g += `<g id="tn-needle"><line x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY - R + 18}"/><circle cx="${CX}" cy="${CY}" r="6"/></g>`;
+  $('tn-gauge').innerHTML = g;
+  const needle = $('tn-needle');
+  function setNeedle(c, color) {
+    needle.style.transform = `rotate(${Math.max(-50, Math.min(50, c)) / 50 * 60}deg)`;
+    needle.querySelector('line').style.stroke = color;
+    needle.querySelector('circle').style.fill = color;
+  }
+  setNeedle(0, 'var(--muted)');
+
+  // ── controls ──
+  function render() {
+    const chrom = st.instr === 'chromatic';
+    $('tn-seg').querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.instr === st.instr);
+      b.setAttribute('aria-pressed', b.dataset.instr === st.instr);
+    });
+    $('tn-a4').textContent = st.a4;
+    $('tn-preset').hidden = chrom; $('tn-preset-lbl').hidden = chrom;
+    $('tn-shead').hidden = chrom; $('tn-strings').hidden = chrom; $('tn-any').hidden = !chrom; $('tn-tname-row').hidden = chrom;
+    if (chrom) return;
+
+    const s = strings(), presets = TUNER_INSTR[st.instr].presets, pi = tunerPresetIndex(st.instr, s);
+    if (pi >= 0) st.base[st.instr] = pi;
+    const base = presets[st.base[st.instr]][1], nums = TUNER_INSTR[st.instr].nums;
+    $('tn-preset').innerHTML = presets.map((p, i) => `<option value="${i}">${p[0]}</option>`).join('') + (pi < 0 ? '<option value="custom">Custom</option>' : '');
+    $('tn-preset').value = pi < 0 ? 'custom' : String(pi);
+    $('tn-reset').hidden = pi >= 0;
+    $('tn-reset').textContent = 'Reset to ' + presets[st.base[st.instr]][0];
+    $('tn-tname').innerHTML = s.map((m, i) => {
+      let n = tunerLabel(m).n;
+      if (st.instr === 'banjo' && i === 0) n = n.toLowerCase();
+      return m !== base[i] ? `<span class="m">${n}</span>` : n;
+    }).join(' ');
+    $('tn-strings').innerHTML = s.map((m, i) => `
+      <div class="tn-str${m !== base[i] ? ' mod' : ''}${locked === i ? ' locked' : ''}${active === i ? ' active' : ''}${tuned.has(i) ? ' tuned' : ''}" data-i="${i}">
+        <span class="tn-chk" aria-hidden="true">✓</span>
+        <span class="tn-num">${nums[i]}${st.instr === 'banjo' && i === 0 ? '<span class="tn-drone"> · drone</span>' : ''}</span>
+        <button type="button" class="tn-step" data-d="1" aria-label="String ${nums[i]} up a semitone">▲</button>
+        <button type="button" class="tn-main" aria-pressed="${locked === i}" aria-label="String ${nums[i]}, ${tunerLabel(m).n}${tunerLabel(m).o}: target only this string">${noteHtml(m)}</button>
+        <span class="tn-shz">${tunerHz(m, st.a4).toFixed(1)}</span>
+        <button type="button" class="tn-step" data-d="-1" aria-label="String ${nums[i]} down a semitone">▼</button>
+      </div>`).join('');
+    $('tn-auto').classList.toggle('on', locked === null);
+    $('tn-auto').setAttribute('aria-pressed', locked === null);
+  }
+
+  $('tn-seg').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    st.instr = b.dataset.instr; locked = null; active = null; tuned.clear(); resetTrack(); save(); render();
+  });
+  $('tn-preset').addEventListener('change', e => {
+    if (e.target.value === 'custom') return;
+    st.base[st.instr] = +e.target.value;
+    st.tunings[st.instr] = TUNER_INSTR[st.instr].presets[+e.target.value][1].slice();
+    tuned.clear(); save(); render();
+  });
+  $('tn-reset').addEventListener('click', () => {
+    st.tunings[st.instr] = TUNER_INSTR[st.instr].presets[st.base[st.instr]][1].slice();
+    tuned.clear(); save(); render();
+  });
+  $('tn-strings').addEventListener('click', e => {
+    const card = e.target.closest('.tn-str'); if (!card) return;
+    const i = +card.dataset.i, step = e.target.closest('.tn-step');
+    if (step) {
+      const next = strings()[i] + +step.dataset.d;
+      if (Math.abs(next - TUNER_INSTR[st.instr].presets[st.base[st.instr]][1][i]) > TUNER_MAX_SHIFT) return;
+      st.tunings[st.instr][i] = next; tuned.delete(i); save();
+    } else if (e.target.closest('.tn-main')) locked = locked === i ? null : i;
+    else return;
+    render();
+    const again = $('tn-strings').querySelector(`.tn-str[data-i="${i}"] ${step ? `.tn-step[data-d="${step.dataset.d}"]` : '.tn-main'}`);
+    if (again) again.focus();
+  });
+  $('tn-auto').addEventListener('click', () => { locked = null; render(); });
+  $('tn-a4-dn').addEventListener('click', () => { st.a4 = Math.max(430, st.a4 - 1); save(); render(); });
+  $('tn-a4-up').addEventListener('click', () => { st.a4 = Math.min(450, st.a4 + 1); save(); render(); });
+
+  const setPill = (kind, txt) => { $('tn-pill').className = 'tn-pill ' + kind; $('tn-pill-txt').textContent = txt; };
+
+  // ── audio ──
+  let ctx = null, analyser = null, input = null, buf = null, stream = null, micSrc = null, sim = null, wake = null, raf = null, lastT = 0;
+  async function ensureCtx() {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = ctx.createAnalyser(); analyser.fftSize = 4096; buf = new Float32Array(analyser.fftSize);
+      input = ctx.createBiquadFilter(); input.type = 'highpass'; input.frequency.value = 45; input.connect(analyser);
+      const mute = ctx.createGain(); mute.gain.value = 0;
+      analyser.connect(mute); mute.connect(ctx.destination);
+    }
+    await ctx.resume();
+  }
+  function stopAll(keepCtx) {
+    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    if (micSrc) { micSrc.disconnect(); micSrc = null; }
+    if (sim) { clearInterval(sim.timer); sim.osc.stop(); sim.out.disconnect(); sim.env.disconnect(); sim = null; }
+    if (wake) { wake.release().catch(() => {}); wake = null; }
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    if (!keepCtx && ctx && ctx.state === 'running') ctx.suspend().catch(() => {});
+    $('tn-start').textContent = 'Start'; $('tn-start').classList.remove('stop');
+    $('tn-demo').textContent = 'Demo';
+    $('tn-level').style.width = '0';
+    setPill('', 'Mic off'); quiet();
+  }
+  async function startMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setPill('err', 'Needs HTTPS or localhost'); return; }
+    stopAll(true); await ensureCtx();
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: {
+        echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+        ...(st.device ? { deviceId: { exact: st.device } } : {}) } });
+    } catch (e) {
+      if (e.name === 'OverconstrainedError' && st.device) { st.device = ''; save(); return startMic(); }
+      setPill('err', e.name === 'NotAllowedError' ? 'Mic blocked: allow it in the site settings' : e.name === 'NotFoundError' ? 'No microphone found' : 'Mic error: ' + e.name);
+      return;
+    }
+    if (!overlay.classList.contains('open')) { stream.getTracks().forEach(t => t.stop()); stream = null; return; }
+    micSrc = ctx.createMediaStreamSource(stream); micSrc.connect(input);
+    setPill('on', 'Listening');
+    $('tn-start').textContent = 'Stop'; $('tn-start').classList.add('stop');
+    try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
+    listDevices(); resetTrack(); loop();
+  }
+  async function listDevices() {
+    const devs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput');
+    $('tn-dev').hidden = devs.length < 2;
+    const cur = stream && stream.getAudioTracks()[0].getSettings().deviceId;
+    $('tn-dev-sel').innerHTML = devs.map((d, i) => `<option value="${_escHtml(d.deviceId)}"${d.deviceId === cur ? ' selected' : ''}>${_escHtml(d.label || 'Microphone ' + (i + 1))}</option>`).join('');
+  }
+  $('tn-dev-sel').addEventListener('change', e => { st.device = e.target.value; save(); startMic(); });
+  $('tn-start').addEventListener('click', () => stream ? stopAll() : startMic());
+  $('tn-demo').addEventListener('click', () => sim ? stopAll() : startDemo());
+
+  // A plucked-ish tone that starts flat and walks into tune, string by string,
+  // through the same detector as the mic.
+  async function startDemo() {
+    stopAll(true); await ensureCtx();
+    const real = [], imag = [];
+    for (let h = 0; h <= 12; h++) { real.push(0); imag.push(h ? 1 / Math.pow(h, 1.3) : 0); }
+    const osc = ctx.createOscillator(); osc.setPeriodicWave(ctx.createPeriodicWave(real, imag));
+    const env = ctx.createGain(); env.gain.value = 0;
+    const out = ctx.createGain(); out.gain.value = 0.12;
+    osc.connect(env); env.connect(input); env.connect(out); out.connect(ctx.destination); osc.start();
+    const detunes = [-41, -17, 9, -2, 0];
+    let k = 0;
+    const pluck = () => {
+      const t = st.instr === 'chromatic' ? TUNER_INSTR.guitar.presets[0][1] : strings();
+      const si = locked !== null ? locked : Math.floor(k / detunes.length) % t.length, now = ctx.currentTime;
+      osc.frequency.setValueAtTime(tunerHz(t[si], st.a4) * Math.pow(2, detunes[k % detunes.length] / 1200), now);
+      env.gain.cancelScheduledValues(now); env.gain.setValueAtTime(0.0001, now);
+      env.gain.linearRampToValueAtTime(0.6, now + 0.008); env.gain.exponentialRampToValueAtTime(0.03, now + 1.5);
+      k++;
+    };
+    sim = { osc, env, out, timer: setInterval(pluck, 1600) };
+    pluck();
+    setPill('demo', 'Demo signal'); $('tn-demo').textContent = 'Stop demo';
+    resetTrack(); loop();
+  }
+
+  $('tn-ref').addEventListener('click', () => {
+    const m = st.instr === 'chromatic' ? (track.m !== null ? track.m : 69)
+      : strings()[locked !== null ? locked : active !== null ? active : 0];
+    tunerReference(st.instr, m, st.a4);
+  });
+
+  // ── tracking ──
+  const track = { hist: [], shown: 0, m: null, silentSince: 0 };
+  function resetTrack() { track.hist = []; track.shown = 0; inTuneRun = 0; }
+  function rangeHz() {
+    if (st.instr === 'chromatic') return [50, 1500];
+    const s = strings();
+    return [tunerHz(Math.min(...s), st.a4) * 0.66, Math.min(1500, tunerHz(Math.max(...s), st.a4) * 1.6)];
+  }
+  function loop() {
+    raf = requestAnimationFrame(loop);
+    const now = performance.now();
+    if (now - lastT < 33) return;
+    lastT = now;
+    analyser.getFloatTimeDomainData(buf);
+    let rms = 0;
+    for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+    rms = Math.sqrt(rms / buf.length);
+    $('tn-level').style.width = Math.min(100, rms * 600) + '%';
+    const [lo, hi] = rangeHz();
+    const r = rms > 0.006 ? tunerYin(buf, ctx.sampleRate, lo, hi) : null;
+    if (!r || r.conf < 0.75) {
+      if (!track.silentSince) track.silentSince = now;
+      if (now - track.silentSince > 900) quiet();
+      return;
+    }
+    track.silentSince = 0;
+    onPitch(r.f);
+  }
+  function quiet() {
+    modal.classList.add('quiet'); inTuneRun = 0;
+    $('tn-cents').textContent = stream || sim ? (st.instr === 'chromatic' ? 'Play a note' : 'Play a string') : 'Press Start and play a string';
+    $('tn-hz').textContent = '';
+    setNeedle(0, 'var(--muted)');
+  }
+  function onPitch(f) {
+    const mf = 69 + 12 * Math.log2(f / st.a4);
+    if (track.hist.length && Math.abs(mf - track.hist[track.hist.length - 1]) > 0.5) resetTrack();
+    track.hist.push(mf);
+    if (track.hist.length > 5) track.hist.shift();
+    const med = track.hist.slice().sort((a, b) => a - b)[track.hist.length >> 1];
+    const { idx, target } = tunerTarget(st.instr === 'chromatic' ? [] : strings(), med, locked);
+    const cents = (med - target) * 100;
+    track.shown = track.hist.length === 1 ? cents : track.shown + 0.35 * (cents - track.shown);
+    track.m = target;
+
+    const ok = Math.abs(cents) <= TUNER_IN_TUNE;
+    inTuneRun = ok ? inTuneRun + 1 : 0;
+    let rerender = false;
+    if (idx !== active) { active = idx; rerender = true; }
+    if (idx !== null && inTuneRun === TUNED_FRAMES && !tuned.has(idx)) { tuned.add(idx); rerender = true; }
+    if (rerender) render();
+
+    const color = ok ? 'var(--tn-ok)' : Math.abs(cents) <= 15 ? 'var(--gold2)' : 'var(--tn-far)';
+    modal.classList.remove('quiet');
+    setNeedle(track.shown, color);
+    $('tn-note').innerHTML = noteHtml(target);
+    $('tn-note').style.color = ok ? 'var(--tn-ok)' : '';
+    $('tn-cents').innerHTML = ok ? '<b style="color:var(--tn-ok)">In tune ✓</b>'
+      : `<b style="color:${color}">${tunerOffsetText(cents)}</b> · ${cents < 0 ? 'too low - tighten ▲' : 'too high - loosen ▼'}`;
+    const heard = Math.round(med) !== target ? ` (${tunerLabel(Math.round(med)).n}${tunerLabel(Math.round(med)).o})` : '';
+    $('tn-hz').innerHTML = `hearing <span>${(st.a4 * Math.pow(2, (med - 69) / 12)).toFixed(1)} Hz</span>${heard} · target <span>${tunerHz(target, st.a4).toFixed(1)} Hz</span>`;
+  }
+
+  // ── open / close ──
+  function openTuner() {
+    lastFocus = document.activeElement;
+    overlay.classList.add('open');
+    lockScroll();
+    render();
+    setTimeout(() => $('tn-start').focus(), 50);
+  }
+  function closeTuner() {
+    stopAll();
+    overlay.classList.remove('open');
+    unlockScroll();
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  $('tuner-btn').addEventListener('click', openTuner);
+  $('tn-close').addEventListener('click', closeTuner);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeTuner(); });
+  document.addEventListener('keydown', e => {
+    if (!overlay.classList.contains('open')) return;
+    if (e.key === 'Escape') { closeTuner(); return; }
+    if (e.key !== 'Tab') return;
+    const f = [...modal.querySelectorAll('button, select')].filter(el => !el.closest('[hidden]') && !el.hidden && el.offsetParent !== null);
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && (stream || sim)) stopAll(); });
 })();
 
 // ── Version row, written from the single source above ──────────────────────

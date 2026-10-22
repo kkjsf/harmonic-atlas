@@ -219,6 +219,50 @@ check('plucked strings are in tune (banjo D4, mandolin E5 within 2 cents)', () =
   eq(cents, 'true,true');
 });
 
+// ── Tuner ──
+check('tuner standard tunings are the instruments\' own', () => {
+  eq(run(`[TUNER_INSTR.guitar.presets[0][1].join() === GUITAR_MIDI.join(), TUNER_INSTR.mandolin.presets[0][1].join() === MANDO_MIDI.join(),
+    TUNER_INSTR.banjo.presets[0][1].join() === [GRIP_INSTR.banjo.drone.midi].concat(GRIP_INSTR.banjo.midi).join()].join()`), 'true,true,true');
+});
+check('tuner preset names read gDGBD / DADGAD', () => {
+  const name = (i, p) => run(`TUNER_INSTR.${i}.presets.find(p => p[0] === ${JSON.stringify(p)})[1].map(m => tunerLabel(m).n).join(' ')`);
+  eq(name('banjo', 'Open G') + ' | ' + name('banjo', 'Double C') + ' | ' + name('guitar', 'DADGAD') + ' | ' + name('mandolin', 'Cross A (AEAE)'),
+    'G D G B D | G C G C D | D A D G A D | A E A E');
+});
+check('tuner: low E down 2 is Drop D, banjo drone up 1 is custom', () => {
+  eq(run(`[TUNER_INSTR.guitar.presets[tunerPresetIndex('guitar', [38,45,50,55,59,64])][0], tunerPresetIndex('banjo', [68,50,55,59,62])].join()`), 'Drop D,-1');
+});
+check('tuner: banjo drone in A-flat aims at 415.3 Hz', () => {
+  eq(run(`tunerLabel(68).n + tunerLabel(68).o + ' ' + tunerHz(68, 440).toFixed(1)`), 'A♭4 415.3');
+});
+check('tuner: a G played on an A-flat drone reads a semitone and a bit low', () => {
+  eq(run(`[tunerOffsetText(-117), tunerOffsetText(191), tunerOffsetText(-200), tunerOffsetText(4.4), tunerOffsetText(-0.2)].join(' | ')`), '−1 st 17¢ | +1 st 91¢ | −2 st | +4¢ | −0¢');
+});
+check('tuner: Auto picks the closest string, a lock keeps its own', () => {
+  eq(run(`[tunerTarget([40,45,50,55,59,64], 44.7, null).idx, tunerTarget([67,50,55,59,62], 67, 0).target, tunerTarget([], 60.4, null).target].join()`), '1,67,60');
+});
+check('tuner YIN within 1 cent from 65 Hz to 1.3 kHz, no octave error on a loud 2nd harmonic', () => {
+  eq(run(`(() => { const sr = 48000, bad = [];
+    for (const f of [65.41, 82.41, 110, 196, 293.66, 415.3, 659.26, 1318.5]) for (const h2 of [0.5, 5]) {
+      const x = new Float32Array(4096);
+      for (let i = 0; i < x.length; i++) x[i] = 0.1 * (Math.sin(2 * Math.PI * f * i / sr) + h2 * Math.sin(4 * Math.PI * f * i / sr + 1) + 0.4 * Math.sin(6 * Math.PI * f * i / sr + 2));
+      const r = tunerYin(x, sr, Math.min(55, f * 0.66), 1500);
+      if (!r || Math.abs(1200 * Math.log2(r.f / f)) > 1) bad.push(f + 'x' + h2);
+    } return bad.join() || 'ok'; })()`), 'ok');
+});
+check('tuner reads plucked strings through a phone-like mic (A-flat drone at the attack, low E, mandolin E)', () => {
+  eq(run(`(() => { const sr = 48000, ctx = { sampleRate: sr, createBuffer: (c, n) => { const d = new Float32Array(n); return { getChannelData: () => d }; } };
+    const hp = x => { const a = 1 / (1 + 2 * Math.PI * 250 / sr); let px = 0, py = 0; return x.map(v => { py = a * (py + v - px); px = v; return py; }); };
+    return [['banjo', 68, 50], ['guitar', 40, 38], ['mandolin', 76, 55]].map(([i, m, low]) => {
+      const x = hp(hp(pluckBuffer(ctx, i, m).getChannelData(0).slice(2400 - 1000, 2400 + 4096))).slice(1000);
+      const r = tunerYin(x, sr, tunerHz(low, 440) * 0.66, 1500);
+      return r && Math.abs(1200 * Math.log2(r.f / tunerHz(m, 440))) < 3; }).join(); })()`), 'true,true,true');
+});
+check('tuner YIN hears nothing in noise', () => {
+  eq(run(`(() => { let s = 7; const x = new Float32Array(4096).map(() => ((s = s * 16807 % 2147483647) / 2147483647 - 0.5) * 0.2);
+    const r = tunerYin(x, 48000, 55, 1500); return r === null || r.conf < 0.75; })()`), true);
+});
+
 // ── Shared links and share codes ──
 check('a malformed link is ignored, not fatal', () => eq(run(`[decodeHash('#k=0&s=%25'), decodeHash('#k=0&s=constructor')].join(',')`), ','));
 check('a link keeps known values only', () => eq(run(`JSON.stringify(decodeHash('#k=2&s=Dorian&m=99&v=zzz'))`), '{"key":2,"scale":"Dorian","mode":"4","view":"list"}'));
