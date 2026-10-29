@@ -2386,8 +2386,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v82';
-window.APP_DEPLOYED = '2026-10-29 10:12';
+window.APP_VERSION = 'v83';
+window.APP_DEPLOYED = '2026-10-29 11:01';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -9024,20 +9024,24 @@ function pluckOut(ctx, instr) {
   return (_pluckOut[instr] = chain[0]);
 }
 
-// Starts one string, kept in _plucking so the next strum can damp it.
+// Starts one string through its gain into `out`.
 function startString(src, g, out, when, offset) {
   src.connect(g); g.connect(out);
   src.start(when, offset);
-  const node = { src, g };
+  return { src, g };
+}
+
+// Kept in _plucking so the next strum can damp it.
+function trackString(node) {
   _plucking.push(node);
-  src.onended = () => { _plucking = _plucking.filter(n => n !== node); };
+  node.src.onended = () => { _plucking = _plucking.filter(n => n !== node); };
 }
 
 function pluckNote(ctx, instr, midi, when, gain) {
   const src = ctx.createBufferSource(), g = ctx.createGain();
   src.buffer = pluckBuffer(ctx, instr, midi);
   g.gain.value = gain;
-  startString(src, g, pluckOut(ctx, instr), when, 0);
+  trackString(startString(src, g, pluckOut(ctx, instr), when, 0));
 }
 
 // ── Mandolin and banjo samples ─────────────────
@@ -9047,7 +9051,9 @@ function pluckNote(ctx, instr, midi, when, gain) {
 // its instrument first shows a diagram and plays once every file has answered;
 // a missing note is played from its nearest neighbour (playback rate), and
 // anything further than 3 semitones from a recording is plucked in software.
-const SAMPLE_SETS = { mandolin: { lo: 55, hi: 91 }, banjo: { lo: 48, hi: 88 } };
+// rev goes into the URL: the service worker keeps samples forever under their URL,
+// so a rebuilt set bumps it (banjo 2: the soft G4 and G#5 takes replaced, v83).
+const SAMPLE_SETS = { mandolin: { lo: 55, hi: 91, rev: 1 }, banjo: { lo: 48, hi: 88, rev: 2 } };
 const SAMPLE_GAIN = 0.7;   // a strum then peaks where the guitar's does (measured on the master bus)
 const _samples = {};
 
@@ -9058,7 +9064,7 @@ function loadSampleSet(instr) {
   const set = _samples[instr] = { notes: {}, ready: false };
   const loads = [];
   for (let m = range.lo; m <= range.hi; m++) {
-    loads.push(fetch('samples/' + instr + '/' + m + '.mp3')
+    loads.push(fetch('samples/' + instr + '/' + m + '.mp3?rev=' + range.rev)
       .then(r => r.ok ? r.arrayBuffer() : Promise.reject(new Error(r.status)))
       .then(a => ctx.decodeAudioData(a))
       .then(buf => { set.notes[m] = { buf, start: sampleStart(buf.getChannelData(0), buf.sampleRate) }; })
@@ -9091,16 +9097,63 @@ function nearestSample(notes, midi) {
   return best;
 }
 
-// Plays one note from the recordings; false when the set is not ready or too far away.
-function sampleNote(ctx, instr, midi, when, gain) {
+// One note from the recordings, or null when the set is not ready or too far away.
+function sampleVoice(ctx, instr, midi, when, gain) {
   const set = _samples[instr], key = set && set.ready ? nearestSample(set.notes, midi) : null;
-  if (key === null) return false;
+  if (key === null) return null;
   const s = set.notes[key], src = ctx.createBufferSource(), g = ctx.createGain();
   src.buffer = s.buf;
   src.playbackRate.value = Math.pow(2, (midi - key) / 12);
   g.gain.value = gain;
-  startString(src, g, ensureCompMasterBus(), when, s.start);
-  return true;
+  return startString(src, g, ensureCompMasterBus(), when, s.start);
+}
+
+function sampleNote(ctx, instr, midi, when, gain) {
+  const v = sampleVoice(ctx, instr, midi, when, gain);
+  if (v) trackString(v);
+  return !!v;
+}
+
+// Midi moved by octaves into a sample set's range: no mandolin plays a C3.
+function fitToRange(midi, range) {
+  while (midi < range.lo) midi += 12;
+  while (midi > range.hi) midi -= 12;
+  return midi;
+}
+
+// The composition player's mandolin or banjo: the triggerAttackRelease / releaseAll
+// of a Tone.Sampler on top of the recordings, so the player schedules it like the
+// piano. It voices chords up from C3, a fifth under the mandolin's G string, so the
+// mandolin takes everything an octave up (the chord keeps its shape, low to high);
+// what is still out of range moves by octaves, and a pitch already struck at that
+// instant is skipped: the octave-down bass doubling folds onto the chord's root.
+const COMP_STRING_LIFT = { mandolin: 12, banjo: 0 };
+const _compStrings = {};
+function compStringSampler(instr) {
+  if (_compStrings[instr]) return _compStrings[instr];
+  const ringing = new Set(), struck = {};
+  return (_compStrings[instr] = {
+    triggerAttackRelease(note, dur, time, vel) {
+      const m = fitToRange(Tone.Frequency(note).toMidi() + COMP_STRING_LIFT[instr], SAMPLE_SETS[instr]);
+      if (Math.abs((struck[m] ?? -1) - time) < 0.004) return;
+      struck[m] = time;
+      const v = sampleVoice(Tone.getContext().rawContext, instr, m, time, SAMPLE_GAIN * vel);
+      if (!v) return;
+      v.g.gain.setTargetAtTime(0, time + dur, 0.08);
+      v.src.stop(time + dur + 0.6);
+      ringing.add(v);
+      v.src.onended = () => ringing.delete(v);
+    },
+    releaseAll() {
+      const t = Tone.getContext().rawContext.currentTime;
+      ringing.forEach(v => {
+        v.g.gain.cancelScheduledValues(t);
+        v.g.gain.setTargetAtTime(0, t, 0.03);
+        try { v.src.stop(t + 0.2); } catch (e) {}
+      });
+      ringing.clear();
+    }
+  });
 }
 
 // Starts loading an instrument's samples as soon as one of its diagrams is on
@@ -11636,7 +11689,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Mandolin &amp; banjo samples</span><span class="tech-val">Philharmonia Orchestra recordings, served with the app (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/mandolin/</code> G3-G6, 37 notes, 1.1 MB; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/banjo/</code> C3-E6, 41 notes, 1.3 MB; one MP3 per MIDI note). Prepared by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tools/build_samples.mjs</code>: high-passed below the lowest string (the mandolin takes carry a room noise loud enough to pass for the attack up to 200 ms early), cut 4 ms before the attack, retuned to A = 440 (the takes were up to 30 cents off; now within 2 cents on every open string, measured in the app), levelled on their first 300 ms, faded out. The one take that would not hold its pitch (mandolin G♯5) is its neighbour moved a semitone. The attack is found again after decoding, past the MP3 encoder's head padding. Cached for offline use after the first load.</span></div>
       <div class="tech-row"><span class="tech-key">Chord list playback</span><span class="tech-val">Chord List cards: ▶ plays the chord in root position (notes 8 ms apart), the arpeggio button plays it up at 220 ms a note; always piano, via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">playMidiNote()</code>. Instrument diagrams have their own buttons (Chord Sound above).</span></div>
       <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button inside the staff SVG (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code>); notes queued one by one at 380 ms, pitches taken from the scale intervals; pause clears the queue and releases the sampler.</span></div>
-      <div class="tech-row"><span class="tech-key">Composition player</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Transport</code>-based scheduling — enables accurate loop, stop, and live update. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_compPlayGen</code> counter cancels stale callbacks after stop. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compPendingRestart</code> flag triggers seamless loop restart when chords change during playback.</span></div>
+      <div class="tech-row"><span class="tech-key">Composition player</span><span class="tech-val">Sound: piano, guitar, mandolin or banjo (the last two through <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compStringSampler()</code>, a Tone.Sampler look-alike on the recordings: notes lifted an octave on mandolin, any still out of range moved by octaves, a pitch struck twice at the same instant played once; piano if the recordings fail). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Transport</code>-based scheduling - enables accurate loop, stop, and live update. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_compPlayGen</code> counter cancels stale callbacks after stop. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compPendingRestart</code> flag triggers seamless loop restart when chords change during playback.</span></div>
       <div class="tech-row"><span class="tech-key">Note value / timing</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">stepDur = beatDur × 4 / noteVal</code>. Arp mode: fixed step interval at noteVal rate with swing offset on odd steps. Full mode: strum rate at noteVal, velocity from strum pattern (cycling).</span></div>
       <div class="tech-row"><span class="tech-key">Strum patterns</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">STRUM_PATTERNS</code> object — each pattern defines beat arrays with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{d, a, g}</code> flags (downstroke, accent, ghost). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations(dur, beats)</code> converts to hit objects with velocity (accent=1.0, normal=0.72, up=0.48, ghost=0.22).</span></div>
       <div class="tech-row"><span class="tech-key">Drums</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DRUM_PATTERNS</code> — 9 styles (Rock/Funk/Jazz/Bossa/Waltz/Ballad/Reggae/HiHat/Click), each with bpm+subdiv+beat arrays. Synthesised entirely via Web Audio API: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthKick</code> (sub+punch), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthSnare</code> (dual bandpass), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthHihat</code> (HP 8.5 kHz), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthRide</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthClap</code> (3 layered bursts). Auto mode maps strum pattern name to matching drum style.</span></div>
@@ -12235,7 +12288,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-key">Strum</span><span class="guide-kv-val">Rhythmic feel for the whole composition: Straight, Folk, Rock, Ballad, Bossa, Waltz, Funk, Reggae.</span>
         <span class="guide-kv-key">Swing</span><span class="guide-kv-val">Straight / Light / Medium / Hard — delays off-beat notes to create swing or shuffle feel.</span>
         <span class="guide-kv-key">Drums</span><span class="guide-kv-val">Synthesized drum pattern (Web Audio API). Style selector: Auto (matches strum pattern), Rock, Funk, Jazz, Bossa, Waltz, Ballad, Reggae, Hi-hat, Click, plus Imported for a MusicXML drum track.</span>
-        <span class="guide-kv-key">Sound</span><span class="guide-kv-val"><strong>Piano</strong> — Salamander Grand Piano samples. <strong>Guitar</strong> — real acoustic guitar samples (loads on first use).</span>
+        <span class="guide-kv-key">Sound</span><span class="guide-kv-val"><strong>Piano</strong> - Salamander Grand Piano samples. <strong>Guitar</strong> - real acoustic guitar samples (loads on first use). <strong>Mandolin</strong>, <strong>Banjo</strong> - Philharmonia recordings; chords sit in the instrument's own register (an octave up on mandolin) and the bass doubling folds into the chord.</span>
       </div>
 
       <p class="guide-p" style="margin-bottom:6px"><strong>▶ Play tab</strong></p>
@@ -12702,7 +12755,7 @@ function _sanitizeComp(p) {
     drumTrack: Array.isArray(p.drumTrack) ? p.drumTrack.filter(h => h && /^[a-z]{2,12}$/.test(h.type)).slice(0, 8192)
       .map(h => ({ at: _clampNum(h.at, 0, 100000, 0), type: h.type, vel: _clampNum(h.vel, 0, 1, 0.7) })) : undefined,
     drumShift: _clampNum(p.drumShift, 0, 100000, 0),
-    sound: p.sound === 'guitar' ? 'guitar' : 'piano',
+    sound: ['guitar', 'mandolin', 'banjo'].includes(p.sound) ? p.sound : 'piano',
     strum: Object.hasOwn(STRUM_PATTERNS, p.strum) ? p.strum : 'Straight',
     swing: _clampNum(p.swing, 0, 100, 0),
   };
@@ -13922,7 +13975,7 @@ function compRenderDetail(comp) {
   // Sync global strum/swing to this comp's settings
   activeStrum = comp.strum || 'Straight';
   progSwing   = comp.swing ?? 0;
-  if (comp.sound === 'guitar') initGuitarSampler();
+  warmVoice(comp.sound || 'piano');
 
   const panel = document.getElementById('comp-detail-panel');
   panel.innerHTML = `
@@ -14002,6 +14055,8 @@ function compRenderDetail(comp) {
       <select class="comp-sound-select" id="comp-sound-select">
         <option value="piano"${!comp.sound||comp.sound==='piano'?' selected':''}>Piano</option>
         <option value="guitar"${comp.sound==='guitar'?' selected':''}>Guitar</option>
+        <option value="mandolin"${comp.sound==='mandolin'?' selected':''}>Mandolin</option>
+        <option value="banjo"${comp.sound==='banjo'?' selected':''}>Banjo</option>
       </select>
     </div>
     <div>
@@ -14105,7 +14160,7 @@ function compRenderDetail(comp) {
   });
   document.getElementById('comp-sound-select').addEventListener('change', e => {
     compUpdate(comp.id, { sound: e.target.value });
-    if (e.target.value === 'guitar') initGuitarSampler();
+    warmVoice(e.target.value);
     if (compIsPlaying) compPendingRestart = true;
   });
   // Play / Pause / Resume — handled by static listener below
@@ -14622,10 +14677,15 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
   if (samplerFailed) { _compToast('Piano samples could not be loaded (offline?). Playback needs them once.'); return; }
   const needsGuitar = comp.sound === 'guitar' && !guitarSamplerFailed;
   if (needsGuitar) initGuitarSampler();
+  // Mandolin or banjo: wait for their recordings; a set that failed is gone from
+  // _samples, and the piano plays instead.
+  const strings = SAMPLE_SETS[comp.sound] ? comp.sound : null;
+  if (strings) loadSampleSet(strings);
+  const stringsPending = () => !!(strings && _samples[strings] && !_samples[strings].ready);
   // Taken before waiting for the samples, so a Stop (or closing the tool) while
   // they load cancels the deferred start instead of letting it play unseen.
   const gen = ++_compPlayGen;
-  const waitingForSampler = !samplerReady || (needsGuitar && !guitarSamplerReady);
+  const waitingForSampler = !samplerReady || (needsGuitar && !guitarSamplerReady) || stringsPending();
   if (waitingForSampler) {
     const playBtn = document.getElementById('comp-play-btn');
     const resetBtn = () => { if (playBtn) { delete playBtn.dataset.waiting; playBtn.innerHTML = '<svg width="8" height="9" viewBox="0 0 8 9"><polygon points="1,1 7,4.5 1,8" fill="currentColor"/></svg>Play'; } };
@@ -14636,17 +14696,17 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
     const retry = () => {
       if (_compPlayGen !== gen) { resetBtn(); return; }
       if (samplerFailed) { resetBtn(); _compToast('Piano samples could not be loaded (offline?).'); return; }
-      if (samplerReady && (!needsGuitar || guitarSamplerReady || guitarSamplerFailed)) {
+      if (samplerReady && (!needsGuitar || guitarSamplerReady || guitarSamplerFailed) && !stringsPending()) {
         resetBtn();
         compStartPlayback(id, startIdx, loopRange);
       }
     };
     if (!samplerReady) _samplerReadyCbs.push(retry);
-    if (needsGuitar && !guitarSamplerReady) {
+    if ((needsGuitar && !guitarSamplerReady) || stringsPending()) {
       clearInterval(_compWaitTimer);
       _compWaitTimer = setInterval(() => {
         if (_compPlayGen !== gen) { clearInterval(_compWaitTimer); resetBtn(); return; }
-        if (guitarSamplerReady || guitarSamplerFailed) { clearInterval(_compWaitTimer); retry(); }
+        if ((!needsGuitar || guitarSamplerReady || guitarSamplerFailed) && !stringsPending()) { clearInterval(_compWaitTimer); retry(); }
       }, 100);
     }
     return;
@@ -14670,8 +14730,10 @@ function compStartPlayback(id, startIdx = 0, loopRange = null) {
     const beatDur = 60 / bpm;
     Tone.Transport.bpm.value = bpm;
     const useGuitar     = comp.sound === 'guitar' && guitarSampler && guitarSamplerReady;
-    const activeSampler = useGuitar ? guitarSampler : sampler;
-    const activeReady   = () => useGuitar ? guitarSamplerReady : samplerReady;
+    const useStrings    = !!(strings && _samples[strings] && _samples[strings].ready);
+    if (strings && !useStrings) _compToast('The ' + strings + ' samples could not be loaded (offline?). The piano plays instead.');
+    const activeSampler = useStrings ? compStringSampler(strings) : useGuitar ? guitarSampler : sampler;
+    const activeReady   = () => useStrings || (useGuitar ? guitarSamplerReady : samplerReady);
 
     function scheduleChords(srcComp) {
       let tOffset = 0;
@@ -15011,6 +15073,7 @@ function compStopPlayback() {
   try { Tone.Transport.stop(); Tone.Transport.cancel(0); } catch(e) {}
   if (sampler) sampler.releaseAll();
   if (guitarSampler) guitarSampler.releaseAll();
+  Object.values(_compStrings).forEach(s => s.releaseAll());
   if (progMasterBus === compMasterBus) progMasterBus = null;
   compIsPlaying = false;
   _releaseWakeLock();

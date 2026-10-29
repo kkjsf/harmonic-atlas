@@ -230,6 +230,12 @@ check('every mandolin and banjo note has its sample file (no 404 on load)', () =
   }
   eq(bad.join() || 'ok', 'ok');
 });
+check('the composition player moves notes into the instrument by octaves (C2 bass on mandolin = C4)', () => {
+  eq(run(`[fitToRange(36, SAMPLE_SETS.mandolin), fitToRange(48, SAMPLE_SETS.banjo), fitToRange(43, SAMPLE_SETS.banjo), fitToRange(95, SAMPLE_SETS.mandolin)].join()`), '60,48,55,83');
+});
+check('every sample set has a revision for its URLs (the service worker caches them for good)', () => {
+  eq(run(`Object.values(SAMPLE_SETS).every(r => Number.isInteger(r.rev) && r.rev > 0)`), true);
+});
 check('a note plays from the closest recording, none past 3 semitones', () => {
   eq(run(`[nearestSample({ 55: 1, 57: 1, 60: 1 }, 56.4), nearestSample({ 55: 1, 57: 1 }, 55.4), nearestSample({ 55: 1 }, 58.5), nearestSample({}, 60)].join()`), '57,55,,');
 });

@@ -218,7 +218,9 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 - **Strum** pattern selector (Straight / Folk / Rock / Ballad / Bossa / Waltz / Funk / Reggae)
 - **Swing** selector (Straight / Light / Medium / Hard)
 - **Drums** toggle + style selector (Auto / Rock / Funk / Jazz / Bossa / Waltz / Ballad / Reggae / HiHat / Click) — synthesized kick, snare, hi-hat, ride, clap via Web Audio API; Auto maps strum pattern to a matching drum style
-- **Sound** selector — Piano (Salamander Grand) or Guitar (real acoustic guitar samples, nbrosowsky)
+- **Sound** selector - Piano (Salamander Grand), Guitar (real acoustic guitar samples, nbrosowsky),
+  Mandolin or Banjo (the Philharmonia recordings; chords move into the instrument's register, an
+  octave up on mandolin, and the octave-down bass doubling folds onto the chord's root)
 - Live loop update — adding/removing/reordering chords takes effect at the next loop cycle (no need to stop)
 
 **Compact view** toggle — collapses all cards to chord name + degree only; individual cards expand on tap.
@@ -238,6 +240,7 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 |---|---|
 | Piano | Tone.js Sampler → Salamander Grand Piano samples (CDN) |
 | Guitar | Tone.js Sampler → nbrosowsky acoustic guitar samples (CDN, 37 notes) |
+| Mandolin, Banjo | `compStringSampler(instr)` → the app's own Philharmonia samples (same `triggerAttackRelease` / `releaseAll` as a Tone.Sampler) |
 | Drums | Raw Web Audio API synthesis (`_synthKick`, `_synthSnare`, `_synthHihat`, `_synthRide`, `_synthClap`) |
 | Scale staff | `sampler.triggerAttackRelease` via Tone.Transport |
 | Chord card buttons | `sampler.triggerAttackRelease` directly |
@@ -361,7 +364,7 @@ Each composition is a plain JS object stored as JSON in `localStorage` (key: `ha
   loop: false,
   drums: true,
   drumsStyle: "funk",      // "auto"|"rock"|"funk"|"jazz"|"bossa"|"waltz"|"ballad"|"reggae"|"hihat"|"click"
-  sound: "piano",          // "piano" | "guitar"
+  sound: "piano",          // "piano" | "guitar" | "mandolin" | "banjo"
   strum: "Straight",       // strum pattern name
   swing: 0,                // 0=straight, 30=light, 55=medium, 75=hard
   text: "verse idea...",
@@ -388,7 +391,7 @@ Two caches:
   Old shell caches are dropped on activate.
 - **`harmonic-atlas-runtime`** — Tone.js, the piano and guitar samples, and Google Fonts, served
   stale-while-revalidate, plus the app's own mandolin and banjo samples, served cache-first (a
-  rebuilt set therefore needs a new folder name). This is what makes the installed app work
+  rebuilt set therefore bumps its `rev` in `SAMPLE_SETS`, which goes into the URLs). This is what makes the installed app work
   offline, and it deliberately survives a deploy so a version bump does not re-download every
   sample.
 
