@@ -2386,8 +2386,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v83';
-window.APP_DEPLOYED = '2026-10-29 11:01';
+window.APP_VERSION = 'v84';
+window.APP_DEPLOYED = '2026-10-29 11:19';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -9166,6 +9166,21 @@ function warmVoice(instr) {
   loadSampleSet(instr);
 }
 
+// Resolves once an instrument's recordings can play, or after `ms`: a click
+// waits for them rather than playing the synthesised strings, which is what a
+// first click on a phone used to get while the files were still on their way
+// (and every click after v83 renamed the sample URLs). Past `ms`, or offline,
+// the synthesis stands in.
+function voiceReady(instr, ms) {
+  warmVoice(instr);
+  const ok = () => instr === 'guitar' ? !guitarSampler || guitarSamplerReady || guitarSamplerFailed
+    : !_samples[instr] || _samples[instr].ready;
+  const t0 = Date.now();
+  return new Promise(resolve => (function poll() {
+    if (ok() || Date.now() - t0 > ms) resolve(); else setTimeout(poll, 50);
+  })());
+}
+
 // A new strum damps the strings still ringing, as the hand does on the instrument.
 function dampPlucks(ctx) {
   const t = ctx.currentTime;
@@ -9257,12 +9272,13 @@ function makeSoundBar(getVoicing) {
     b.addEventListener('click', e => {
       e.stopPropagation();
       if (typeof Tone === 'undefined') return;
-      Tone.start().then(() => {
+      b.classList.add('playing');
+      clearTimeout(b._playT);
+      Tone.start().then(() => voiceReady(voicingSound(getVoicing()).instr, 5000)).then(() => {
         const ms = playVoicing(voicingSound(getVoicing()), mode);
-        b.classList.add('playing');
         clearTimeout(b._playT);
         b._playT = setTimeout(() => b.classList.remove('playing'), ms);
-      }).catch(() => {});
+      }).catch(() => b.classList.remove('playing'));
     });
     bar.appendChild(b);
   });
@@ -9367,7 +9383,7 @@ function tunerYin(x, sr, minF, maxF) {
 // software; the mandolin and banjo recordings shift to any A4.
 function tunerReference(instr, midi, a4) {
   if (typeof Tone === 'undefined') return;
-  Tone.start().then(() => {
+  Tone.start().then(() => voiceReady(instr, 5000)).then(() => {
     const ctx = Tone.getContext().rawContext, at440 = midi + 12 * Math.log2(a4 / 440);
     if (instr === 'chromatic') {
       if (a4 === 440) playMidiNote(midi, 2.6, 0);
