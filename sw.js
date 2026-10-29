@@ -2,7 +2,7 @@
 // window.APP_VERSION in index.html is the only edit a deploy needs.
 const VERSION = new URL(self.location).searchParams.get('v') || 'dev';
 const CACHE   = 'harmonic-atlas-' + VERSION;        // app shell, replaced every deploy
-const RUNTIME = 'harmonic-atlas-runtime';           // third-party audio, survives deploys
+const RUNTIME = 'harmonic-atlas-runtime';           // audio samples (CDN and own), survives deploys
 
 const ASSETS = ['./index.html', './manifest.json',
   './icons/icon-192.png','./icons/icon-512.png',
@@ -82,6 +82,18 @@ self.addEventListener('fetch', e => {
         }).catch(() => hit);
         return hit || network;
       })
+    ));
+    return;
+  }
+
+  // Mandolin and banjo samples: cache-first into RUNTIME, which deploys keep, so
+  // each file downloads once. Rebuilt samples therefore need a new folder name.
+  if (host === self.location.hostname && new URL(req.url).pathname.indexOf('/samples/') !== -1) {
+    e.respondWith(caches.open(RUNTIME).then(cache =>
+      cache.match(req).then(hit => hit || fetch(req).then(res => {
+        if (res.ok) cache.put(req, res.clone()).catch(() => {});
+        return res;
+      }))
     ));
     return;
   }

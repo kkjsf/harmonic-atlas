@@ -102,11 +102,19 @@ has two buttons that play exactly the voicing drawn:
 - **Arp** - one note at a time, low to high. Arpeggio shapes get a single **Play**, up and back
   down.
 
-Guitar plays the acoustic samples (synthesised until they have loaded), piano the Salamander
-grand. Mandolin and banjo have no sample set, so they are synthesised plucked strings (extended
-Karplus-Strong): a noise burst in a delay line one period long, a loss filter for brightness and
-decay, an allpass that tunes it (within 2 cents), doubled courses 4 cents apart on mandolin, a
-bright pluck near the bridge and a short decay on banjo.
+Guitar plays the acoustic samples, piano the Salamander grand, mandolin and banjo real
+recordings from the [Philharmonia Orchestra sample library](https://philharmonia.co.uk/resources/sound-samples/)
+(`samples/mandolin/`, `samples/banjo/`, one MP3 per MIDI note, served with the app). An
+instrument's samples load when one of its diagrams first shows. Until they arrive, or offline on a
+first visit, the strings are synthesised (extended Karplus-Strong: a noise burst in a delay line
+one period long, a loss filter for brightness and decay, an allpass that tunes it within 2 cents,
+doubled courses on mandolin).
+
+The mandolin and banjo files are built by `tools/build_samples.mjs` from the Philharmonia takes
+(fetched by `tools/fetch_philharmonia.py`): high-passed below the lowest string, cut 4 ms before
+the attack, retuned to A = 440 (the takes were up to 30 cents off), levelled, faded out. The
+Philharmonia licence allows any use in a work but not redistributing the samples as they are, which
+is why the app ships these processed derivatives. The `tools/` folder is not part of the app.
 
 ### Closed-grip engine (mandolin Chop · banjo Moveable)
 
@@ -229,7 +237,7 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 | Sound | Engine |
 |---|---|
 | Piano | Tone.js Sampler → Salamander Grand Piano samples (CDN) |
-| Guitar | Tone.js Sampler → nbrosowsky acoustic guitar samples (CDN, 36 notes) |
+| Guitar | Tone.js Sampler → nbrosowsky acoustic guitar samples (CDN, 37 notes) |
 | Drums | Raw Web Audio API synthesis (`_synthKick`, `_synthSnare`, `_synthHihat`, `_synthRide`, `_synthClap`) |
 | Scale staff | `sampler.triggerAttackRelease` via Tone.Transport |
 | Chord card buttons | `sampler.triggerAttackRelease` directly |
@@ -293,7 +301,7 @@ git push
 
 - **Single-file app** — all CSS, JS, and HTML live in `index.html`. Intentional: easier to share and edit.
 - **No JS framework** — vanilla JS only. External resources: Google Fonts (CSS) and Tone.js (audio, loaded from CDN).
-- **Audio:** Tone.js 14.8.49 (CDN) + Salamander Grand Piano + nbrosowsky acoustic guitar samples
+- **Audio:** Tone.js 14.8.49 (CDN) + Salamander Grand Piano + nbrosowsky acoustic guitar samples + Philharmonia mandolin and banjo samples (served with the app)
 - **Theme:** dark mode only
 - **PWA:** `manifest.json` + `sw.js`. Service worker uses network-first for HTML navigation and cache-first for static assets.
 
@@ -304,7 +312,7 @@ git push
 | Path | Engine |
 |---|---|
 | Chord card play/arp buttons | `addCardPlayBtn` → `playMidiNote` (piano) |
-| Instrument diagram Strum / Chord / Arp | `attachSoundBars` → `voicingSound` → `playVoicing`: guitar sampler, piano sampler, or `pluckNote` (Karplus-Strong) |
+| Instrument diagram Strum / Chord / Arp | `attachSoundBars` → `voicingSound` → `playVoicing`: guitar sampler, piano sampler, `sampleNote` (mandolin and banjo recordings), or `pluckNote` (Karplus-Strong) |
 | Scale staff playback | `Tone.Transport.schedule` → sampler |
 | Composition player | `Tone.Transport.schedule` → `activeSampler` (piano or guitar) |
 | Composition drums | Raw Web Audio API — `_synthKick`, `_synthSnare`, `_synthHihat`, `_synthRide`, `_synthClap` |
@@ -336,6 +344,7 @@ git push
 | `pianoFingering(midis, hand)` | Block-chord fingering (Parncutt span model, anchored on the outer fingers) |
 | `makeKeyboardDiagram(opt, chord, w, labelMode)` / `renderPianoTab(…, hands)` | Keyboard SVG with RH and LH finger rows; the two Piano sub-tabs |
 | `voicingSound(v)` / `playVoicing(snd, mode)` / `pluckBuffer(ctx, instr, midi)` | What a card plays (frets or keys to MIDI), how (strum, chord, arpeggio), and the plucked-string synthesis |
+| `loadSampleSet(instr)` / `sampleNote(...)` / `warmVoice(instr)` | Mandolin and banjo recordings: load (when a diagram of the instrument first shows), play the nearest note at the right rate, warm an instrument's samples before its first click |
 | `computeVoicingFromTemplate(rootPc, template)` | Derives guitar frets/pcs from a semitone-offset template; enforces ascending pitch per string and span ≤ 4 frets |
 | `showDiagramModal(…, navList, navIdx)` | Zoom overlay with smooth in-place navigation (fade swap 80 ms, swipe, arrow keys, prev/next context labels) |
 | `renderBrowse()` | Renders jazz resource hub cards with search filtering and category grouping |
@@ -378,8 +387,10 @@ Two caches:
   deploy needs: the version string, the visible timestamp and the cache name all follow from it.
   Old shell caches are dropped on activate.
 - **`harmonic-atlas-runtime`** — Tone.js, the piano and guitar samples, and Google Fonts, served
-  stale-while-revalidate. This is what makes the installed app work offline, and it deliberately
-  survives a deploy so a version bump does not re-download every sample.
+  stale-while-revalidate, plus the app's own mandolin and banjo samples, served cache-first (a
+  rebuilt set therefore needs a new folder name). This is what makes the installed app work
+  offline, and it deliberately survives a deploy so a version bump does not re-download every
+  sample.
 
 HTML is always fetched fresh (network-first). Assets are precached one at a time rather than with
 `addAll`, which is atomic and would drop the whole shell if a single request failed.

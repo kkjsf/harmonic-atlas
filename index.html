@@ -2386,8 +2386,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v81';
-window.APP_DEPLOYED = '2026-10-22 11:24';
+window.APP_VERSION = 'v82';
+window.APP_DEPLOYED = '2026-10-29 10:12';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -8937,9 +8937,10 @@ function playMidiNote(midi, dur, delay) {
 // CHORD SOUND - strum, block chord and arpeggio for every diagram card
 //
 // Each card plays the voicing it draws, string by string or key by key: the
-// guitar on its acoustic samples, the piano on the Salamander grand. Mandolin
-// and banjo have no sample set, so they are plucked in software (extended
-// Karplus-Strong below), and so is the guitar until its samples have loaded.
+// guitar on its acoustic samples, the piano on the Salamander grand, mandolin
+// and banjo on Philharmonia recordings. Until an instrument's samples have
+// loaded (or offline) its strings are plucked in software (extended
+// Karplus-Strong below).
 // ══════════════════════════════════════════════
 
 // strum = gap between strings on a downstroke, arp = one note to the next, ring = note length (s).
@@ -9023,15 +9024,93 @@ function pluckOut(ctx, instr) {
   return (_pluckOut[instr] = chain[0]);
 }
 
+// Starts one string, kept in _plucking so the next strum can damp it.
+function startString(src, g, out, when, offset) {
+  src.connect(g); g.connect(out);
+  src.start(when, offset);
+  const node = { src, g };
+  _plucking.push(node);
+  src.onended = () => { _plucking = _plucking.filter(n => n !== node); };
+}
+
 function pluckNote(ctx, instr, midi, when, gain) {
   const src = ctx.createBufferSource(), g = ctx.createGain();
   src.buffer = pluckBuffer(ctx, instr, midi);
   g.gain.value = gain;
-  src.connect(g); g.connect(pluckOut(ctx, instr));
-  src.start(when);
-  const node = { src, g };
-  _plucking.push(node);
-  src.onended = () => { _plucking = _plucking.filter(n => n !== node); };
+  startString(src, g, pluckOut(ctx, instr), when, 0);
+}
+
+// ── Mandolin and banjo samples ─────────────────
+// Real recordings from the Philharmonia Orchestra's free sample library, one per
+// semitone, cut at the attack, retuned to A = 440 and levelled by
+// tools/build_samples.mjs (samples/<instr>/<midi>.mp3). A set starts loading when
+// its instrument first shows a diagram and plays once every file has answered;
+// a missing note is played from its nearest neighbour (playback rate), and
+// anything further than 3 semitones from a recording is plucked in software.
+const SAMPLE_SETS = { mandolin: { lo: 55, hi: 91 }, banjo: { lo: 48, hi: 88 } };
+const SAMPLE_GAIN = 0.7;   // a strum then peaks where the guitar's does (measured on the master bus)
+const _samples = {};
+
+function loadSampleSet(instr) {
+  const range = SAMPLE_SETS[instr];
+  if (!range || _samples[instr] || typeof Tone === 'undefined') return;
+  const ctx = Tone.getContext().rawContext;
+  const set = _samples[instr] = { notes: {}, ready: false };
+  const loads = [];
+  for (let m = range.lo; m <= range.hi; m++) {
+    loads.push(fetch('samples/' + instr + '/' + m + '.mp3')
+      .then(r => r.ok ? r.arrayBuffer() : Promise.reject(new Error(r.status)))
+      .then(a => ctx.decodeAudioData(a))
+      .then(buf => { set.notes[m] = { buf, start: sampleStart(buf.getChannelData(0), buf.sampleRate) }; })
+      .catch(() => {}));
+  }
+  // Nothing came back (offline on a first visit): forget the set so a later click retries.
+  Promise.all(loads).then(() => {
+    if (Object.keys(set.notes).length) set.ready = true;
+    else delete _samples[instr];
+  });
+}
+
+// Where the attack starts, in seconds: MP3 encoders pad the head with silence,
+// by an amount that depends on the decoder, so it is measured once decoded.
+function sampleStart(x, sr) {
+  let peak = 0;
+  for (let i = 0; i < x.length; i++) if (Math.abs(x[i]) > peak) peak = Math.abs(x[i]);
+  let i = 0;
+  while (i < x.length && Math.abs(x[i]) < peak * 0.02) i++;
+  return Math.max(0, i / sr - 0.003);
+}
+
+// The recorded note closest to a MIDI pitch (fractional for the tuner), within 3 semitones.
+function nearestSample(notes, midi) {
+  let best = null;
+  for (const k in notes) {
+    const d = Math.abs(k - midi);
+    if (d <= 3 && (best === null || d < Math.abs(best - midi))) best = +k;
+  }
+  return best;
+}
+
+// Plays one note from the recordings; false when the set is not ready or too far away.
+function sampleNote(ctx, instr, midi, when, gain) {
+  const set = _samples[instr], key = set && set.ready ? nearestSample(set.notes, midi) : null;
+  if (key === null) return false;
+  const s = set.notes[key], src = ctx.createBufferSource(), g = ctx.createGain();
+  src.buffer = s.buf;
+  src.playbackRate.value = Math.pow(2, (midi - key) / 12);
+  g.gain.value = gain;
+  startString(src, g, ensureCompMasterBus(), when, s.start);
+  return true;
+}
+
+// Starts loading an instrument's samples as soon as one of its diagrams is on
+// screen, so the first click already plays the recording. The first view renders
+// before the deferred Tone.js has run, so _startAudio() warms it afterwards.
+const _warmLater = new Set();
+function warmVoice(instr) {
+  if (typeof Tone === 'undefined') { _warmLater.add(instr); return; }
+  if (instr === 'guitar' && !guitarSampler && !guitarSamplerFailed) initGuitarSampler();
+  loadSampleSet(instr);
 }
 
 // A new strum damps the strings still ringing, as the hand does on the instrument.
@@ -9079,18 +9158,22 @@ function playVoicing(snd, mode) {
     ? (snd.arpOnly ? up.concat(up.slice(0, -1).reverse()) : up).map((m, i) => ({ m, t: i * feel.arp }))
     : snd.notes.map((m, i) => ({ m, t: i * feel.strum }));
   const sampled = snd.instr === 'piano' || (snd.instr === 'guitar' && guitarSamplerReady);
-  if (snd.instr === 'guitar' && !guitarSampler && !guitarSamplerFailed) initGuitarSampler();
+  const recorded = _samples[snd.instr] && _samples[snd.instr].ready;
+  warmVoice(snd.instr);
+  // A new strum damps what still rings, as the hand does (not the guitar notes of a
+  // composition playing on the same sampler).
+  if (snd.instr === 'guitar' && sampled && !compIsPlaying) guitarSampler.releaseAll();
   if (!sampled) {
     dampPlucks(ctx);
-    seq.forEach(({ m }) => pluckBuffer(ctx, snd.instr, m));   // build first, so the strum keeps its timing
+    if (!recorded) seq.forEach(({ m }) => pluckBuffer(ctx, snd.instr, m));   // build first, so the strum keeps its timing
   }
   const gain = 0.55 / Math.sqrt(mode === 'arp' ? 2 : seq.length);
   const t0 = ctx.currentTime + 0.04;
   seq.forEach(({ m, t }, i) => {
-    const vel = mode === 'arp' ? 0.9 : 1 - i * 0.03;
+    const vel = (mode === 'arp' ? 0.9 : 1 - i * 0.03) * (0.95 + Math.random() * 0.1);
     if (snd.instr === 'piano') playMidiNote(m, feel.ring, t);
     else if (sampled) guitarSampler.triggerAttackRelease(midiToNoteName(m), feel.ring, Tone.now() + 0.03 + t, 0.75 * vel);
-    else pluckNote(ctx, snd.instr, m, t0 + t, gain * vel * (0.95 + Math.random() * 0.1));
+    else if (!sampleNote(ctx, snd.instr, m, t0 + t, SAMPLE_GAIN * vel)) pluckNote(ctx, snd.instr, m, t0 + t, gain * vel);
   });
   return (seq[seq.length - 1].t + Math.min(feel.ring, 1.4)) * 1000;
 }
@@ -9105,6 +9188,7 @@ const SND_ICON = {
 function makeSoundBar(getVoicing) {
   const first = voicingSound(getVoicing());
   if (!first || !first.notes.length) return null;
+  warmVoice(first.instr);
   const bar = document.createElement('div');
   bar.className = 'snd-bar';
   const modes = first.arpOnly ? [['arp', 'Play', 'Play the arpeggio, up and back down']]
@@ -9225,8 +9309,9 @@ function tunerYin(x, sr, minF, maxF) {
 }
 
 // The reference pitch, on the app's own voices: guitar samples (or the plucked
-// guitar until they load), plucked mandolin and banjo, the piano for chromatic.
-// Samples are pitched for A = 440, so another A4 plucks in software instead.
+// guitar until they load), mandolin and banjo samples, the piano for chromatic.
+// The guitar sampler is pitched for A = 440, so another A4 plucks the guitar in
+// software; the mandolin and banjo recordings shift to any A4.
 function tunerReference(instr, midi, a4) {
   if (typeof Tone === 'undefined') return;
   Tone.start().then(() => {
@@ -9236,13 +9321,13 @@ function tunerReference(instr, midi, a4) {
       else makePianoNote(ctx, tunerHz(midi, a4), ctx.currentTime + 0.02, 2.6, 0.13);
       return;
     }
-    if (instr === 'guitar' && !guitarSampler && !guitarSamplerFailed) initGuitarSampler();
+    warmVoice(instr);
     if (instr === 'guitar' && guitarSamplerReady && a4 === 440) {
       guitarSampler.triggerAttackRelease(midiToNoteName(midi), 2.8, Tone.now() + 0.03, 0.8);
       return;
     }
     dampPlucks(ctx);
-    pluckNote(ctx, instr, at440, ctx.currentTime + 0.04, 0.5);
+    if (!sampleNote(ctx, instr, at440, ctx.currentTime + 0.04, SAMPLE_GAIN)) pluckNote(ctx, instr, at440, ctx.currentTime + 0.04, 0.5);
   }).catch(() => {});
 }
 
@@ -11532,7 +11617,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">What plays</span><span class="tech-val">The voicing each card draws, read at click time (a pill that switches grip or inversion switches the sound): frets → MIDI per string, banjo 5th string from its own nut at fret 5, piano keys as drawn. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">attachSoundBars()</code> runs after every chord view and adds the buttons to any card carrying a <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_voicing</code>; the zoom modals get them too.</span></div>
       <div class="tech-row"><span class="tech-key">Strum / Chord</span><span class="tech-val">Downstroke, low string to high: 30 ms between strings on guitar, 18 on mandolin, 22 on banjo (5th-string drone first, as a brush goes), slightly softer toward the top. Piano: every key at once. A new strum damps the strings still ringing.</span></div>
       <div class="tech-row"><span class="tech-key">Arp</span><span class="tech-val">One note at a time, low to high: 170 ms guitar, 140 mandolin, 120 banjo (drone last, unless it doubles the 1st string), 160 piano (left hand, then right). Arpeggio shapes play up and back down.</span></div>
-      <div class="tech-row"><span class="tech-key">Voices</span><span class="tech-val">Guitar: the acoustic guitar samples (loaded on the first guitar click; synthesised until they arrive). Piano: the Salamander grand (synth piano if the samples fail). Mandolin and banjo: extended Karplus-Strong (Jaffe &amp; Smith 1983) - a noise burst in a delay line one period long, with a loss filter for brightness and decay, an allpass for exact tuning (within 2 cents, tested), a pick-position comb and a short decay that shortens up the neck. Mandolin courses are two strings 4 cents apart, struck 4 ms apart; banjo is plucked near the bridge with little damping. Each instrument has its own body filter before the master compressor and limiter.</span></div>
+      <div class="tech-row"><span class="tech-key">Voices</span><span class="tech-val">Guitar: the acoustic guitar samples. Piano: the Salamander grand (synth piano if the samples fail). Mandolin and banjo: real recordings from the Philharmonia Orchestra sample library, one per semitone (see Mandolin &amp; banjo samples). Each instrument's samples start loading when one of its diagrams is on screen, so the first click already plays them; a new guitar strum damps the one still ringing. Until they arrive, or offline on a first visit, the strings are synthesised: extended Karplus-Strong (Jaffe &amp; Smith 1983) - a noise burst in a delay line one period long, with a loss filter for brightness and decay, an allpass for exact tuning (within 2 cents, tested), a pick-position comb, mandolin courses two strings 4 cents apart, and a body filter per instrument before the master compressor and limiter.</span></div>
     </div>
 
     <div class="tech-section">
@@ -11540,14 +11625,15 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Microphone</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getUserMedia</code> with echo cancellation, noise suppression and auto gain off (call-audio filters that thin out a low string's fundamental), a 45 Hz high-pass, and its own AudioContext, created on Start and suspended on Stop, so the tuner works even when Tone.js did not load. Needs HTTPS or localhost. The mic stops when the window closes or the tab goes to the background; the screen stays awake while listening.</span></div>
       <div class="tech-row"><span class="tech-key">Detection</span><span class="tech-val">YIN (de Cheveigné &amp; Kawahara 2002) on a 4096-sample window, ~30 times a second: the first dip under 0.15 of the normalised difference function, a parabola through it, then an octave check (a weak fundamental under a loud 2nd harmonic also dips at half the period). Search bounded by the tuning (lowest string × 0.66). Median of 5 readings, needle eased. Tested: within 1 cent from 65 Hz to 1.3 kHz, and 333/333 plucked guitar, mandolin and banjo notes read within 2 cents through a phone-like high-pass.</span></div>
       <div class="tech-row"><span class="tech-key">Tunings</span><span class="tech-val">Guitar: Standard, Drop D, Half step down, DADGAD, Open G, Open D. Mandolin: Standard, Cross A (AEAE), Cross G (GDGD). Banjo: Open G, Double C, G modal (Sawmill), Standard C, Open D. Each string moves by semitones (up to 7 from its preset); a tuning that matches a preset takes its name. Auto targets the closest string, a tapped string stays the target. In tune = within 3 cents; a string held in tune for 0.4 s gets a ✓. A4 430-450 Hz. Saved in this browser.</span></div>
-      <div class="tech-row"><span class="tech-key">Reference</span><span class="tech-val">The target pitch on the app's own voices: guitar samples (plucked guitar until they load), plucked mandolin and banjo, the piano in Chromatic. Samples are pitched for A = 440, so another A4 plucks in software.</span></div>
+      <div class="tech-row"><span class="tech-key">Reference</span><span class="tech-val">The target pitch on the app's own voices: guitar samples (plucked guitar until they load), mandolin and banjo samples, the piano in Chromatic. The guitar samples play at A = 440 only, so another A4 plucks the guitar in software; the mandolin and banjo recordings shift to any A4.</span></div>
     </div>
 
     <div class="tech-section">
       <div class="tech-section-title">Audio Engine</div>
-      <div class="tech-row"><span class="tech-key">Library</span><span class="tech-val">Tone.js 14.8.49 (CDN) — wraps Web Audio API. Two samplers: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler</code> (piano, loads on init) and <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">guitarSampler</code> (guitar, lazy-loaded on first use).</span></div>
+      <div class="tech-row"><span class="tech-key">Library</span><span class="tech-val">Tone.js 14.8.49 (CDN) - wraps Web Audio API. Two samplers: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler</code> (piano, loads on init) and <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">guitarSampler</code> (guitar, loaded when a guitar diagram first shows). Mandolin and banjo play their own buffers (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampleNote()</code>), so a new strum damps them like the synthesised strings.</span></div>
       <div class="tech-row"><span class="tech-key">Piano samples</span><span class="tech-val">Salamander Grand Piano — real mp3 samples via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> (tonejs.github.io/audio/salamander/). Loads on page init. "⟳ loading…" indicator while pending.</span></div>
-      <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val">nbrosowsky acoustic guitar — 36 real mp3 samples (nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/). Tone.js pitch-shifts between recorded notes. Loaded lazily when Guitar sound is selected.</span></div>
+      <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val">nbrosowsky acoustic guitar - 37 real mp3 samples (nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/), in tune within 5 cents. Tone.js pitch-shifts between recorded notes. Loaded when a guitar diagram first shows, or when Guitar sound is selected.</span></div>
+      <div class="tech-row"><span class="tech-key">Mandolin &amp; banjo samples</span><span class="tech-val">Philharmonia Orchestra recordings, served with the app (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/mandolin/</code> G3-G6, 37 notes, 1.1 MB; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/banjo/</code> C3-E6, 41 notes, 1.3 MB; one MP3 per MIDI note). Prepared by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tools/build_samples.mjs</code>: high-passed below the lowest string (the mandolin takes carry a room noise loud enough to pass for the attack up to 200 ms early), cut 4 ms before the attack, retuned to A = 440 (the takes were up to 30 cents off; now within 2 cents on every open string, measured in the app), levelled on their first 300 ms, faded out. The one take that would not hold its pitch (mandolin G♯5) is its neighbour moved a semitone. The attack is found again after decoding, past the MP3 encoder's head padding. Cached for offline use after the first load.</span></div>
       <div class="tech-row"><span class="tech-key">Chord list playback</span><span class="tech-val">Chord List cards: ▶ plays the chord in root position (notes 8 ms apart), the arpeggio button plays it up at 220 ms a note; always piano, via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">playMidiNote()</code>. Instrument diagrams have their own buttons (Chord Sound above).</span></div>
       <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button inside the staff SVG (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code>); notes queued one by one at 380 ms, pitches taken from the scale intervals; pause clears the queue and releases the sampler.</span></div>
       <div class="tech-row"><span class="tech-key">Composition player</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Transport</code>-based scheduling — enables accurate loop, stop, and live update. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_compPlayGen</code> counter cancels stale callbacks after stop. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compPendingRestart</code> flag triggers seamless loop restart when chords change during playback.</span></div>
@@ -11589,6 +11675,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Arpeggio shapes</span><span class="tech-val"><a href="https://www.jazzguitar.be/blog/guitar-arpeggios/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Guitar Arpeggios</a> - CAGED arpeggio positions for 7th chords</span></div>
       <div class="tech-row"><span class="tech-key">Negative harmony</span><span class="tech-val">Ernst Levy, <em>A Theory of Harmony</em> (1985); Jacob Collier interviews; <a href="https://www.youtube.com/watch?v=9-EHgH4LZEQ" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">Adam Neely's Negative Harmony explanation</a></span></div>
       <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val"><a href="https://github.com/nbrosowsky/tonejs-instruments" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">nbrosowsky/tonejs-instruments</a> — open-source real instrument samples for Tone.js</span></div>
+      <div class="tech-row"><span class="tech-key">Mandolin &amp; banjo samples</span><span class="tech-val"><a href="https://philharmonia.co.uk/resources/sound-samples/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">Philharmonia Orchestra sound samples</a> - recorded by Philharmonia musicians, free to use in any work; shipped here trimmed, retuned and re-encoded</span></div>
       <div class="tech-row"><span class="tech-key">Scale modes</span><span class="tech-val"><a href="https://www.musictheory.net/lessons/mode" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">musictheory.net modes</a>; Mark Levine, <em>The Jazz Theory Book</em>; Jerry Bergonzi, <em>Inside Improvisation</em></span></div>
     </div>
   </div>
@@ -12027,7 +12114,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-kv">
         <span class="guide-kv-key">Sound</span>
-        <span class="guide-kv-val">Every diagram card and zoomed diagram, on every instrument, has two buttons. <strong>Strum</strong> plays the voicing as drawn, low string to high (a banjo brush starts on the 5th-string drone); on piano the button is <strong>Chord</strong> and plays every key at once. <strong>Arp</strong> plays it one note at a time. Arpeggio shapes get a single <strong>Play</strong>, up and back down. Guitar uses the acoustic samples once loaded, piano the grand piano samples; mandolin (with its doubled courses) and banjo are synthesised plucked strings.</span>
+        <span class="guide-kv-val">Every diagram card and zoomed diagram, on every instrument, has two buttons. <strong>Strum</strong> plays the voicing as drawn, low string to high (a banjo brush starts on the 5th-string drone); on piano the button is <strong>Chord</strong> and plays every key at once. <strong>Arp</strong> plays it one note at a time. Arpeggio shapes get a single <strong>Play</strong>, up and back down. Guitar uses acoustic guitar samples, piano the grand piano samples, mandolin and banjo real recordings from the Philharmonia Orchestra. They load when an instrument's diagrams first show; until then (or offline on a first visit) the strings are synthesised.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
@@ -15689,6 +15776,7 @@ window.addEventListener('resize', () => {
   $('tn-seg').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     st.instr = b.dataset.instr; locked = null; active = null; tuned.clear(); resetTrack(); save(); render();
+    warmVoice(st.instr);
   });
   $('tn-preset').addEventListener('change', e => {
     if (e.target.value === 'custom') return;
@@ -15873,6 +15961,7 @@ window.addEventListener('resize', () => {
     overlay.classList.add('open');
     lockScroll();
     render();
+    warmVoice(st.instr);   // the reference button then plays the recording from its first press
     setTimeout(() => $('tn-start').focus(), 50);
   }
   function closeTuner() {
@@ -15935,7 +16024,7 @@ function _startAudio() {
     audioUnavailable('Audio needs Tone.js, which could not be loaded.');
     return;
   }
-  try { initSampler(); }
+  try { initSampler(); _warmLater.forEach(warmVoice); }
   catch (err) { console.warn('Sampler init failed:', err); audioUnavailable('Audio failed to start.'); }
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _startAudio);

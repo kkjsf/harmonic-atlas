@@ -218,6 +218,25 @@ check('plucked strings are in tune (banjo D4, mandolin E5 within 2 cents)', () =
       return Math.abs(1200 * Math.log2(f / f0)) < 2; }).join(','); })()`);
   eq(cents, 'true,true');
 });
+check('mandolin and banjo samples span every tuning and 15 frets up the top string', () => {
+  eq(run(`['mandolin', 'banjo'].map(i => { const r = SAMPLE_SETS[i], all = TUNER_INSTR[i].presets.flatMap(p => p[1]);
+    return Math.min(...all) >= r.lo && Math.max(...all) + 15 <= r.hi; }).join()`), 'true,true');
+});
+check('every mandolin and banjo note has its sample file (no 404 on load)', () => {
+  const bad = [];
+  for (const instr of ['mandolin', 'banjo']) {
+    const r = JSON.parse(run(`JSON.stringify(SAMPLE_SETS.${instr})`));
+    for (let m = r.lo; m <= r.hi; m++) if (!fs.existsSync(path.join(__dirname, '..', 'samples', instr, m + '.mp3'))) bad.push(instr + ' ' + m);
+  }
+  eq(bad.join() || 'ok', 'ok');
+});
+check('a note plays from the closest recording, none past 3 semitones', () => {
+  eq(run(`[nearestSample({ 55: 1, 57: 1, 60: 1 }, 56.4), nearestSample({ 55: 1, 57: 1 }, 55.4), nearestSample({ 55: 1 }, 58.5), nearestSample({}, 60)].join()`), '57,55,,');
+});
+check('a sample starts 3 ms before its attack, past the MP3 head padding', () => {
+  eq(run(`(() => { const x = new Float32Array(44100); for (let i = 1105; i < x.length; i++) x[i] = (i % 2 ? 0.5 : -0.5) * Math.exp(-(i - 1105) / 9000);
+    return Math.round(sampleStart(x, 44100) * 44100); })()`), 973);
+});
 
 // ── Tuner ──
 check('tuner standard tunings are the instruments\' own', () => {
