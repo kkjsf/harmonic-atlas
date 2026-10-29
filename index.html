@@ -2092,27 +2092,29 @@
      The key and the scale move to a sticky bar that opens a bottom sheet, the round
      tool buttons go into a "More" sheet, a rail jumps to each degree, and nothing
      on the main screen is smaller than 12 px or narrower than a 40 px target. */
-  #m-top, .m-sheet, .m-scrim, .m-about { display: none; }
+  #m-top, .m-sheet, .m-scrim, .m-about, .m-nav { display: none; }
   @media (max-width: 700px) {
-    .wrap { padding: 0 14px 104px; }
-    #page-top, #guide-btn, #tech-btn, #lick-lib-btn, #tuner-btn, #back-top, #history-strip,
-    .ctrl-scale-key-row, .ctrl-group-wide > .ctrl-label, .views-hdr { display: none !important; }
+    .wrap { padding: 0 14px calc(100px + env(safe-area-inset-bottom)); }
+    #page-top, #guide-btn, #tech-btn, #lick-lib-btn, #tuner-btn, #comp-btn, #back-top, #history-strip,
+    .ctrl-scale-key-row, .ctrl-group-wide > .ctrl-label, .views-hdr, .view-tabs { display: none !important; }
     .compare-bar { display: none; }
     body.m-compare .compare-bar { display: flex; }
-    .degree-section, .left-panel, .compare-bar { scroll-margin-top: calc(var(--m-top-h, 130px) + 8px); }
+    .degree-section, .left-panel, .compare-bar, .right-panel { scroll-margin-top: calc(var(--m-top-h, 130px) + 8px); }
     /* Stretch, not start: a fit-content panel took the width of the tab row and widened the page. */
     .main-layout { align-items: stretch; }
 
     #m-top { display: block; position: sticky; top: 0; z-index: var(--z-sticky); background: rgba(11,13,15,.95); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
-    .m-bar { display: flex; align-items: center; gap: 8px; padding: 8px 14px; }
+    .m-bar { display: flex; align-items: center; gap: 2px; padding: 8px 10px 8px 4px; }
     .m-bar button { font-family: 'IBM Plex Mono', monospace; color: var(--text); background: var(--surface2); border: 1px solid var(--border2); border-radius: 3px; cursor: pointer; }
-    .m-bar .m-key { flex: none; min-width: 52px; height: 48px; padding: 0 8px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 24px; color: var(--cream); }
-    .m-scale { flex: 1; min-width: 0; height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 12px; text-align: left; }
+    .m-bar .m-step { flex: none; width: 34px; height: 48px; display: grid; place-items: center; color: var(--gold); background: none; border: none; }
+    .m-bar .m-key { flex: none; min-width: 40px; height: 48px; padding: 0 2px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 30px; line-height: 1; color: var(--cream); background: none; border: none; white-space: nowrap; }
+    .m-scale { flex: 1; min-width: 0; margin-left: 6px; height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 12px; text-align: left; }
     .m-scale-txt { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
     .m-fam { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .m-name { font-size: 15px; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .m-scale svg { flex: none; }
-    .m-bar .m-more { flex: none; width: 48px; height: 48px; display: grid; place-items: center; color: var(--muted); }
+    .m-bar .m-more { flex: none; width: 48px; height: 48px; margin-left: 6px; padding: 0; display: grid; place-items: center; background: none; border: none; }
+    .m-more img { display: block; width: 38px; height: 38px; border-radius: 9px; box-shadow: 0 0 0 1px rgba(201,168,76,.35); }
     .m-rail { display: flex; gap: 4px; padding: 0 10px 8px; overflow-x: auto; scrollbar-width: none; }
     .m-rail::-webkit-scrollbar { display: none; }
     .m-rail[hidden] { display: none; }
@@ -2155,7 +2157,7 @@
     .view-tabs::-webkit-scrollbar { display: none; }
     .view-tab { flex: none; min-height: 46px; margin-bottom: 0; padding: 0 12px; gap: 7px; font-size: 14px; letter-spacing: .02em; text-transform: none; white-space: nowrap; }
     .view-tab svg { width: 16px; height: 16px; }
-    .guitar-sub-tabs { margin: -14px -14px 14px; padding: 0 8px; }
+    .guitar-sub-tabs { margin: 0 -14px 12px; padding: 0 8px; }
     .guitar-sub-tab { min-height: 42px; padding: 0 12px; font-size: 14px; letter-spacing: .02em; text-transform: none; }
 
     /* Chord list cards */
@@ -2198,10 +2200,30 @@
     /* Circle of fifths and the side tools: their many 9-10 px labels scale together */
     .left-panel { zoom: 1.2; scroll-margin-top: calc((var(--m-top-h, 130px) + 8px) / 1.2); }
 
-    /* The composition button: bottom right, out of the way while scrolling down */
-    #comp-btn { top: auto; left: auto; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom)); width: 56px; height: 56px; transition: transform .25s, opacity .25s; }
-    #comp-btn svg { width: 22px; height: 22px; }
-    body.m-scrolling-down #comp-btn { transform: translateY(96px); opacity: 0; pointer-events: none; }
+    /* The five views in a bottom bar, at the thumb; the composer lives in the menu */
+    .m-nav { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-sticky); padding-bottom: env(safe-area-inset-bottom); background: rgba(17,20,23,.97); border-top: 1px solid var(--border2); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .m-nav button { position: relative; min-height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); background: none; border: none; cursor: pointer; }
+    .m-nav button.on { color: var(--gold2); }
+    .m-nav button.on::before { content: ''; position: absolute; top: -1px; left: 50%; width: 40px; margin-left: -20px; height: 2px; background: var(--gold); }
+    body.m-compare .m-nav { display: none; }
+
+    /* Diagram views: two cards per row */
+    #all-degrees.m-grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 10px; align-items: start; }
+    #all-degrees.m-grid2 > :not(.degree-section) { grid-column: 1 / -1; }
+    .m-grid2 .degree-header { margin: 14px 0 8px; padding-bottom: 6px; }
+    .m-grid2 .degree-num { font-size: 24px; }
+    .m-grid2 .degree-name-label, .m-grid2 .section-divider { display: none; }
+    .m-grid2 .chords-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .m-grid2 .diag-card { padding: 12px 6px 10px; gap: 8px; }
+    .m-grid2 .diag-chord-name { font-size: 22px; }
+    .m-grid2 .diag-notes { font-size: 13px; }
+    .m-grid2 .diag-card:not(.piano-card) > svg[role="img"], .m-grid2 .diag-card:not(.piano-card) > div > svg[role="img"] { width: 100%; max-width: 170px; }
+    .m-grid2 .snd-bar { gap: 6px; }
+    .m-grid2 .snd-btn { padding: 0 12px; }
+
+    /* Menu: the circle of fifths on top, then the tools */
+    .m-cof-card { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; padding: 4px 0 12px; background: none; border: none; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); cursor: pointer; }
+    .m-cof-card svg { width: 230px !important; height: 230px !important; }   /* beats .cof-svg-el's 100% */
 
     /* Bottom sheets */
     .m-scrim { display: block; position: fixed; inset: 0; z-index: calc(var(--z-overlay) - 1); background: rgba(0,0,0,.6); opacity: 0; pointer-events: none; transition: opacity .2s; }
@@ -2277,13 +2299,15 @@
 <!-- Phone only (≤700px): key + scale + tools bar and degree rail, both sticky -->
 <div id="m-top">
   <div class="m-bar">
+    <button class="m-step" id="m-key-dn" aria-label="Root key down a semitone"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l-6 6 6 6"/></svg></button>
     <button class="m-key" id="m-key" aria-label="Choose the key and the scale">C</button>
+    <button class="m-step" id="m-key-up" aria-label="Root key up a semitone"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4l6 6-6 6"/></svg></button>
     <button class="m-scale" id="m-scale" aria-label="Choose the key and the scale">
       <span class="m-scale-txt"><span class="m-fam" id="m-fam"></span><span class="m-name" id="m-name"></span></span>
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 5l5 5 5-5" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <button class="m-more" id="m-more" aria-label="More tools">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><circle cx="4.5" cy="10" r="1.6"/><circle cx="10" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/></svg>
+    <button class="m-more" id="m-more" aria-label="Harmonic Atlas menu: tools, circle of fifths, history">
+      <img src="icons/icon-192.png" alt="" width="34" height="34">
     </button>
   </div>
   <nav class="m-rail" id="m-rail" aria-label="Jump to a degree" hidden></nav>
@@ -2570,6 +2594,14 @@
   <div class="m-sheet-head"><h2 id="m-moresheet-title">Harmonic <em>Atlas</em><small id="m-version"></small></h2><button class="m-done" data-m-close>Close</button></div>
   <div class="m-sheet-body" id="m-tools"></div>
 </div>
+<!-- Phone only: the five views at the thumb -->
+<nav class="m-nav" id="m-nav" aria-label="Views">
+  <button data-view="list"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h8"/></svg>Chords</button>
+  <button data-view="guitar"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="13" r="4.5"/><circle cx="8" cy="13" r="1.2"/><path d="M11.2 9.8L17 4M15.5 2.5l3 3"/></svg>Guitar</button>
+  <button data-view="mandolin"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><ellipse cx="8" cy="13" rx="4.2" ry="5" transform="rotate(-40 8 13)"/><circle cx="8" cy="13" r="1"/><path d="M11 9.8L17 4"/></svg>Mandolin</button>
+  <button data-view="banjo"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="13" r="5"/><circle cx="8" cy="13" r="3.2"/><path d="M11.6 9.4L17 4"/></svg>Banjo</button>
+  <button data-view="piano"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="1"/><path d="M7 4v7M10 4v7M13 4v7"/></svg>Piano</button>
+</nav>
 <div id="cof-tooltip"></div>
 
 <script>
@@ -2578,8 +2610,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v85';
-window.APP_DEPLOYED = '2026-10-29 14:19';
+window.APP_VERSION = 'v86';
+window.APP_DEPLOYED = '2026-10-29 15:13';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -5521,7 +5553,7 @@ function makeChordDiagram(frets6, pcs6, rootPc, w=140, forceSharpPcs=null) {
         const _pc  = ((pc%12)+12)%12;
         const lbl  = pc !== -1 ? (forceSharpPcs?.has(_pc) ? NOTE_NAMES_SHARP[_pc] : dotName(_pc)) : '';
         g.push(`<circle cx="${x}" cy="${y}" r="${dotR}" fill="${fill}"/>`);
-        if (lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dotR*0.88}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
+        if (lbl) g.push(`<text x="${x}" y="${y}" font-family="IBM Plex Mono,monospace" font-size="${dotR * (matchMedia('(max-width: 700px)').matches ? 1.2 : 0.88)}" font-weight="600" fill="#fff" text-anchor="middle" dominant-baseline="middle">${lbl}</text>`);
       }
     }
   }
@@ -7479,10 +7511,34 @@ function renderGripTab(instr, scaleNotes, scaleData, cfgUI) {
   const DNAMES   = degreeNames(scaleData.intervals);
   const romans   = computeAllRomans(scaleData.intervals, scaleData);
 
-  scaleNotes.forEach((_, di) => {
+  // The chords follow the chord mode, like the other instruments (this tab used to
+  // show a triad and a 7th whatever the mode). Four strings hold four notes, so a
+  // larger chord keeps root, 3rd, 7th and its top extension, as the mandolin does.
+  const isOthers = state.mode === 'others';
+  const n        = Math.min(isOthers ? 3 : (parseInt(state.mode) || 3), scaleLen);
+  const TAG      = { 3: 'Triad', 4: '7th', 5: '9th', 6: '11th', 7: '13th' };
+  let groups;
+  if (['secdom', 'secdim', 'secsub', 'chromed'].includes(state.mode)) {
+    const items =
+      state.mode === 'secdom' ? buildSecondaryDominants(rootPc, scaleData.intervals, romans) :
+      state.mode === 'secdim' ? buildSecondaryDiminished(rootPc, scaleData.intervals, romans, scaleNotes) :
+      state.mode === 'secsub' ? buildSecondarySubdominants(rootPc, scaleData.intervals, romans) :
+                                buildChromaticMediants(rootPc, scaleData.intervals, romans);
+    groups = items.map(it => ({ di: it.degIdx, chords: [{ ...it.chord, tag: it.label }] }));
+  } else {
+    groups = scaleNotes.map((_, di) => ({ di, chords: isOthers
+      ? buildOtherChords(scaleNotes, scaleData.intervals, di)
+      : [(() => {
+          const notes = buildChord(scaleNotes, di, n), iv = chordIntervals(scaleData.intervals, di, n);
+          const { sym, quality } = getChordSymbol(notes[0], iv);
+          return { notes, iv, sym, qual: quality, tag: TAG[n] };
+        })()] }));
+  }
+
+  groups.forEach(({ di, chords }, gi) => {
     const sec = document.createElement('div');
     sec.className = 'degree-section';
-    sec.id = `${instr}-grip-deg-${di}`;
+    sec.id = `${instr}-grip-${gi}-deg-${di}`;
 
     const hdr = document.createElement('div');
     hdr.className = 'degree-header';
@@ -7492,17 +7548,16 @@ function renderGripTab(instr, scaleNotes, scaleData, cfgUI) {
     const grid = document.createElement('div');
     grid.className = 'chords-grid';
 
-    [3, 4].forEach(n => {
-      const notes    = buildChord(scaleNotes, di, n);
-      const iv       = chordIntervals(scaleData.intervals, di, n);
-      const { sym, quality } = getChordSymbol(notes[0], iv);
+    chords.forEach(ch => {
+      const { notes, iv, sym } = ch, quality = ch.qual;
       const chRootPc = noteNameToPc(notes[0]);
-      const grips    = getGrips(instr, chRootPc, iv, { allowOpen: !!cfgUI.allowOpen, limit: 4 });
+      const gripIv   = iv.length > 4 ? [0, 1, 3, iv.length - 1].map(i => iv[i]) : iv;
+      const grips    = getGrips(instr, chRootPc, gripIv, { allowOpen: !!cfgUI.allowOpen, limit: 4 });
 
       const card = document.createElement('div');
       card.className = 'diag-card';
       card.innerHTML = `
-        <div style="font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">${n === 3 ? 'Triad' : '7th'}</div>
+        ${ch.tag ? `<div style="font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">${ch.tag}</div>` : ''}
         <div class="diag-chord-name">${notes[0]}<sup>${sym}</sup></div>
         <div class="diag-quality">${quality}</div>`;
 
@@ -7564,7 +7619,7 @@ function renderGripTab(instr, scaleNotes, scaleData, cfgUI) {
     });
 
     sec.appendChild(grid);
-    if (di < scaleLen - 1) { const dv = document.createElement('div'); dv.className = 'section-divider'; sec.appendChild(dv); }
+    if (gi < groups.length - 1) { const dv = document.createElement('div'); dv.className = 'section-divider'; sec.appendChild(dv); }
     container.appendChild(sec);
   });
 }
@@ -11642,14 +11697,13 @@ const M_KEYS = ['C','D♭','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 const M_TOOLS = [
   ['comp-btn',     'Composer',                 'Build a progression, improvise over it'],
   ['tuner-btn',    'Tuner',                    'Guitar, mandolin, banjo, chromatic'],
-  ['m-cof',        'Circle of fifths & tools', 'Relationships, cadences, substitutions, pivots, ear training'],
   ['m-compare',    'Compare scales',           'Two scales side by side'],
   ['lick-lib-btn', 'Jazz resources',           'Licks, lessons and references'],
   ['guide-btn',    'User guide',               'Every tab explained'],
   ['tech-btn',     'Technical details',        'Engine, audio, sources'],
 ];
-const M_COF_ICON = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="3.5"/><path d="M9 1.5v4M9 12.5v4M1.5 9h4M12.5 9h4"/></svg>';
-let _mScaleNotes = [], _mOpenSheet = null, _mReturnFocus = null, _mRailRaf = 0, _mLastY = 0;
+const M_GRID2_VIEWS = new Set(['diagrams', 'shell', 'drop2', 'drop3', 'mandolin', 'mandolin-chop', 'banjo', 'banjo-moveable']);
+let _mScaleNotes = [], _mOpenSheet = null, _mReturnFocus = null, _mRailRaf = 0;
 
 function syncPhoneBar(scaleNotes, scaleData) {
   _mScaleNotes = scaleNotes;
@@ -11657,6 +11711,12 @@ function syncPhoneBar(scaleNotes, scaleData) {
   document.getElementById('m-fam').textContent = scaleData.family;
   document.getElementById('m-name').textContent = state.scale;
   document.getElementById('scale-hero').classList.remove('m-about-open');
+  document.querySelectorAll('#m-nav button').forEach(b => {
+    const on = document.querySelector(`.view-tab[data-view="${b.dataset.view}"]`).classList.contains('active');
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-current', on ? 'page' : 'false');
+  });
+  document.getElementById('all-degrees').classList.toggle('m-grid2', M_GRID2_VIEWS.has(state.view));
   buildDegreeRail();
 }
 
@@ -11760,8 +11820,12 @@ function renderToolsSheet() {
   const iconOf = id => document.getElementById(id)?.querySelector('svg')?.outerHTML || '';
   const cmpBtn = document.getElementById('compare-toggle-btn');
   const comparing = cmpBtn.classList.contains('active');
-  let html = M_TOOLS.map(([id, title, sub]) => {
-    const icon = id === 'm-cof' ? M_COF_ICON : id === 'm-compare' ? iconOf('compare-toggle-btn') : iconOf(id);
+  const cof = document.getElementById('cof-svg').cloneNode(true);
+  cof.removeAttribute('id');
+  cof.setAttribute('aria-hidden', 'true');
+  let html = `<button class="m-cof-card" data-tool="m-cof">${cof.outerHTML}<span>Circle of fifths, relationships, cadences, pivots, ear training ›</span></button>`;
+  html += M_TOOLS.map(([id, title, sub]) => {
+    const icon = id === 'm-compare' ? iconOf('compare-toggle-btn') : iconOf(id);
     const t = id === 'm-compare' && comparing ? 'Stop comparing' : title;
     return `<button class="m-tool" data-tool="${id}"><span class="mi">${icon}</span><span class="mt"><b>${t}</b><span>${sub}</span></span></button>`;
   }).join('');
@@ -11782,6 +11846,15 @@ document.getElementById('m-version').textContent = window.APP_VERSION;
   const row = document.querySelector('#m-scales .m-row.on');
   if (row) body.scrollTop = row.offsetTop - body.offsetTop - (body.clientHeight - row.offsetHeight) / 2;
 }));
+document.getElementById('m-key-dn').addEventListener('click', () => document.getElementById('transpose-dn').click());
+document.getElementById('m-key-up').addEventListener('click', () => document.getElementById('transpose-up').click());
+document.getElementById('m-nav').addEventListener('click', e => {
+  const b = e.target.closest('button[data-view]');
+  if (!b) return;
+  document.querySelector(`.view-tab[data-view="${b.dataset.view}"]`).click();
+  const panel = document.querySelector('.right-panel');
+  if (panel.getBoundingClientRect().top < document.getElementById('m-top').offsetHeight) panel.scrollIntoView({ block: 'start' });
+});
 document.getElementById('m-more').addEventListener('click', () => { renderToolsSheet(); openPhoneSheet('m-moresheet'); });
 document.getElementById('m-scrim').addEventListener('click', closePhoneSheet);
 document.querySelectorAll('[data-m-close]').forEach(b => b.addEventListener('click', closePhoneSheet));
@@ -11838,20 +11911,13 @@ document.getElementById('scale-hero').addEventListener('click', e => {
   b.textContent = open ? 'Less ‹' : 'About ›';
 });
 
-// The composition button slides away while scrolling down and comes back on the way up.
 window.addEventListener('scroll', () => {
-  if (!PHONE_MQ.matches) return;
-  const y = window.scrollY;
-  if (Math.abs(y - _mLastY) > 8) {
-    document.body.classList.toggle('m-scrolling-down', y > _mLastY && y > 200);
-    _mLastY = y;
-  }
-  if (!_mRailRaf) _mRailRaf = requestAnimationFrame(updateRailActive);
+  if (PHONE_MQ.matches && !_mRailRaf) _mRailRaf = requestAnimationFrame(updateRailActive);
 }, { passive: true });
 PHONE_MQ.addEventListener('change', () => {
   closePhoneSheet();
-  document.body.classList.remove('m-scrolling-down');
   setPhoneTopHeight();
+  render();   // diagram letters are sized for the phone at draw time
 });
 
 render();

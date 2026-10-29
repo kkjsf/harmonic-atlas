@@ -236,13 +236,12 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 
 ## On a phone
 
-Below 700 px the page reorganises around the thumb:
-- A sticky bar at the top holds the key and the scale. Tap either to open the **Key & scale** sheet: the 12 keys, a filter, and every scale with its notes in the current key.
+Below 700 px the page is laid out for the thumb:
+- **Top bar** (sticky): ‹ key › to step the key a semitone, the scale (tap it, or the key, for the **Key & scale** sheet: the 12 keys, a filter, every scale with its notes in the current key), and the app icon, which opens the menu.
 - Under it, a **degree rail** (I, ii, iii... with each chord) jumps to that degree and lights up the one on screen.
-- The chord modes are one row of chips; the instrument tabs and their sub-tabs are single rows that scroll sideways.
-- The **⋯** button opens **More**: composer, tuner, circle of fifths & tools, compare scales, jazz resources, guide, technical details, and the history.
-- The composition button sits bottom right and slides away while you scroll down.
-- Nothing on the main screen is smaller than 12 px, and buttons are at least 40 px.
+- **Bottom bar**: Chords, Guitar, Mandolin, Banjo, Piano. The sub-tabs of each instrument are one row that scrolls sideways; chord diagrams show two per row.
+- **Menu** (app icon): the circle of fifths on top (it leads to the full circle and its tools), then composer, tuner, compare scales, jazz resources, guide, technical details, and the history.
+- The chord modes are one row of chips. Nothing on the main screen is smaller than 12 px, and buttons are at least 40 px.
 
 ---
 
