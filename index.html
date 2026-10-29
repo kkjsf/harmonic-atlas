@@ -2079,6 +2079,165 @@
     #tuner-btn { right: 16px; }
   }
   @media (max-width: 480px) { #tuner-btn { right: 12px; } }
+
+  /* Sub-tab rows scroll sideways instead of widening the page: the seven guitar
+     sub-tabs made the page 429 px wide on a 375 px phone. */
+  .guitar-sub-tabs { overflow-x: auto; scrollbar-width: none; border-bottom: none; box-shadow: inset 0 -1px 0 var(--border); }
+  .guitar-sub-tabs::-webkit-scrollbar { display: none; }
+  /* The scroll box clips at its padding edge, so the underline sits inside it
+     (a -1px margin over the row's border would lose a pixel of the gold). */
+  .guitar-sub-tab { flex: none; white-space: nowrap; margin-bottom: 0; }
+
+  /* ══ Phone layout (≤700px, v85) ══
+     The key and the scale move to a sticky bar that opens a bottom sheet, the round
+     tool buttons go into a "More" sheet, a rail jumps to each degree, and nothing
+     on the main screen is smaller than 12 px or narrower than a 40 px target. */
+  #m-top, .m-sheet, .m-scrim, .m-about { display: none; }
+  @media (max-width: 700px) {
+    .wrap { padding: 0 14px 104px; }
+    #page-top, #guide-btn, #tech-btn, #lick-lib-btn, #tuner-btn, #back-top, #history-strip,
+    .ctrl-scale-key-row, .ctrl-group-wide > .ctrl-label, .views-hdr { display: none !important; }
+    .compare-bar { display: none; }
+    body.m-compare .compare-bar { display: flex; }
+    .degree-section, .left-panel, .compare-bar { scroll-margin-top: calc(var(--m-top-h, 130px) + 8px); }
+    /* Stretch, not start: a fit-content panel took the width of the tab row and widened the page. */
+    .main-layout { align-items: stretch; }
+
+    #m-top { display: block; position: sticky; top: 0; z-index: var(--z-sticky); background: rgba(11,13,15,.95); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+    .m-bar { display: flex; align-items: center; gap: 8px; padding: 8px 14px; }
+    .m-bar button { font-family: 'IBM Plex Mono', monospace; color: var(--text); background: var(--surface2); border: 1px solid var(--border2); border-radius: 3px; cursor: pointer; }
+    .m-bar .m-key { flex: none; min-width: 52px; height: 48px; padding: 0 8px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 24px; color: var(--cream); }
+    .m-scale { flex: 1; min-width: 0; height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 12px; text-align: left; }
+    .m-scale-txt { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .m-fam { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-name { font-size: 15px; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-scale svg { flex: none; }
+    .m-bar .m-more { flex: none; width: 48px; height: 48px; display: grid; place-items: center; color: var(--muted); }
+    .m-rail { display: flex; gap: 4px; padding: 0 10px 8px; overflow-x: auto; scrollbar-width: none; }
+    .m-rail::-webkit-scrollbar { display: none; }
+    .m-rail[hidden] { display: none; }
+    .m-rl { flex: 1 0 44px; min-width: 44px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0 3px; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; color: var(--text); font-family: 'IBM Plex Mono', monospace; cursor: pointer; }
+    .m-rl b { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 17px; line-height: 1; color: var(--cream); white-space: nowrap; }
+    .m-rl span { max-width: 100%; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-rl.on { border-color: var(--gold); background: rgba(201,168,76,.12); }
+    .m-rl.on b, .m-rl.on span { color: var(--gold2); }
+
+    /* Chord modes: one row of chips that scrolls sideways */
+    .controls { display: block; padding: 0; margin: 0 -14px 14px; background: none; border: none; }
+    .controls::before { display: none; }
+    .mode-groups { flex-direction: row; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding: 12px 14px 2px; scrollbar-width: none; }
+    .mode-groups::-webkit-scrollbar { display: none; }
+    .mode-group, .mode-groups .chord-types, .mode-group-chromatic .chord-types { display: contents; }
+    .mode-group-label { display: none !important; }
+    .controls .ct-btn { flex: none; min-height: 40px; padding: 0 14px; font-size: 14px; letter-spacing: .02em; white-space: nowrap; }
+    .controls .ct-btn svg { width: 14px; height: 14px; }
+    .mode-group-chromatic .ct-btn:first-child { margin-left: 10px; }
+    .compare-bar { margin: 0 0 14px; }
+
+    /* Scale card: the name sits in the bar, the notes get the room */
+    .scale-hero { padding: 14px; margin-bottom: 14px; }
+    .scale-hero-family, .scale-hero-top, .scale-hero-identity, .scale-hero-desc-inline { display: none; }
+    .scale-hero.m-about-open .scale-hero-desc-inline { display: block; font-size: 15px; line-height: 1.55; margin: 0 0 12px; }
+    .scale-hero-formula { font-size: 13px; letter-spacing: .1em; margin-bottom: 10px; }
+    .hero-notes-lbl { font-size: 12px !important; }
+    #intervals-toggle { min-height: 36px; padding: 0 12px; font-size: 13px; }
+    .m-about { display: inline-flex; align-items: center; margin-left: auto; min-height: 36px; padding: 0 4px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent2); background: none; border: none; cursor: pointer; }
+    .scale-hero-body { align-items: stretch; }
+    .scale-hero-left { min-width: 0; }
+    .scale-hero-notes:not(.show-intervals) { flex-wrap: nowrap; gap: 5px; }
+    .scale-hero-notes:not(.show-intervals) .hero-note-item { flex: 1 1 0; min-width: 0; }
+    .scale-hero-notes:not(.show-intervals) .hero-note-pill { width: 100%; padding: 9px 0; text-align: center; font-size: 19px; }
+    .hero-note-degree { font-size: 15px; }
+    .hero-interval-label { font-size: 12px; }
+
+    /* View tabs and sub-tabs: one row each, thumb-sized */
+    .view-tabs { flex-wrap: nowrap; gap: 2px; overflow-x: auto; margin: 0 -14px 14px; padding: 0 8px; scrollbar-width: none; border-bottom: none; box-shadow: inset 0 -1px 0 var(--border); }
+    .view-tabs::-webkit-scrollbar { display: none; }
+    .view-tab { flex: none; min-height: 46px; margin-bottom: 0; padding: 0 12px; gap: 7px; font-size: 14px; letter-spacing: .02em; text-transform: none; white-space: nowrap; }
+    .view-tab svg { width: 16px; height: 16px; }
+    .guitar-sub-tabs { margin: -14px -14px 14px; padding: 0 8px; }
+    .guitar-sub-tab { min-height: 42px; padding: 0 12px; font-size: 14px; letter-spacing: .02em; text-transform: none; }
+
+    /* Chord list cards */
+    .degree-header { margin: 22px 0 10px; padding-bottom: 8px; }
+    .degree-num { min-width: 0; font-size: 30px; }
+    .degree-name-label { font-size: 12px; }
+    .chord-card { padding: 16px; }
+    .chord-root { font-size: 32px; margin-bottom: 4px; padding-right: 148px; }
+    .chord-root sup { font-size: 16px; }
+    .chord-card .chord-label, .chord-card.chrom-card .chord-label, .chord-card.secdom-card .chord-label, .chord-card.subsub-card .chord-label { font-size: 12px; padding-right: 148px; }
+    .chord-quality { font-size: 13px; letter-spacing: .06em; margin-bottom: 12px; }
+    .chord-notes-row { gap: 8px; margin-bottom: 10px; }
+    .cn { min-width: 44px; padding: 9px 10px; font-size: 16px; text-align: center; }
+    .chord-intervals, .trit-detail { font-size: 13px; letter-spacing: .04em; }
+    .chord-impro { gap: 8px; margin-top: 12px; padding-top: 12px; }
+    .impro-label { font-size: 12px; }
+    .impro-pill { padding: 7px 10px; font-size: 13px; }
+    .chord-play-btn, .chord-arp-btn, .chord-add-btn { top: 12px; width: 40px; height: 40px; }
+    .chord-play-btn { right: 12px; }
+    .chord-arp-btn { right: 58px; }
+    .chord-add-btn { right: 104px; }
+    .chord-play-btn svg, .chord-arp-btn svg, .chord-add-btn svg { width: 16px; height: 16px; }
+    /* Two compare columns are too narrow for the room kept for those buttons. */
+    .compare-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .compare-cols .chord-root, .compare-cols .chord-card .chord-label { padding-right: 40px; }
+    .compare-cols .chord-arp-btn, .compare-cols .chord-add-btn { display: none; }
+    .compare-cols .cn { min-width: 0; padding: 5px 7px; font-size: 13px; }
+    .compare-cols .chord-impro .impro-pill { padding: 5px 7px; }
+
+    /* Diagram cards: bigger diagrams (the dot letters were 6.5 px) and real buttons */
+    .diag-card { padding: 16px 12px 14px; gap: 10px; }
+    .diag-chord-name { font-size: 26px; }
+    .diag-chord-name sup { font-size: 14px; }
+    .diag-quality { font-size: 12px; letter-spacing: .08em; }
+    .diag-notes { font-size: 14px; }
+    .diag-card:not(.piano-card) > svg[role="img"], .diag-card:not(.piano-card) > div > svg[role="img"] { width: 200px; max-width: 100%; height: auto; }
+    .snd-bar { gap: 8px; margin-top: 4px; }
+    .snd-btn { min-height: 40px; padding: 0 18px; border-radius: 20px; font-size: 13px; letter-spacing: .04em; text-transform: none; }
+
+    /* Circle of fifths and the side tools: their many 9-10 px labels scale together */
+    .left-panel { zoom: 1.2; scroll-margin-top: calc((var(--m-top-h, 130px) + 8px) / 1.2); }
+
+    /* The composition button: bottom right, out of the way while scrolling down */
+    #comp-btn { top: auto; left: auto; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom)); width: 56px; height: 56px; transition: transform .25s, opacity .25s; }
+    #comp-btn svg { width: 22px; height: 22px; }
+    body.m-scrolling-down #comp-btn { transform: translateY(96px); opacity: 0; pointer-events: none; }
+
+    /* Bottom sheets */
+    .m-scrim { display: block; position: fixed; inset: 0; z-index: calc(var(--z-overlay) - 1); background: rgba(0,0,0,.6); opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .m-scrim.open { opacity: 1; pointer-events: auto; }
+    .m-sheet { display: flex; flex-direction: column; position: fixed; left: 0; right: 0; bottom: 0; max-height: calc(100% - 48px); z-index: var(--z-overlay); padding-bottom: env(safe-area-inset-bottom); background: var(--surface); border-top: 1px solid var(--border2); border-radius: 16px 16px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.5); transform: translateY(105%); visibility: hidden; transition: transform .25s cubic-bezier(.3,.7,.3,1), visibility 0s linear .25s; }
+    .m-sheet.open { transform: none; visibility: visible; transition: transform .25s cubic-bezier(.3,.7,.3,1), visibility 0s; }
+    body.m-sheet-open { overflow: hidden; }
+    .m-grab { flex: none; width: 40px; height: 4px; margin: 10px auto 2px; border-radius: 2px; background: var(--border2); }
+    .m-sheet-head { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 10px; }
+    .m-sheet-head h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 22px; color: var(--cream); }
+    .m-sheet-head h2 em { color: var(--gold); }
+    .m-sheet-head small { margin-left: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); }
+    .m-done { min-height: 44px; padding: 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--gold2); background: none; border: none; cursor: pointer; }
+    .m-sheet-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 20px; }
+    .m-label { margin: 8px 0; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+    .m-keys { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 14px; }
+    .m-keys button { height: 48px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 19px; color: var(--cream); background: var(--surface2); border: 1px solid var(--border2); border-radius: 3px; cursor: pointer; }
+    .m-keys button.on { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.12); }
+    #m-filter { width: 100%; height: 48px; margin-bottom: 4px; padding: 0 14px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: var(--text); background: var(--bg); border: 1px solid var(--border2); border-radius: 3px; outline: none; }
+    #m-filter:focus { border-color: var(--gold); }
+    .m-grp { padding: 14px 0 4px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+    .m-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 52px; padding: 6px 0; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; cursor: pointer; }
+    .m-row .nm { min-width: 0; font-size: 15px; color: var(--cream); }
+    .m-row .pv { flex: none; max-width: 48%; font-size: 12px; color: var(--muted); text-align: right; }
+    .m-row.on .nm { color: var(--gold2); }
+    .m-row.on .pv { color: var(--gold); }
+    .m-empty { padding: 16px 0; font-size: 14px; color: var(--muted); }
+    .m-tool { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 60px; padding: 8px 0; text-align: left; background: none; border: none; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; cursor: pointer; }
+    .m-tool .mi { flex: none; width: 42px; height: 42px; display: grid; place-items: center; color: var(--gold); background: var(--surface2); border: 1px solid var(--border2); border-radius: 3px; }
+    .m-tool .mt { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .m-tool b { font-size: 15px; font-weight: 500; color: var(--cream); }
+    .m-tool .mt span { font-size: 12px; color: var(--muted); }
+    .m-hist-lbl { margin-top: 18px; }
+    .m-hist { display: flex; flex-wrap: wrap; gap: 8px; }
+    .m-hist button { min-height: 40px; padding: 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text); background: var(--surface2); border: 1px solid var(--border2); border-radius: 3px; cursor: pointer; }
+  }
 </style>
 </head>
 <body>
@@ -2115,6 +2274,20 @@
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M8.5 2.5v7.2a3.5 3.5 0 0 0 7 0V2.5"/><path d="M12 13.2v8.3"/></svg>
 </button>
 <div class="grain"></div>
+<!-- Phone only (≤700px): key + scale + tools bar and degree rail, both sticky -->
+<div id="m-top">
+  <div class="m-bar">
+    <button class="m-key" id="m-key" aria-label="Choose the key and the scale">C</button>
+    <button class="m-scale" id="m-scale" aria-label="Choose the key and the scale">
+      <span class="m-scale-txt"><span class="m-fam" id="m-fam"></span><span class="m-name" id="m-name"></span></span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 5l5 5 5-5" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="m-more" id="m-more" aria-label="More tools">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><circle cx="4.5" cy="10" r="1.6"/><circle cx="10" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/></svg>
+    </button>
+  </div>
+  <nav class="m-rail" id="m-rail" aria-label="Jump to a degree" hidden></nav>
+</div>
 <main class="wrap">
   <header id="page-top">
     <div class="logo-eyebrow">Music Theory Reference</div>
@@ -2324,7 +2497,7 @@
 </div><!-- end left-panel -->
 
 <div class="right-panel">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+  <div class="views-hdr" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
     <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Scale &amp; Chord Views</span>
     <span class="has-tip" style="display:inline-flex;align-items:center">
       <span class="tip-badge" tabindex="0">?</span>
@@ -2378,6 +2551,25 @@
 </main><!-- end wrap -->
 
 <button id="back-top" title="Back to top" aria-label="Back to top">↑</button>
+
+<!-- Phone only: bottom sheets opened from the sticky bar -->
+<div class="m-scrim" id="m-scrim"></div>
+<div class="m-sheet" id="m-keysheet" role="dialog" aria-modal="true" aria-labelledby="m-keysheet-title">
+  <div class="m-grab"></div>
+  <div class="m-sheet-head"><h2 id="m-keysheet-title">Key &amp; scale</h2><button class="m-done" data-m-close>Done</button></div>
+  <div class="m-sheet-body">
+    <div class="m-label">Key</div>
+    <div class="m-keys" id="m-keys"></div>
+    <div class="m-label">Scale</div>
+    <input id="m-filter" type="search" placeholder="Filter scales…" autocomplete="off" aria-label="Filter scales by name">
+    <div id="m-scales"></div>
+  </div>
+</div>
+<div class="m-sheet" id="m-moresheet" role="dialog" aria-modal="true" aria-labelledby="m-moresheet-title">
+  <div class="m-grab"></div>
+  <div class="m-sheet-head"><h2 id="m-moresheet-title">Harmonic <em>Atlas</em><small id="m-version"></small></h2><button class="m-done" data-m-close>Close</button></div>
+  <div class="m-sheet-body" id="m-tools"></div>
+</div>
 <div id="cof-tooltip"></div>
 
 <script>
@@ -2386,8 +2578,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v84';
-window.APP_DEPLOYED = '2026-10-29 11:19';
+window.APP_VERSION = 'v85';
+window.APP_DEPLOYED = '2026-10-29 14:19';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -3654,13 +3846,14 @@ function renderScaleInfo(scaleNotes, scaleData){
         <div class="scale-hero-formula" title="Step pattern: H=half step, W=whole step, A2=augmented 2nd, m3=minor 3rd, M3=major 3rd">${scaleFormula(scaleData.intervals)}</div>
         ${descHtml ? `<div class="scale-hero-desc scale-hero-desc-inline">${scaleData.desc}</div>` : ''}
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Notes</span>
+          <span class="hero-notes-lbl" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Notes</span>
           <button id="intervals-toggle" title="Show/hide interval steps between notes">
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
               <path d="M1 9 Q3 2 5.5 9 Q8 2 10 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/>
             </svg>
             Steps
           </button>
+          ${descHtml ? `<button class="m-about" type="button" aria-expanded="false">About ›</button>` : ''}
         </div>
         <div class="scale-hero-notes" id="note-pills">
           ${(()=>{
@@ -4936,6 +5129,7 @@ function renderViewCore(scaleNotes,scaleData){
   else if(state.view==='piano')          renderPiano(scaleNotes,scaleData);
   else if(state.view==='piano-two')      renderPianoTwo(scaleNotes,scaleData);
   attachSoundBars(document.getElementById('all-degrees'));
+  syncPhoneBar(scaleNotes, scaleData);
 }
 
 // ══════════════════════════════════════════════
@@ -11440,6 +11634,225 @@ function render() {
   historyPush(state.key, state.scale);
 }
 function syncUrl() { history.replaceState(null, '', encodeHash(state)); }
+
+// ── Phone layout (≤700px): sticky key/scale bar, degree rail, bottom sheets ──
+// The elements exist on desktop too but stay hidden there (CSS).
+const PHONE_MQ = matchMedia('(max-width: 700px)');
+const M_KEYS = ['C','D♭','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
+const M_TOOLS = [
+  ['comp-btn',     'Composer',                 'Build a progression, improvise over it'],
+  ['tuner-btn',    'Tuner',                    'Guitar, mandolin, banjo, chromatic'],
+  ['m-cof',        'Circle of fifths & tools', 'Relationships, cadences, substitutions, pivots, ear training'],
+  ['m-compare',    'Compare scales',           'Two scales side by side'],
+  ['lick-lib-btn', 'Jazz resources',           'Licks, lessons and references'],
+  ['guide-btn',    'User guide',               'Every tab explained'],
+  ['tech-btn',     'Technical details',        'Engine, audio, sources'],
+];
+const M_COF_ICON = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="3.5"/><path d="M9 1.5v4M9 12.5v4M1.5 9h4M12.5 9h4"/></svg>';
+let _mScaleNotes = [], _mOpenSheet = null, _mReturnFocus = null, _mRailRaf = 0, _mLastY = 0;
+
+function syncPhoneBar(scaleNotes, scaleData) {
+  _mScaleNotes = scaleNotes;
+  document.getElementById('m-key').textContent = scaleNotes[0];
+  document.getElementById('m-fam').textContent = scaleData.family;
+  document.getElementById('m-name').textContent = state.scale;
+  document.getElementById('scale-hero').classList.remove('m-about-open');
+  buildDegreeRail();
+}
+
+// One button per degree section of the current view, labelled with its numeral
+// and its first chord (or the scale note when the view shows no chord name).
+function buildDegreeRail() {
+  const rail = document.getElementById('m-rail');
+  const all = document.getElementById('all-degrees');
+  const secs = all.style.display === 'none' ? []
+    : [...all.querySelectorAll('.degree-section')].filter(s => s.querySelector('.degree-num'));
+  rail.hidden = secs.length < 2;
+  rail.innerHTML = '';
+  secs.forEach((sec, i) => {
+    if (!sec.id) sec.id = 'm-sec-' + i;
+    const chord = sec.querySelector('.chord-root, .diag-chord-name');
+    const deg = sec.id.match(/(\d+)$/);
+    const b = document.createElement('button');
+    b.className = 'm-rl';
+    b.dataset.target = sec.id;
+    b.innerHTML = '<b></b><span></span>';
+    b.firstChild.textContent = sec.querySelector('.degree-num').textContent.trim();
+    b.lastChild.textContent = chord ? chord.textContent.trim() : (deg && _mScaleNotes[+deg[1]]) || '';
+    rail.appendChild(b);
+  });
+  setPhoneTopHeight();
+  updateRailActive();
+}
+
+function setPhoneTopHeight() {
+  document.documentElement.style.setProperty('--m-top-h', document.getElementById('m-top').offsetHeight + 'px');
+}
+
+// The rail lights the degree whose section has reached the bar.
+function updateRailActive() {
+  _mRailRaf = 0;
+  const rail = document.getElementById('m-rail');
+  if (rail.hidden || !PHONE_MQ.matches) return;
+  const limit = document.getElementById('m-top').offsetHeight + 24;
+  let active = null;
+  rail.querySelectorAll('.m-rl').forEach(b => {
+    const sec = document.getElementById(b.dataset.target);
+    if (sec && sec.getBoundingClientRect().top <= limit) active = b;
+  });
+  rail.querySelectorAll('.m-rl').forEach(b => b.classList.toggle('on', b === active));
+  if (active && rail.scrollWidth > rail.clientWidth)
+    rail.scrollLeft = active.offsetLeft - (rail.clientWidth - active.offsetWidth) / 2;
+}
+
+function openPhoneSheet(id) {
+  closePhoneSheet();
+  _mReturnFocus = document.activeElement;
+  _mOpenSheet = document.getElementById(id);
+  _mOpenSheet.classList.add('open');
+  document.getElementById('m-scrim').classList.add('open');
+  document.body.classList.add('m-sheet-open');
+  _mOpenSheet.querySelector('[data-m-close]').focus({ preventScroll: true });
+}
+function closePhoneSheet() {
+  if (!_mOpenSheet) return;
+  _mOpenSheet.classList.remove('open');
+  document.getElementById('m-scrim').classList.remove('open');
+  document.body.classList.remove('m-sheet-open');
+  _mOpenSheet = null;
+  _mReturnFocus?.focus?.({ preventScroll: true });
+}
+
+function goToKeyAndScale(key, scale) {
+  state.key = key;
+  state.scale = scale;
+  document.getElementById('sel-key').value = key;
+  document.getElementById('sel-scale').value = scale;
+  render();
+}
+
+function renderKeySheet() {
+  const pc = parseInt(state.key);
+  document.getElementById('m-keys').innerHTML = M_KEYS.map((k, i) =>
+    `<button data-pc="${i}" class="${i === pc ? 'on' : ''}" aria-pressed="${i === pc}">${k}</button>`).join('');
+  renderScaleList();
+}
+
+// Each scale with its notes in the current key, so the choice is not a guess.
+function renderScaleList() {
+  const q = document.getElementById('m-filter').value.trim().toLowerCase();
+  const pc = parseInt(state.key);
+  const out = [];
+  SCALE_FAMILIES.forEach(fam => {
+    const rows = Object.entries(SCALES).filter(([name, v]) => v.family === fam
+      && (!q || name.toLowerCase().includes(q) || fam.toLowerCase().includes(q)));
+    if (!rows.length) return;
+    out.push(`<div class="m-grp">${fam}</div>`);
+    rows.forEach(([name, v]) => {
+      const on = name === state.scale;
+      out.push(`<button class="m-row${on ? ' on' : ''}" data-scale="${name.replace(/"/g, '&quot;')}" aria-pressed="${on}"><span class="nm">${name}</span><span class="pv">${spellScale(pc, v.intervals, v).join(' ')}</span></button>`);
+    });
+  });
+  document.getElementById('m-scales').innerHTML = out.join('') || '<p class="m-empty">No scale matches.</p>';
+}
+
+function renderToolsSheet() {
+  const iconOf = id => document.getElementById(id)?.querySelector('svg')?.outerHTML || '';
+  const cmpBtn = document.getElementById('compare-toggle-btn');
+  const comparing = cmpBtn.classList.contains('active');
+  let html = M_TOOLS.map(([id, title, sub]) => {
+    const icon = id === 'm-cof' ? M_COF_ICON : id === 'm-compare' ? iconOf('compare-toggle-btn') : iconOf(id);
+    const t = id === 'm-compare' && comparing ? 'Stop comparing' : title;
+    return `<button class="m-tool" data-tool="${id}"><span class="mi">${icon}</span><span class="mt"><b>${t}</b><span>${sub}</span></span></button>`;
+  }).join('');
+  if (_history.length > 1) {
+    html += '<div class="m-label m-hist-lbl">History</div><div class="m-hist">'
+      + _history.slice(1).map((h, i) => `<button data-hist="${i + 1}">${KEY_SHORT[h.key]} ${h.scale}</button>`).join('')
+      + '</div>';
+  }
+  document.getElementById('m-tools').innerHTML = html;
+}
+
+document.getElementById('m-version').textContent = window.APP_VERSION;
+['m-key', 'm-scale'].forEach(id => document.getElementById(id).addEventListener('click', () => {
+  document.getElementById('m-filter').value = '';
+  renderKeySheet();
+  openPhoneSheet('m-keysheet');
+  const body = document.querySelector('#m-keysheet .m-sheet-body');
+  const row = document.querySelector('#m-scales .m-row.on');
+  if (row) body.scrollTop = row.offsetTop - body.offsetTop - (body.clientHeight - row.offsetHeight) / 2;
+}));
+document.getElementById('m-more').addEventListener('click', () => { renderToolsSheet(); openPhoneSheet('m-moresheet'); });
+document.getElementById('m-scrim').addEventListener('click', closePhoneSheet);
+document.querySelectorAll('[data-m-close]').forEach(b => b.addEventListener('click', closePhoneSheet));
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && _mOpenSheet) closePhoneSheet(); });
+
+document.getElementById('m-keys').addEventListener('click', e => {
+  const b = e.target.closest('button[data-pc]');
+  if (!b) return;
+  goToKeyAndScale(b.dataset.pc, state.scale);
+  renderKeySheet();
+});
+document.getElementById('m-scales').addEventListener('click', e => {
+  const b = e.target.closest('button[data-scale]');
+  if (!b) return;
+  closePhoneSheet();
+  goToKeyAndScale(state.key, b.dataset.scale);
+});
+document.getElementById('m-filter').addEventListener('input', renderScaleList);
+
+document.getElementById('m-tools').addEventListener('click', e => {
+  const hist = e.target.closest('[data-hist]');
+  const tool = e.target.closest('[data-tool]');
+  if (!hist && !tool) return;
+  closePhoneSheet();
+  if (hist) {
+    const h = _history[+hist.dataset.hist];
+    goToKeyAndScale(h.key, h.scale);
+  } else if (tool.dataset.tool === 'm-cof') {
+    document.querySelector('.left-panel').scrollIntoView({ block: 'start' });
+  } else if (tool.dataset.tool === 'm-compare') {
+    document.getElementById('compare-toggle-btn').click();
+    if (document.body.classList.contains('m-compare'))
+      document.getElementById('compare-bar').scrollIntoView({ block: 'start' });
+  } else {
+    document.getElementById(tool.dataset.tool).click();
+  }
+});
+// The compare bar only shows on a phone while a comparison is on.
+document.getElementById('compare-toggle-btn').addEventListener('click', () => {
+  document.body.classList.toggle('m-compare', document.getElementById('compare-toggle-btn').classList.contains('active'));
+  buildDegreeRail();
+});
+
+document.getElementById('m-rail').addEventListener('click', e => {
+  const b = e.target.closest('.m-rl');
+  const sec = b && document.getElementById(b.dataset.target);
+  if (sec) sec.scrollIntoView({ block: 'start' });
+});
+document.getElementById('scale-hero').addEventListener('click', e => {
+  const b = e.target.closest('.m-about');
+  if (!b) return;
+  const open = document.getElementById('scale-hero').classList.toggle('m-about-open');
+  b.setAttribute('aria-expanded', open);
+  b.textContent = open ? 'Less ‹' : 'About ›';
+});
+
+// The composition button slides away while scrolling down and comes back on the way up.
+window.addEventListener('scroll', () => {
+  if (!PHONE_MQ.matches) return;
+  const y = window.scrollY;
+  if (Math.abs(y - _mLastY) > 8) {
+    document.body.classList.toggle('m-scrolling-down', y > _mLastY && y > 200);
+    _mLastY = y;
+  }
+  if (!_mRailRaf) _mRailRaf = requestAnimationFrame(updateRailActive);
+}, { passive: true });
+PHONE_MQ.addEventListener('change', () => {
+  closePhoneSheet();
+  document.body.classList.remove('m-scrolling-down');
+  setPhoneTopHeight();
+});
 
 render();
 initCollapsibles();
