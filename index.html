@@ -2364,17 +2364,98 @@
   .tz-chip.playing { background: rgba(201,168,76,.22); }
   .tz-pop { font-size: 9.5px; color: var(--muted); }
   .tz-pbtns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tz-side { display: contents; }
+  .tz-fullbtn { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; }
+  .tz-fullbtn svg { flex: none; }
+
+  /* Desktop full screen (v89): the same view, rendered into a fixed overlay. Map on
+     the left with all the height and the progression strip under it, the
+     inspector in a column on the right that scrolls on its own; the page never
+     scrolls. */
+  .tz-full { position: fixed; inset: 0; z-index: calc(var(--z-overlay) - 1); display: flex; flex-direction: column; background: var(--bg); }
+  .tz-full[hidden] { display: none; }
+  body.tz-full-open { overflow: hidden; }
+  .tz-fhead { flex: none; display: flex; align-items: center; gap: 18px; padding: 6px 20px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .tz-fhead h2 { margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: 20px; color: var(--cream); }
+  .tz-fhead button { font-family: 'IBM Plex Mono', monospace; color: var(--text); background: var(--surface2); border: 1px solid var(--border2); border-radius: 2px; cursor: pointer; }
+  .tz-fhead button:hover { border-color: var(--gold); color: var(--cream); }
+  .tz-fkey { display: flex; align-items: center; gap: 4px; }
+  .tz-fkey b { min-width: 34px; text-align: center; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 22px; line-height: 1; color: var(--cream); }
+  .tz-fkey button { width: 26px; height: 26px; font-size: 15px; color: var(--gold); }
+  .tz-fscale { font-size: 12px; color: var(--muted); letter-spacing: .04em; white-space: nowrap; }
+  .tz-fmodes { display: flex; gap: 4px; }
+  .tz-fmodes button { padding: 5px 10px; font-size: 11px; color: var(--muted); }
+  .tz-fmodes button.on { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.1); }
+  .tz-fhead .tz-fclose { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 11px; }
+  .tz-fbody { flex: 1; min-height: 0; padding: 10px 20px; }
+  .tz-fbody .tz-view { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: auto minmax(0, 1fr) auto auto; column-gap: 16px; }
+  .tz-fbody .tz-bar { grid-column: 1 / -1; margin-bottom: 8px; }
+  .tz-fbody .tz-mapbox { grid-column: 1; grid-row: 2; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+  .tz-fbody .tz-map { height: 100%; }
+  .tz-fbody .tz-mnote { grid-column: 1; grid-row: 3; }
+  /* The progression is a strip under the map: label and buttons, then the chips on
+     one line that scrolls sideways (always the same height, so the map never jumps) */
+  .tz-fbody .tz-prog { grid-column: 1; grid-row: 4; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 14px; margin-top: 8px; padding: 8px 12px; }
+  .tz-fbody .tz-prog .tz-h { margin: 0; }
+  .tz-fbody .tz-pbtns { grid-row: 1; grid-column: 2; flex-wrap: nowrap; margin-top: 0; }
+  .tz-fbody .tz-chips { grid-column: 1 / -1; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tz-fbody .tz-chips::-webkit-scrollbar { display: none; }
+  .tz-fbody .tz-chip { flex: none; }
+  /* Inspector column: the same boxes, packed tighter, scrolling on its own if needed */
+  .tz-fbody .tz-side { display: block; grid-column: 2; grid-row: 2 / 5; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .tz-fbody .tz-insp { grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 0; }
+  .tz-fbody .tz-box { padding: 8px 12px; }
+  .tz-fbody .tz-h { margin-bottom: 5px; }
+  .tz-fbody .tz-h2 { margin-top: 6px; }
+  .tz-fbody .tz-notes { margin: 4px 0 8px; }
+  .tz-fbody .tz-plr { margin-top: 0; }
+  .tz-fbody .tz-plr button { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: baseline; gap: 2px 8px; padding: 6px 8px 6px 10px; }
+  .tz-fbody .tz-plr .vl { grid-column: 1 / -1; justify-self: start; }
+  .tz-fbody .tz-row { padding: 3px 4px; }
+  .tz-fbody .tz-row b { line-height: 1.15; }
+  .tz-fbody .tz-cyc { flex-wrap: nowrap; }
+  .tz-fbody .tz-cyc .tz-act { flex: 1; padding: 6px 4px; text-align: center; }
   #tz-sheet { display: none; }
 
   @media (max-width: 700px) {
+    :root { --tz-peek-h: 168px; }
     .tz-bar, .tz-legend, .tz-insp, .tz-prog { display: none; }
-    .tz-maptools { display: flex; gap: 5px; position: absolute; top: 6px; right: 6px; }
-    .tz-maptools .tz-tg { min-height: 40px; padding: 0 10px; font-size: 12px; background: rgba(17,20,23,.92); }
-    .tz-mnote { font-size: 13px; }
+    /* Map tools: undo / clear the path on the left, the layers on the right */
+    .tz-maptools { display: flex; justify-content: space-between; gap: 5px; position: absolute; top: 6px; left: 6px; right: 6px; pointer-events: none; }
+    .tz-maptools > div { display: flex; gap: 5px; pointer-events: auto; }
+    .tz-maptools .tz-tg { min-width: 40px; min-height: 40px; padding: 0 10px; font-size: 12px; background: rgba(17,20,23,.92); }
+    .tz-maptools .tz-undo { padding: 0; font-size: 18px; line-height: 1; }
+    .tz-maptools .tz-tg:disabled { opacity: 1; color: var(--border2); }   /* the lattice would show through */
+    .tz-mnote { font-size: 12px; line-height: 1.45; }
     .tz-map .v text, .tz-map .n-lbl { font-size: 12px; }
-    body.tz-sheet-on .wrap { padding-bottom: calc(var(--tz-sheet-h, 190px) + 90px + env(safe-area-inset-bottom)); }
-    body.tz-sheet-on.tz-open .wrap { padding-bottom: calc(100vh + env(safe-area-inset-bottom)); }
+    /* The Tonnetz screen fits the phone: nothing scrolls, nothing sits under the map.
+       The map takes the room between the sub-tabs and the sheet, stays pinned under
+       the top bar if the page ever scrolls (short screens), and shrinks above the
+       sheet when it opens instead of sliding under it. --tz-above and --tz-below are
+       measured (tzPhoneLayout), 70px = the bottom bar (62) + a gap. */
+    body.tz-sheet-on #scale-hero, body.tz-sheet-on .left-panel, body.tz-sheet-on footer { display: none; }
+    body.tz-sheet-on .wrap { padding-bottom: 0; }
+    body.tz-sheet-on .controls { margin-bottom: 4px; }
+    body.tz-sheet-on .mode-groups { padding-top: 8px; }
+    body.tz-sheet-on #chords-sub-tabs { margin-bottom: 6px; }
+    body.tz-sheet-on #all-degrees { overflow: visible; }   /* a scroll box would hold the sticky map */
+    body.tz-sheet-on .tz-mapbox {
+      position: sticky; top: var(--m-top-h, 123px);
+      height: max(200px, calc(100vh - var(--tz-above, 225px) - var(--tz-below, 0px) - var(--tz-sheet-h, 168px) - 70px - env(safe-area-inset-bottom)));
+      height: max(200px, calc(100dvh - var(--tz-above, 225px) - var(--tz-below, 0px) - var(--tz-sheet-h, 168px) - 70px - env(safe-area-inset-bottom)));
+    }
+    body.tz-sheet-on .tz-map { height: 100%; }
+    body.tz-sheet-on .tz-view::after { content: ''; display: block; height: calc(var(--tz-sheet-h, 168px) + 70px + env(safe-area-inset-bottom)); }
     #tz-sheet:not([hidden]) { display: flex; flex-direction: column; position: fixed; left: 0; right: 0; bottom: calc(62px + env(safe-area-inset-bottom)); z-index: calc(var(--z-sticky) - 1); max-height: 290px; background: var(--surface); border-top: 1px solid var(--border2); border-radius: 16px 16px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.5); }
+    /* Two fixed heights, so a chord with a longer description never moves the map */
+    #tz-sheet.peek { height: var(--tz-peek-h); }
+    #tz-sheet:not(.peek) {
+      height: min(290px, max(var(--tz-peek-h), calc(100vh - var(--tz-above, 225px) - var(--tz-below, 0px) - 270px - env(safe-area-inset-bottom))));
+      height: min(290px, max(var(--tz-peek-h), calc(100dvh - var(--tz-above, 225px) - var(--tz-below, 0px) - 270px - env(safe-area-inset-bottom))));
+    }
+    #tz-sheet.peek .tz-sbody { overflow: hidden; }
+    #tz-sheet.peek .tz-notes { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #tz-sheet.peek .tz-note { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; line-height: 1.45; }
     body.m-compare #tz-sheet { display: none; }
     .tz-handle { flex: none; display: block; width: 100%; height: 40px; position: relative; }
     .tz-handle::after { content: ''; position: absolute; left: 50%; top: 10px; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: var(--border2); }
@@ -2393,8 +2474,10 @@
     #tz-sheet .tz-notes { margin: 4px 0 0; font-size: 13px; }
     .tz-mini { margin-left: auto; display: flex; gap: 6px; }
     .tz-mini button { width: 40px; height: 40px; border: 1px solid var(--border2); background: var(--surface2); color: var(--gold2); font-size: 15px; border-radius: 3px; }
-    #tz-sheet .tz-plr { margin-top: 10px; }
-    #tz-sheet .tz-plr button { min-height: 58px; }
+    #tz-sheet .tz-plr { margin-top: 8px; }
+    /* Two lines instead of three: "P  Cm" then the voice that moves */
+    #tz-sheet .tz-plr button { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: baseline; gap: 2px 8px; min-height: 52px; padding: 6px 8px 6px 10px; }
+    #tz-sheet .tz-plr .vl { grid-column: 1 / -1; justify-self: start; }
     #tz-sheet .tz-plr .vl, #tz-sheet .tz-plr i { font-size: 12px; }
     #tz-sheet .tz-note { font-size: 13px; }
     #tz-sheet .tz-row { grid-template-columns: 44px 56px minmax(0, 1fr); min-height: 44px; }
@@ -2758,6 +2841,17 @@
   <div class="tz-stabs" id="tz-stabs"></div>
   <div class="tz-sbody" id="tz-sbody"></div>
 </section>
+<!-- Desktop only: Chords › Tonnetz in full screen (renderTonnetz draws into #tz-full-body) -->
+<div class="tz-full" id="tz-full" role="dialog" aria-modal="true" aria-labelledby="tz-full-title" hidden>
+  <div class="tz-fhead">
+    <h2 id="tz-full-title">Tonnetz</h2>
+    <div class="tz-fkey"><button data-tzf="dn" aria-label="Root key down a semitone">‹</button><b id="tz-fkey" aria-live="polite"></b><button data-tzf="up" aria-label="Root key up a semitone">›</button></div>
+    <span class="tz-fscale" id="tz-fscale"></span>
+    <div class="tz-fmodes" role="group" aria-label="Chord mode"><button data-tzf="mode" data-n="3">Triads</button><button data-tzf="mode" data-n="4">7ths</button></div>
+    <button class="tz-fclose" data-tzf="close" aria-label="Close the full-screen Tonnetz (Escape)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>Close</button>
+  </div>
+  <div class="tz-fbody" id="tz-full-body"></div>
+</div>
 <div id="cof-tooltip"></div>
 
 <script>
@@ -2766,8 +2860,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v88';
-window.APP_DEPLOYED = '2026-10-30 12:09';
+window.APP_VERSION = 'v89';
+window.APP_DEPLOYED = '2026-10-30 15:37';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -3943,7 +4037,7 @@ document.addEventListener('keydown', e => {
 // STATE & RENDERING
 // ══════════════════════════════════════════════
 
-let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastChordsView:'list',lastGuitarView:'diagrams',lastMandolinView:'mandolin',lastBanjoView:'banjo',lastPianoView:'piano',scaleLabelMode:'notes',gripLabel:'intervals'};
+let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastChordsView:'list',tzFull:false,lastGuitarView:'diagrams',lastMandolinView:'mandolin',lastBanjoView:'banjo',lastPianoView:'piano',scaleLabelMode:'notes',gripLabel:'intervals'};
 
 function buildSelectors(){
   // Key selector: show both enharmonic names for ambiguous keys
@@ -11748,12 +11842,13 @@ function rebuildCompPresets() {
 buildSelectors();
 
 // ── URL Hash: encode/decode state so the page is shareable ──
-// Format: #k=0&s=Major+(Ionian)&m=4&v=list
+// Format: #k=0&s=Major+(Ionian)&m=4&v=list (+ &f=1 for the full-screen Tonnetz)
 function encodeHash(st) {
   return '#k=' + st.key +
     '&s=' + encodeURIComponent(st.scale) +
     '&m=' + encodeURIComponent(st.mode) +
-    '&v=' + encodeURIComponent(st.view);
+    '&v=' + encodeURIComponent(st.view) +
+    (st.view === 'tonnetz' && st.tzFull ? '&f=1' : '');
 }
 // URLSearchParams already decodes: a second decodeURIComponent threw on "%25" and
 // blanked the page. Anything unknown falls back to the default instead.
@@ -11772,6 +11867,7 @@ function decodeHash(hash) {
       scale: s,
       mode:  HASH_MODES.includes(m) ? m : '4',
       view:  HASH_VIEWS.includes(v) ? v : 'list',
+      full:  v === 'tonnetz' && p.get('f') === '1',
     };
   } catch (e) { return null; }
 }
@@ -11784,6 +11880,7 @@ function decodeHash(hash) {
     state.scale = fromHash.scale;
     state.mode  = fromHash.mode;
     state.view  = fromHash.view;
+    state.tzFull = fromHash.full;   // a phone ignores it (renderTonnetz)
     if (state.view === 'tonnetz') state.lastChordsView = 'tonnetz';
     // Sync selectors
     const keyEl = document.getElementById('sel-key');
@@ -12101,25 +12198,134 @@ function tzChordOf(s) {
   return { name: notes[0], sym: t.minor ? 'm' : '', roman: '', notes, quality: t.minor ? 'Minor' : 'Major', label: notes[0] + (t.minor ? 'm' : ''), pcs: tzTriPcs(t) };
 }
 
+// Drawn inline under the Chords tabs, or into the desktop full-screen overlay
+// (state.tzFull): one view, one tz state, two places.
 function renderTonnetz(scaleNotes, scaleData) {
-  const phone = PHONE_MQ.matches;
-  tz.W = phone ? 340 : 620; tz.HH = phone ? 268 : 330;
+  const phone = PHONE_MQ.matches, full = !!state.tzFull && !phone && !compareActive;
+  if (!phone && !full) { tz.W = 620; tz.HH = 330; }
   const sig = `${state.key}|${state.scale}|${state.mode}`;
   if (sig !== tz.sig) tzRebuild(sig, scaleData);
-  const box = document.getElementById('all-degrees');
+  if (phone) tzSyncSheet();   // the phone screen's CSS sizes the map box before it is measured
+  tzShowFull(full);
+  const box = document.getElementById(full ? 'tz-full-body' : 'all-degrees');
   box.innerHTML = `<div class="tz-view">
     <div class="tz-bar"><div class="tz-dchips" role="group" aria-label="Degree chords"></div><div class="tz-layers" role="group" aria-label="Map layers"></div></div>
-    <div class="tz-mapbox"><svg class="tz-map" role="img"></svg><div class="tz-maptools" role="group" aria-label="Map layers"></div>
+    <div class="tz-mapbox"><svg class="tz-map" role="img"></svg><div class="tz-maptools"><div class="tz-mt-path" role="group" aria-label="Path"></div><div class="tz-mt-layers" role="group" aria-label="Map layers"></div></div>
       <div class="tz-legend"><span><i>▲</i> major</span><span><i class="mn">▼</i> minor</span><span><i>━</i> other chords (dim, aug, sus...)</span><span><i>┄</i> jump</span><span><i class="mn">◆</i> negative-harmony axis</span><span>numerals = the key</span></div></div>
     <p class="tz-mnote"></p>
-    <div class="tz-insp"></div>
+    <div class="tz-side"><div class="tz-insp"></div></div>
     <div class="tz-prog"></div></div>`;
   const root = box.firstElementChild;
-  tz.el = { root, svg: root.querySelector('.tz-map'), L: {}, vtx: [] };
+  tz.el = { root, svg: root.querySelector('.tz-map'), L: {}, vtx: [], full };
   root.addEventListener('click', tzOnClick);
+  if (full) tzFullHead(scaleNotes);
   tzBuildGrid();
   tzRefresh();
+  if (tzRO) tzRO.disconnect();
+  if (phone) tzPhoneLayout();
+  if (phone || full) {
+    tzRefit();
+    tzRO = new ResizeObserver(tzRefit);
+    tzRO.observe(tz.el.svg);
+  }
 }
+
+// The viewBox for a map of boxW x boxH px: W lattice units wide, clamped to
+// [minW, maxW], and at least the key's width (outer vertices, their circles and a
+// margin) so the whole key shows. The height follows the box.
+function tzFrame(boxW, boxH, verts, vc, minW, maxW) {
+  const half = Math.max(0, ...verts.map(v => Math.abs(tzX(...v) - vc[0])));
+  const W = Math.min(maxW, Math.max(minW, 2 * half + 50));
+  return { W, HH: boxH * W / boxW };
+}
+// Phone: the key fills the width, so the triangles grow instead of showing more
+// lattice; at least 290 units so a narrow key does not blow up, and never under
+// 1 unit per px so no label drops below 12 px. Full screen: a fixed zoom, so a
+// bigger screen shows more lattice at the same size, unless the key is wider.
+const TZ_PHONE_W = 290, TZ_FULL_ZOOM = 1.2;
+let tzRO = null;
+// The map box follows the screen and the sheet (CSS); the viewBox follows the box.
+function tzRefit() {
+  if (!tz.el || !tz.el.root.isConnected || !(tz.el.full || PHONE_MQ.matches)) return;
+  const w = tz.el.svg.clientWidth, h = tz.el.svg.clientHeight;
+  if (!w || !h) return;
+  const verts = tz.place.flatMap(p => p.verts);
+  const f = tz.el.full ? tzFrame(w, h, verts, tz.vc, w / TZ_FULL_ZOOM, Infinity) : tzFrame(w, h, verts, tz.vc, TZ_PHONE_W, w);
+  if (Math.abs(f.W - tz.W) < 1 && Math.abs(f.HH - tz.HH) < 1) return;
+  tz.W = f.W; tz.HH = f.HH;
+  tz.el.svg.textContent = '';
+  tz.el.vtx = [];
+  tzBuildGrid();
+  tzDraw();
+}
+// What sits above the map (top bar, chord modes, sub-tabs) and under it (the note).
+// offsetTop, not getBoundingClientRect: the view slides in with a transform.
+function tzPhoneLayout() {
+  if (!tz.el || !tz.el.root.isConnected) return;
+  const v = tz.el.root, mn = v.querySelector('.tz-mnote'), s = document.documentElement.style;
+  let top = 0;
+  for (let e = v; e; e = e.offsetParent) top += e.offsetTop;
+  s.setProperty('--tz-above', top + 'px');
+  s.setProperty('--tz-below', mn.hidden ? '0px' : mn.offsetHeight + 8 + 'px');
+}
+
+// Desktop full screen. The inline copy stays behind the overlay untouched (the
+// page keeps its height and scroll) and is redrawn from the same state on close.
+function tzShowFull(on) {
+  const o = document.getElementById('tz-full');
+  if (o.hidden === !on) return;
+  o.hidden = !on;
+  document.body.classList.toggle('tz-full-open', on);
+  if (!on) document.getElementById('tz-full-body').textContent = '';
+}
+function tzFullHead(scaleNotes) {
+  document.getElementById('tz-fkey').textContent = scaleNotes[0];
+  document.getElementById('tz-fscale').textContent = state.scale;
+  document.querySelectorAll('#tz-full [data-tzf="mode"]').forEach(b => {
+    const on = b.dataset.n === state.mode;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on);
+  });
+}
+function tzRerender() {
+  const sd = SCALES[state.scale];
+  renderTonnetz(spellScale(parseInt(state.key), sd.intervals, sd), sd);
+}
+function tzOpenFull() {
+  if (PHONE_MQ.matches || state.view !== 'tonnetz' || compareActive) return;
+  state.tzFull = true;
+  tzRerender();
+  syncUrl();
+  document.querySelector('#tz-full .tz-fclose').focus();
+}
+function tzCloseFull() {
+  if (!state.tzFull) return;
+  state.tzFull = false;
+  tzShowFull(false);
+  syncUrl();
+  if (state.view !== 'tonnetz') return;
+  tzRerender();
+  tz.el.root.querySelector('[data-tz="full"]')?.focus({ preventScroll: true });
+}
+document.getElementById('tz-full').addEventListener('click', e => {
+  const b = e.target.closest('[data-tzf]');
+  if (!b) return;
+  const a = b.dataset.tzf;
+  if (a === 'close') tzCloseFull();
+  else if (a === 'dn' || a === 'up') document.getElementById('transpose-' + a).click();
+  else if (a === 'mode') document.querySelector(`#chord-types .ct-btn[data-n="${b.dataset.n}"]`).click();
+});
+// Escape closes, Tab stays inside (unless a window opened over it, the composer say).
+document.addEventListener('keydown', e => {
+  const o = document.getElementById('tz-full');
+  if (o.hidden || tzModalOpen()) return;
+  if (e.key === 'Escape') { e.preventDefault(); tzCloseFull(); return; }
+  if (e.key !== 'Tab') return;
+  const f = [...o.querySelectorAll('button:not(:disabled), [tabindex]:not([tabindex="-1"])')].filter(el => el.getClientRects().length);
+  if (!f.length) return;
+  if (e.shiftKey && (document.activeElement === f[0] || !o.contains(document.activeElement))) { e.preventDefault(); f[f.length - 1].focus(); }
+  else if (!e.shiftKey && (document.activeElement === f[f.length - 1] || !o.contains(document.activeElement))) { e.preventDefault(); f[0].focus(); }
+});
 
 function tzRebuild(sig, sd) {
   tzStop();
@@ -12223,18 +12429,23 @@ function tzUI() {
     ['neg', short ? 'Neg' : 'Negative', negHarmonyActive, negOk ? 'Negative harmony: the key mirrored around the tonic-fifth edge (the same switch as on the circle of fifths)' : 'Negative harmony works on the major scale, as on the circle of fifths'],
     ['deg', short ? '1·3·5' : 'Degrees', tz.deg, 'Label the notes 1, ♭3, 5... instead of note names'],
   ].map(([l, t, on, title]) => `<button class="tz-tg${on ? ' on' : ''}" data-tz="layer" data-l="${l}" aria-pressed="${on}" title="${title}"${l === 'neg' && !negOk ? ' disabled' : ''}>${t}</button>`).join('');
-  root.querySelector('.tz-layers').innerHTML = '<span class="tz-lbl">Layers</span>' + layers(false);
-  root.querySelector('.tz-maptools').innerHTML = layers(true);
+  root.querySelector('.tz-layers').innerHTML = '<span class="tz-lbl">Layers</span>' + layers(false)
+    + (tz.el.full ? '' : '<button class="tz-tg tz-fullbtn" data-tz="full" title="Map, chord and moves side by side, without the side panels (Escape closes)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 4.5V1h3.5M7.5 1H11v3.5M11 7.5V11H7.5M4.5 11H1V7.5"/></svg>Full screen</button>');
+  root.querySelector('.tz-mt-layers').innerHTML = layers(true);
   const notes = [tz.data.note,
     chords.some(c => c.pcs.length > 4) && 'Notes above the 7th are not drawn; they sound when the chord plays.',
     !chords.some(c => c.tri) && 'This scale has no major or minor triad, so its chords are lines and shapes: pick a triad one semitone away, or click any triangle.'].filter(Boolean);
   const mn = root.querySelector('.tz-mnote');
   mn.textContent = notes.join(' ');
   mn.hidden = !notes.length;
-  if (phone) { tzSheetUI(); tzRailSync(); }
-  else {
+  if (phone) {
+    const none = tz.path.length < 2 ? ' disabled' : '';
+    root.querySelector('.tz-mt-path').innerHTML = `<button class="tz-tg tz-undo" data-tz="undo" aria-label="Undo the last move" title="Undo the last move (Backspace)"${none}>↶</button><button class="tz-tg" data-tz="clear" title="Clear the path, keep the chord"${none}>Clear</button>`;
+    tzSheetUI(); tzRailSync();
+  } else {
     root.querySelector('.tz-insp').innerHTML = `<div class="tz-box"><div class="tz-h">Selected chord</div>${tzCardHTML(false)}${sel.tri ? '<div class="tz-h tz-h2">One move</div>' : ''}${tzPlrHTML()}</div><div class="tz-box">${tzMovesHTML()}</div>`;
     root.querySelector('.tz-prog').innerHTML = tzProgHTML();
+    if (tz.el.full) { const c = root.querySelector('.tz-chips'); c.scrollLeft = c.scrollWidth; }   // one line there: keep the last chord in view
   }
 }
 const tzRefresh = () => { tzDraw(); tzUI(); };
@@ -12300,23 +12511,21 @@ function tzSheetUI() {
   document.getElementById('tz-stabs').innerHTML = [['chord', 'Chord'], ['prog', `Progression · ${tz.path.length}`]]
     .map(([t, l]) => `<button class="tz-stab${tz.tab === t ? ' on' : ''}" data-tz="tab" data-tab="${t}" aria-pressed="${tz.tab === t}">${l}</button>`).join('');
   document.getElementById('tz-sbody').innerHTML = open && tz.tab === 'prog' ? tzProgHTML() : tzCardHTML(true) + tzPlrHTML() + `<div class="tz-more">${tzMovesHTML()}</div>`;
-  document.body.classList.toggle('tz-open', open);
   document.documentElement.style.setProperty('--tz-sheet-h', sh.offsetHeight + 'px');
 }
+// Nothing scrolls: the map box shrinks above the open sheet (CSS) and refits.
 function tzSetSheet(open) {
-  const was = tz.sheet === 'open';
   tz.sheet = open ? 'open' : 'peek';
   tzSheetUI();
-  const box = tz.el && tz.el.root.querySelector('.tz-mapbox');
-  if (open && !was && box) window.scrollTo({ top: box.getBoundingClientRect().top + window.scrollY - document.getElementById('m-top').offsetHeight - 8, behavior: 'smooth' });
 }
 // The sheet shows only with the Tonnetz sub-view on a phone, never during a comparison.
 function tzSyncSheet() {
   const on = state.view === 'tonnetz' && PHONE_MQ.matches && !compareActive, sh = document.getElementById('tz-sheet');
   sh.hidden = !on;
   document.body.classList.toggle('tz-sheet-on', on);
-  if (!on) document.body.classList.remove('tz-open');
   if (state.view !== 'tonnetz' || compareActive) tzStop();
+  // The desktop full screen belongs to the Tonnetz sub-view too.
+  if (state.tzFull && (state.view !== 'tonnetz' || compareActive || PHONE_MQ.matches)) { state.tzFull = false; tzShowFull(false); syncUrl(); }
   if (on) document.documentElement.style.setProperty('--tz-sheet-h', sh.offsetHeight + 'px');
 }
 // In this view the degree rail selects the degree chord on the map.
@@ -12432,6 +12641,7 @@ function tzSend() {
 }
 function tzToGuitar() {
   const d = tz.sel.d;
+  tzCloseFull();
   document.getElementById('tab-guitar').click();
   const sec = d != null && document.getElementById('deg-' + d);
   if (sec) sec.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -12464,6 +12674,7 @@ function tzAction(b) {
   else if (a === 'arp') tzPlay(tz.voicing, 0.22, 1.6);
   else if (a === 'comp') addToProgression(tz.ch.name, tz.ch.sym, tz.ch.roman, tz.ch.notes, tz.ch.quality);
   else if (a === 'guitar') { tzToGuitar(); return; }
+  else if (a === 'full') { tzOpenFull(); return; }
   else if (a === 'chip') tzPlay(tz.path[+b.dataset.k].v);
   else if (a === 'playall') tzPlayAll();
   else if (a === 'undo') tzUndo();
@@ -12471,10 +12682,12 @@ function tzAction(b) {
   else if (a === 'send') tzSend();
   else if (a === 'sheet') tzSetSheet(tz.sheet !== 'open');
   else if (a === 'tab') { tz.tab = b.dataset.tab; tzSetSheet(true); }
-  // The panels are redrawn: give the focus back to the same control.
+  // The panels are redrawn: give the focus back to the same control (the visible
+  // copy: the layers exist in the desktop bar and over the phone map).
   if (b.isConnected || (document.activeElement && document.activeElement !== document.body)) return;
   const scope = inSheet ? document.getElementById('tz-sheet') : tz.el.root;
-  scope.querySelector(`[data-tz="${a}"]` + keys.map(k => `[data-${k}="${b.dataset[k]}"]`).join(''))?.focus({ preventScroll: true });
+  [...scope.querySelectorAll(`[data-tz="${a}"]` + keys.map(k => `[data-${k}="${b.dataset[k]}"]`).join(''))]
+    .find(el => el.getClientRects().length)?.focus({ preventScroll: true });
 }
 document.getElementById('tz-sheet').addEventListener('click', tzOnClick);
 
@@ -12520,6 +12733,7 @@ function syncPhoneBar(scaleNotes, scaleData) {
   });
   document.getElementById('all-degrees').classList.toggle('m-grid2', M_GRID2_VIEWS.has(state.view));
   buildDegreeRail();
+  if (document.body.classList.contains('tz-sheet-on')) tzPhoneLayout();   // the rail may have changed the bar's height
 }
 
 // One button per degree section of the current view, labelled with its numeral
@@ -12687,6 +12901,8 @@ document.getElementById('m-tools').addEventListener('click', e => {
     const h = _history[+hist.dataset.hist];
     goToKeyAndScale(h.key, h.scale);
   } else if (tool.dataset.tool === 'm-cof') {
+    // The phone Tonnetz screen keeps nothing under the map: the circle is under the List.
+    if (state.view === 'tonnetz' && !compareActive) document.getElementById('tab-chords-list').click();
     document.querySelector('.left-panel').scrollIntoView({ block: 'start' });
   } else if (tool.dataset.tool === 'm-compare') {
     document.getElementById('compare-toggle-btn').click();

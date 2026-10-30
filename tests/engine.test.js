@@ -349,10 +349,23 @@ check('Tonnetz: modes the map cannot draw fall back to the triads and say so', (
     "C Dm Em F G Am Bdim | Secondary dominants are shown in List view; the map shows the scale's triads.");
 });
 check('Tonnetz: a link to the Tonnetz sub-view survives', () => eq(run(`decodeHash('#k=7&s=Dorian&m=3&v=tonnetz').view`), 'tonnetz'));
+const frame = (s, w, h, min, max) => `(() => { const d = tzDegreeChords(0, ${JSON.stringify(s)}, '4'), vs = tzPlaceKey(d.chords, 0).flatMap(x => x.verts), c = tzCentroid(vs);
+  return tzFrame(${w}, ${h}, vs, [Math.round(c[0]), Math.round(c[1])], ${min}, ${max}); })()`;
+check('Tonnetz phone frame: C major fills 290 units of a 345 px map (triangles 69 px), the blues scale stops at 1 unit per px', () => {
+  eq(run(`(([a, b]) => [a.W, Math.round(a.HH), (345 / a.W * TZ_S).toFixed(1), b.W].join(' '))([${frame('Major (Ionian)', 345, 347, 'TZ_PHONE_W', 345)}, ${frame('Blues', 345, 347, 'TZ_PHONE_W', 345)}])`), '290 292 69.0 345');
+});
+check('Tonnetz full screen: a fixed zoom, so a 700 x 500 px map is 583 x 417 units, and the wide blues key still fits a 400 px one', () => {
+  eq(run(`(([a, b]) => [Math.round(a.W), Math.round(a.HH), b.W].join(' '))([${frame('Major (Ionian)', 700, 500, '700 / TZ_FULL_ZOOM', 'Infinity')}, ${frame('Blues', 400, 300, '400 / TZ_FULL_ZOOM', 'Infinity')}])`), '583 417 376');
+});
+check('Tonnetz: a full-screen link (f=1) reopens full screen, on the Tonnetz only', () => {
+  eq(run(`[decodeHash('#k=0&s=Major%20(Ionian)&m=4&v=tonnetz&f=1').full, decodeHash('#k=0&s=Major%20(Ionian)&m=4&v=list&f=1').full,
+    encodeHash({ key: 0, scale: 'Dorian', mode: '3', view: 'tonnetz', tzFull: true }), encodeHash({ key: 0, scale: 'Dorian', mode: '3', view: 'list', tzFull: true })].join(' ')`),
+    'true false #k=0&s=Dorian&m=3&v=tonnetz&f=1 #k=0&s=Dorian&m=3&v=list');
+});
 
 // ── Shared links and share codes ──
 check('a malformed link is ignored, not fatal', () => eq(run(`[decodeHash('#k=0&s=%25'), decodeHash('#k=0&s=constructor')].join(',')`), ','));
-check('a link keeps known values only', () => eq(run(`JSON.stringify(decodeHash('#k=2&s=Dorian&m=99&v=zzz'))`), '{"key":2,"scale":"Dorian","mode":"4","view":"list"}'));
+check('a link keeps known values only', () => eq(run(`JSON.stringify(decodeHash('#k=2&s=Dorian&m=99&v=zzz'))`), '{"key":2,"scale":"Dorian","mode":"4","view":"list","full":false}'));
 
 const total = passed + failures.length;
 if (failures.length) {
