@@ -2260,6 +2260,152 @@
     .m-hist { display: flex; flex-wrap: wrap; gap: 8px; }
     .m-hist button { min-height: 40px; padding: 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text); background: var(--surface2); border: 1px solid var(--border2); border-radius: 3px; cursor: pointer; }
   }
+
+  /* ══ Chords › Tonnetz (v88) ══
+     The key on the tone network. Desktop: degree chips and layers, the map, the
+     inspector and the progression under it. Phone: the map full width with the
+     layers over its corner, the inspector in a sheet docked above the bottom bar. */
+  :where(.tz-view, #tz-sheet) button { font-family: 'IBM Plex Mono', monospace; color: var(--text); background: none; border: none; padding: 0; cursor: pointer; }
+  :where(.tz-view, #tz-sheet) button:disabled { cursor: not-allowed; }
+  .tz-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 12px; margin-bottom: 10px; }
+  .tz-dchips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tz-dchip { min-width: 50px; padding: 5px 7px; border: 1px solid var(--border); background: var(--surface); border-radius: 2px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tz-dchip b { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 14px; color: var(--cream); line-height: 1; }
+  .tz-dchip span { font-size: 10px; color: var(--muted); white-space: nowrap; }
+  .tz-dchip:hover { border-color: var(--accent); }
+  .tz-dchip.on { border-color: var(--gold); background: rgba(201,168,76,.12); }
+  .tz-dchip.on b, .tz-dchip.on span { color: var(--gold2); }
+  .tz-layers { display: flex; gap: 6px; align-items: center; }
+  .tz-lbl { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-right: 2px; }
+  .tz-tg { padding: 6px 10px; border: 1px solid var(--border2); background: var(--surface2); color: var(--muted); font-size: 10.5px; letter-spacing: .04em; white-space: nowrap; border-radius: 2px; }
+  .tz-tg:hover:not(:disabled) { color: var(--cream); }
+  .tz-tg.on { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.1); }
+  .tz-tg:disabled { opacity: .35; }
+  .tz-mapbox { position: relative; background: var(--surface); border: 1px solid var(--border); }
+  .tz-maptools { display: none; }
+  .tz-map { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  .tz-legend { display: flex; gap: 6px 16px; flex-wrap: wrap; padding: 8px 12px; border-top: 1px solid var(--border); font-size: 10px; color: var(--muted); letter-spacing: .04em; }
+  .tz-legend i { font-style: normal; color: var(--gold); }
+  .tz-legend .mn { color: var(--accent2); }
+  .tz-mnote { margin-top: 8px; font-size: 10.5px; color: var(--muted); line-height: 1.6; }
+  .tz-mnote[hidden] { display: none; }
+
+  .tz-map .tri { cursor: pointer; fill-opacity: .05; transition: fill-opacity .15s; }
+  .tz-map .tri.up { fill: var(--gold); }
+  .tz-map .tri.dn { fill: var(--accent); }
+  .tz-map .tri:hover { fill-opacity: .16; }
+  .tz-map .edge { stroke: var(--border2); stroke-width: 1; }
+  .tz-map .L-key, .tz-map .L-neg, .tz-map .L-sel, .tz-map .L-num, .tz-map .L-path, .tz-map .L-mark { pointer-events: none; }
+  .tz-map .L-key .k-line { pointer-events: stroke; }
+  .tz-map .k-tri { fill-opacity: .2; stroke: rgba(201,168,76,.5); stroke-width: 1; }
+  .tz-map .k-tri.maj { fill: var(--gold); }
+  .tz-map .k-tri.min { fill: var(--accent); }
+  .tz-map .k-line { fill: none; stroke: var(--gold); stroke-opacity: .55; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; cursor: pointer; }
+  .tz-map .k-line:hover { stroke-opacity: .8; }
+  .tz-map .k-num { font-family: 'Playfair Display', serif; font-size: 15px; fill: var(--cream); text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+  .tz-map .k-num.dark { fill: var(--bg); font-weight: 700; stroke: none; }
+  .tz-map .n-tri { fill: var(--accent2); fill-opacity: .1; stroke: var(--accent2); stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .tz-map .n-line { fill: none; stroke: var(--accent2); stroke-width: 2; stroke-dasharray: 4 3; }
+  .tz-map .n-lbl { font-size: 11px; font-weight: 600; fill: var(--accent2); text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+  .tz-map .s-tri { fill-opacity: .62; }
+  .tz-map .s-tri.maj { fill: var(--gold); }
+  .tz-map .s-tri.min { fill: var(--accent); }
+  .tz-map .s-edge { stroke: var(--gold2); stroke-width: 3; stroke-linecap: round; }
+  .tz-map .trace { fill: none; stroke: var(--cream); stroke-opacity: .8; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .tz-map .trace.jump { stroke-dasharray: 3 5; stroke-opacity: .55; }
+  .tz-map .dot { fill: var(--cream); }
+  .tz-map .head { fill: none; stroke: var(--gold2); stroke-width: 2; }
+  .tz-map .mark { fill: var(--accent2); stroke: var(--bg); stroke-width: 1.5; }
+  .tz-map .v { cursor: pointer; }
+  .tz-map .v circle { fill: var(--bg); stroke: var(--border2); stroke-width: 1; }
+  .tz-map .v text { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: var(--muted); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+  .tz-map .v.in circle { fill: var(--surface2); stroke: rgba(201,168,76,.55); }
+  .tz-map .v.in text { fill: var(--cream); }
+  .tz-map .v.on circle { stroke: var(--gold2); stroke-width: 2; }
+  .tz-map .v.on text { fill: var(--gold2); font-weight: 600; }
+
+  .tz-insp { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 14px; }
+  .tz-box { background: var(--surface); border: 1px solid var(--border); padding: 14px 16px; min-width: 0; }
+  .tz-h { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .tz-h2 { margin-top: 14px; }
+  .tz-card-top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .tz-name { font-family: 'Playfair Display', serif; font-size: 34px; color: var(--cream); line-height: 1; }
+  .tz-name sup { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--gold2); vertical-align: super; }
+  .tz-deg { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold2); }
+  .tz-out { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+  .tz-notes { font-size: 12px; color: var(--muted); margin: 6px 0 12px; line-height: 1.5; }
+  .tz-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tz-act { padding: 6px 10px; border: 1px solid var(--border2); background: var(--surface2); font-size: 11px; white-space: nowrap; border-radius: 2px; }
+  .tz-act:hover:not(:disabled) { border-color: var(--accent); color: var(--cream); }
+  .tz-act:disabled { opacity: .35; }
+  .tz-act.tz-send { border-color: var(--gold); color: var(--gold2); }
+  .tz-plr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+  .tz-plr button { position: relative; border: 1px solid var(--border2); background: var(--surface2); padding: 7px 4px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; border-radius: 2px; }
+  .tz-plr button:hover { border-color: var(--gold); }
+  .tz-plr b { font-size: 17px; color: var(--gold2); font-weight: 600; line-height: 1.1; }
+  .tz-plr .to { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--cream); }
+  .tz-plr .vl { max-width: 100%; font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tz-plr i { position: absolute; top: 4px; right: 6px; font-style: normal; font-size: 10px; color: var(--gold); }
+  .tz-note { font-size: 11.5px; color: var(--muted); line-height: 1.55; margin-top: 10px; }
+  .tz-row { width: 100%; display: grid; grid-template-columns: 38px 50px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid var(--border); text-align: left; }
+  .tz-row:hover { background: var(--surface2); }
+  .tz-row .op { font-size: 10.5px; color: var(--gold); font-weight: 600; }
+  .tz-row b { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--cream); font-weight: 400; white-space: nowrap; }
+  .tz-row .vl { font-size: 10.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tz-row .tag { font-size: 9.5px; color: var(--dim); text-align: right; white-space: nowrap; }
+  .tz-row .tag.k { color: var(--gold2); }
+  .tz-cyc { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tz-prog { margin-top: 14px; background: var(--surface); border: 1px solid var(--border); padding: 12px 16px 14px; }
+  .tz-chips { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .tz-chip { display: flex; flex-direction: column; align-items: center; padding: 4px 9px; border: 1px solid var(--border); background: var(--surface2); min-width: 46px; border-radius: 2px; }
+  .tz-chip i { font-style: normal; font-size: 10px; color: var(--gold); }
+  .tz-chip b { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--cream); font-weight: 400; }
+  .tz-chip.on { border-color: var(--gold); }
+  .tz-chip.playing { background: rgba(201,168,76,.22); }
+  .tz-pop { font-size: 9.5px; color: var(--muted); }
+  .tz-pbtns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  #tz-sheet { display: none; }
+
+  @media (max-width: 700px) {
+    .tz-bar, .tz-legend, .tz-insp, .tz-prog { display: none; }
+    .tz-maptools { display: flex; gap: 5px; position: absolute; top: 6px; right: 6px; }
+    .tz-maptools .tz-tg { min-height: 40px; padding: 0 10px; font-size: 12px; background: rgba(17,20,23,.92); }
+    .tz-mnote { font-size: 13px; }
+    .tz-map .v text, .tz-map .n-lbl { font-size: 12px; }
+    body.tz-sheet-on .wrap { padding-bottom: calc(var(--tz-sheet-h, 190px) + 90px + env(safe-area-inset-bottom)); }
+    body.tz-sheet-on.tz-open .wrap { padding-bottom: calc(100vh + env(safe-area-inset-bottom)); }
+    #tz-sheet:not([hidden]) { display: flex; flex-direction: column; position: fixed; left: 0; right: 0; bottom: calc(62px + env(safe-area-inset-bottom)); z-index: calc(var(--z-sticky) - 1); max-height: 290px; background: var(--surface); border-top: 1px solid var(--border2); border-radius: 16px 16px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.5); }
+    body.m-compare #tz-sheet { display: none; }
+    .tz-handle { flex: none; display: block; width: 100%; height: 40px; position: relative; }
+    .tz-handle::after { content: ''; position: absolute; left: 50%; top: 10px; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: var(--border2); }
+    .tz-stabs { flex: none; display: flex; gap: 6px; padding: 0 14px 10px; }
+    .tz-stab { flex: 1; min-height: 40px; border: 1px solid var(--border2); background: var(--surface2); font-size: 13px; color: var(--muted); border-radius: 3px; }
+    .tz-stab.on { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,.1); }
+    .tz-sbody { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 14px 14px; }
+    #tz-sheet.peek .tz-stabs, #tz-sheet.peek .tz-more { display: none; }
+    #tz-sheet.peek .tz-handle { margin-bottom: -8px; }
+    #tz-sheet .tz-h { font-size: 12px; letter-spacing: .12em; }
+    .tz-more > .tz-h:first-child { margin-top: 16px; }
+    #tz-sheet .tz-card-top { align-items: center; flex-wrap: nowrap; }
+    #tz-sheet .tz-name { font-size: 30px; white-space: nowrap; }
+    #tz-sheet .tz-name sup { font-size: 15px; }
+    #tz-sheet .tz-out { font-size: 12px; }
+    #tz-sheet .tz-notes { margin: 4px 0 0; font-size: 13px; }
+    .tz-mini { margin-left: auto; display: flex; gap: 6px; }
+    .tz-mini button { width: 40px; height: 40px; border: 1px solid var(--border2); background: var(--surface2); color: var(--gold2); font-size: 15px; border-radius: 3px; }
+    #tz-sheet .tz-plr { margin-top: 10px; }
+    #tz-sheet .tz-plr button { min-height: 58px; }
+    #tz-sheet .tz-plr .vl, #tz-sheet .tz-plr i { font-size: 12px; }
+    #tz-sheet .tz-note { font-size: 13px; }
+    #tz-sheet .tz-row { grid-template-columns: 44px 56px minmax(0, 1fr); min-height: 44px; }
+    #tz-sheet .tz-row .op { font-size: 12px; }
+    #tz-sheet .tz-row .vl { font-size: 12px; }
+    #tz-sheet .tz-row .tag { grid-column: 3; text-align: left; margin-top: -4px; font-size: 12px; }
+    #tz-sheet .tz-act { min-height: 40px; font-size: 13px; }
+    #tz-sheet .tz-chip { min-width: 52px; min-height: 44px; padding: 6px 10px; }
+    #tz-sheet .tz-chip i, #tz-sheet .tz-pop { font-size: 12px; }
+    #tz-sheet .tz-chip b { font-size: 17px; }
+  }
 </style>
 </head>
 <body>
@@ -2525,15 +2671,19 @@
     <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace">Scale &amp; Chord Views</span>
     <span class="has-tip" style="display:inline-flex;align-items:center">
       <span class="tip-badge" tabindex="0">?</span>
-      <div class="tip-popup" style="left:auto;right:0;transform:none"><span class="tip-title">Scale &amp; Chord Views</span>Switch between different ways to display the harmonised chords. Chord List shows all notes and intervals. Guitar, Mandolin and Banjo tabs each include a Scale view showing the full fretboard. Drop 2 and Drop 3 are jazz voicing techniques that redistribute chord tones across strings for smoother voice-leading. Mandolin Chop and Banjo Moveable show closed grips with no open strings, so every shape slides to any root. Piano shows each chord on a keyboard with right- and left-hand fingering: One hand for close position and inversions, Two hands for left-hand bass plus right-hand chord. Every diagram has Strum (Chord on piano) and Arp buttons that play exactly what it draws.</div>
+      <div class="tip-popup" style="left:auto;right:0;transform:none"><span class="tip-title">Scale &amp; Chord Views</span>Switch between different ways to display the harmonised chords. Chords has two sub-tabs: List shows all notes and intervals, Tonnetz draws the key on the tone network (major chords are triangles pointing up, minor ones pointing down) and moves between chords by P, L and R. Guitar, Mandolin and Banjo tabs each include a Scale view showing the full fretboard. Drop 2 and Drop 3 are jazz voicing techniques that redistribute chord tones across strings for smoother voice-leading. Mandolin Chop and Banjo Moveable show closed grips with no open strings, so every shape slides to any root. Piano shows each chord on a keyboard with right- and left-hand fingering: One hand for close position and inversions, Two hands for left-hand bass plus right-hand chord. Every diagram has Strum (Chord on piano) and Arp buttons that play exactly what it draws.</div>
     </span>
   </div>
   <div class="view-tabs" id="view-tabs" style="align-items:center">
-    <button class="view-tab active" data-view="list"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="5.6" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="9.2" width="7" height="1.8" rx=".5" fill="currentColor" opacity=".5"/></svg>Chord List</button>
+    <button class="view-tab active" data-view="list"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="5.6" width="11" height="1.8" rx=".5" fill="currentColor" opacity=".8"/><rect x="1" y="9.2" width="7" height="1.8" rx=".5" fill="currentColor" opacity=".5"/></svg>Chords</button>
     <button class="view-tab" data-view="guitar" id="tab-guitar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1"/><line x1="3" y1="1" x2="3" y2="12" stroke="currentColor" stroke-width="1"/><line x1="6" y1="1" x2="6" y2="12" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="9" y2="12" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="6" cy="9" r="1.2" fill="currentColor"/></svg>Guitar</button>
     <button class="view-tab" data-view="mandolin" id="tab-mandolin"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><ellipse cx="6.5" cy="8" rx="3.5" ry="4.5" stroke="currentColor" stroke-width="1.1" fill="none"/><line x1="6.5" y1="1" x2="6.5" y2="3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.5" y1="4" x2="8.5" y2="4" stroke="currentColor" stroke-width="1" opacity=".6"/><circle cx="6.5" cy="8" r="1" fill="currentColor" opacity=".4"/></svg>Mandolin</button>
     <button class="view-tab" data-view="banjo" id="tab-banjo"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.1" fill="none"/><circle cx="6.5" cy="8.5" r="1.7" stroke="currentColor" stroke-width=".8" fill="none" opacity=".5"/><line x1="6.5" y1="1" x2="6.5" y2="4.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.9" y1="3.4" x2="4.9" y2="4.9" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".7"/></svg>Banjo</button>
     <button class="view-tab" data-view="piano" id="tab-piano"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="9" rx="1" stroke="currentColor" stroke-width="1.1" fill="none"/><line x1="4.7" y1="2" x2="4.7" y2="11" stroke="currentColor" stroke-width=".8"/><line x1="8.3" y1="2" x2="8.3" y2="11" stroke="currentColor" stroke-width=".8"/><rect x="3.6" y="2" width="2.2" height="5" fill="currentColor"/><rect x="7.2" y="2" width="2.2" height="5" fill="currentColor"/></svg>Piano</button>
+  </div>
+  <div class="guitar-sub-tabs" id="chords-sub-tabs" style="display:none">
+    <button class="guitar-sub-tab active" data-view="list" id="tab-chords-list">List</button>
+    <button class="guitar-sub-tab" data-view="tonnetz" id="tab-chords-tonnetz">Tonnetz</button>
   </div>
   <div class="guitar-sub-tabs" id="guitar-sub-tabs" style="display:none">
     <button class="guitar-sub-tab active" data-view="diagrams" id="tab-diagrams">Basic</button>
@@ -2602,6 +2752,12 @@
   <button data-view="banjo"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="13" r="5"/><circle cx="8" cy="13" r="3.2"/><path d="M11.6 9.4L17 4"/></svg>Banjo</button>
   <button data-view="piano"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="1"/><path d="M7 4v7M10 4v7M13 4v7"/></svg>Piano</button>
 </nav>
+<!-- Phone only: the Chords › Tonnetz inspector, docked above the bottom bar -->
+<section class="peek" id="tz-sheet" aria-label="Tonnetz chord inspector" hidden>
+  <button class="tz-handle" id="tz-handle" data-tz="sheet" aria-expanded="false" aria-label="Open the chord inspector"></button>
+  <div class="tz-stabs" id="tz-stabs"></div>
+  <div class="tz-sbody" id="tz-sbody"></div>
+</section>
 <div id="cof-tooltip"></div>
 
 <script>
@@ -2610,8 +2766,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v87';
-window.APP_DEPLOYED = '2026-10-30 11:40';
+window.APP_VERSION = 'v88';
+window.APP_DEPLOYED = '2026-10-30 12:09';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -3787,7 +3943,7 @@ document.addEventListener('keydown', e => {
 // STATE & RENDERING
 // ══════════════════════════════════════════════
 
-let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastGuitarView:'diagrams',lastMandolinView:'mandolin',lastBanjoView:'banjo',lastPianoView:'piano',scaleLabelMode:'notes',gripLabel:'intervals'};
+let state={key:0,scale:'Major (Ionian)',mode:'4',view:'list',lastChordsView:'list',lastGuitarView:'diagrams',lastMandolinView:'mandolin',lastBanjoView:'banjo',lastPianoView:'piano',scaleLabelMode:'notes',gripLabel:'intervals'};
 
 function buildSelectors(){
   // Key selector: show both enharmonic names for ambiguous keys
@@ -4826,10 +4982,11 @@ function renderCore(){
   const isMandolin = ['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
   const isBanjo    = ['banjo','banjo-scale','banjo-moveable'].includes(state.view);
   const isPiano    = ['piano','piano-two'].includes(state.view);
+  const isChords   = ['list','tonnetz'].includes(state.view);
 
   document.querySelectorAll('.view-tab').forEach(t => {
     const tv = t.dataset.view;
-    const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv==='banjo' ? isBanjo : tv==='piano' ? isPiano : tv===state.view;
+    const isActive = tv==='guitar' ? isGuitar : tv==='mandolin' ? isMandolin : tv==='banjo' ? isBanjo : tv==='piano' ? isPiano : tv==='list' ? isChords : tv===state.view;
     t.classList.toggle('active', isActive);
     t.setAttribute('aria-pressed', isActive);
   });
@@ -4839,6 +4996,7 @@ function renderCore(){
   document.getElementById('mandolin-sub-tabs').style.display = isMandolin ? 'flex' : 'none';
   document.getElementById('banjo-sub-tabs').style.display    = isBanjo    ? 'flex' : 'none';
   document.getElementById('piano-sub-tabs').style.display    = isPiano    ? 'flex' : 'none';
+  document.getElementById('chords-sub-tabs').style.display   = isChords && !compareActive ? 'flex' : 'none';
 
   // Debounce the heavy DOM rebuild with a smooth fade+slide transition
   if (_renderTimer) clearTimeout(_renderTimer);
@@ -5145,6 +5303,7 @@ function renderAltDomTab(scaleNotes, scaleData) {
 function renderViewCore(scaleNotes,scaleData){
   document.getElementById('all-degrees').className = state.view === 'list' ? 'chord-list-view' : '';
   if(state.view==='list')           renderChords(scaleNotes,scaleData);
+  else if(state.view==='tonnetz')   renderTonnetz(scaleNotes,scaleData);
   else if(state.view==='diagrams')  renderDiagrams(scaleNotes,scaleData);
   else if(state.view==='arpeggio')  renderArpeggios(scaleNotes,scaleData);
   else if(state.view==='scale')     renderScaleTab(scaleNotes,scaleData);
@@ -5161,6 +5320,7 @@ function renderViewCore(scaleNotes,scaleData){
   else if(state.view==='piano')          renderPiano(scaleNotes,scaleData);
   else if(state.view==='piano-two')      renderPianoTwo(scaleNotes,scaleData);
   attachSoundBars(document.getElementById('all-degrees'));
+  tzSyncSheet();
   syncPhoneBar(scaleNotes, scaleData);
 }
 
@@ -11183,7 +11343,8 @@ document.getElementById('compare-toggle-btn')?.addEventListener('click', () => {
   if (viewHdr) viewHdr.style.display = compareActive ? 'none' : '';
   if (compareActive) {
     // The instrument sub-tabs would otherwise stay clickable and re-render the hidden list.
-    ['guitar-sub-tabs','mandolin-sub-tabs','banjo-sub-tabs','piano-sub-tabs'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+    ['guitar-sub-tabs','mandolin-sub-tabs','banjo-sub-tabs','piano-sub-tabs','chords-sub-tabs'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+    tzSyncSheet();
     initCompareSelects();
     renderComparison();
   } else {
@@ -11474,6 +11635,7 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   else if (tv==='mandolin') state.view = state.lastMandolinView || 'mandolin';
   else if (tv==='banjo')    state.view = state.lastBanjoView    || 'banjo';
   else if (tv==='piano')    state.view = state.lastPianoView    || 'piano';
+  else if (tv==='list')     state.view = state.lastChordsView   || 'list';
   else state.view = tv;
   const rootPc=parseInt(state.key);
   const scaleData=SCALES[state.scale];
@@ -11482,15 +11644,17 @@ document.getElementById('view-tabs').addEventListener('click',e=>{
   const isMandolin2=['mandolin','mandolin-scale','mandolin-chop'].includes(state.view);
   const isBanjo2   =['banjo','banjo-scale','banjo-moveable'].includes(state.view);
   const isPiano2   =['piano','piano-two'].includes(state.view);
+  const isChords2  =['list','tonnetz'].includes(state.view);
   document.querySelectorAll('.view-tab').forEach(t=>{
     const v=t.dataset.view;
-    t.classList.toggle('active', v==='guitar'?isGuitar2:v==='mandolin'?isMandolin2:v==='banjo'?isBanjo2:v==='piano'?isPiano2:v===state.view);
+    t.classList.toggle('active', v==='guitar'?isGuitar2:v==='mandolin'?isMandolin2:v==='banjo'?isBanjo2:v==='piano'?isPiano2:v==='list'?isChords2:v===state.view);
   });
   document.querySelectorAll('.guitar-sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===state.view));
   document.getElementById('guitar-sub-tabs').style.display  =isGuitar2  ?'flex':'none';
   document.getElementById('mandolin-sub-tabs').style.display=isMandolin2?'flex':'none';
   document.getElementById('banjo-sub-tabs').style.display   =isBanjo2   ?'flex':'none';
   document.getElementById('piano-sub-tabs').style.display   =isPiano2   ?'flex':'none';
+  document.getElementById('chords-sub-tabs').style.display  =isChords2  ?'flex':'none';
   renderView(scaleNotes,scaleData);
   syncUrl();
 });
@@ -11547,6 +11711,20 @@ document.getElementById('piano-sub-tabs').addEventListener('click',e=>{
   syncUrl();
 });
 
+// Chords › List | Tonnetz
+document.getElementById('chords-sub-tabs').addEventListener('click',e=>{
+  const tab = e.target.closest('.guitar-sub-tab');
+  if(!tab) return;
+  state.view = tab.dataset.view;
+  state.lastChordsView = tab.dataset.view;
+  document.querySelectorAll('#chords-sub-tabs .guitar-sub-tab').forEach(t=>{ t.classList.toggle('active', t.dataset.view===state.view); t.setAttribute('aria-pressed', t.dataset.view===state.view); });
+  const rootPc=parseInt(state.key);
+  const scaleData=SCALES[state.scale];
+  const scaleNotes=spellScale(rootPc,scaleData.intervals,scaleData);
+  renderView(scaleNotes,scaleData);
+  syncUrl();
+});
+
 // (Progression panel buttons removed — composition tool is unified)
 
 const backTop=document.getElementById('back-top');
@@ -11580,7 +11758,7 @@ function encodeHash(st) {
 // URLSearchParams already decodes: a second decodeURIComponent threw on "%25" and
 // blanked the page. Anything unknown falls back to the default instead.
 const HASH_MODES = ['3','4','5','6','7','others','secdom','secdim','secsub','chromed'];
-const HASH_VIEWS = ['list','diagrams','arpeggio','scale','shell','drop2','drop3','altdom',
+const HASH_VIEWS = ['list','tonnetz','diagrams','arpeggio','scale','shell','drop2','drop3','altdom',
   'mandolin','mandolin-scale','mandolin-chop','banjo','banjo-scale','banjo-moveable','piano','piano-two'];
 function decodeHash(hash) {
   if (!hash || hash.length < 3) return null;
@@ -11606,6 +11784,7 @@ function decodeHash(hash) {
     state.scale = fromHash.scale;
     state.mode  = fromHash.mode;
     state.view  = fromHash.view;
+    if (state.view === 'tonnetz') state.lastChordsView = 'tonnetz';
     // Sync selectors
     const keyEl = document.getElementById('sel-key');
     const scaleEl = document.getElementById('sel-scale');
@@ -11690,6 +11869,629 @@ function render() {
 }
 function syncUrl() { history.replaceState(null, '', encodeHash(state)); }
 
+// ══════════════════════════════════════════════
+// TONNETZ - Chords › Tonnetz (v88)
+// The tone network: vertex (i,j) is 7i + 4j semitones, so fifths run to the
+// right, major thirds up-right and minor thirds down-right. Up triangle (i,j) =
+// the major triad on (i,j); down triangle (i,j) = the minor triad rooted at
+// (i,j+1). P, L and R flip a triangle over one of its edges: two notes stay and
+// the third moves by a semitone (P, L) or a tone (R).
+// ══════════════════════════════════════════════
+const TZ_S = 58, TZ_H = TZ_S * Math.sqrt(3) / 2;
+const tzMod = n => ((n % 12) + 12) % 12;
+const tzPcAt = (i, j) => tzMod(7 * i + 4 * j);
+const tzX = (i, j) => (i + j / 2) * TZ_S, tzY = (i, j) => -j * TZ_H;
+const tzP2 = ([i, j]) => [tzX(i, j), tzY(i, j)];
+const tzTriVerts = t => t.up ? [[t.i, t.j], [t.i + 1, t.j], [t.i, t.j + 1]] : [[t.i + 1, t.j], [t.i, t.j + 1], [t.i + 1, t.j + 1]];
+const tzTriChord = t => t.up ? { root: tzPcAt(t.i, t.j), minor: false } : { root: tzPcAt(t.i, t.j + 1), minor: true };
+const tzTriPcs = c => [c.root, tzMod(c.root + (c.minor ? 3 : 4)), tzMod(c.root + 7)];
+const tzCentroid = vs => { const ps = vs.map(tzP2); return [ps.reduce((s, p) => s + p[0], 0) / ps.length, ps.reduce((s, p) => s + p[1], 0) / ps.length]; };
+const tzDist2 = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2;
+const tzSameTri = (a, b) => !!a && !!b && a.i === b.i && a.j === b.j && a.up === b.up;
+const tzSameV = (a, b) => a[0] === b[0] && a[1] === b[1];
+const TZ_OPS = {
+  P: t => t.up ? { i: t.i, j: t.j - 1, up: false } : { i: t.i, j: t.j + 1, up: true },
+  R: t => t.up ? { i: t.i - 1, j: t.j, up: false } : { i: t.i + 1, j: t.j, up: true },
+  L: t => ({ i: t.i, j: t.j, up: !t.up }),
+};
+// Every pitch class sits in any 4 x 3 patch of the lattice, so searching around
+// the point is enough.
+function tzAround(px, py, fn) {
+  const jc = Math.round(-py / TZ_H), ic = Math.round(px / TZ_S - jc / 2);
+  for (let j = jc - 6; j <= jc + 6; j++) for (let i = ic - 8; i <= ic + 8; i++) fn(i, j);
+}
+function tzNearestTri(c, px, py) {
+  let best = null, bd = Infinity;
+  tzAround(px, py, (i, j) => {
+    const t = { i, j, up: !c.minor };
+    if (tzTriChord(t).root !== c.root) return;
+    const d = tzDist2(tzCentroid(tzTriVerts(t)), [px, py]);
+    if (d < bd) { bd = d; best = t; }
+  });
+  return best;
+}
+function tzNearestVertex(pc, px, py) {
+  let best = null, bd = Infinity;
+  tzAround(px, py, (i, j) => {
+    if (tzPcAt(i, j) !== pc) return;
+    const d = tzDist2(tzP2([i, j]), [px, py]);
+    if (d < bd) { bd = d; best = [i, j]; }
+  });
+  return best;
+}
+const tzAdjacent = (a, b) => { const di = b[0] - a[0], dj = b[1] - a[1]; return Math.abs(di) + Math.abs(dj) === 1 || (di === 1 && dj === -1) || (di === -1 && dj === 1); };
+// A chord drawn on the lattice: every triangle whose three corners are chord
+// tones, every edge between two of them.
+function tzShapeOf(vs) {
+  const has = (i, j) => vs.some(v => v[0] === i && v[1] === j), tris = [], seen = new Set();
+  for (const [vi, vj] of vs) for (let i = vi - 1; i <= vi; i++) for (let j = vj - 1; j <= vj; j++) for (const up of [true, false]) {
+    const id = `${i},${j},${up}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    if (tzTriVerts({ i, j, up }).every(([a, b]) => has(a, b))) tris.push({ i, j, up });
+  }
+  const edges = [];
+  vs.forEach((a, x) => vs.slice(x + 1).forEach(b => { if (tzAdjacent(a, b)) edges.push([a, b]); }));
+  return { tris, edges };
+}
+const tzGreedyShape = (pcs, start) => pcs.slice(1).reduce((vs, pc) => vs.concat([tzNearestVertex(pc, ...tzCentroid(vs))]), [start]);
+// The selected chord: its placed notes plus its 7th, next to them (Δ7 = rhombus,
+// 7 = triangle and tail, dim7 = line of four). Extensions are not drawn.
+const tzSelShape = (verts, pcs) => pcs.length < 4 ? verts : verts.concat([tzNearestVertex(pcs[3], ...tzCentroid(verts))]);
+
+// Triads outside the key are spelled on the line of fifths: Db major, C# minor.
+const TZ_LOF = 'FCGDAEB', TZ_MAJ_K = [0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5], TZ_MIN_K = [0, 7, 2, -3, 4, -1, 6, 1, 8, 3, -2, 5];
+const tzLofName = k => { const a = Math.floor((k + 1) / 7); return TZ_LOF[((k + 1) % 7 + 7) % 7] + (a > 0 ? '#'.repeat(a) : 'b'.repeat(-a)); };
+const tzSpellTriad = (root, minor) => { const k = (minor ? TZ_MIN_K : TZ_MAJ_K)[root]; return [k, minor ? k - 3 : k + 4, k + 1].map(tzLofName); };
+
+// Negative harmony on the map: a half-turn around the midpoint of a tonic-fifth
+// edge sends pc to 2 tonic + 7 - pc, the mirror negMirrorPcCoF draws on the circle.
+const tzMirrorPc = (pc, tonic) => tzMod(2 * tonic + 7 - pc);
+function tzAxisNear(tonic, px, py) {
+  let best = null, bd = Infinity;
+  tzAround(px, py, (a, b) => {
+    if (tzPcAt(a, b) !== tonic) return;
+    const d = tzDist2([(tzX(a, b) + tzX(a + 1, b)) / 2, tzY(a, b)], [px, py]);
+    if (d < bd) { bd = d; best = { a, b }; }
+  });
+  return best;
+}
+const tzAxisMid = ax => [(tzX(ax.a, ax.b) + tzX(ax.a + 1, ax.b)) / 2, tzY(ax.a, ax.b)];
+const tzReflect = (ax, [i, j]) => [2 * ax.a + 1 - i, 2 * ax.b - j];
+const tzMirrorTri = (ax, t) => ({ i: 2 * ax.a - t.i, j: 2 * ax.b - t.j - 1, up: !t.up });
+
+const tzPerms = n => n === 1 ? [[0]] : tzPerms(n - 1).flatMap(p => Array.from({ length: n }, (_, k) => [...p.slice(0, k), n - 1, ...p.slice(k)]));
+const TZ_PERMS = { 3: tzPerms(3), 4: tzPerms(4) };
+const tzMean = v => v.reduce((s, m) => s + m, 0) / v.length;
+// Close position in chord order, centred near `center` (MIDI).
+function tzCloseVoicing(pcs, center = 62) {
+  const v = [];
+  pcs.forEach((pc, k) => { let m = 48 + pc; if (k) while (m <= v[k - 1]) m += 12; v.push(m); });
+  const shift = Math.round((center - tzMean(v)) / 12) * 12;
+  return v.map(m => m + shift);
+}
+// Shortest voice-leading: each voice goes to the nearest tone of the next chord.
+function tzVoiceLead(from, pcs) {
+  if (from.length !== pcs.length || !TZ_PERMS[pcs.length]) return tzCloseVoicing(pcs, tzMean(from));
+  let best = null;
+  for (const p of TZ_PERMS[pcs.length]) {
+    let tot = 0;
+    const v = from.map((m, k) => { let d = tzMod(pcs[p[k]] - m); if (d > 6) d -= 12; tot += Math.abs(d); return m + d; });
+    if (!best || tot < best.tot) best = { tot, v };
+  }
+  const mean = tzMean(best.v);
+  return mean > 71 ? best.v.map(m => m - 12) : mean < 53 ? best.v.map(m => m + 12) : best.v;
+}
+// The smallest note-to-note motion between two triads, as text: "G→A +2".
+function tzVlText(a, b, nameA, nameB) {
+  let best = null;
+  for (const p of TZ_PERMS[3]) {
+    let tot = 0;
+    const mv = a.map((pc, k) => { let d = tzMod(b[p[k]] - pc); if (d > 6) d -= 12; tot += Math.abs(d); return [pc, b[p[k]], d]; });
+    if (!best || tot < best.tot) best = { tot, mv };
+  }
+  return best.mv.filter(m => m[2]).map(([x, y, d]) => `${nameA(x)}→${nameB(y)} ${d > 0 ? '+' : '−'}${Math.abs(d)}`).join(' · ');
+}
+// Triads one semitone away from a chord that is not a triangle (dim, aug, sus...).
+function tzSemitoneNeighbours(pcs) {
+  const out = [];
+  pcs.forEach((pc, k) => [1, -1].forEach(d => {
+    const set = pcs.map((p, x) => x === k ? tzMod(p + d) : p);
+    for (const r of set) for (const minor of [false, true])
+      if (tzTriPcs({ root: r, minor }).every(p => set.includes(p)) && !out.some(o => o.root === r && o.minor === minor))
+        out.push({ root: r, minor, from: pc, to: tzMod(pc + d), d });
+  }));
+  return out;
+}
+
+// The List view's chords, one per degree, as the map needs them. Modes that are
+// not one diatonic chord per degree (Others, the chromatic modes) fall back to
+// the scale's triads, and say so.
+const TZ_LIST_ONLY = { others: 'Others (sus, add, aug)', secdom: 'Secondary dominants', secdim: 'Secondary diminished chords', secsub: 'Secondary subdominants', chromed: 'Chromatic mediants' };
+function tzDegreeChords(rootPc, scaleName, mode) {
+  const sd = SCALES[scaleName], notes = spellScale(rootPc, sd.intervals, sd), romans = computeAllRomans(sd.intervals, sd);
+  const chromatic = ['secdom', 'secdim', 'secsub', 'chromed'].includes(mode);
+  const mk = (d, cn, iv, numeral = romans[d]) => {
+    const { sym, quality } = getChordSymbol(cn[0], iv), pcs = cn.map(noteNameToPc);
+    const a = tzMod(pcs[1] - pcs[0]), b = tzMod(pcs[2] - pcs[0]), tri = b === 7 && (a === 3 || a === 4);
+    return { d, numeral, notes: cn, pcs, iv, sym, qual: quality, name: cn[0] + sym,
+      tname: cn[0] + getChordSymbol(cn[0], iv.slice(0, 3)).sym, tri, minor: tri && a === 3 };
+  };
+  let chords;
+  if (sd.specialChords === 'halfwhole') {
+    const cn = [0, 4, 7, 10, 1].map(iv => notes.find(n => noteNameToPc(n) === (rootPc + iv) % 12)).filter(Boolean);
+    chords = [{ ...mk(0, cn, [0, 4, 7, 10, 13], 'I'), qual: 'Dominant 7♭9' }];
+  } else if (sd.specialChords === 'wholehalf') {
+    chords = notes.map((_, d) => mk(d, [0, 2, 4, 6].map(o => notes[(d + o) % notes.length]), [0, 3, 6, 9]));
+  } else {
+    const n = TZ_LIST_ONLY[mode] ? 3 : Math.min(parseInt(mode) || 3, notes.length);
+    chords = notes.map((_, d) => mk(d, buildChord(notes, d, n), chordIntervals(sd.intervals, d, n)));
+  }
+  const note = TZ_LIST_ONLY[mode] && (chromatic || !sd.specialChords)
+    ? `${TZ_LIST_ONLY[mode]} are shown in List view; the map shows the scale's ${sd.specialChords ? 'chords' : 'triads'}.` : '';
+  return { notes, chords, note };
+}
+
+// The key on the map. Major and minor triads become triangles grown through
+// P, L and R from the tonic; any other chord takes the most compact shape next
+// to them, sharing as many notes as it can. A scale with no triad at all is
+// laid out around the tonic.
+function tzPlaceKey(chords, tonic) {
+  const out = chords.map(() => null);
+  const cluster = () => out.filter(Boolean).flatMap(p => p.verts);
+  const center = () => { const cl = cluster(); return cl.length ? tzCentroid(cl) : tzP2(tzNearestVertex(tonic, 0, 0)); };
+  const free = c => chords.find(k => k.tri && !out[k.d] && k.pcs[0] === c.root && k.minor === c.minor);
+  const put = (k, t) => { out[k.d] = { tri: t, verts: tzTriVerts(t) }; };
+  chords.filter(c => c.tri).sort((a, b) => (b.d === 0) - (a.d === 0)).forEach(c => {
+    if (out[c.d]) return;
+    const queue = [tzNearestTri({ root: c.pcs[0], minor: c.minor }, ...center())];
+    put(c, queue[0]);
+    while (queue.length) {
+      const t = queue.shift();
+      for (const op of 'PLR') { const n = TZ_OPS[op](t), k = free(tzTriChord(n)); if (k) { put(k, n); queue.push(n); } }
+    }
+  });
+  chords.forEach(c => {
+    if (out[c.d]) return;
+    const cl = cluster(), cc = center(), roots = [];
+    tzAround(...cc, (i, j) => { if (tzPcAt(i, j) === c.pcs[0]) roots.push([i, j]); });
+    roots.sort((a, b) => tzDist2(tzP2(a), cc) - tzDist2(tzP2(b), cc));
+    let best = null, bs = Infinity;
+    for (const r of roots.slice(0, 8)) {
+      const vs = tzGreedyShape(c.pcs.slice(0, 3), r), shared = vs.filter(v => cl.some(w => tzSameV(v, w))).length;
+      const s = -shared * 1000 + Math.sqrt(tzDist2(tzCentroid(vs), cc));
+      if (s < bs) { bs = s; best = vs; }
+    }
+    out[c.d] = { tri: null, verts: best };
+  });
+  return out;
+}
+
+// ── The view: chips, map, inspector and progression (on a phone the inspector
+// is a sheet docked above the bottom bar) ──
+const TZ_MOVES = [['LP', 'chromatic mediant'], ['PL', 'chromatic mediant'], ['RP', 'chromatic mediant'], ['PR', 'chromatic mediant'], ['RLP', 'N'], ['LPR', 'S · slide'], ['PLP', 'H · hexatonic pole']];
+const TZ_OP_NAMES = { P: 'Parallel', L: 'Leading-tone exchange', R: 'Relative' };
+const TZ_CYCLES = { hex: 'PLPLPL', oct: 'PRPRPRPR', lr: 'RLRLRLRLRLRL' };
+const TZ_OUT_DEG = ['1', '♭2', '2', '♭3', '3', '4', '♯4', '5', '♭6', '6', '♭7', '7'];
+const tz = { sig: '', key: true, deg: false, sheet: 'peek', tab: 'chord', W: 620, HH: 330, data: null, place: [], vc: [0, 0],
+  ids: [], sel: null, ch: null, path: [], voicing: null, mark: null, anim: 0, playingK: -1, el: null };
+
+const tzEl = (tag, attrs, parent) => {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+};
+const tzPts = vs => vs.map(v => tzP2(v).map(n => n.toFixed(1)).join(',')).join(' ');
+const tzDiamond = ([x, y]) => `M${x.toFixed(1)} ${(y - 8).toFixed(1)}l8 8l-8 8l-8 -8z`;
+const tzTonic = () => parseInt(state.key);
+const tzDegOfTriad = c => tz.data.chords.find(k => k.tri && k.pcs[0] === c.root && k.minor === c.minor);
+// Note names as the List spells them: the degree chord's own notes when the
+// triad is one, the line of fifths otherwise.
+function tzNamesFor(c) {
+  const k = tzDegOfTriad(c), sp = k ? k.notes : tzSpellTriad(c.root, c.minor), ps = k ? k.pcs : tzTriPcs(c);
+  return pc => sp[ps.indexOf(pc)] || _plainName(pc);
+}
+const tzTriadLabel = c => { const k = tzDegOfTriad(c); return k ? k.name : tzSpellTriad(c.root, c.minor)[0] + (c.minor ? 'm' : ''); };
+const tzDegSel = d => ({ tri: tz.place[d].tri, verts: tz.place[d].verts, d });
+// What a selection is, in the shape addToProgression takes.
+function tzChordOf(s) {
+  if (s.d != null) { const c = tz.data.chords[s.d]; return { name: c.notes[0], sym: c.sym, roman: c.numeral, notes: c.notes, quality: c.qual, label: c.name, pcs: c.pcs }; }
+  const t = tzTriChord(s.tri), notes = tzSpellTriad(t.root, t.minor);
+  return { name: notes[0], sym: t.minor ? 'm' : '', roman: '', notes, quality: t.minor ? 'Minor' : 'Major', label: notes[0] + (t.minor ? 'm' : ''), pcs: tzTriPcs(t) };
+}
+
+function renderTonnetz(scaleNotes, scaleData) {
+  const phone = PHONE_MQ.matches;
+  tz.W = phone ? 340 : 620; tz.HH = phone ? 268 : 330;
+  const sig = `${state.key}|${state.scale}|${state.mode}`;
+  if (sig !== tz.sig) tzRebuild(sig, scaleData);
+  const box = document.getElementById('all-degrees');
+  box.innerHTML = `<div class="tz-view">
+    <div class="tz-bar"><div class="tz-dchips" role="group" aria-label="Degree chords"></div><div class="tz-layers" role="group" aria-label="Map layers"></div></div>
+    <div class="tz-mapbox"><svg class="tz-map" role="img"></svg><div class="tz-maptools" role="group" aria-label="Map layers"></div>
+      <div class="tz-legend"><span><i>▲</i> major</span><span><i class="mn">▼</i> minor</span><span><i>━</i> other chords (dim, aug, sus...)</span><span><i>┄</i> jump</span><span><i class="mn">◆</i> negative-harmony axis</span><span>numerals = the key</span></div></div>
+    <p class="tz-mnote"></p>
+    <div class="tz-insp"></div>
+    <div class="tz-prog"></div></div>`;
+  const root = box.firstElementChild;
+  tz.el = { root, svg: root.querySelector('.tz-map'), L: {}, vtx: [] };
+  root.addEventListener('click', tzOnClick);
+  tzBuildGrid();
+  tzRefresh();
+}
+
+function tzRebuild(sig, sd) {
+  tzStop();
+  tz.sig = sig;
+  tz.data = tzDegreeChords(tzTonic(), state.scale, state.mode);
+  tz.place = tzPlaceKey(tz.data.chords, tzTonic());
+  const [cx, cy] = tzCentroid(tz.place.flatMap(p => p.verts));
+  tz.vc = [Math.round(cx), Math.round(cy)];
+  tz.ids = scaleIdentity(sd.intervals, sd).trim().split(/\s+/);
+  tz.path = []; tz.voicing = null; tz.mark = null;
+  tzSetSel(tzDegSel(0), null, { silent: true });
+}
+
+function tzBuildGrid() {
+  const { svg, L } = tz.el, [vx, vy] = tz.vc, W = tz.W, HH = tz.HH;
+  svg.setAttribute('viewBox', `${vx - W / 2} ${vy - HH / 2} ${W} ${HH}`);
+  for (const k of ['grid', 'edge', 'key', 'neg', 'sel', 'path', 'num', 'vtx', 'mark']) L[k] = tzEl('g', { class: 'L-' + k }, svg);
+  const j0 = Math.floor(-(vy + HH / 2) / TZ_H) - 1, j1 = Math.ceil(-(vy - HH / 2) / TZ_H) + 1;
+  for (let j = j0; j <= j1; j++) {
+    const i0 = Math.floor((vx - W / 2 - TZ_S) / TZ_S - j / 2) - 1, i1 = Math.ceil((vx + W / 2 + TZ_S) / TZ_S - j / 2) + 1;
+    for (let i = i0; i <= i1; i++) {
+      for (const up of [true, false]) {
+        const t = { i, j, up }, p = tzEl('polygon', { points: tzPts(tzTriVerts(t)), class: 'tri ' + (up ? 'up' : 'dn'), 'data-tri': `${i},${j},${up ? 1 : 0}` }, L.grid);
+        tzEl('title', {}, p).textContent = tzTriadLabel(tzTriChord(t));
+      }
+      const x = tzX(i, j), y = tzY(i, j);
+      for (const [di, dj] of [[1, 0], [0, 1], [1, -1]]) tzEl('line', { x1: x.toFixed(1), y1: y.toFixed(1), x2: tzX(i + di, j + dj).toFixed(1), y2: tzY(i + di, j + dj).toFixed(1), class: 'edge' }, L.edge);
+      if (Math.abs(x - vx) > W / 2 + 16 || Math.abs(y - vy) > HH / 2 + 16) continue;
+      const pc = tzPcAt(i, j), g = tzEl('g', { class: 'v', 'data-pc': pc, transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})` }, L.vtx);
+      tzEl('circle', { r: 13 }, g);
+      tz.el.vtx.push({ i, j, pc, g, tx: tzEl('text', {}, g) });
+    }
+  }
+}
+
+// Where a degree's numeral goes: in its triangle, or beside the middle of its line.
+function tzNumPos(p) {
+  if (p.tri) return tzCentroid(p.verts);
+  const a = tzP2(p.verts[0]), b = tzP2(p.verts[p.verts.length - 1]), m = tzP2(p.verts[1] || p.verts[0]);
+  const n = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  let px = (b[1] - a[1]) / n, py = -(b[0] - a[0]) / n;
+  if (py > 0) { px = -px; py = -py; }
+  return [m[0] + px * 27, m[1] + py * 27];
+}
+
+function tzDraw() {
+  const { L, vtx, svg } = tz.el, chords = tz.data.chords, sel = tz.sel, tonic = tzTonic();
+  for (const k of ['key', 'neg', 'sel', 'num', 'path', 'mark']) L[k].textContent = '';
+  if (tz.key) chords.forEach((c, d) => {
+    const p = tz.place[d];
+    if (p.tri) tzEl('polygon', { points: tzPts(p.verts), class: 'k-tri ' + (c.minor ? 'min' : 'maj') }, L.key);
+    else tzEl('title', {}, tzEl('polyline', { points: tzPts(p.verts), class: 'k-line', 'data-d': d }, L.key)).textContent = c.name;
+    const [nx, ny] = tzNumPos(p), dark = sel.d === d && p.tri && !c.minor && tzSameTri(sel.tri, p.tri);
+    tzEl('text', { x: nx.toFixed(1), y: ny.toFixed(1), class: 'k-num' + (dark ? ' dark' : '') }, L.num).textContent = c.numeral;
+  });
+  if (negHarmonyActive) tzDrawNeg();
+  const shape = tzSelShape(sel.verts, tz.ch.pcs), shp = tzShapeOf(shape);
+  shp.tris.forEach(t => tzEl('polygon', { points: tzPts(tzTriVerts(t)), class: 's-tri ' + (tzTriChord(t).minor ? 'min' : 'maj') }, L.sel));
+  shp.edges.forEach(([a, b]) => tzEl('line', { x1: tzX(...a), y1: tzY(...a), x2: tzX(...b), y2: tzY(...b), class: 's-edge' }, L.sel));
+  tz.path.forEach((e, k) => {
+    const end = e.pts[e.pts.length - 1];
+    if (k) {
+      const prev = tz.path[k - 1].pts[tz.path[k - 1].pts.length - 1], line = e.jump ? [prev, end] : [prev, ...e.pts];
+      tzEl('polyline', { points: line.map(p => p.map(n => n.toFixed(1)).join(',')).join(' '), class: 'trace' + (e.jump ? ' jump' : '') }, L.path);
+    }
+    const last = k === tz.path.length - 1;
+    tzEl('circle', { cx: end[0].toFixed(1), cy: end[1].toFixed(1), r: last ? 13 : 2.5, class: last ? 'head' : 'dot' }, L.path);
+  });
+  if (tz.mark) tzEl('path', { d: tzDiamond(tz.mark), class: 'mark' }, L.mark);
+  const scale = tz.data.notes, spcs = scale.map(noteNameToPc), ch = tz.ch;
+  for (const v of vtx) {
+    const k = spcs.indexOf(v.pc), on = shape.some(w => tzSameV(w, [v.i, v.j]));
+    v.g.classList.toggle('in', k >= 0);
+    v.g.classList.toggle('on', on);
+    v.tx.textContent = tz.deg ? (k >= 0 ? tz.ids[k] : TZ_OUT_DEG[tzMod(v.pc - tonic)])
+      : on ? ch.notes[ch.pcs.indexOf(v.pc)] || _plainName(v.pc) : k >= 0 ? scale[k] : _plainName(v.pc);
+  }
+  svg.setAttribute('aria-label', `Tonnetz of ${scale[0]} ${state.scale}, ${ch.label} selected`);
+}
+
+// The key mirrored around the tonic-fifth edge of the tonic chord.
+function tzDrawNeg() {
+  const L = tz.el.L, tonic = tzTonic(), tv = tz.place[0].verts.find(v => tzPcAt(...v) === tonic);
+  const ax = tv ? { a: tv[0], b: tv[1] } : tzAxisNear(tonic, ...tz.vc);
+  tz.data.chords.forEach((c, d) => {
+    const vs = tz.place[d].verts.map(v => tzReflect(ax, v)), shp = tzShapeOf(vs);
+    if (!shp.tris.length) { tzEl('polyline', { points: tzPts(vs), class: 'n-line' }, L.neg); return; }
+    shp.tris.forEach(t => tzEl('polygon', { points: tzPts(tzTriVerts(t)), class: 'n-tri' }, L.neg));
+    const neg = buildNegChord(c.notes.slice(0, 3), tonic), [x, y] = tzCentroid(tzTriVerts(shp.tris[0]));
+    if (neg) tzEl('text', { x: x.toFixed(1), y: y.toFixed(1), class: 'n-lbl' }, L.neg).textContent = neg.root + neg.sym;
+  });
+  tzEl('path', { d: tzDiamond(tzAxisMid(ax)), class: 'mark' }, L.neg);
+}
+
+function tzUI() {
+  const root = tz.el.root, chords = tz.data.chords, sel = tz.sel, phone = PHONE_MQ.matches;
+  root.querySelector('.tz-dchips').innerHTML = chords.map(c => `<button class="tz-dchip${sel.d === c.d ? ' on' : ''}" data-tz="deg" data-d="${c.d}" aria-pressed="${sel.d === c.d}"><b>${c.numeral}</b><span>${c.name}</span></button>`).join('');
+  const negOk = state.scale === 'Major (Ionian)';
+  const layers = short => [
+    ['key', 'Key', tz.key, 'The scale\'s chords and their numerals'],
+    ['neg', short ? 'Neg' : 'Negative', negHarmonyActive, negOk ? 'Negative harmony: the key mirrored around the tonic-fifth edge (the same switch as on the circle of fifths)' : 'Negative harmony works on the major scale, as on the circle of fifths'],
+    ['deg', short ? '1·3·5' : 'Degrees', tz.deg, 'Label the notes 1, ♭3, 5... instead of note names'],
+  ].map(([l, t, on, title]) => `<button class="tz-tg${on ? ' on' : ''}" data-tz="layer" data-l="${l}" aria-pressed="${on}" title="${title}"${l === 'neg' && !negOk ? ' disabled' : ''}>${t}</button>`).join('');
+  root.querySelector('.tz-layers').innerHTML = '<span class="tz-lbl">Layers</span>' + layers(false);
+  root.querySelector('.tz-maptools').innerHTML = layers(true);
+  const notes = [tz.data.note,
+    chords.some(c => c.pcs.length > 4) && 'Notes above the 7th are not drawn; they sound when the chord plays.',
+    !chords.some(c => c.tri) && 'This scale has no major or minor triad, so its chords are lines and shapes: pick a triad one semitone away, or click any triangle.'].filter(Boolean);
+  const mn = root.querySelector('.tz-mnote');
+  mn.textContent = notes.join(' ');
+  mn.hidden = !notes.length;
+  if (phone) { tzSheetUI(); tzRailSync(); }
+  else {
+    root.querySelector('.tz-insp').innerHTML = `<div class="tz-box"><div class="tz-h">Selected chord</div>${tzCardHTML(false)}${sel.tri ? '<div class="tz-h tz-h2">One move</div>' : ''}${tzPlrHTML()}</div><div class="tz-box">${tzMovesHTML()}</div>`;
+    root.querySelector('.tz-prog').innerHTML = tzProgHTML();
+  }
+}
+const tzRefresh = () => { tzDraw(); tzUI(); };
+
+function tzCardHTML(phone) {
+  const sel = tz.sel, ch = tz.ch, c = sel.d != null ? tz.data.chords[sel.d] : null, spcs = tz.data.notes.map(noteNameToPc);
+  const badge = c ? `<span class="tz-deg">${c.numeral}</span>` : `<span class="tz-out">${ch.pcs.every(p => spcs.includes(p)) ? 'in the scale' : 'outside the key'}</span>`;
+  const mini = phone ? `<span class="tz-mini"><button data-tz="play" aria-label="Play ${ch.label}">▶</button><button data-tz="comp" aria-label="Add ${ch.label} to the composition">+</button></span>` : '';
+  const triNote = c && c.pcs.length > 3 && sel.tri ? ` · P, L, R act on the triad ${c.tname}` : '';
+  return `<div class="tz-card-top"><span class="tz-name">${ch.name}<sup>${ch.sym}</sup></span>${badge}${mini}</div>
+    <div class="tz-notes">${ch.quality} · ${ch.notes.join(' ')}${triNote}</div>
+    ${phone ? '' : '<div class="tz-acts"><button class="tz-act" data-tz="play">▶ Chord</button><button class="tz-act" data-tz="arp">Arp</button><button class="tz-act" data-tz="comp">+ Composer</button><button class="tz-act" data-tz="guitar">Guitar ›</button></div>'}`;
+}
+function tzPlrHTML() {
+  const sel = tz.sel;
+  if (!sel.tri) {
+    const c = tz.data.chords[sel.d], line = c.iv[1] === 3 && c.iv[2] === 6 ? 'two minor thirds' : c.iv[1] === 4 && c.iv[2] === 8 ? 'two major thirds' : '';
+    return `<p class="tz-note">${c.tname} is not a triangle${line ? `: its notes sit in a line (${line})` : ': it is neither a major nor a minor triad'}. P, L and R only move major and minor chords; try a triad one semitone away.</p>`;
+  }
+  const cur = tzTriChord(sel.tri), na = tzNamesFor(cur);
+  return `<div class="tz-plr">${[...'PLR'].map(op => {
+    const c = tzTriChord(TZ_OPS[op](sel.tri)), k = tzDegOfTriad(c), to = tzTriadLabel(c);
+    return `<button data-tz="op" data-op="${op}" title="${TZ_OP_NAMES[op]} (key ${op})" aria-label="${op}, ${TZ_OP_NAMES[op]}: ${to}"><b>${op}</b><span class="to">${to}</span><span class="vl">${tzVlText(tzTriPcs(cur), tzTriPcs(c), na, tzNamesFor(c))}</span>${k ? `<i>${k.numeral}</i>` : ''}</button>`;
+  }).join('')}</div>`;
+}
+const tzAxisName = () => { const n = tz.data.notes, f = tzMod(tzTonic() + 7), k = n.map(noteNameToPc).indexOf(f); return `${n[0]}-${k >= 0 ? n[k] : _plainName(f)}`; };
+function tzMovesHTML() {
+  const sel = tz.sel;
+  if (!sel.tri) {
+    const c = tz.data.chords[sel.d], na = pc => c.notes[c.pcs.indexOf(pc)] || _plainName(pc);
+    return '<div class="tz-h">One semitone away</div>' + tzSemitoneNeighbours(c.pcs.slice(0, 3)).map(n => {
+      const k = tzDegOfTriad(n);
+      return `<button class="tz-row" data-tz="semi" data-root="${n.root}" data-minor="${n.minor ? 1 : 0}"><span class="op">½</span><b>${tzTriadLabel(n)}</b><span class="vl">${na(n.from)}→${tzNamesFor(n)(n.to)} ${n.d > 0 ? '+1' : '−1'}</span><span class="tag${k ? ' k' : ''}">${k ? k.numeral : ''}</span></button>`;
+    }).join('');
+  }
+  const cur = tzTriChord(sel.tri), na = tzNamesFor(cur);
+  const rows = TZ_MOVES.map(([ops, tag]) => {
+    let t = sel.tri;
+    for (const o of ops) t = TZ_OPS[o](t);
+    const c = tzTriChord(t), k = tzDegOfTriad(c), lbl = ops === 'RLP' ? `N · ${cur.minor ? 'major V' : 'minor iv'}` : tag;
+    return `<button class="tz-row" data-tz="move" data-ops="${ops}"><span class="op">${ops}</span><b>${tzTriadLabel(c)}</b><span class="vl">${tzVlText(tzTriPcs(cur), tzTriPcs(c), na, tzNamesFor(c))}</span><span class="tag${k ? ' k' : ''}">${k ? k.numeral + ' · ' : ''}${lbl}</span></button>`;
+  }).join('');
+  const mt = tzTriChord(tzMirrorTri(tzAxisNear(tzTonic(), ...tzCentroid(sel.verts)), sel.tri)), mk = tzDegOfTriad(mt);
+  return `<div class="tz-h">Two or three moves</div>${rows}
+    <div class="tz-h tz-h2">Negative harmony · cycles</div>
+    <button class="tz-row" data-tz="mirror"><span class="op">neg</span><b>${tzTriadLabel(mt)}</b><span class="vl">mirror around ${tzAxisName()}</span><span class="tag${mk ? ' k' : ''}">${mk ? mk.numeral : ''}</span></button>
+    <div class="tz-cyc"><button class="tz-act" data-tz="cyc" data-c="hex">Hexatonic · PL</button><button class="tz-act" data-tz="cyc" data-c="oct">Octatonic · PR</button><button class="tz-act" data-tz="cyc" data-c="lr">LR chain</button></div>`;
+}
+function tzProgHTML() {
+  const p = tz.path, chips = p.map((e, k) => (k ? `<span class="tz-pop">${e.op || ''}</span>` : '')
+    + `<button class="tz-chip${k === p.length - 1 ? ' on' : ''}${k === tz.playingK ? ' playing' : ''}" data-tz="chip" data-k="${k}" aria-label="Play ${e.ch.label}"><i>${e.ch.roman || '·'}</i><b>${e.ch.label}</b></button>`).join('');
+  return `<div class="tz-h">Progression · ${p.length} chord${p.length > 1 ? 's' : ''}</div><div class="tz-chips">${chips}</div>
+    <div class="tz-pbtns"><button class="tz-act" data-tz="playall">▶ Play</button><button class="tz-act" data-tz="undo"${p.length < 2 ? ' disabled' : ''}>↶ Undo</button><button class="tz-act" data-tz="clear"${p.length < 2 ? ' disabled' : ''}>Clear</button><button class="tz-act tz-send" data-tz="send">Send to Composer →</button></div>`;
+}
+
+// Phone: the inspector docked above the bottom bar, folded (chord + P, L, R)
+// or open (tabs Chord / Progression).
+function tzSheetUI() {
+  const sh = document.getElementById('tz-sheet'), open = tz.sheet === 'open', h = document.getElementById('tz-handle');
+  sh.classList.toggle('peek', !open);
+  h.setAttribute('aria-expanded', open);
+  h.setAttribute('aria-label', open ? 'Fold the chord inspector' : 'Open the chord inspector');
+  document.getElementById('tz-stabs').innerHTML = [['chord', 'Chord'], ['prog', `Progression · ${tz.path.length}`]]
+    .map(([t, l]) => `<button class="tz-stab${tz.tab === t ? ' on' : ''}" data-tz="tab" data-tab="${t}" aria-pressed="${tz.tab === t}">${l}</button>`).join('');
+  document.getElementById('tz-sbody').innerHTML = open && tz.tab === 'prog' ? tzProgHTML() : tzCardHTML(true) + tzPlrHTML() + `<div class="tz-more">${tzMovesHTML()}</div>`;
+  document.body.classList.toggle('tz-open', open);
+  document.documentElement.style.setProperty('--tz-sheet-h', sh.offsetHeight + 'px');
+}
+function tzSetSheet(open) {
+  const was = tz.sheet === 'open';
+  tz.sheet = open ? 'open' : 'peek';
+  tzSheetUI();
+  const box = tz.el && tz.el.root.querySelector('.tz-mapbox');
+  if (open && !was && box) window.scrollTo({ top: box.getBoundingClientRect().top + window.scrollY - document.getElementById('m-top').offsetHeight - 8, behavior: 'smooth' });
+}
+// The sheet shows only with the Tonnetz sub-view on a phone, never during a comparison.
+function tzSyncSheet() {
+  const on = state.view === 'tonnetz' && PHONE_MQ.matches && !compareActive, sh = document.getElementById('tz-sheet');
+  sh.hidden = !on;
+  document.body.classList.toggle('tz-sheet-on', on);
+  if (!on) document.body.classList.remove('tz-open');
+  if (state.view !== 'tonnetz' || compareActive) tzStop();
+  if (on) document.documentElement.style.setProperty('--tz-sheet-h', sh.offsetHeight + 'px');
+}
+// In this view the degree rail selects the degree chord on the map.
+function tzBuildRail(rail) {
+  const chords = tz.data ? tz.data.chords : [];
+  rail.hidden = chords.length < 2;
+  rail.setAttribute('aria-label', 'Select a degree chord on the map');
+  rail.innerHTML = chords.map(c => `<button class="m-rl${tz.sel.d === c.d ? ' on' : ''}" data-deg="${c.d}" aria-pressed="${tz.sel.d === c.d}"><b>${c.numeral}</b><span>${c.name}</span></button>`).join('');
+}
+function tzRailSync() {
+  const rail = document.getElementById('m-rail');
+  rail.querySelectorAll('.m-rl[data-deg]').forEach(b => {
+    const on = +b.dataset.deg === tz.sel.d;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on);
+    if (on && rail.scrollWidth > rail.clientWidth) rail.scrollLeft = b.offsetLeft - (rail.clientWidth - b.offsetWidth) / 2;
+  });
+}
+
+// Selection and moves. A selection that would leave the view comes back by a
+// whole period of the lattice (same chord, another copy), drawn as a jump.
+function tzSetSel(s, op, opts = {}) {
+  let jumped = false;
+  const [cx, cy] = tzCentroid(s.verts);
+  if (Math.abs(cx - tz.vc[0]) > tz.W / 2 - TZ_S * 0.55 || Math.abs(cy - tz.vc[1]) > tz.HH / 2 - TZ_H * 0.45) {
+    let best = [0, 0], bd = Infinity;
+    for (let a = -6; a <= 6; a++) for (let b = -4; b <= 4; b++) {
+      const di = 4 * a, dj = -a + 3 * b, d = (cx + (di + dj / 2) * TZ_S - tz.vc[0]) ** 2 + 1.5 * (cy - dj * TZ_H - tz.vc[1]) ** 2;
+      if (d < bd) { bd = d; best = [di, dj]; }
+    }
+    if (best[0] || best[1]) {
+      const [di, dj] = best;
+      s = { ...s, tri: s.tri && { i: s.tri.i + di, j: s.tri.j + dj, up: s.tri.up }, verts: s.verts.map(([i, j]) => [i + di, j + dj]) };
+      jumped = true;
+    }
+  }
+  tz.sel = s;
+  tz.ch = tzChordOf(s);
+  tz.voicing = tz.voicing ? tzVoiceLead(tz.voicing, tz.ch.pcs) : tzCloseVoicing(tz.ch.pcs);
+  tz.mark = op === 'neg' ? opts.mark : null;
+  const end = tzCentroid(s.verts), pts = jumped ? [end] : (opts.via || []).map(t => tzCentroid(tzTriVerts(t))).concat([end]);
+  tz.path.push({ s, ch: tz.ch, op, pts, jump: jumped || op === '·' || op === 'neg' || op === '½', v: tz.voicing.slice() });
+  if (!opts.silent) { tzRefresh(); tzPlay(tz.voicing); }
+}
+function tzSelectTri(t, op, opts) {
+  const k = tzDegOfTriad(tzTriChord(t));
+  tzSetSel({ tri: t, verts: tzTriVerts(t), d: k ? k.d : null }, op, opts);
+}
+const tzSelectDegree = d => tzSetSel(tzDegSel(d), '·');
+function tzOnTri(t) {
+  tzStop();
+  if (tzSameTri(t, tz.sel.tri)) { tzPlay(tz.voicing); return; }
+  const op = tz.sel.tri ? [...'PLR'].find(o => tzSameTri(TZ_OPS[o](tz.sel.tri), t)) : null;
+  tzSelectTri(t, op || '·');
+}
+function tzMove(ops) {
+  if (!tz.sel.tri) return;
+  let t = tz.sel.tri;
+  const via = [];
+  for (const o of ops) { t = TZ_OPS[o](t); via.push(t); }
+  via.pop();
+  tzSelectTri(t, ops, { via });
+}
+function tzMirror() {
+  if (!tz.sel.tri) return;
+  const ax = tzAxisNear(tzTonic(), ...tzCentroid(tz.sel.verts));
+  tzSelectTri(tzMirrorTri(ax, tz.sel.tri), 'neg', { mark: tzAxisMid(ax) });
+}
+function tzRunCycle(c) {
+  if (!tz.sel.tri) return;
+  tzStop();
+  const seq = TZ_CYCLES[c];
+  tz.path = [{ ...tz.path[tz.path.length - 1], op: null, jump: false, pts: [tzCentroid(tz.sel.verts)] }];
+  tzRefresh();
+  let k = 0;
+  const tick = () => { if (k >= seq.length) { tz.anim = 0; tzUI(); return; } tzMove(seq[k++]); tz.anim = setTimeout(tick, 720); };
+  tz.anim = setTimeout(tick, 250);
+}
+function tzStop() { clearTimeout(tz.anim); tz.anim = 0; tz.playingK = -1; }
+function tzUndo() {
+  tzStop();
+  if (tz.path.length < 2) return;
+  tz.path.pop();
+  const e = tz.path[tz.path.length - 1];
+  tz.sel = e.s; tz.ch = e.ch; tz.voicing = e.v.slice(); tz.mark = null;
+  tzRefresh();
+  tzPlay(tz.voicing);
+}
+function tzClear() {
+  tzStop();
+  const e = tz.path[tz.path.length - 1];
+  tz.path = [{ ...e, op: null, jump: false, pts: [tzCentroid(e.s.verts)] }];
+  tzRefresh();
+}
+function tzPlayAll() {
+  tzStop();
+  let k = 0;
+  const tick = () => {
+    if (k >= tz.path.length) { tz.playingK = -1; tz.anim = 0; tzUI(); return; }
+    tz.playingK = k; tzPlay(tz.path[k].v, 0.008, 1.2); tzUI(); k++;
+    tz.anim = setTimeout(tick, 780);
+  };
+  tick();
+}
+// The app's own piano (samples, synth piano while they load), as the List cards play.
+function tzPlay(midis, gap = 0.008, dur = 2) {
+  if (typeof Tone === 'undefined') return;
+  Tone.start().then(() => midis.slice().sort((a, b) => a - b).forEach((m, k) => playMidiNote(m, dur, k * gap))).catch(() => {});
+}
+function tzSend() {
+  tz.path.forEach(e => addToProgression(e.ch.name, e.ch.sym, e.ch.roman, e.ch.notes, e.ch.quality));
+  _compToast(`${tz.path.length} chord${tz.path.length > 1 ? 's' : ''} sent to the composition: ${tz.path.map(e => e.ch.label).join(' · ')}`);
+}
+function tzToGuitar() {
+  const d = tz.sel.d;
+  document.getElementById('tab-guitar').click();
+  const sec = d != null && document.getElementById('deg-' + d);
+  if (sec) sec.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+function tzLayer(l) {
+  if (l !== 'neg') { tz[l] = !tz[l]; tzRefresh(); return; }
+  const t = document.getElementById('neg-harmony-toggle');
+  t.checked = !negHarmonyActive;
+  t.dispatchEvent(new Event('change'));
+}
+
+function tzOnClick(e) {
+  const b = e.target.closest('[data-tz]');
+  if (b) { tzAction(b); return; }
+  const line = e.target.closest('.k-line'), v = e.target.closest('.v'), tri = e.target.closest('[data-tri]');
+  if (line) { tzStop(); tzSelectDegree(+line.dataset.d); }
+  else if (v) tzPlay([+v.dataset.pc > 6 ? 48 + +v.dataset.pc : 60 + +v.dataset.pc], 0, 1.4);
+  else if (tri) { const [i, j, u] = tri.dataset.tri.split(','); tzOnTri({ i: +i, j: +j, up: u === '1' }); }
+}
+function tzAction(b) {
+  const a = b.dataset.tz, inSheet = !!b.closest('#tz-sheet');
+  const keys = ['op', 'ops', 'd', 'l', 'c', 'tab'].filter(k => b.dataset[k] != null);
+  if (a === 'op' || a === 'move') { tzStop(); tzMove(b.dataset.op || b.dataset.ops); }
+  else if (a === 'semi') { tzStop(); tzSelectTri(tzNearestTri({ root: +b.dataset.root, minor: b.dataset.minor === '1' }, ...tzCentroid(tz.sel.verts)), '½'); }
+  else if (a === 'mirror') { tzStop(); tzMirror(); }
+  else if (a === 'cyc') tzRunCycle(b.dataset.c);
+  else if (a === 'deg') { tzStop(); tzSelectDegree(+b.dataset.d); }
+  else if (a === 'layer') tzLayer(b.dataset.l);
+  else if (a === 'play') tzPlay(tz.voicing);
+  else if (a === 'arp') tzPlay(tz.voicing, 0.22, 1.6);
+  else if (a === 'comp') addToProgression(tz.ch.name, tz.ch.sym, tz.ch.roman, tz.ch.notes, tz.ch.quality);
+  else if (a === 'guitar') { tzToGuitar(); return; }
+  else if (a === 'chip') tzPlay(tz.path[+b.dataset.k].v);
+  else if (a === 'playall') tzPlayAll();
+  else if (a === 'undo') tzUndo();
+  else if (a === 'clear') tzClear();
+  else if (a === 'send') tzSend();
+  else if (a === 'sheet') tzSetSheet(tz.sheet !== 'open');
+  else if (a === 'tab') { tz.tab = b.dataset.tab; tzSetSheet(true); }
+  // The panels are redrawn: give the focus back to the same control.
+  if (b.isConnected || (document.activeElement && document.activeElement !== document.body)) return;
+  const scope = inSheet ? document.getElementById('tz-sheet') : tz.el.root;
+  scope.querySelector(`[data-tz="${a}"]` + keys.map(k => `[data-${k}="${b.dataset[k]}"]`).join(''))?.focus({ preventScroll: true });
+}
+document.getElementById('tz-sheet').addEventListener('click', tzOnClick);
+
+// P, L, R and Backspace, only while the map is on screen and nothing else has the keyboard.
+const tzModalOpen = () => !!document.querySelector('#diag-modal, [role=alertdialog], .slot-sub-popover, #comp-chord-edit-pop')
+  || document.body.classList.contains('m-sheet-open')
+  || ['comp-overlay', 'guide-modal', 'tech-modal', 'lick-overlay', 'tuner-overlay'].some(id => document.getElementById(id)?.classList.contains('open'));
+document.addEventListener('keydown', e => {
+  if (state.view !== 'tonnetz' || compareActive || !tz.el || !tz.el.root.isConnected || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.closest?.('input, select, textarea, [contenteditable]') || tzModalOpen()) return;
+  const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+  if (k === 'P' || k === 'L' || k === 'R') { tzStop(); tzMove(k); }
+  else if (k === 'Backspace') tzUndo();
+  else return;
+  e.preventDefault();
+});
+
 // ── Phone layout (≤700px): sticky key/scale bar, degree rail, bottom sheets ──
 // The elements exist on desktop too but stay hidden there (CSS).
 const PHONE_MQ = matchMedia('(max-width: 700px)');
@@ -11725,6 +12527,8 @@ function syncPhoneBar(scaleNotes, scaleData) {
 function buildDegreeRail() {
   const rail = document.getElementById('m-rail');
   const all = document.getElementById('all-degrees');
+  if (state.view === 'tonnetz' && all.style.display !== 'none') { tzBuildRail(rail); setPhoneTopHeight(); return; }
+  rail.setAttribute('aria-label', 'Jump to a degree');
   const secs = all.style.display === 'none' ? []
     : [...all.querySelectorAll('.degree-section')].filter(s => s.querySelector('.degree-num'));
   rail.hidden = secs.length < 2;
@@ -11753,8 +12557,8 @@ function setPhoneTopHeight() {
 function updateRailActive() {
   _mRailRaf = 0;
   const rail = document.getElementById('m-rail');
-  if (rail.hidden || !PHONE_MQ.matches) return;
-  const limit = document.getElementById('m-top').offsetHeight + 24;
+  if (rail.hidden || !PHONE_MQ.matches || state.view === 'tonnetz') return;
+  const limit =document.getElementById('m-top').offsetHeight + 24;
   let active = null;
   rail.querySelectorAll('.m-rl').forEach(b => {
     const sec = document.getElementById(b.dataset.target);
@@ -11900,6 +12704,7 @@ document.getElementById('compare-toggle-btn').addEventListener('click', () => {
 
 document.getElementById('m-rail').addEventListener('click', e => {
   const b = e.target.closest('.m-rl');
+  if (b && b.dataset.deg) { tzStop(); tzSelectDegree(+b.dataset.deg); return; }
   const sec = b && document.getElementById(b.dataset.target);
   if (sec) sec.scrollIntoView({ block: 'start' });
 });
@@ -12161,6 +12966,13 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     </div>
 
     <div class="tech-section">
+      <div class="tech-section-title">Tonnetz <span style="color:var(--muted);font-weight:400">- Chords › Tonnetz</span></div>
+      <div class="tech-row"><span class="tech-key">Lattice</span><span class="tech-val">Vertex (i, j) = 7i + 4j semitones. Up triangle (i, j) = the major triad on (i, j), down triangle = the minor triad rooted at (i, j+1). P, L, R are flips over one edge (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">TZ_OPS</code>), each an involution; R L R L R L R from C lands on C minor.</span></div>
+      <div class="tech-row"><span class="tech-key">The key</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tzDegreeChords()</code> takes the List view's chords (same names and numerals, every scale and mode); <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tzPlaceKey()</code> grows the major and minor triads by P, L, R from the tonic and lays every other chord (first three tones) as the most compact shape next to them. Others and the chromatic modes fall back to the scale's triads.</span></div>
+      <div class="tech-row"><span class="tech-key">Moves &amp; sound</span><span class="tech-val">Voice motion per move is the cheapest pairing of the two triads (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tzVlText</code>); playback carries one MIDI voicing from chord to chord by the shortest voice-leading, on the piano like the List cards. The negative layer is a half-turn around the tonic-fifth edge, pc → 2 tonic + 7 - pc, the same mirror as the circle of fifths.</span></div>
+    </div>
+
+    <div class="tech-section">
       <div class="tech-section-title">Chord Sound <span style="color:var(--muted);font-weight:400">- every diagram</span></div>
       <div class="tech-row"><span class="tech-key">What plays</span><span class="tech-val">The voicing each card draws, read at click time (a pill that switches grip or inversion switches the sound): frets → MIDI per string, banjo 5th string from its own nut at fret 5, piano keys as drawn. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">attachSoundBars()</code> runs after every chord view and adds the buttons to any card carrying a <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_voicing</code>; the zoom modals get them too.</span></div>
       <div class="tech-row"><span class="tech-key">Strum / Chord</span><span class="tech-val">Downstroke, low string to high: 30 ms between strings on guitar, 18 on mandolin, 22 on banjo (5th-string drone first, as a brush goes), slightly softer toward the top. Piano: every key at once. A new strum damps the strings still ringing.</span></div>
@@ -12182,7 +12994,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Piano samples</span><span class="tech-val">Salamander Grand Piano — real mp3 samples via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> (tonejs.github.io/audio/salamander/). Loads on page init. "⟳ loading…" indicator while pending.</span></div>
       <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val">nbrosowsky acoustic guitar - 37 real mp3 samples (nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/), in tune within 5 cents. Tone.js pitch-shifts between recorded notes. Loaded when a guitar diagram first shows, or when Guitar sound is selected.</span></div>
       <div class="tech-row"><span class="tech-key">Mandolin &amp; banjo samples</span><span class="tech-val">Philharmonia Orchestra recordings, served with the app (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/mandolin/</code> G3-G6, 37 notes, 1.1 MB; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/banjo/</code> C3-E6, 41 notes, 1.3 MB; one MP3 per MIDI note). Prepared by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tools/build_samples.mjs</code>: high-passed below the lowest string (the mandolin takes carry a room noise loud enough to pass for the attack up to 200 ms early), cut 4 ms before the attack, retuned to A = 440 (the takes were up to 30 cents off; now within 2 cents on every open string, measured in the app), levelled on their first 300 ms, faded out. The one take that would not hold its pitch (mandolin G♯5) is its neighbour moved a semitone. The attack is found again after decoding, past the MP3 encoder's head padding. Cached for offline use after the first load.</span></div>
-      <div class="tech-row"><span class="tech-key">Chord list playback</span><span class="tech-val">Chord List cards: ▶ plays the chord in root position (notes 8 ms apart), the arpeggio button plays it up at 220 ms a note; always piano, via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">playMidiNote()</code>. Instrument diagrams have their own buttons (Chord Sound above).</span></div>
+      <div class="tech-row"><span class="tech-key">Chord list playback</span><span class="tech-val">Chords › List cards: ▶ plays the chord in root position (notes 8 ms apart), the arpeggio button plays it up at 220 ms a note; always piano, via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">playMidiNote()</code>. Instrument diagrams have their own buttons (Chord Sound above).</span></div>
       <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button inside the staff SVG (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code>); notes queued one by one at 380 ms, pitches taken from the scale intervals; pause clears the queue and releases the sampler.</span></div>
       <div class="tech-row"><span class="tech-key">Composition player</span><span class="tech-val">Sound: piano, guitar, mandolin or banjo (the last two through <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compStringSampler()</code>, a Tone.Sampler look-alike on the recordings: notes lifted an octave on mandolin, any still out of range moved by octaves, a pitch struck twice at the same instant played once; piano if the recordings fail). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Transport</code>-based scheduling - enables accurate loop, stop, and live update. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_compPlayGen</code> counter cancels stale callbacks after stop. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compPendingRestart</code> flag triggers seamless loop restart when chords change during playback.</span></div>
       <div class="tech-row"><span class="tech-key">Note value / timing</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">stepDur = beatDur × 4 / noteVal</code>. Arp mode: fixed step interval at noteVal rate with swing offset on odd steps. Full mode: strum rate at noteVal, velocity from strum pattern (cycling).</span></div>
@@ -12603,10 +13415,18 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Chord Views</div>
         </div>
       </div>
-      <p class="guide-p">Four tabs above the right panel switch the display mode for all chords:</p>
+      <p class="guide-p">Five tabs above the right panel switch the display mode for all chords:</p>
       <div class="guide-kv">
-        <span class="guide-kv-key">Chord List</span>
+        <span class="guide-kv-key">Chords</span>
+        <span class="guide-kv-val">Two sub-tabs:</span>
+      </div>
+      <div class="guide-kv" style="margin-left:18px">
+        <span class="guide-kv-key">List</span>
         <span class="guide-kv-val">Default view. Each degree shows one card with the chord symbol, quality, note names, and interval stack (e.g. 1 · ♭3 · 5 · ♭7).</span>
+        <span class="guide-kv-key">Tonnetz</span>
+        <span class="guide-kv-val">The key on the tone network: fifths run to the right, major thirds up-right, so a major chord is a triangle pointing up and a minor chord one pointing down. The scale's chords form a ribbon with their numerals (other chords are lines). Click a triangle to hear it and extend the path; <strong>P</strong>, <strong>L</strong>, <strong>R</strong> (buttons or keys, Backspace to undo) flip it over an edge, and each button shows the voice that moves. Below: two- and three-move neighbours, the negative mirror, the hexatonic, octatonic and LR cycles, and the path as a progression to play or send to the composition. Layers: Key, Negative (the circle's switch, major scale only), Degrees. In 7ths mode the selected chord grows its 7th (Δ7 and m7 = rhombus, 7 and ø7 = triangle and tail, dim7 = line of four).</span>
+      </div>
+      <div class="guide-kv">
         <span class="guide-kv-key">Guitar</span>
         <span class="guide-kv-val">Seven sub-tabs for guitar-specific views:</span>
       </div>
@@ -12674,7 +13494,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🖥️</span>
-        <span class="guide-tip-text"><strong>Two-column chord list:</strong> on screens ≥ 1125 px wide, the Chord List view arranges degree sections in two columns for a more compact overview.</span>
+        <span class="guide-tip-text"><strong>Two-column chord list:</strong> on screens ≥ 1125 px wide, the Chords › List view arranges degree sections in two columns for a more compact overview.</span>
       </div>
     </section>
 

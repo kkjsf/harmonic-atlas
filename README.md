@@ -25,6 +25,10 @@ Each scale degree shows a chord card with:
 - Staff notation toggle
 - **+ button** — adds the chord to the composition tool
 
+### Chords tab (List · Tonnetz)
+
+Two sub-tabs. **List** is the chord cards above. **Tonnetz** draws the key on the tone network (fifths to the right, major thirds up-right): major chords are triangles pointing up, minor ones pointing down, the scale's chords a ribbon with their numerals, other chords lines. Click a triangle to hear it and extend a path; P, L, R (buttons or keys, Backspace to undo) flip it over an edge, each button showing the voice that moves. The inspector adds two- and three-move neighbours, the negative mirror and the hexatonic / octatonic / LR cycles; the path plays back with smooth voice-leading and goes to the composition in one click. Layers: Key, Negative (the circle's switch, major scale only), Degrees. In 7ths mode the selected chord grows its 7th (rhombus, triangle and tail, line of four). On a phone the inspector is a sheet above the bottom bar and the degree rail selects on the map.
+
 ### Guitar tab
 
 Seven sub-tabs:
@@ -238,7 +242,7 @@ Draft and save multi-chord compositions with full playback and improvisation sup
 
 Below 700 px the page is laid out for the thumb:
 - **Top bar** (sticky): ‹ key › to step the key a semitone, the scale (tap it, or the key, for the **Key & scale** sheet: the 12 keys, a filter, every scale with its notes in the current key), and the app icon, which opens the menu.
-- Under it, a **degree rail** (I, ii, iii... with each chord) jumps to that degree and lights up the one on screen.
+- Under it, a **degree rail** (I, ii, iii... with each chord) jumps to that degree and lights up the one on screen (in Chords › Tonnetz it selects the chord on the map).
 - **Bottom bar**: Chords, Guitar, Mandolin, Banjo, Piano. The sub-tabs of each instrument are one row that scrolls sideways; chord diagrams show two per row.
 - **Menu** (app icon): the circle of fifths on top (it leads to the full circle and its tools), then composer, tuner, compare scales, jazz resources, guide, technical details, and the history.
 - The chord modes are one row of chips. Nothing on the main screen is smaller than 12 px, and buttons are at least 40 px.
@@ -362,6 +366,7 @@ git push
 | `computeVoicingFromTemplate(rootPc, template)` | Derives guitar frets/pcs from a semitone-offset template; enforces ascending pitch per string and span ≤ 4 frets |
 | `showDiagramModal(…, navList, navIdx)` | Zoom overlay with smooth in-place navigation (fade swap 80 ms, swipe, arrow keys, prev/next context labels) |
 | `renderBrowse()` | Renders jazz resource hub cards with search filtering and category grouping |
+| `tzDegreeChords(rootPc, scale, mode)` / `tzPlaceKey(chords, tonic)` / `renderTonnetz(...)` | Chords › Tonnetz: the List view's chords per degree, laid on the lattice (triangles grown by P/L/R, other chords as compact shapes), and the view (map, inspector, progression, phone sheet) |
 
 ### Composition data model
 

@@ -288,6 +288,68 @@ check('tuner YIN hears nothing in noise', () => {
     const r = tunerYin(x, 48000, 55, 1500); return r === null || r.conf < 0.75; })()`), true);
 });
 
+// ── Tonnetz (Chords › Tonnetz) ──
+const tzName = `(c => tzSpellTriad(c.root, c.minor)[0] + (c.minor ? 'm' : ''))`;
+check('Tonnetz: P, L and R are involutions on all 24 triads, and each keeps two notes', () => {
+  eq(run(`(() => { let bad = 0; for (let r = 0; r < 12; r++) for (const minor of [false, true]) { const t = tzNearestTri({ root: r, minor }, 0, 0);
+    for (const op of 'PLR') { const n = TZ_OPS[op](t), a = tzTriPcs(tzTriChord(t)), b = tzTriPcs(tzTriChord(n));
+      if (!tzSameTri(TZ_OPS[op](n), t) || a.filter(p => b.includes(p)).length !== 2) bad++; } } return bad; })()`), 0);
+});
+check('Tonnetz: C goes to Cm by P, Em by L, Am by R', () => {
+  eq(run(`(t => 'PLR'.split('').map(op => ${tzName}(tzTriChord(TZ_OPS[op](t)))).join(' '))({ i: 0, j: 0, up: true })`), 'Cm Em Am');
+});
+check('Tonnetz: R L R L R L R from C lands on Cm (= P)', () => {
+  eq(run(`(() => { let t = { i: 0, j: 0, up: true }; for (const op of 'RLRLRLR') t = TZ_OPS[op](t); return ${tzName}(tzTriChord(t)); })()`), 'Cm');
+});
+const place = (k, s, m) => `(() => { const d = tzDegreeChords(${k}, ${JSON.stringify(s)}, ${JSON.stringify(m)}); return { d, p: tzPlaceKey(d.chords, ${k}) }; })()`;
+check('Tonnetz: the C major ribbon Dm F Am C Em G is contiguous, each chord sharing an edge with the next', () => {
+  eq(run(`(({ d, p }) => { const order = [1, 3, 5, 0, 2, 4];
+    const names = order.map(i => d.chords[i].name).join(' ');
+    const edges = order.slice(1).map((i, x) => p[i].verts.filter(v => p[order[x]].verts.some(w => tzSameV(v, w))).length).join('');
+    return names + ' ' + edges + ' ' + order.every(i => p[i].tri); })(${place(0, 'Major (Ionian)', '3')})`), 'Dm F Am C Em G 22222 true');
+});
+check('Tonnetz: A harmonic minor places 4 triangles (Am Dm E F) and 3 other chords (Bdim Caug G#dim)', () => {
+  eq(run(`(({ d, p }) => d.chords.filter((c, i) => p[i].tri).map(c => c.name).join(' ') + ' | ' + d.chords.filter((c, i) => !p[i].tri && p[i].verts.length === 3).map(c => c.name).join(' '))(${place(9, 'Harmonic Minor', '3')})`),
+    'Am Dm E F | Bdim Caug G#dim');
+});
+check('Tonnetz: the map names chords as the List does (C major 7ths)', () => {
+  eq(run(`tzDegreeChords(0, 'Major (Ionian)', '4').chords.map(c => c.numeral + ' ' + c.name).join(', ')`), 'I CΔ7, ii Dm7, iii Em7, IV FΔ7, V G7, vi Am7, vii° Bø7');
+});
+check('Tonnetz: 7th shapes, CΔ7 = 2 triangles / 5 edges, G7 = 1 / 4, B°7 = 0 / 3', () => {
+  const shp = (r, iv) => `(s => s.tris.length + '/' + s.edges.length)(tzShapeOf(tzGreedyShape(${JSON.stringify(iv.map(x => (r + x) % 12))}, tzNearestVertex(${r}, 0, 0))))`;
+  eq(run(`[${shp(0, [0, 4, 7, 11])}, ${shp(7, [0, 4, 7, 10])}, ${shp(11, [0, 3, 6, 9])}].join(' ')`), '2/5 1/4 0/3');
+});
+check('Tonnetz: the selected chord grows its 7th on the placed key (CΔ7, G7 in C major, B°7 in C harmonic minor)', () => {
+  const sel = (k, s, deg) => `(({ d, p }) => (x => x.tris.length + '/' + x.edges.length)(tzShapeOf(tzSelShape(p[${deg}].verts, d.chords[${deg}].pcs))))(${place(k, s, '4')})`;
+  eq(run(`[${sel(0, 'Major (Ionian)', 0)}, ${sel(0, 'Major (Ionian)', 4)}, ${sel(0, 'Harmonic Minor', 6)}].join(' ')`), '2/5 1/4 0/3');
+});
+check('Tonnetz: the negative mirror in C maps C to Cm and G to Fm, on pitch classes and on the map', () => {
+  const geo = (r, minor) => `(t => ${tzName}(tzTriChord(tzMirrorTri(tzAxisNear(0, ...tzCentroid(tzTriVerts(t))), t))))(tzNearestTri({ root: ${r}, minor: ${minor} }, 0, 0))`;
+  eq(run(`[[0,4,7],[7,11,2]].map(c => c.map(p => tzMirrorPc(p, 0)).sort((a, b) => a - b).join(',')).join(' ') + ' ' + ${geo(0, false)} + ' ' + ${geo(7, false)}`), '0,3,7 0,5,8 Cm Fm');
+});
+check('Tonnetz: the map mirror is the app\'s negative-harmony mirror for every pitch class and key', () => {
+  eq(run(`(() => { let bad = 0; for (let t = 0; t < 12; t++) for (let pc = 0; pc < 12; pc++) if (tzMirrorPc(pc, t) !== negMirrorPcCoF(pc, t)) bad++; return bad; })()`), 0);
+});
+check('Tonnetz: voice-leading text C to Am is "G→A +2"', () => eq(run(`tzVlText([0, 4, 7], [9, 0, 4], pcToName, pcToName)`), 'G→A +2'));
+check('Tonnetz: shortest voice-leading moves C to Am by one tone, keeping C and E', () => {
+  eq(run(`tzVoiceLead([60, 64, 67], [9, 0, 4]).join(' ')`), '60 64 69');
+});
+check('Tonnetz: every scale, key and chord mode places without throwing, every degree on the map', () => {
+  eq(run(`(() => { const bad = []; for (const s of Object.keys(SCALES)) for (let k = 0; k < 12; k++) for (const m of HASH_MODES) {
+    try { const d = tzDegreeChords(k, s, m), p = tzPlaceKey(d.chords, k);
+      if (!d.chords.length || p.some(x => !x || !x.verts || x.verts.length !== 3 || x.verts.some(v => !v))) bad.push(s + ' ' + k + ' ' + m); }
+    catch (e) { bad.push(s + ' ' + k + ' ' + m + ': ' + e.message); } } return bad.slice(0, 3).join('; ') || 'ok'; })()`), 'ok');
+});
+check('Tonnetz: C major pentatonic (no triangle) and C whole tone (all augmented lines) place around the tonic', () => {
+  eq(run(`['Major Pentatonic', 'Whole Tone'].map(s => { const d = tzDegreeChords(0, s, '3'), p = tzPlaceKey(d.chords, 0);
+    return p.filter(x => x.tri).length + ':' + p[0].verts.some(v => tzPcAt(...v) === 0); }).join(' ')`), '0:true 0:true');
+});
+check('Tonnetz: modes the map cannot draw fall back to the triads and say so', () => {
+  eq(run(`(d => d.chords.map(c => c.name).join(' ') + ' | ' + d.note)(tzDegreeChords(0, 'Major (Ionian)', 'secdom'))`),
+    "C Dm Em F G Am Bdim | Secondary dominants are shown in List view; the map shows the scale's triads.");
+});
+check('Tonnetz: a link to the Tonnetz sub-view survives', () => eq(run(`decodeHash('#k=7&s=Dorian&m=3&v=tonnetz').view`), 'tonnetz'));
+
 // ── Shared links and share codes ──
 check('a malformed link is ignored, not fatal', () => eq(run(`[decodeHash('#k=0&s=%25'), decodeHash('#k=0&s=constructor')].join(',')`), ','));
 check('a link keeps known values only', () => eq(run(`JSON.stringify(decodeHash('#k=2&s=Dorian&m=99&v=zzz'))`), '{"key":2,"scale":"Dorian","mode":"4","view":"list"}'));
