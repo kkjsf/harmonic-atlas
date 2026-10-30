@@ -2860,8 +2860,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v89';
-window.APP_DEPLOYED = '2026-10-30 15:37';
+window.APP_VERSION = 'v90';
+window.APP_DEPLOYED = '2026-10-30 22:13';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -13087,6 +13087,12 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 .tech-val {
   font-family: 'IBM Plex Mono', monospace; font-size: 11px;
   color: var(--cream); line-height: 1.5;
+  min-width: 0; overflow-wrap: anywhere;
+}
+@media (max-width: 560px) {
+  #tech-panel { padding: 28px 18px 32px; }
+  .tech-row { flex-direction: column; gap: 2px; margin-bottom: 12px; }
+  .tech-key { min-width: 0; }
 }
 .tech-chip {
   display: inline-block; background: rgba(124,111,160,.12);
@@ -13108,9 +13114,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-section">
       <div class="tech-section-title">Stack &amp; Platform</div>
       <div class="tech-row"><span class="tech-key">Language</span><span class="tech-val">Vanilla HTML5 / CSS3 / ES2022 JavaScript - zero build tools, zero frameworks</span></div>
-      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.html</code> file (~14 000 lines); no server, no network requests at runtime beyond Tone.js CDN and piano samples</span></div>
+      <div class="tech-row"><span class="tech-key">Delivery</span><span class="tech-val">Single self-contained <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">index.html</code> (~17 800 lines, ~1 MB) plus <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sw.js</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">manifest.json</code>, the icons and the mandolin / banjo samples; static hosting, no back end. Network at runtime: Google Fonts, Tone.js from jsDelivr, the piano and guitar samples from GitHub Pages, and the app's own <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/</code>.</span></div>
       <div class="tech-row"><span class="tech-key">Fonts (CDN)</span><span class="tech-val"><span class="tech-chip">Playfair Display</span><span class="tech-chip">IBM Plex Mono</span><span class="tech-chip">Cormorant Garamond</span><span class="tech-chip">EB Garamond</span> via Google Fonts</span></div>
-      <div class="tech-row"><span class="tech-key">No frameworks</span><span class="tech-val">No React, Vue, jQuery, D3 — all UI and SVG written from scratch. <span class="tech-chip">Tone.js 14.8.49</span> used for Salamander Grand Piano sample playback only.</span></div>
+      <div class="tech-row"><span class="tech-key">No frameworks</span><span class="tech-val">No React, Vue, jQuery, D3 - all UI and SVG written from scratch. <span class="tech-chip">Tone.js 14.8.49</span> used for the piano and guitar samplers and the composition player's Transport; everything else (strings synthesis, drums, tuner, mandolin / banjo buffers) is plain Web Audio.</span></div>
     </div>
 
     <div class="tech-section">
@@ -13122,14 +13128,16 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Keyboard access</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">a11yTagClickables()</code> gives every clickable div / span / SVG path a <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tabindex</code>, a role and a label after each render; a MutationObserver re-tags whatever gets rebuilt, and one delegated handler turns Enter / Space into a click. Circle-of-Fifths slices are all labelled for assistive tech but only the diatonic ones join the tab order, and the hover readout also fires on focus.</span></div>
       <div class="tech-row"><span class="tech-key">Enharmonic spelling</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spellScale()</code> - sequential letter assignment for heptatonic; PREFER_FLAT_PC set for pentatonic</span></div>
       <div class="tech-row"><span class="tech-key">Roman numerals</span><span class="tech-val">Compared against Major reference intervals; handles pentatonic degree naming separately</span></div>
-      <div class="tech-row"><span class="tech-key">Chromatic chords</span><span class="tech-val">Secondary dominants, secondary diminished, subdominant substitutes, chromatic mediants - all computed at render time from scale degree analysis</span></div>
+      <div class="tech-row"><span class="tech-key">Chromatic chords</span><span class="tech-val">Computed at render time from the quality of each degree: secondary dominants = dom7 a fifth above each major / minor degree (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildSecondaryDominants</code>), secondary diminished = dim7 a semitone below, spelled on the letter below the target, secondary subdominants = Δ7 a fourth above; any of these already wholly in the scale is skipped. Chromatic mediants = the four triads of the tonic's quality a minor or major third above or below the tonic, each labelled with its one common tone.</span></div>
+      <div class="tech-row"><span class="tech-key">Others mode</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildOtherChords()</code>: sus2, sus4, (m)add9, (m)add11, 6, m6, 6/9, m6/9, aug, dim, 5, and on seven-note scales 7sus4, Maj7sus4, 7sus2, each only when every tone is in the scale (add9 / add11 need the natural 9th / 11th).</span></div>
     </div>
 
     <div class="tech-section">
       <div class="tech-section-title">Guitar Voicing Engine</div>
       <div class="tech-row"><span class="tech-key">Tuning</span><span class="tech-val">E2-A2-D3-G3-B3-E4 (MIDI 40-45-50-55-59-64)</span></div>
       <div class="tech-row"><span class="tech-key">Jazz shell voicing</span><span class="tech-val">Extended chords (9th+) reduce to [root, 3rd, 7th, highest extension] - 5th dropped. Standard jazz practice for playable shapes.</span></div>
-      <div class="tech-row"><span class="tech-key">Shape search</span><span class="tech-val">Exhaustive permutation search over 4-string sets [1-4, 2-5, 3-6]; span ≤6 frets; scored by span × 8 + fret position penalty</span></div>
+      <div class="tech-row"><span class="tech-key">Basic shapes</span><span class="tech-val">Triads and 7ths: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">basicChordShape()</code> searches open position first (frets 0-4, adjacent strings, root as the lowest note, every tone present except the fifth of a 7th chord, at most four fingers with a barre counted as one), scored on strings played and open strings. A triad with no open shape takes the lowest barre window (frets 1-9). Verified by name: C = x32010, G = 320003, E7 = 020100, C♯m = x46654.</span></div>
+      <div class="tech-row"><span class="tech-key">Shape search</span><span class="tech-val">Otherwise (9ths and up, or a 7th with no open shape): exhaustive permutation search over the 4-string sets [1-4, 2-5, 3-6] (5 strings when the chord keeps 5 tones), root in the bass, span ≤ 4 fretted frets (5 when an open string carries the bass), scored by span × 8 + fret position penalty + 50 if the root is not the lowest note</span></div>
       <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val">Drop 2: 2nd-from-top voice lowered an octave. Drop 3: 3rd-from-top lowered. Both follow jazzguitar.be standard across all 4 inversions × 3 string sets. No open strings. Inversion shown in slash notation (e.g. Gmaj7/B).</span></div>
       <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Generated inline via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordDiagram()</code>; pitch-class labels on fret dots. Modal is persistent (single DOM element reused across navigations); inner panel fades at 80 ms; prev/next chord names shown as context labels.</span></div>
       <div class="tech-row"><span class="tech-key">Alt. Dom tab</span><span class="tech-val">Dedicated <em>Alt. Dom</em> sub-tab under Guitar showing altered dominant shapes for the V7 and secondary dominants of the current key. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">ALT_DOM_VOICINGS</code> constant (12 chord types, 24 shapes, all movable and four-finger) + <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">computeVoicingFromTemplate(rootPc, template)</code> derives frets6/pcs6 from semitone-offset templates; enforces ascending pitch per string and hard span ≤ 4 frets. Each dominant gets its own section with its tritone substitution. Reference: Dirk Laukens <em>Dominant Chords For Jazz Guitar</em>.</span></div>
@@ -13140,35 +13148,37 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">System</span><span class="tech-val">CAGED-based: 5 positions anchored by root on each string (E, A, D, G, B). Each shape labelled E form, A form, D form, G form, C form.</span></div>
       <div class="tech-row"><span class="tech-key">Fret window</span><span class="tech-val">Compact 5-fret span: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">anchorFret ± 2</code>. All chord tones on all 6 strings within the window are candidates.</span></div>
       <div class="tech-row"><span class="tech-key">Note selection</span><span class="tech-val">Every chord tone in the position, taken in strictly ascending pitch (so a correct R–3–5–7 cycle, but starting on whichever chord tone is lowest in the window rather than always the root). Max 2 notes per string, minimum 4 notes per shape. The root on the anchor string is ringed in gold, since that is the dot the form is named after.</span></div>
-      <div class="tech-row"><span class="tech-key">Scope</span><span class="tech-val">7th chords only (4 pitch classes). Disabled for triads. Works with diatonic, secondary dominant, and secondary diminished chord modes.</span></div>
+      <div class="tech-row"><span class="tech-key">Scope</span><span class="tech-val">Always 7th chords (4 pitch classes), whatever the chord mode: the scale's diatonic 7ths, or the secondary dominants / secondary diminished 7ths in those two modes. Shell, Drop 2 and Drop 3 follow the same rule.</span></div>
       <div class="tech-row"><span class="tech-key">SVG diagrams</span><span class="tech-val">Horizontal fretboard: strings horizontal (E bottom → e top), frets as vertical lines. Gold dots = root, purple = other chord tones, note names inside dots. Click opens near-fullscreen modal (98vw × 96vh); mouse-wheel or pinch zooms up to 6×; overflow scrolls to pan.</span></div>
     </div>
 
     <div class="tech-section">
       <div class="tech-section-title">Mandolin Engine</div>
       <div class="tech-row"><span class="tech-key">Tuning</span><span class="tech-val">G3-D4-A4-E5 (MIDI 55-62-69-76) - 4 courses</span></div>
-      <div class="tech-row"><span class="tech-key">Regular voicing</span><span class="tech-val">Triads/7ths: all chord tones. Extended: jazz shell [root, 3rd, 7th, ext]. Exhaustive permutation search; span ≤5 frets.</span></div>
+      <div class="tech-row"><span class="tech-key">Chords tab</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getMandolinVoicing()</code>, every chord of the chord mode. A triad needs a fourth course: doubling the root, the fifth or the third (the last two cost a point) are all tried and the score picks, so the open shapes come out (G = 0-0-2-3, A = 2-2-4-5, C = 0-2-3-0). 7ths: all four tones. 5+ notes: jazz shell [root, 3rd, 7th, top extension]. Exhaustive permutation search, open strings allowed, span ≤ 5 fretted frets, scored span × 8 + lowest fretted fret (×4 above fret 3).</span></div>
     </div>
 
     <div class="tech-section">
       <div class="tech-section-title">Banjo Engine</div>
       <div class="tech-row"><span class="tech-key">Tuning</span><span class="tech-val">Open G, gDGBD. Melody strings 4th-1st = D3-G3-B3-D4 (MIDI 50-55-59-62); 5th string = a fixed g drone (G4, MIDI 67) whose nut sits at fret 5, so its first fretted note is fret 6.</span></div>
       <div class="tech-row"><span class="tech-key">Drone handling</span><span class="tech-val">Per grip the 5th string is shown fretted when the shape reaches past fret 5 and lands on a chord tone, open when g itself belongs to the chord, and crossed out otherwise - a clash you keep out of the roll rather than a note you play.</span></div>
+      <div class="tech-row"><span class="tech-key">Chords tab</span><span class="tech-val">The closed-grip engine below with open strings allowed (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">renderGripTab('banjo', …, {allowOpen: true})</code>), so first-position G, C and D appear; Moveable is the same engine with open strings off.</span></div>
       <div class="tech-row"><span class="tech-key">Scale view</span><span class="tech-val">Melody strings only. The 5th string has its own nut, so it shares no fret grid with the other four and cannot be drawn on the same map.</span></div>
     </div>
 
     <div class="tech-section">
-      <div class="tech-section-title">Closed-Grip Engine <span style="color:var(--muted);font-weight:400">— mandolin Chop · banjo Moveable</span></div>
+      <div class="tech-section-title">Closed-Grip Engine <span style="color:var(--muted);font-weight:400">- mandolin Chop · banjo Moveable</span></div>
       <div class="tech-row"><span class="tech-key">Why closed</span><span class="tech-val">A chop speaks because the whole grip lifts off at once. One open string keeps ringing and the percussive snap is gone, so the search only ever returns voicings with every string fretted - which is also what makes the shapes moveable to any root.</span></div>
       <div class="tech-row"><span class="tech-key">Search</span><span class="tech-val">Exhaustive over which chord tone lands on which string, then over every per-string octave shift. Shapes are cached per interval set, so exotic scales get real grips instead of a fallback table.</span></div>
       <div class="tech-row"><span class="tech-key">Playability filter</span><span class="tech-val">≤4 fingers, counting one finger per maximal run of <em>adjacent</em> strings on the same fret (non-adjacent strings sharing a fret each cost a finger; a damped course breaks the run and costs none). On banjo the fretted strings sit at most 3 frets apart (the hand covers four frets; open strings do not count, and an open-position grip stays at or below fret 5). A four-fret reach that breaks one-finger-per-fret (two separate fingers on one fret, or a barre by any finger but the index) ranks after a compact grip nearby, and the 5th string is fretted only when a finger is free. <strong>Span ≤5 on mandolin</strong>: the traditional chops stretch that far, and a four-fret cap silently deletes them.</span></div>
       <div class="tech-row"><span class="tech-key">Five-fret stretch</span><span class="tech-val">Allowed one way round only: the highest fret on the bass side and the lowest on the treble side, which is how the hand angles (pinky reaching up the neck, index sitting back). The mirror image is not a grip. Also needs to sit at the 2nd fret or above, where the frets have closed up.</span></div>
       <div class="tech-row"><span class="tech-key">Damped course</span><span class="tech-val">Mandolin only, and only the top course: a fretting-hand mute you simply do not strike. It is how the small chop gets its reach down. Damping the G would throw away the bass weight the chop lives on, so it is never offered.</span></div>
-      <div class="tech-row"><span class="tech-key">Required tones</span><span class="tech-val">Root, third (or the sus tone) and any altered fifth / sixth / seventh must sound. The perfect fifth may be dropped — the documented D chop 7-4-5-2 is D F♯ D F♯ and has none — but it costs points, so ordinary voicings still prefer the whole chord.</span></div>
-      <div class="tech-row"><span class="tech-key">Ranking</span><span class="tech-val">Tight span, then doubling (root and fifth free, doubled third penalised, doubled seventh heavily), then <strong>bass-side weight</strong>: fretting the G and D courses high is what gives the chop its bark and the pick something to aim at. The grip shown first also pays for height, and a named chop hands its bonus back above the 5th fret — which is why G chops 7-5-2-3 but C chops 5-2-3-3 rather than 12-10-7-8.</span></div>
+      <div class="tech-row"><span class="tech-key">Required tones</span><span class="tech-val">Root, third (or the sus tone) and any altered fifth / sixth / seventh must sound. The perfect fifth may be dropped - the documented D chop 7-4-5-2 is D F♯ D F♯ and has none - but it costs points, so ordinary voicings still prefer the whole chord.</span></div>
+      <div class="tech-row"><span class="tech-key">Ranking</span><span class="tech-val">Tight span, then doubling (root and fifth free, doubled third penalised, doubled seventh heavily), then <strong>bass-side weight</strong>: fretting the G and D courses high is what gives the chop its bark and the pick something to aim at. The grip shown first also pays for height, and a named chop hands its bonus back above the 5th fret - which is why G chops 7-5-2-3 but C chops 5-2-3-3 rather than 12-10-7-8.</span></div>
       <div class="tech-row"><span class="tech-key">Named chops</span><span class="tech-val"><strong>Big Chop</strong> = 5-R-3-R, root on the D course, five frets wide (G: 7-5-2-3 = D G B G); its sibling voicing for D is 7-4-5-2. <strong>Small Chop</strong> = the same idea with the pinky brought home and the top course damped (G: 4-5-2-✕, C: 5-2-3-✕). Both are guaranteed a pill whenever they are in reach, even when the score would crowd them out.</span></div>
+      <div class="tech-row"><span class="tech-key">Chord modes</span><span class="tech-val">One grip set per chord of the chord mode: triads to 13ths per degree, Others (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildOtherChords</code>) and the four chromatic modes. Four strings to fill, so a chord of 5+ notes keeps root, third, seventh and the top extension (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">[0, 1, 3, last]</code>, the rule of <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getMandolinVoicing</code>); the diagram labels still name every tone.</span></div>
       <div class="tech-row"><span class="tech-key">Alternates</span><span class="tech-val">Up to four grips per chord, at most two per root string so they are different ideas rather than four fingerings of one. Pills are labelled by the string carrying the root - with its number on banjo, which has two D strings.</span></div>
-      <div class="tech-row"><span class="tech-key">Other named shapes</span><span class="tech-val">Mandolin <em>E shape</em> (the open-E grip, 1-2-2-0 moved up), <em>G shape</em> (open G, 0-0-2-3 — and open A, 2-2-4-5, is the same shape), <em>D shape</em> (open D, 2-4-5-5); banjo <em>Barre</em>, <em>F shape</em>, <em>D shape</em>. Descriptive only, each verified against the open chord it derives from.</span></div>
+      <div class="tech-row"><span class="tech-key">Other named shapes</span><span class="tech-val">Mandolin <em>E shape</em> (the open-E grip, 1-2-2-0 moved up), <em>G shape</em> (open G, 0-0-2-3 - and open A, 2-2-4-5, is the same shape), <em>D shape</em> (open D, 2-4-5-5); banjo <em>Barre</em>, <em>F shape</em>, <em>D shape</em>. Descriptive only, each verified against the open chord it derives from.</span></div>
       <div class="tech-row"><span class="tech-key">Sources</span><span class="tech-val"><a href="https://www.mandozine.com/resources/chords/moveablechords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">mandozine.com</a> moveable-chord charts, <a href="https://www.mandolincafe.com/chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">mandolincafe.com</a>, mandolessons.com "Chop Chords"</span></div>
     </div>
 
@@ -13186,6 +13196,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Lattice</span><span class="tech-val">Vertex (i, j) = 7i + 4j semitones. Up triangle (i, j) = the major triad on (i, j), down triangle = the minor triad rooted at (i, j+1). P, L, R are flips over one edge (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">TZ_OPS</code>), each an involution; R L R L R L R from C lands on C minor.</span></div>
       <div class="tech-row"><span class="tech-key">The key</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tzDegreeChords()</code> takes the List view's chords (same names and numerals, every scale and mode); <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tzPlaceKey()</code> grows the major and minor triads by P, L, R from the tonic and lays every other chord (first three tones) as the most compact shape next to them. Others and the chromatic modes fall back to the scale's triads.</span></div>
       <div class="tech-row"><span class="tech-key">Moves &amp; sound</span><span class="tech-val">Voice motion per move is the cheapest pairing of the two triads (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tzVlText</code>); playback carries one MIDI voicing from chord to chord by the shortest voice-leading, on the piano like the List cards. The negative layer is a half-turn around the tonic-fifth edge, pc → 2 tonic + 7 - pc, the same mirror as the circle of fifths.</span></div>
+      <div class="tech-row"><span class="tech-key">State</span><span class="tech-val">Everything in one <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tz</code> object (selection, path, layers, voicing), so the page view and the full-screen module draw the same map; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">state.lastChordsView</code> brings the Chords tab back to the last sub-tab. Keys P / L / R / Backspace only while the map is on screen, outside text fields and windows.</span></div>
+      <div class="tech-row"><span class="tech-key">Full screen</span><span class="tech-val">Desktop only: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">#tz-full</code> dialog, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">renderTonnetz</code> draws into it while <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">state.tzFull</code> is set; fixed zoom <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">TZ_FULL_ZOOM = 1.2</code> (triangles ~87 px on screen at 1280 × 800 against ~62 in the page). Escape, Tab kept inside, focus returned to the button; leaving the view, comparing or going under 700 px closes it. Kept in the link as <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&amp;f=1</code>, which a phone ignores.</span></div>
+      <div class="tech-row"><span class="tech-key">Phone</span><span class="tech-val">The map takes the height between the sub-tabs and the inspector sheet (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">100dvh</code> minus the measured bars, minimum 200 px), so the page does not scroll; the sheet has two fixed heights (168 px folded, at most 290 px open). A <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">ResizeObserver</code> refits the viewBox (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tzFrame()</code>): the key fills the width, never below 1 unit per pixel so note names stay ≥ 12 px.</span></div>
     </div>
 
     <div class="tech-section">
@@ -13207,17 +13220,17 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-section">
       <div class="tech-section-title">Audio Engine</div>
       <div class="tech-row"><span class="tech-key">Library</span><span class="tech-val">Tone.js 14.8.49 (CDN) - wraps Web Audio API. Two samplers: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler</code> (piano, loads on init) and <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">guitarSampler</code> (guitar, loaded when a guitar diagram first shows). Mandolin and banjo play their own buffers (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampleNote()</code>), so a new strum damps them like the synthesised strings.</span></div>
-      <div class="tech-row"><span class="tech-key">Piano samples</span><span class="tech-val">Salamander Grand Piano — real mp3 samples via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> (tonejs.github.io/audio/salamander/). Loads on page init. "⟳ loading…" indicator while pending.</span></div>
+      <div class="tech-row"><span class="tech-key">Piano samples</span><span class="tech-val">Salamander Grand Piano - real mp3 samples via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Sampler</code> (tonejs.github.io/audio/salamander/). Loads on page init. "⟳ loading…" indicator while pending.</span></div>
       <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val">nbrosowsky acoustic guitar - 37 real mp3 samples (nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/), in tune within 5 cents. Tone.js pitch-shifts between recorded notes. Loaded when a guitar diagram first shows, or when Guitar sound is selected.</span></div>
       <div class="tech-row"><span class="tech-key">Mandolin &amp; banjo samples</span><span class="tech-val">Philharmonia Orchestra recordings, served with the app (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/mandolin/</code> G3-G6, 37 notes, 1.1 MB; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">samples/banjo/</code> C3-E6, 41 notes, 1.3 MB; one MP3 per MIDI note). Prepared by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">tools/build_samples.mjs</code>: high-passed below the lowest string (the mandolin takes carry a room noise loud enough to pass for the attack up to 200 ms early), cut 4 ms before the attack, retuned to A = 440 (the takes were up to 30 cents off; now within 2 cents on every open string, measured in the app), levelled on their first 300 ms, faded out. The one take that would not hold its pitch (mandolin G♯5) is its neighbour moved a semitone. The attack is found again after decoding, past the MP3 encoder's head padding. Cached for offline use after the first load.</span></div>
       <div class="tech-row"><span class="tech-key">Chord list playback</span><span class="tech-val">Chords › List cards: ▶ plays the chord in root position (notes 8 ms apart), the arpeggio button plays it up at 220 ms a note; always piano, via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">playMidiNote()</code>. Instrument diagrams have their own buttons (Chord Sound above).</span></div>
       <div class="tech-row"><span class="tech-key">Scale playback</span><span class="tech-val">Play button inside the staff SVG (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;g class="staff-play-circle"&gt;</code>); notes queued one by one at 380 ms, pitches taken from the scale intervals; pause clears the queue and releases the sampler.</span></div>
       <div class="tech-row"><span class="tech-key">Composition player</span><span class="tech-val">Sound: piano, guitar, mandolin or banjo (the last two through <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compStringSampler()</code>, a Tone.Sampler look-alike on the recordings: notes lifted an octave on mandolin, any still out of range moved by octaves, a pitch struck twice at the same instant played once; piano if the recordings fail). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.Transport</code>-based scheduling - enables accurate loop, stop, and live update. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_compPlayGen</code> counter cancels stale callbacks after stop. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compPendingRestart</code> flag triggers seamless loop restart when chords change during playback.</span></div>
       <div class="tech-row"><span class="tech-key">Note value / timing</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">stepDur = beatDur × 4 / noteVal</code>. Arp mode: fixed step interval at noteVal rate with swing offset on odd steps. Full mode: strum rate at noteVal, velocity from strum pattern (cycling).</span></div>
-      <div class="tech-row"><span class="tech-key">Strum patterns</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">STRUM_PATTERNS</code> object — each pattern defines beat arrays with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{d, a, g}</code> flags (downstroke, accent, ghost). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations(dur, beats)</code> converts to hit objects with velocity (accent=1.0, normal=0.72, up=0.48, ghost=0.22).</span></div>
-      <div class="tech-row"><span class="tech-key">Drums</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DRUM_PATTERNS</code> — 9 styles (Rock/Funk/Jazz/Bossa/Waltz/Ballad/Reggae/HiHat/Click), each with bpm+subdiv+beat arrays. Synthesised entirely via Web Audio API: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthKick</code> (sub+punch), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthSnare</code> (dual bandpass), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthHihat</code> (HP 8.5 kHz), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthRide</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthClap</code> (3 layered bursts). Auto mode maps strum pattern name to matching drum style.</span></div>
-      <div class="tech-row"><span class="tech-key">Improv suggestions</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getImprovSuggestions(chord)</code> — quality-first regex matching against <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> output strings. No degree-based lookup — scale choice is determined by chord type (dom7→Mixolydian/Altered, Δ7→Ionian/Lydian, m7→Dorian, ø7→Locrian/Locrian♯2, etc.).</span></div>
-      <div class="tech-row"><span class="tech-key">MusicXML import</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compImportMusicXML()</code> — imports a Guitar Pro / partwise MusicXML export into a composition with chords + <em>exact groove</em>. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseMusicXMLDoc()</code> walks measures via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DOMParser</code> (no library), tracking divisions/backup/forward for onset times. Each onset becomes a per-chord <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">rhythm:[{at,dur,vel,midis}]</code> capturing the <em>actual notes</em> played (preserving bass/chord alternation), played back by a dedicated branch in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">scheduleChords</code>. Duplicate TAB staff skipped; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">octave-change</code> transpose applied; consecutive identical chords merged. Percussion part parsed into an absolute-beat <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">drumTrack</code> (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseDrumTrack</code> → GP instrument names mapped to kick/snare/hat/ride synths). Multi-part exports (drums/solo/bass/comp) show a part chooser — <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_pickBestPartId()</code> defaults to the most chordal pitched part and excludes <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;unpitched&gt;</code> drum tracks. Chords from <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;harmony&gt;</code> labels used verbatim; otherwise detected per half-bar by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_matchChordFromPcs()</code> — a pool scorer (over <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildAllKeysChordPool()</code>) tolerant of omitted 5ths, so altered guitar voicings like G7♭9♭13 (no 5th) name correctly.</span></div>
+      <div class="tech-row"><span class="tech-key">Strum patterns</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">STRUM_PATTERNS</code> object - each pattern defines beat arrays with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{d, a, g}</code> flags (downstroke, accent, ghost). <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getStrumDurations(dur, beats)</code> converts to hit objects with velocity (accent=1.0, normal=0.72, up=0.48, ghost=0.22).</span></div>
+      <div class="tech-row"><span class="tech-key">Drums</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DRUM_PATTERNS</code> - 9 styles (Rock/Funk/Jazz/Bossa/Waltz/Ballad/Reggae/HiHat/Click), each with bpm+subdiv+beat arrays. Synthesised entirely via Web Audio API: <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthKick</code> (sub+punch), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthSnare</code> (dual bandpass), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthHihat</code> (HP 8.5 kHz), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthRide</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_synthClap</code> (3 layered bursts). Auto mode maps strum pattern name to matching drum style.</span></div>
+      <div class="tech-row"><span class="tech-key">Improv suggestions</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getImprovSuggestions(chord)</code> - quality-first regex matching against <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">classifyChord()</code> output strings. No degree-based lookup - scale choice is determined by chord type (dom7→Mixolydian/Altered, Δ7→Ionian/Lydian, m7→Dorian, ø7→Locrian/Locrian♯2, etc.).</span></div>
+      <div class="tech-row"><span class="tech-key">MusicXML import</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">compImportMusicXML()</code> - imports a Guitar Pro / partwise MusicXML export into a composition with chords + <em>exact groove</em>. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseMusicXMLDoc()</code> walks measures via <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">DOMParser</code> (no library), tracking divisions/backup/forward for onset times. Each onset becomes a per-chord <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">rhythm:[{at,dur,vel,midis}]</code> capturing the <em>actual notes</em> played (preserving bass/chord alternation), played back by a dedicated branch in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">scheduleChords</code>. Duplicate TAB staff skipped; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">octave-change</code> transpose applied; consecutive identical chords merged. Percussion part parsed into an absolute-beat <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">drumTrack</code> (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_parseDrumTrack</code> → GP instrument names mapped to kick/snare/hat/ride synths). Multi-part exports (drums/solo/bass/comp) show a part chooser - <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_pickBestPartId()</code> defaults to the most chordal pitched part and excludes <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;unpitched&gt;</code> drum tracks. Chords from <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&lt;harmony&gt;</code> labels used verbatim; otherwise detected per half-bar by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_matchChordFromPcs()</code> - a pool scorer (over <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">buildAllKeysChordPool()</code>) tolerant of omitted 5ths, so altered guitar voicings like G7♭9♭13 (no 5th) name correctly.</span></div>
       <div class="tech-row"><span class="tech-key">Chord octave spread</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">spreadChordOctaves()</code> - stacks the chord upward from its root in the C3 octave, so chord cards sound in root position.</span></div>
       <div class="tech-row"><span class="tech-key">iOS/PWA unlock</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">Tone.start()</code> on first user gesture; <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sampler.releaseAll()</code> on stop.</span></div>
     </div>
@@ -13225,13 +13238,34 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-section">
       <div class="tech-section-title">Visual &amp; UI</div>
       <div class="tech-row"><span class="tech-key">Scale/arpeggio zoom</span><span class="tech-val">Position cards and full-board click open <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">showSvgModal()</code>: near-fullscreen panel (98 vw × 96 vh); SVG fills width at 100%. Mouse-wheel or two-finger pinch zooms up to 6× (width-based scaling); inner panel scrolls to pan when zoomed. Landscape lock + fullscreen API requested on mobile.</span></div>
-      <div class="tech-row"><span class="tech-key">Staff notation</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeScaleStaffSVG()</code> / <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordStaffSVG()</code> — pure SVG; auto-fitting viewBox from actual note Y-bounds; treble clef uses overflow:visible; accidentals, ledger lines, stems</span></div>
+      <div class="tech-row"><span class="tech-key">Staff notation</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeScaleStaffSVG()</code> / <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordStaffSVG()</code> - pure SVG; auto-fitting viewBox from actual note Y-bounds; treble clef uses overflow:visible; accidentals, ledger lines, stems</span></div>
       <div class="tech-row"><span class="tech-key">Circle of Fifths</span><span class="tech-val">Inline SVG, 380×380 px; three concentric rings (major/minor/dim); bidirectional hover (CoF↔chord cards); transparent overlay slices cover all 12 positions × 3 rings with CSS :hover fill; negative harmony axis overlay</span></div>
       <div class="tech-row"><span class="tech-key">Negative harmony</span><span class="tech-val">CoF fold method (Ernst Levy / Jacob Collier): <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">mirror = (2×tonicSlot + 1 - pcSlot + 12) % 12</code></span></div>
-      <div class="tech-row"><span class="tech-key">Scale relationships</span><span class="tech-val">Relative (shared pitch set, different root); Parallel (same root, ≥4 shared notes); Closely related (adjacent root, ≥n-1 shared); enharmonic names use PREFER_FLAT_PC set (Db/Eb/Ab/Bb)</span></div>
-      <div class="tech-row"><span class="tech-key">Jazz impro hints</span><span class="tech-val">IMPRO_MAP quality→scale lookup on each 7th-chord card; clicking a scale pill navigates to that scale at the chord root via state update + render()</span></div>
+      <div class="tech-row"><span class="tech-key">Scale relationships</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">findScaleRelationships()</code>, same number of notes only. Relative: every note shared, another root (≤ 6). Parallel: same root, n-1 or n-2 notes shared, Major ↔ Aeolian pinned first (≤ 7). Closely related: exactly n-1 shared on any other root, the same scale first (the neighbouring keys), then nearest on the circle of fifths (≤ 5).</span></div>
+      <div class="tech-row"><span class="tech-key">Jazz impro hints</span><span class="tech-val">IMPRO_MAP quality → scale lookup on each 7th-and-up card; scales that contain every chord tone come first, one that leaves a tone out is dimmed, and a quality the table does not know gets the fullest scale containing every tone (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">findCoveringScale</code>, pentatonics last). Clicking a pill navigates to that scale at the chord root via state update + render()</span></div>
       <div class="tech-row"><span class="tech-key">Theme</span><span class="tech-val">Dark mode only; CSS custom properties on <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">:root</code>; CoF SVG uses hardcoded dark-palette colours</span></div>
-      <div class="tech-row"><span class="tech-key">Responsive</span><span class="tech-val">Whole UI rendered at zoom 1.25 above 700 px, zoom 1 below; two-column layout from 1125 px; composition modal switches to its mobile layout at 600 px; landscape-mobile at max-height: 500 px; pinch-zoom allowed</span></div>
+      <div class="tech-row"><span class="tech-key">Responsive</span><span class="tech-val">Whole UI rendered at zoom 1.25 above 700 px, zoom 1 below; two-column layout from 1125 px; composition modal switches to its phone layout at 750 px; landscape-mobile at max-height: 500 px; pinch-zoom allowed</span></div>
+      <div class="tech-row"><span class="tech-key">Phone layout</span><span class="tech-val">Everything under <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">@media (max-width: 700px)</code> plus a JS block (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">syncPhoneBar()</code> after every view render): sticky top bar <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">#m-top</code> (‹ key ›, scale, app-icon menu) and degree rail built from the view's <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">.degree-section</code>s, bottom bar <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">#m-nav</code>, Key &amp; scale and menu sheets. The bars and the menu click the desktop controls, so there is one implementation of each action. Chord diagrams two degree sections per row (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">m-grid2</code>, not for arpeggios, scales, Alt. Dom or piano), bigger dot letters drawn by <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">makeChordDiagram</code> on a phone, left panel at <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">zoom: 1.2</code>; nothing under 12 px, buttons ≥ 40 px.</span></div>
+    </div>
+
+    <div class="tech-section">
+      <div class="tech-section-title">State, Links &amp; Storage</div>
+      <div class="tech-row"><span class="tech-key">URL hash</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">#k=0&amp;s=Major+(Ionian)&amp;m=4&amp;v=list</code> (+ <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">&amp;f=1</code> for the full-screen Tonnetz), rewritten with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">history.replaceState</code> after every render (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">encodeHash</code>) and read on load (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">decodeHash</code>): an unknown scale or key drops the hash, an unknown mode or view falls back to 7ths / List (<code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">HASH_MODES</code>, <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">HASH_VIEWS</code>).</span></div>
+      <div class="tech-row"><span class="tech-key">localStorage</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">harmonic-compositions</code> (all compositions), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">harmonic-history</code> (last 15 key + scale pairs), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">harmonic-show-intervals</code> (Steps), <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">ha-resource-status</code> (Jazz Resources), plus the tuner's settings. Reset preferences clears the history and Steps only.</span></div>
+      <div class="tech-row"><span class="tech-key">Share codes</span><span class="tech-val">⇪ Share writes a composition as an <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">HA1:</code> text code; Import and Restore pass every field through <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">_sanitizeComp()</code> (types, lengths, known values only) and the UI escapes all text, so a pasted code cannot inject markup. Export all = one JSON backup <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">{app, v, exported, compositions}</code>; Restore adds what is not already there.</span></div>
+    </div>
+
+    <div class="tech-section">
+      <div class="tech-section-title">PWA &amp; Offline</div>
+      <div class="tech-row"><span class="tech-key">Versioning</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">window.APP_VERSION</code> is the single source: the worker registers as <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">sw.js?v=</code> + version, derives its cache name from it, and the Version row above is written from it. A deploy is one edit.</span></div>
+      <div class="tech-row"><span class="tech-key">Caches</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">harmonic-atlas-&lt;version&gt;</code> = the app shell, precached one file at a time with <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">cache: 'reload'</code> (never a stale copy from the HTTP cache), replaced on every deploy. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">harmonic-atlas-runtime</code> = Tone.js, fonts, piano and guitar samples (stale-while-revalidate) and the app's mandolin / banjo samples (cache-first, a rebuilt set bumps its <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">rev</code> in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">SAMPLE_SETS</code>); it survives deploys so a new version does not download every sample again.</span></div>
+      <div class="tech-row"><span class="tech-key">Page loads</span><span class="tech-val">Network first, so a deploy shows at once, but the cached page answers after 3 s on a weak connection while the network copy refreshes the cache for next time.</span></div>
+      <div class="tech-row"><span class="tech-key">Install</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">manifest.json</code> with any and maskable icons (a Tonnetz: C major in gold, its three minor neighbours in violet), apple-touch icon and favicon.</span></div>
+    </div>
+
+    <div class="tech-section">
+      <div class="tech-section-title">Tests</div>
+      <div class="tech-row"><span class="tech-key">Engine tests</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">node tests/engine.test.js</code>, no dependencies: loads the first script of this page in a Node VM with a stand-in DOM and checks the engine <em>by name</em> - spelling, chord names, guitar / mandolin / banjo shapes (C = x32010, G big chop = 7-5-2-3), piano fingerings and voicings, the notes each diagram plays and the tuning of the synthesised strings, the tuner (presets, detection, plucked strings through a simulated phone mic), the Tonnetz, and the links. 112 checks, run before every deploy. Named checks, because the v74 grips passed every invariant test while the two most important chop shapes were missing.</span></div>
     </div>
 
     <div class="tech-section">
@@ -13250,7 +13284,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <div class="tech-row"><span class="tech-key">Drop voicings</span><span class="tech-val"><a href="https://www.jazzguitar.be/blog/drop-2-chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Drop 2</a>; <a href="https://www.jazzguitar.be/blog/drop-3-chords/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Drop 3</a></span></div>
       <div class="tech-row"><span class="tech-key">Arpeggio shapes</span><span class="tech-val"><a href="https://www.jazzguitar.be/blog/guitar-arpeggios/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">jazzguitar.be - Guitar Arpeggios</a> - CAGED arpeggio positions for 7th chords</span></div>
       <div class="tech-row"><span class="tech-key">Negative harmony</span><span class="tech-val">Ernst Levy, <em>A Theory of Harmony</em> (1985); Jacob Collier interviews; <a href="https://www.youtube.com/watch?v=9-EHgH4LZEQ" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">Adam Neely's Negative Harmony explanation</a></span></div>
-      <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val"><a href="https://github.com/nbrosowsky/tonejs-instruments" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">nbrosowsky/tonejs-instruments</a> — open-source real instrument samples for Tone.js</span></div>
+      <div class="tech-row"><span class="tech-key">Guitar samples</span><span class="tech-val"><a href="https://github.com/nbrosowsky/tonejs-instruments" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">nbrosowsky/tonejs-instruments</a> - open-source real instrument samples for Tone.js</span></div>
       <div class="tech-row"><span class="tech-key">Mandolin &amp; banjo samples</span><span class="tech-val"><a href="https://philharmonia.co.uk/resources/sound-samples/" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">Philharmonia Orchestra sound samples</a> - recorded by Philharmonia musicians, free to use in any work; shipped here trimmed, retuned and re-encoded</span></div>
       <div class="tech-row"><span class="tech-key">Scale modes</span><span class="tech-val"><a href="https://www.musictheory.net/lessons/mode" target="_blank" style="color:var(--gold2);text-decoration:underline dotted">musictheory.net modes</a>; Mark Levine, <em>The Jazz Theory Book</em>; Jerry Bergonzi, <em>Inside Improvisation</em></span></div>
     </div>
@@ -13482,12 +13516,17 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <li><a class="guide-toc-link" href="#g-views">Chord Views</a></li>
         <li><a class="guide-toc-link" href="#g-relationships">Scale Relationships</a></li>
         <li><a class="guide-toc-link" href="#g-cadences">Cadence Suggester</a></li>
+        <li><a class="guide-toc-link" href="#g-subs">Substitutions &amp; Passing Chords</a></li>
+        <li><a class="guide-toc-link" href="#g-pivot">Pivot Chord Finder</a></li>
+        <li><a class="guide-toc-link" href="#g-ear">Interval Ear Training</a></li>
         <li><a class="guide-toc-link" href="#g-composition">Composition &amp; Improvisation</a></li>
         <li><a class="guide-toc-link" href="#g-neg">Negative Harmony</a></li>
         <li><a class="guide-toc-link" href="#g-compare">Scale Comparison</a></li>
-        <li><a class="guide-toc-link" href="#g-tips">Pro Tips</a></li>
         <li><a class="guide-toc-link" href="#g-licks">Jazz Resources</a></li>
         <li><a class="guide-toc-link" href="#g-tuner">Tuner</a></li>
+        <li><a class="guide-toc-link" href="#g-phone">On a Phone</a></li>
+        <li><a class="guide-toc-link" href="#g-links">Links, History &amp; Offline</a></li>
+        <li><a class="guide-toc-link" href="#g-tips">Pro Tips</a></li>
         <li><a class="guide-toc-link" href="#g-sources">Sources &amp; References</a></li>
       </ol>
     </nav>
@@ -13503,11 +13542,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Overview</div>
         </div>
       </div>
-      <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and offers guitar, mandolin, banjo and piano diagrams - each one playable - a circle of fifths, scale relationships, a cadence suggester, and a composition tool that plays your progressions back.</p>
-      <p class="guide-p">The tool covers <strong>37 scales</strong> across seven families: Major Modes, Harmonic Minor, Melodic Minor, Bebop (Dominant, Major, Dorian, Phrygian), Pentatonic (Major, Minor, Blues), Symmetric (Half-Whole, Whole-Half) and Exotic (Neapolitan Minor, Hungarian Minor, Byzantine, Hirajoshi, Whole Tone, Arabian). Every scale is presented in all 12 keys. Notes are spelled the way a musician reads them: one letter per degree (B♭ not A♯ in F major), each note named after the degree it stands for in pentatonic and bebop scales (E major pentatonic is E F♯ G♯ B C♯), and the simpler of two enharmonic tonics (C♯ minor, not D♭ minor). Where a diatonic Maj7 chord has a ♯11 available in the scale, a Δ7♯11 (Lydian chord) is shown as an alternative voicing.</p>
+      <p class="guide-p">The <strong>Harmonic Atlas</strong> is a complete music theory reference for any key and scale. It harmonises a chosen scale into full chord stacks - from basic triads through 13th chords - and shows them as chord cards, on a Tonnetz, and as guitar, mandolin, banjo and piano diagrams that all play what they draw. Around them: a circle of fifths, scale relationships, a cadence suggester, substitution ideas, a pivot chord finder, interval ear training, a side-by-side scale comparison, a composition tool that plays your progressions back, a microphone tuner and a library of jazz lessons.</p>
+      <p class="guide-p">The tool covers <strong>37 scales</strong> across seven families: Major Modes (7), Harmonic Minor (7 modes), Melodic Minor (7 modes, Altered included), Bebop (Dominant, Major, Dorian, Phrygian), Pentatonic (Major, Minor, Blues), Symmetric (Half-Whole, Whole-Half) and Exotic (Neapolitan Minor, Hungarian Minor, Byzantine, Hirajoshi and its 4th mode, Whole Tone, Arabian). Every scale is presented in all 12 keys. Notes are spelled the way a musician reads them: one letter per degree (B♭ not A♯ in F major), each note named after the degree it stands for in pentatonic and bebop scales (E major pentatonic is E F♯ G♯ B C♯), and the simpler of two enharmonic tonics (C♯ minor, not D♭ minor).</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">💡</span>
-        <span class="guide-tip-text">The left column holds reference tools (circle of fifths, scale relationships, cadences, substitutions, pivot chords, ear training). The right column always shows the chord view.</span>
+        <span class="guide-tip-text">On a computer the left column holds the reference tools (circle of fifths, scale relationships, cadences, substitutions, pivot chords, ear training) and the right column the chord views. The round buttons at the top right open the composition tool (♩), the tuner (tuning fork), Jazz Resources (saxophone), this guide (?) and Technical Details (wrench). Every <strong>?</strong> badge next to a heading explains it on hover or focus. On a phone the same tools sit behind the app icon (see <em>On a Phone</em>).</span>
       </div>
     </section>
 
@@ -13522,12 +13561,14 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Choosing Key &amp; Scale</div>
         </div>
       </div>
-      <p class="guide-p">Set the <strong>Root Key</strong> with the ▼ ▲ buttons (one semitone at a time) and pick the <strong>Scale / Mode</strong> from the list, grouped by family; type in the filter box to narrow it. Every panel updates instantly.</p>
+      <p class="guide-p">Set the <strong>Root Key</strong> with the ▼ ▲ buttons (one semitone at a time) and pick the <strong>Scale / Mode</strong> from the list, grouped by family; type in the filter box to narrow it, and press Enter to open the first match. Every panel updates instantly.</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Root Key</span>
         <span class="guide-kv-val">Sets the tonic of the scale. All note names and chord roots adjust automatically with correct spelling.</span>
         <span class="guide-kv-key">Scale / Mode</span>
         <span class="guide-kv-val">Selects from 37 scales across 7 families. Each scale is described in the Scale Hero banner with its characteristic colours and degrees.</span>
+        <span class="guide-kv-key">History</span>
+        <span class="guide-kv-val">Once you have visited two key + scale pairs, a <strong>History</strong> strip above the Scale Hero lists the last 15, oldest to newest: click one to go back to it.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎸</span>
@@ -13561,23 +13602,23 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-key">13ths</span>
         <span class="guide-kv-val">Full seven-note chord stacks. Every scale degree voiced simultaneously - the richest harmonic texture.</span>
         <span class="guide-kv-key">Others</span>
-        <span class="guide-kv-val">Sus2, Sus4, add9, add11, M6, m6, 6/9, m6/9, augmented, diminished, power chord (5), 7sus4, Maj7sus4, 7sus2 — all built from scale tones where available.</span>
+        <span class="guide-kv-val">Sus2, Sus4, add9, add11, M6, m6, 6/9, m6/9, augmented, diminished, power chord (5), 7sus4, Maj7sus4, 7sus2 - all built from scale tones where available.</span>
       </div>
 
-      <p class="guide-p" style="margin-bottom:6px"><strong>Chromatic modes:</strong></p>
+      <p class="guide-p" style="margin-bottom:6px"><strong>Chromatic modes</strong> (a chord that is already in the scale is left out, so a degree may have none):</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Secondary Dom.</span>
-        <span class="guide-kv-val">V7 chords targeting each diatonic degree (V/ii, V/IV, etc.). Each card shows common alterations — <strong>7♭9, 7♯9, 7♯11, 7♭13, 7♭5, 7♯5</strong> — a <strong>♭II tritone substitution</strong>, and a <strong>🎸 voicings</strong> button opening guitar chord diagrams for all altered dominant shapes.</span>
+        <span class="guide-kv-val">The dominant 7th a fifth above each major or minor degree (V / ii, V / IV...). Each card has a <strong>🎸 altered voicings</strong> button that opens Guitar › Alt. Dom on that dominant, its <strong>♭II tritone substitution</strong>, and Impro scale pills.</span>
         <span class="guide-kv-key">Secondary Dim.</span>
-        <span class="guide-kv-val">vii° chords a semitone below each diatonic root. Tighter chromatic pull than secondary dominants.</span>
+        <span class="guide-kv-val">The fully diminished 7th a semitone below each major or minor degree (vii°7 / ii...), spelled as a leading tone (C♯°7 into D). Tighter chromatic pull than secondary dominants.</span>
         <span class="guide-kv-key">Secondary Sub.</span>
-        <span class="guide-kv-val">IV chords a perfect fourth above each degree - the subdominant of each degree, adding modal colour.</span>
+        <span class="guide-kv-val">The major 7th a perfect fourth above each degree (IVΔ7 / ii...): the subdominant of each degree, adding modal colour.</span>
         <span class="guide-kv-key">Chr. Mediants</span>
-        <span class="guide-kv-val">Chords a major or minor third away from the tonic sharing one common tone. Romantic, filmic, surprising.</span>
+        <span class="guide-kv-val">The four chords of the tonic's quality a minor or major third above or below the tonic; each card names the one tone it shares with the tonic chord. Romantic, filmic, surprising. Needs a major or minor tonic.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🎹</span>
-        <span class="guide-tip-text">Chord symbols follow standard jazz notation. The interval line below each chord name shows exact semitone distances from the root, so you can verify the voicing on any instrument.</span>
+        <span class="guide-tip-text">Chord symbols follow standard jazz notation. The interval line below each chord name gives each tone's interval from the root (1 · ♭3 · 5 · ♭7), so you can check the voicing on any instrument. The chord mode drives the cards, the Tonnetz and the chord diagrams of every instrument; Guitar › Arpeggios, Shell, Drop 2 and Drop 3 always work on seventh chords (see Chord Views).</span>
       </div>
     </section>
 
@@ -13592,12 +13633,12 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Scale Hero Banner</div>
         </div>
       </div>
-      <p class="guide-p">The full-width banner directly below the chord mode buttons shows the current scale at a glance: its family, the degree identity line (e.g. <em>1 2 ♭3 4 5 ♭6 ♭7</em>), and large note pills in scale order. A <strong>Steps</strong> toggle reveals interval arcs between each note pill showing the semitone distance (½ = half step, 1 = whole step, 1½ = minor 3rd, 2 = major 3rd).</p>
-      <p class="guide-p">Below the note pills, a live <strong>treble-clef staff</strong> shows the ascending scale in standard notation — noteheads, stems, accidentals, and ledger lines rendered in real time. A small <strong>▶ play button</strong> sits to the left of the staff; clicking it plays the scale up one octave, clicking again stops it.</p>
-      <p class="guide-p">The <strong>right panel</strong> shows a concise description of the scale's characteristic colour and harmonic applications.</p>
+      <p class="guide-p">The full-width banner directly below the chord mode buttons shows the current scale at a glance: its family, the degree identity line (e.g. <em>1 2 ♭3 4 5 ♭6 ♭7</em>), the step formula (<em>W H W W H W W</em>: H = half step, W = whole step, A2 = augmented 2nd, m3 / M3 = minor / major 3rd, P4 = perfect 4th), and large note pills in scale order, each with its Roman numeral underneath. A <strong>Steps</strong> toggle reveals interval arcs between the note pills showing the distance in tones (½ = half step, 1 = whole step, 1½ = minor 3rd, 2 = major 3rd); the app remembers whether it is on.</p>
+      <p class="guide-p">Below the note pills, a live <strong>treble-clef staff</strong> shows the ascending scale in standard notation - noteheads, stems, accidentals and ledger lines. A small <strong>▶ play button</strong> sits to the left of the staff; clicking it plays the scale up one octave, clicking again stops it.</p>
+      <p class="guide-p">The <strong>right panel</strong> shows a concise description of the scale's characteristic colour and harmonic applications (on a phone it folds behind <strong>About ›</strong>).</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">👆</span>
-        <span class="guide-tip-text">Clicking any note pill scrolls the chord panel to that scale degree's chord cards. The ♩ icon on each chord card opens an inline stacked-chord staff notation for that chord. The search history strip above the banner shows your recent key+scale navigations.</span>
+        <span class="guide-tip-text">Clicking any note pill scrolls the chord panel to that scale degree's chord cards.</span>
       </div>
     </section>
 
@@ -13613,10 +13654,10 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         </div>
       </div>
       <p class="guide-p">The Circle of Fifths arranges all 12 keys clockwise by ascending perfect fifths. The <strong>outer ring</strong> shows major keys, the <strong>middle ring</strong> their relative minors, the <strong>inner ring</strong> diminished chords.</p>
-      <p class="guide-p">Segments highlighted in <strong style="color:#c9a84c">gold</strong> are major chords of your scale; <strong style="color:#a08bc8">purple</strong> are minor chords; <strong style="color:#d4813a">orange</strong> are diminished chords. Keys adjacent on the circle share the most common notes — useful for modulation planning.</p>
+      <p class="guide-p">Segments highlighted in <strong style="color:#c9a84c">gold</strong> are major chords of your scale; <strong style="color:#a08bc8">purple</strong> are minor chords; <strong style="color:#d4813a">orange</strong> are diminished chords. Keys adjacent on the circle share the most common notes - useful for modulation planning.</p>
       <div class="guide-tip">
         <span class="guide-tip-icon">🖱️</span>
-        <span class="guide-tip-text">Hover works in both directions: hover any CoF segment to highlight the matching chord card (and see a tooltip with name + quality) — including non-diatonic positions. Conversely, hover any chord card to highlight its slice on the circle.</span>
+        <span class="guide-tip-text">Hover works in both directions: hover any CoF segment to highlight the matching chord card (and see a tooltip with name + quality), including non-diatonic positions. Conversely, hover any chord card to highlight its slice on the circle. With the keyboard, Tab reaches the diatonic slices and shows the same readout. The <strong>Negative Harmony</strong> switch under the circle is described in its own section.</span>
       </div>
     </section>
 
@@ -13638,9 +13679,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-kv" style="margin-left:18px">
         <span class="guide-kv-key">List</span>
-        <span class="guide-kv-val">Default view. Each degree shows one card with the chord symbol, quality, note names, and interval stack (e.g. 1 · ♭3 · 5 · ♭7).</span>
+        <span class="guide-kv-val">Default view. Each degree, headed by its numeral and its function (Tonic, Supertonic, Mediant...), shows a card with the chord symbol, quality, note names and interval line. On every card: <strong>▶</strong> plays the chord in root position and the arpeggio button plays it up, both on the piano; <strong>♩</strong> shows the chord on a staff; <strong>+</strong> adds it to the composition. From 7ths up, <strong>Impro</strong> pills suggest scales to play over the chord (a dimmed pill leaves out a chord tone); click one to open that scale on the chord's root. A dominant 7th also gets the <strong>🎸 altered voicings</strong> button, its ♭II tritone substitution and the guide tones the two chords swap. Where a major 7th chord has a ♯11 in the scale, a <strong>Δ7♯11</strong> (Lydian chord) card is added as an alternative.</span>
         <span class="guide-kv-key">Tonnetz</span>
-        <span class="guide-kv-val">The key on the tone network: fifths run to the right, major thirds up-right, so a major chord is a triangle pointing up and a minor chord one pointing down. The scale's chords form a ribbon with their numerals (other chords are lines). Click a triangle to hear it and extend the path; <strong>P</strong>, <strong>L</strong>, <strong>R</strong> (buttons or keys, Backspace to undo) flip it over an edge, and each button shows the voice that moves. Below: two- and three-move neighbours, the negative mirror, the hexatonic, octatonic and LR cycles, and the path as a progression to play or send to the composition. Layers: Key, Negative (the circle's switch, major scale only), Degrees. In 7ths mode the selected chord grows its 7th (Δ7 and m7 = rhombus, 7 and ø7 = triangle and tail, dim7 = line of four).</span>
+        <span class="guide-kv-val">The key on the tone network: fifths run to the right, major thirds up-right, so a major chord is a triangle pointing up and a minor chord one pointing down. The scale's chords form a ribbon with their numerals (other chords are lines). Click a triangle to hear it and extend the path, click a note to hear it alone; <strong>P</strong>, <strong>L</strong>, <strong>R</strong> (buttons or keys, Backspace to undo) flip it over an edge, and each button shows the voice that moves. The inspector shows the selected chord (▶ Chord, Arp, + Composer, Guitar ›), its two- and three-move neighbours (the triads a semitone away for a diminished or augmented chord), its negative mirror, and the hexatonic, octatonic and LR cycles. The path is a progression: click a chip to hear one chord, ▶ Play for all of them, Undo, Clear, or <strong>Send to Composer</strong>. Layers: Key, Negative (the circle's switch, major scale only), Degrees (1, ♭3, 5 instead of note names). In 7ths mode the selected chord grows its 7th (Δ7 and m7 = rhombus, 7 and ø7 = triangle and tail, dim7 = line of four); above the 7th, notes are not drawn, and Others and the chromatic modes show the scale's triads. <strong>Full screen</strong> (computer, next to the layers) opens the same Tonnetz over the whole window: the map with the progression strip under it, the chord, its moves and the cycles in a column on the right, and the key, the scale and Triads / 7ths in the header; Escape closes it. On a phone the map fills the screen between the sub-tabs and the inspector sheet, with Undo and Clear in its top-left corner.</span>
       </div>
       <div class="guide-kv">
         <span class="guide-kv-key">Guitar</span>
@@ -13648,9 +13689,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-kv" style="margin-left:18px">
         <span class="guide-kv-key">Basic</span>
-        <span class="guide-kv-val">A chord diagram for each chord. Triads and 7ths come in <strong>open position</strong> first, the way a guitarist learns them (C = x32010, G = 320003, E7 = 020100); a triad with no open shape takes the lowest barre shape (C♯m = x46654). The <strong>root is always the bass note</strong>. Shapes requiring a barre are shown with a purple bar across the relevant strings and a small <strong>B</strong> marker. Gold dot = root, purple = other chord tones.</span>
+        <span class="guide-kv-val">A chord diagram for each chord of the current chord mode (Others and the chromatic modes included). Triads and 7ths come in <strong>open position</strong> first, the way a guitarist learns them (C = x32010, G = 320003, E7 = 020100); a triad with no open shape takes the lowest barre shape (C♯m = x46654). From 9ths up the shape keeps the root, third, seventh and the top extension, the way jazz guitarists voice them. The <strong>root is always the bass note</strong>. Shapes requiring a barre are shown with a purple bar across the relevant strings and a small <strong>B</strong> marker. Gold dot = root, purple = other chord tones. With Negative Harmony on, each diagram sits next to its mirror.</span>
         <span class="guide-kv-key">Arpeggios</span>
-        <span class="guide-kv-val">Horizontal fretboard diagrams showing ascending arpeggio shapes for 7th chords across the CAGED system (E, A, D, G, C forms). Each shape covers a compact window; the root the form is named after is circled in gold. Only available in 7th chord modes.</span>
+        <span class="guide-kv-val">Horizontal fretboard diagrams showing ascending arpeggio shapes for 7th chords across the CAGED system (E, A, D, G, C forms). Each shape covers a compact window; the root the form is named after is circled in gold. Click a shape to zoom it.</span>
         <span class="guide-kv-key">Scale</span>
         <span class="guide-kv-val">The whole scale on a 15-fret fretboard, then the five CAGED positions. A chord-tone overlay highlights the tones of any degree's chord; Notes / Degrees switches the labels.</span>
         <span class="guide-kv-key">Shell</span>
@@ -13660,7 +13701,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-key">Drop 3</span>
         <span class="guide-kv-val">Jazz voicing: the 3rd-highest note dropped one octave. Wider, more open voicings on non-adjacent string sets. Same 4 inversions × 3 sets. Used in big-band arranging. Click any diagram to zoom.</span>
         <span class="guide-kv-key">Alt. Dom</span>
-        <span class="guide-kv-val">Altered dominant voicings for all dominant chords in the current key (V7, secondary dominants). Covers <strong>12 chord types</strong>: 7♭9, 7♯9, 7sus4♭9, 13♭9, 13♯9, 7♯11, 7♭13, 7♭9♭13, 7♭5♭9, 7♭5♯9, 7♯5♭9, 7♯5♯9. Each shows up to 3 moveable shapes (E-str., A-str., D-str.) with the root on a different string. Shapes are compact (span ≤ 4 frets). A tritone-substitution note is shown for each root. Only appears when the scale contains dominant chords.</span>
+        <span class="guide-kv-val">Altered dominant voicings for the dominant 7th chords of the key (the V7 in major), or for the secondary dominants when that chord mode is on. Covers <strong>12 chord types</strong>: 7♭9, 7♯9, 7sus4♭9, 13♭9, 13♯9, 7♯11, 7♭13, 7♭9♭13, 7♭5♭9, 7♭5♯9, 7♯5♭9, 7♯5♯9. Each shows up to 3 moveable shapes (E-str., A-str., D-str.) with the root on a different string. Shapes are compact (span ≤ 4 frets, no open string). A tritone-substitution note is shown for each root. A scale with no dominant 7th says so.</span>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">🎷</span>
+        <span class="guide-tip-text"><strong>Arpeggios, Shell, Drop 2 and Drop 3 always use seventh chords</strong>, whatever the chord mode: the scale's own 7ths, or the secondary dominants / secondary diminished 7ths when one of those two modes is on.</span>
       </div>
       <div class="guide-kv">
         <span class="guide-kv-key">Mandolin</span>
@@ -13668,11 +13713,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-kv" style="margin-left:18px">
         <span class="guide-kv-key">Chords</span>
-        <span class="guide-kv-val">Standard mandolin chord diagrams, may include open strings. Click to zoom.</span>
+        <span class="guide-kv-val">A mandolin chord diagram for each chord of the current chord mode, open strings allowed, so the first-position shapes appear (G = 0-0-2-3, A = 2-2-4-5). A triad has four courses to fill: the root, the fifth or the third is doubled, whichever gives the most natural shape. From 9ths up the grip keeps the root, third, seventh and top extension. Click to zoom.</span>
         <span class="guide-kv-key">Scale</span>
         <span class="guide-kv-val">Full fretboard scale map for mandolin. Swipe horizontally on mobile.</span>
         <span class="guide-kv-key">Chop</span>
-        <span class="guide-kv-val"><strong>Chop chords</strong> — closed shapes for triads and 7ths. Strike on beats 2 &amp; 4 and kill the ring by releasing finger pressure: the snap comes from the release, which is why an open string ruins it. Two things make a grip chop — no open strings, and weight on the bass side (the G and D courses fretted high, which is where the bark comes from and what the pick aims at). The <strong>big chop</strong> is the four-finger stretch, five frets wide, root on the D course: G is 7-5-2-3. The <strong>small chop</strong> brings the pinky home and damps the top course (G: 4-5-2-✕) for faster changes and smaller hands. Dots are labelled by interval (R, 3, 5, ♭7), the row under the string names is a suggested fingering, and ✕ marks a damped course. Pills switch between grips: the letter is the course carrying the root, and a trailing ✕ means a course is damped.</span>
+        <span class="guide-kv-val"><strong>Chop chords</strong> - closed shapes for triads and 7ths. Strike on beats 2 &amp; 4 and kill the ring by releasing finger pressure: the snap comes from the release, which is why an open string ruins it. Two things make a grip chop - no open strings, and weight on the bass side (the G and D courses fretted high, which is where the bark comes from and what the pick aims at). The <strong>big chop</strong> is the four-finger stretch, five frets wide, root on the D course: G is 7-5-2-3. The <strong>small chop</strong> brings the pinky home and damps the top course (G: 4-5-2-✕) for faster changes and smaller hands. Dots are labelled by interval (R, 3, 5, ♭7; <em>Show notes</em> switches to note names), the row under the string names is a suggested fingering, and ✕ marks a damped course. Pills switch between grips: the letter is the course carrying the root, and a trailing ✕ means a course is damped. The grips follow the chord mode: from 9ths up a grip keeps the root, third, seventh and top extension (the diagram still names every tone), and Others and the chromatic modes get grips too.</span>
       </div>
       <div class="guide-kv">
         <span class="guide-kv-key">Banjo</span>
@@ -13680,15 +13725,15 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-kv" style="margin-left:18px">
         <span class="guide-kv-key">Chords</span>
-        <span class="guide-kv-val">Chord shapes with open strings allowed, so first-position G, C and D land where you expect. The 5th string is drawn short because its nut is at fret 5 — open when g belongs to the chord, fretted when the grip reaches past fret 5, crossed out when it clashes and should stay out of the roll.</span>
+        <span class="guide-kv-val">Chord shapes with open strings allowed, so first-position G, C and D land where you expect, for every chord of the current chord mode (four strings to fill, so from 9ths up: root, third, seventh, top extension). No grip asks the hand to cover more than four frets. The 5th string is drawn short because its nut is at fret 5: open when g belongs to the chord, fretted when the grip reaches past fret 5 and leaves a finger free, crossed out when it clashes and should stay out of the roll. Pills switch between grips and <em>Show notes</em> relabels the dots, as on the mandolin Chop tab.</span>
         <span class="guide-kv-key">Scale</span>
         <span class="guide-kv-val">Full fretboard map of the four melody strings. The 5th string is left off: it has its own nut, so it shares no fret grid with the others.</span>
         <span class="guide-kv-key">Moveable</span>
-        <span class="guide-kv-val"><strong>Closed shapes</strong> — the three grips of bluegrass banjo (<em>barre</em>, <em>F shape</em>, <em>D shape</em>) plus whatever else a chord needs. No open strings, so they move to any root: this is how you get out of open G and up the neck.</span>
+        <span class="guide-kv-val"><strong>Closed shapes</strong> - the three grips of bluegrass banjo (<em>barre</em>, <em>F shape</em>, <em>D shape</em>) plus whatever else a chord needs. No open strings, so they move to any root: this is how you get out of open G and up the neck.</span>
       </div>
       <div class="guide-kv">
         <span class="guide-kv-key">Piano</span>
-        <span class="guide-kv-val">Two sub-tabs, each chord on a keyboard (root gold, other tones violet) with two rows of finger numbers under the keys: right hand, then left (1 = thumb, 5 = little finger).</span>
+        <span class="guide-kv-val">Two sub-tabs, each chord of the current chord mode on a keyboard (root gold, other tones violet) with two rows of finger numbers under the keys: right hand, then left (1 = thumb, 5 = little finger). <em>Show intervals</em> / <em>Show notes</em> switches the labels on the keys.</span>
       </div>
       <div class="guide-kv" style="margin-left:18px">
         <span class="guide-kv-key">One hand</span>
@@ -13706,7 +13751,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">👆</span>
-        <span class="guide-tip-text"><strong>Diagram zoom &amp; navigation:</strong> click any chord diagram to open it enlarged. Use the <strong>◀ ▶</strong> buttons, swipe left/right, or arrow keys to navigate between all diagrams in the current view. The previous and next chord names are shown as context labels so you know what's coming before you swipe.</span>
+        <span class="guide-tip-text"><strong>Diagram zoom &amp; navigation:</strong> click any chord diagram to open it enlarged. Use the <strong>◀ ▶</strong> buttons, swipe left/right, or arrow keys to navigate between all diagrams in the current view. The previous and next chord names are shown as context labels so you know what's coming before you swipe. Escape closes it. Scale maps and arpeggio shapes open in a near full-screen view instead: mouse wheel or a two-finger pinch zooms up to 6×, and on a phone it turns to landscape.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🖥️</span>
@@ -13725,14 +13770,14 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Scale Relationships</div>
         </div>
       </div>
-      <p class="guide-p">This collapsible panel (left column) shows three groups of related scales. Each chip now shows a brief explanation of <em>why</em> the two scales are related. Click any chip to instantly navigate to that scale — handy for modal interchange and modulation planning.</p>
+      <p class="guide-p">This collapsible panel (left column) shows three groups of related scales, all with the same number of notes as the current one. Each chip explains <em>why</em> the two scales are related. Click any chip to navigate to that scale - handy for modal interchange and modulation planning.</p>
       <div class="guide-kv">
         <span class="guide-kv-key" style="background:rgba(124,111,160,.15);border-color:rgba(124,111,160,.4);color:#a08bc8">Relative</span>
-        <span class="guide-kv-val">Scales that share every note but start on a different root. The chip shows which mode of the current scale it corresponds to — e.g. "3rd mode of Major (Ionian) — same 7 notes."</span>
+        <span class="guide-kv-val">Scales that share every note but start on a different root (up to 6). The chip says which mode of the current scale it is, e.g. "3rd mode of Major, same 7 notes".</span>
         <span class="guide-kv-key" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.35);color:#e8c96a">Parallel</span>
-        <span class="guide-kv-val">Scales with the same root but different note sets. The chip shows how many notes differ and which ones — e.g. "Same root, 1 note different (Bb altered)".</span>
+        <span class="guide-kv-val">Scales on the same root that differ by one or two notes (up to 7; major and natural minor always list each other). The chip says how many notes differ and which.</span>
         <span class="guide-kv-key" style="background:rgba(80,160,120,.1);border-color:rgba(80,160,120,.35);color:#6bb89a">Closely Related</span>
-        <span class="guide-kv-val">Scales differing by only one note with a root a semitone or two away — the subtlest modulation targets. Shows shared note count and root distance.</span>
+        <span class="guide-kv-val">Scales one note away on another root (up to 5): the same scale in the neighbouring keys first (G and F major for C major), then the others nearest on the circle of fifths - the smoothest modulation targets. Shows the shared note count and how far the root moves.</span>
       </div>
     </section>
 
@@ -13747,7 +13792,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <div class="guide-section-title">Cadence Suggester</div>
         </div>
       </div>
-      <p class="guide-p">Seven common cadences pre-built from your scale's actual chords. The final (resolving) chord of each cadence is highlighted in gold. Click any chord chip to add it to the active composition (one is created if none is open).</p>
+      <p class="guide-p">Seven common cadences pre-built from your scale's actual triads, on any seven-note scale (a pentatonic or bebop scale has no V or vi to build them on, and the panel says so). The final (resolving) chord of each cadence is highlighted in gold, and when the scale's fifth degree is minor the names show the real numerals (v-i in Aeolian). Click any chord chip to add it to the active composition (one is created if none is open).</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Perfect V–I</span><span class="guide-kv-val">Strongest closure in tonal music. Dominant to tonic.</span>
         <span class="guide-kv-key">Plagal IV–I</span><span class="guide-kv-val">The "Amen" cadence. Soft, hymnal, conclusive.</span>
@@ -13759,6 +13804,70 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       </div>
     </section>
 
+    <!-- SUBSTITUTIONS & PASSING CHORDS -->
+    <section class="guide-section" id="g-subs">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon">
+          <svg width="18" height="18" viewBox="0 0 12 12" fill="none"><path d="M2 4h5M2 8h5M9 2v8M9 5l2 2-2 2" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num">09</div>
+          <div class="guide-section-title">Substitutions &amp; Passing Chords</div>
+        </div>
+      </div>
+      <p class="guide-p">A reference card (left column, collapsible) of ways to enrich a progression, written in numerals so it works in any key.</p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Diatonic</span>
+        <span class="guide-kv-val">Swap a chord for its relative (I → vi, IV → ii), or the dominant for ii or vii°.</span>
+        <span class="guide-kv-key">Sus</span>
+        <span class="guide-kv-val">A sus2 or sus4 on the same root, and Vsus4 → V → I.</span>
+        <span class="guide-kv-key">Dominant</span>
+        <span class="guide-kv-val">V7 → V+, V7 → the leading-tone diminished chord, V7 → ♭II7 (tritone sub).</span>
+        <span class="guide-kv-key">Passing</span>
+        <span class="guide-kv-val">Chromatic connectors: a chord a semitone between two chords a whole step apart, a dim before a major or minor target, aug before a major chord, sus2 before a minor one, sus4 before a major one...</span>
+        <span class="guide-kv-key">Progression ideas</span>
+        <span class="guide-kv-val">Turnaround, Backdoor, Cadential 6/4, Line Cliché, coloured ii-V-I, Neapolitan, augmented modulation, each with a line on how it works.</span>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">≈</span>
+        <span class="guide-tip-text">To apply a substitution to a chord you have already placed, use the <strong>≈</strong> button on that chord in the composition tool.</span>
+      </div>
+    </section>
+
+    <!-- PIVOT CHORD FINDER -->
+    <section class="guide-section" id="g-pivot">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon">
+          <svg width="18" height="18" viewBox="0 0 12 12" fill="none"><path d="M6 1L6 11M1 6L11 6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="6" cy="6" r="2.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num">10</div>
+          <div class="guide-section-title">Pivot Chord Finder</div>
+        </div>
+      </div>
+      <p class="guide-p">Pick a target key and scale (the dominant key is preselected) and the panel lists the triads the two scales share, each with its numeral in both: <em>Am · vi in Major ↔ ii in G Major</em>. Play the chord as a degree of the first key, then treat it as a degree of the new one: that is a pivot modulation.</p>
+    </section>
+
+    <!-- INTERVAL EAR TRAINING -->
+    <section class="guide-section" id="g-ear">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon">
+          <svg width="18" height="18" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3 4v4M9 3v6M1 5v2M11 5v2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num">11</div>
+          <div class="guide-section-title">Interval Ear Training</div>
+        </div>
+      </div>
+      <p class="guide-p"><strong>▶ Play Interval</strong> plays two random notes of the current scale; click the interval you heard. Only the intervals the scale can produce are offered. The answer names both notes (<em>C → E = M3</em>), the right button lights up, and a score counts your answers until <strong>Reset</strong>.</p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Ascending</span><span class="guide-kv-val">Low note, then high.</span>
+        <span class="guide-kv-key">Descending</span><span class="guide-kv-val">High note, then low.</span>
+        <span class="guide-kv-key">Harmonic</span><span class="guide-kv-val">Both notes together.</span>
+      </div>
+      <p class="guide-p">Needs a scale of five notes or more.</p>
+    </section>
+
     <!-- COMPOSITION & IMPROVISATION -->
     <section class="guide-section" id="g-composition">
       <div class="guide-section-hdr">
@@ -13766,42 +13875,56 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><ellipse cx="6" cy="14" rx="3" ry="2" transform="rotate(-15 6 14)"/><rect x="8.6" y="3.5" width="1.4" height="10" rx=".7"/><path d="M10 3.5 C13.5 4.5 15 8 12 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
         </div>
         <div>
-          <div class="guide-section-num" style="color:var(--accent2)">09</div>
+          <div class="guide-section-num" style="color:var(--accent2)">12</div>
           <div class="guide-section-title">Composition &amp; Improvisation</div>
         </div>
       </div>
-      <p class="guide-p">The <strong>purple ♩ button</strong> (top-right) opens the Composition tool — a full-featured sequencer for building, saving, and practising over chord progressions. Multiple compositions are saved in the browser (localStorage) and persist across reloads.</p>
+      <p class="guide-p">The <strong>purple ♩ button</strong> (top-right; in the menu on a phone) opens the Composition tool - a sequencer for building, saving and practising over chord progressions. Compositions are saved in this browser and persist across reloads; the chips along the top switch between them.</p>
 
       <p class="guide-p" style="margin-bottom:6px"><strong>Building a progression</strong></p>
       <div class="guide-kv">
-        <span class="guide-kv-key">From the cards</span>
-        <span class="guide-kv-val">Hover any chord card and click its <strong>+</strong>, or click a chord chip in the Cadence Suggester: the chord goes to the active composition, which opens (one is created if needed).</span>
+        <span class="guide-kv-key">From the app</span>
+        <span class="guide-kv-val">Hover any chord card and click its <strong>+</strong>, click a chord chip in the Cadence Suggester, or use <strong>+ Composer</strong> / <strong>Send to Composer</strong> in the Tonnetz: the chord goes to the active composition, which opens (one is created if needed).</span>
         <span class="guide-kv-key">+ New</span>
-        <span class="guide-kv-val">Creates a blank composition. Give it a title by clicking the name field.</span>
+        <span class="guide-kv-val">Creates a blank composition. Give it a title by clicking the name field; <strong>Delete</strong> removes it, after asking.</span>
         <span class="guide-kv-key">Presets</span>
-        <span class="guide-kv-val">I–V–vi–IV, I–IV–V, I–vi–IV–V, ii–V–I and others, built from the current key. A preset replaces the chords of the composition.</span>
+        <span class="guide-kv-val">I-V-vi-IV, I-IV-V, I-vi-IV-V, ii-V-I, i-♭VII-♭VI-♭VII and I-III-IV-iv, built from the current key. Each appears only when the scale gives exactly those numerals. A preset replaces the chords of the composition (it asks first when there are chords to lose).</span>
         <span class="guide-kv-key">Search bar</span>
-        <span class="guide-kv-val">Type any chord name (e.g. "Cm7", "Fmaj7", "F#7b13") to find and add chords, in or out of the key.</span>
+        <span class="guide-kv-val">Type any chord name (e.g. "Cm7", "Fmaj7", "F#7b13"; b and # stand for ♭ and ♯) to find and add chords, in or out of the key.</span>
         <span class="guide-kv-key">⇪ Share / ⇩ Import</span>
         <span class="guide-kv-val">Share copies the composition as a text code; Import pastes one back, on this device or another.</span>
+        <span class="guide-kv-key">⇪ Export all / ⇩ Restore</span>
+        <span class="guide-kv-val">Export all downloads every composition as one backup file (.json); Restore adds the compositions of a backup file, without overwriting or duplicating any.</span>
         <span class="guide-kv-key">♫ MusicXML</span>
-        <span class="guide-kv-val">Imports a Guitar Pro or MusicXML export: chord symbols (or chords detected from the notes), the exact rhythm of the part, and its drum track.</span>
-        <span class="guide-kv-key">◀ ▶</span>
-        <span class="guide-kv-val">Reorder chords within the composition without stopping playback.</span>
-        <span class="guide-kv-key">≈ Substitutions</span>
-        <span class="guide-kv-val">Chord substitution popover — sus chords, relative major/minor, tritone sub, approach chords.</span>
+        <span class="guide-kv-val">Imports a Guitar Pro or MusicXML export: chord symbols (or chords detected from the notes), the exact rhythm of the part, and its drum track. A file with several parts asks which one holds the chords.</span>
+        <span class="guide-kv-key">Notes</span>
+        <span class="guide-kv-val">A free text field under the controls for lyrics, ideas, key, feel.</span>
       </div>
 
-      <p class="guide-p" style="margin-bottom:6px"><strong>Per-chord controls</strong></p>
+      <p class="guide-p" style="margin-bottom:6px"><strong>On each chord</strong></p>
       <div class="guide-kv">
+        <span class="guide-kv-key">Click the card</span>
+        <span class="guide-kv-val">Starts playback from that chord (or jumps there while playing).</span>
+        <span class="guide-kv-key">Click the name</span>
+        <span class="guide-kv-val">Replaces the chord through the same search; its rhythm is kept.</span>
+        <span class="guide-kv-key">⚙</span>
+        <span class="guide-kv-val">Opens the chord's rhythm, arpeggio and timing settings:</span>
         <span class="guide-kv-key">F / A</span>
-        <span class="guide-kv-val"><strong>Full</strong> — strum the whole chord. <strong>Arp</strong> — play notes one at a time in sequence.</span>
+        <span class="guide-kv-val"><strong>Full</strong> - strum the whole chord. <strong>Arp</strong> - play notes one at a time in sequence.</span>
         <span class="guide-kv-key">Note value</span>
-        <span class="guide-kv-val">Whole / Half / Quarter / 8th / 16th — sets how fast notes repeat (strum rate for Full, step speed for Arp). This actually affects the sound — 16th is four notes per beat.</span>
+        <span class="guide-kv-val">Whole / Half / Quarter / 8th / 16th - sets how fast notes repeat (strum rate for Full, step speed for Arp). This actually affects the sound: 16th is four notes per beat.</span>
         <span class="guide-kv-key">Arp pattern</span>
         <span class="guide-kv-val">↑ Up · ↓ Down · ↑↓ Up-Down · ↓↑ Down-Up. Visible only in Arp mode.</span>
         <span class="guide-kv-key">− / +</span>
         <span class="guide-kv-val">Beat count for this chord.</span>
+        <span class="guide-kv-key">◀ ▶</span>
+        <span class="guide-kv-val">Reorder chords within the composition without stopping playback.</span>
+        <span class="guide-kv-key">≈</span>
+        <span class="guide-kv-val">Substitution ideas for this chord (sus, relative major / minor, tritone, augmented and diminished subs for a dominant, half-step approach); click one to replace the chord with it.</span>
+        <span class="guide-kv-key">×</span>
+        <span class="guide-kv-val">Removes the chord.</span>
+        <span class="guide-kv-key">Compact</span>
+        <span class="guide-kv-val">Shrinks every card to its name and numeral, for long progressions.</span>
       </div>
 
       <p class="guide-p" style="margin-bottom:6px"><strong>Global controls (All row)</strong></p>
@@ -13815,9 +13938,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <p class="guide-p" style="margin-bottom:6px"><strong>Playback</strong></p>
       <div class="guide-kv">
         <span class="guide-kv-key">BPM</span><span class="guide-kv-val">40–240. Changes take effect at the next loop cycle.</span>
-        <span class="guide-kv-key">Loop</span><span class="guide-kv-val">Cycles indefinitely. Adding, removing, or reordering chords during playback takes effect at the next cycle — no need to stop.</span>
+        <span class="guide-kv-key">Loop</span><span class="guide-kv-val">Cycles indefinitely. Adding, removing, or reordering chords during playback takes effect at the next cycle - no need to stop.</span>
         <span class="guide-kv-key">Strum</span><span class="guide-kv-val">Rhythmic feel for the whole composition: Straight, Folk, Rock, Ballad, Bossa, Waltz, Funk, Reggae.</span>
-        <span class="guide-kv-key">Swing</span><span class="guide-kv-val">Straight / Light / Medium / Hard — delays off-beat notes to create swing or shuffle feel.</span>
+        <span class="guide-kv-key">Swing</span><span class="guide-kv-val">Straight / Light / Medium / Hard - delays off-beat notes to create swing or shuffle feel.</span>
         <span class="guide-kv-key">Drums</span><span class="guide-kv-val">Synthesized drum pattern (Web Audio API). Style selector: Auto (matches strum pattern), Rock, Funk, Jazz, Bossa, Waltz, Ballad, Reggae, Hi-hat, Click, plus Imported for a MusicXML drum track.</span>
         <span class="guide-kv-key">Sound</span><span class="guide-kv-val"><strong>Piano</strong> - Salamander Grand Piano samples. <strong>Guitar</strong> - real acoustic guitar samples (loads on first use). <strong>Mandolin</strong>, <strong>Banjo</strong> - Philharmonia recordings; chords sit in the instrument's own register (an octave up on mandolin) and the bass doubling folds into the chord.</span>
       </div>
@@ -13843,7 +13966,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.4"/><line x1="1.5" y1="9" x2="16.5" y2="9" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/><path d="M5 6.5C5 8.5 7 9 9 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13 11.5C13 9.5 11 9 9 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         </div>
         <div>
-          <div class="guide-section-num">10</div>
+          <div class="guide-section-num">13</div>
           <div class="guide-section-title">Negative Harmony</div>
         </div>
       </div>
@@ -13853,18 +13976,20 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-chord-pill">G7 → Dø7 (neg)</span>
         <span class="guide-chord-pill">Am → E♭ (neg)</span>
       </div>
-      <p class="guide-p">The axis is shown as a <strong style="color:#e05050">red dashed line</strong> on the Circle of Fifths, with arcs connecting mirrored pitch pairs. Only available in Ionian (Major) mode. When active, the Circle of Fifths shows only the mirror arcs (diatonic highlights are suppressed).</p>
+      <p class="guide-p">Switch it on under the Circle of Fifths. The axis is shown as a <strong style="color:#e05050">red dashed line</strong> on the circle, with arcs connecting mirrored pitch pairs (blue = origin, red = destination, yellow = both); the diatonic highlights are suppressed while it is on. Only available in Ionian (Major) mode.</p>
       <div class="guide-kv">
-        <span class="guide-kv-key">Original card</span>
-        <span class="guide-kv-val">Left card — the diatonic chord as usual.</span>
-        <span class="guide-kv-key">Negative card</span>
-        <span class="guide-kv-val">Right card — the mirrored chord with its own guitar voicing diagram. <strong>Hover the pair</strong> to see a tooltip showing how each note transforms (e.g. C → G, E → E♭, G → C, B → A♭ for Cmaj7).</span>
-        <span class="guide-kv-key">Persistence</span>
-        <span class="guide-kv-val">The toggle state is saved. If you switch to another scale and return to Ionian, Negative Harmony re-activates automatically.</span>
+        <span class="guide-kv-key">Chords › List</span>
+        <span class="guide-kv-val">Each degree becomes a pair: the diatonic chord on the left, its mirror on the right (with its own play, staff, + and Impro buttons). From 7ths up, <strong>hover the original</strong> to see how each note transforms (e.g. C → G, E → E♭, G → C, B → A♭ for Cmaj7). Not in the Others mode.</span>
+        <span class="guide-kv-key">Guitar › Basic</span>
+        <span class="guide-kv-val">Each diagram sits next to the diagram of its mirror chord, tinted red.</span>
+        <span class="guide-kv-key">Chords › Tonnetz</span>
+        <span class="guide-kv-val">The <em>Negative</em> layer is the same switch: the key's mirror is drawn as a dashed violet ribbon.</span>
+        <span class="guide-kv-key">Memory</span>
+        <span class="guide-kv-val">Switch to another scale and back to Ionian during a visit, and Negative Harmony comes back on by itself.</span>
       </div>
       <div class="guide-tip">
         <span class="guide-tip-icon">🪞</span>
-        <span class="guide-tip-text">Use negative harmony to find unexpected chord substitutions — the negative of ii–V–I in C (Dm7–G7–CΔ7) is Gm7–Dø7–A♭Δ7: the same pull toward C, in a darker colour.</span>
+        <span class="guide-tip-text">Use negative harmony to find unexpected chord substitutions - the negative of ii–V–I in C (Dm7–G7–CΔ7) is Gm7–Dø7–A♭Δ7: the same pull toward C, in a darker colour.</span>
       </div>
     </section>
 
@@ -13875,29 +14000,11 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="6.5" height="16" rx="1" stroke="currentColor" stroke-width="1.4" fill="none"/><rect x="10.5" y="1" width="6.5" height="16" rx="1" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
         </div>
         <div>
-          <div class="guide-section-num">11</div>
+          <div class="guide-section-num">14</div>
           <div class="guide-section-title">Scale Comparison</div>
         </div>
       </div>
-      <p class="guide-p">The <strong>Compare Scales → Side by Side</strong> button (above the Scale Hero) opens two selector pairs and displays two scales' chord lists side by side. Chords shared between both scales are marked with a <strong style="color:#6bb89a">◆ SHARED</strong> badge - useful for finding pivot chords when modulating between keys.</p>
-    </section>
-
-    <!-- 12. PRO TIPS -->
-    <section class="guide-section" id="g-tips">
-      <div class="guide-section-hdr">
-        <div class="guide-section-icon">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 013.5 8.6L12 13H6l-.5-2.4A5 5 0 019 2z" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M6.5 13v1.5a2.5 2.5 0 005 0V13" stroke="currentColor" stroke-width="1.4"/></svg>
-        </div>
-        <div>
-          <div class="guide-section-num">12</div>
-          <div class="guide-section-title">Pro Tips</div>
-        </div>
-      </div>
-      <div class="guide-tip"><span class="guide-tip-icon">🔁</span><span class="guide-tip-text"><strong>Modal interchange:</strong> stay in C Major but click a Dorian or Mixolydian scale chip from Scale Relationships - add their chords to your composition with the + button to borrow modal colour.</span></div>
-      <div class="guide-tip"><span class="guide-tip-icon">🎯</span><span class="guide-tip-text"><strong>Finding pivot chords:</strong> use Compare mode to put your current key and target key side by side - the SHARED chords are your pivot candidates for a smooth modulation.</span></div>
-      <div class="guide-tip"><span class="guide-tip-icon">🎷</span><span class="guide-tip-text"><strong>Jazz voicing workflow:</strong> switch to 7ths mode → use the Drop 2 view to find voicings → add the chords to a composition → play it back with the Guitar sound.</span></div>
-      <div class="guide-tip"><span class="guide-tip-icon">🌐</span><span class="guide-tip-text"><strong>Circle of Fifths navigation:</strong> hover adjacent segments to hear (visually) how close two chords are - gold + purple neighbours make the smoothest voice-leading moves.</span></div>
-      <div class="guide-tip"><span class="guide-tip-icon">⚡</span><span class="guide-tip-text"><strong>Quick progressions:</strong> click a Cadence Suggester row chord by chord to assemble a full cadence in the active composition, then hit Play to audition it.</span></div>
+      <p class="guide-p">The <strong>Compare Scales → Side by Side</strong> button (above the Scale Hero; <em>Compare scales</em> in the phone menu) opens two key + scale selector pairs, set to the current scale and its relative minor, and displays the two scales' chord lists side by side in place of the chord views. Chords shared between both scales are marked with a <strong style="color:#6bb89a">◆ SHARED</strong> badge - useful for finding pivot chords when modulating between keys. Click the button again to go back.</p>
     </section>
 
     <!-- JAZZ LICK LIBRARY -->
@@ -13907,7 +14014,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><ellipse cx="6" cy="14" rx="3" ry="2" transform="rotate(-15 6 14)" stroke="currentColor" stroke-width="1.4"/><rect x="8.6" y="3" width="1.4" height="10" rx=".7" fill="currentColor"/><circle cx="13" cy="5" r="1.2" fill="currentColor"/><circle cx="13" cy="8" r="1.2" fill="currentColor"/></svg>
         </div>
         <div>
-          <div class="guide-section-num" style="color:var(--gold)">13</div>
+          <div class="guide-section-num" style="color:var(--gold)">15</div>
           <div class="guide-section-title">Jazz Resources</div>
         </div>
       </div>
@@ -13930,7 +14037,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M8.5 2.5v7.2a3.5 3.5 0 0 0 7 0V2.5"/><path d="M12 13.2v8.3"/></svg>
         </div>
         <div>
-          <div class="guide-section-num" style="color:var(--gold)">14</div>
+          <div class="guide-section-num" style="color:var(--gold)">16</div>
           <div class="guide-section-title">Tuner</div>
         </div>
       </div>
@@ -13949,7 +14056,79 @@ document.getElementById('all-degrees').addEventListener('click', e => {
         <span class="guide-kv-key">Demo</span>
         <span class="guide-kv-val">A simulated string that starts flat and walks into tune, to see how it reads without a mic.</span>
       </div>
-      <div class="guide-tip"><span class="guide-tip-icon">🎤</span><span class="guide-tip-text"><strong>Mic tips:</strong> works on phone and desktop (built-in mic, webcam, or an audio interface, picked from the <em>Mic</em> list when there are several). If the low string reads badly on a laptop mic, turn off the driver's audio enhancements in the Windows sound settings.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">🎤</span><span class="guide-tip-text"><strong>Mic tips:</strong> works on phone and desktop (built-in mic, webcam, or an audio interface, picked from the <em>Mic</em> list when there are several). If the low string reads badly on a laptop mic, turn off the driver's audio enhancements in the Windows sound settings. The screen stays awake while the tuner listens; the mic stops when you close the tuner (× or Escape) or switch to another tab. Your instrument, tunings and A4 are remembered in this browser.</span></div>
+    </section>
+
+    <!-- ON A PHONE -->
+    <section class="guide-section" id="g-phone">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4.5" y="1.5" width="9" height="15" rx="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="7.5" y1="13.8" x2="10.5" y2="13.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num">17</div>
+          <div class="guide-section-title">On a Phone</div>
+        </div>
+      </div>
+      <p class="guide-p">Below 700 px wide the page is laid out for the thumb. Everything above is still there; only the way in changes.</p>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Top bar</span>
+        <span class="guide-kv-val">Stays at the top. <strong>‹ key ›</strong> steps the key a semitone; tap the key or the scale for the <strong>Key &amp; scale</strong> sheet (the 12 keys, a filter, and every scale with its notes in the current key); the <strong>app icon</strong> opens the menu.</span>
+        <span class="guide-kv-key">Degree rail</span>
+        <span class="guide-kv-val">Under the bar, one button per degree (I, ii, iii... with its chord): tap to jump there; the one on screen lights up. In Chords › Tonnetz it selects the chord on the map.</span>
+        <span class="guide-kv-key">Bottom bar</span>
+        <span class="guide-kv-val">Chords, Guitar, Mandolin, Banjo, Piano. Each instrument's sub-tabs are one row that scrolls sideways, and chord diagrams show two per row.</span>
+        <span class="guide-kv-key">Menu</span>
+        <span class="guide-kv-val">The circle of fifths on top (it leads to the full circle and the tools under it: relationships, cadences, substitutions, pivots, ear training), then Composer, Tuner, Compare scales, Jazz resources, this guide, Technical details, and your History.</span>
+        <span class="guide-kv-key">Chord modes</span>
+        <span class="guide-kv-val">One row of chips under the bar. Nothing on the main screen is smaller than 12 px, and buttons are at least 40 px.</span>
+        <span class="guide-kv-key">Tonnetz</span>
+        <span class="guide-kv-val">Fills the screen without scrolling: the map between the sub-tabs and the inspector sheet, Undo and Clear in its top-left corner, the layers in its top-right corner. Pull the sheet up for the Chord and Progression tabs.</span>
+      </div>
+    </section>
+
+    <!-- LINKS, HISTORY & OFFLINE -->
+    <section class="guide-section" id="g-links">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7.5 10.5a3 3 0 004.2 0l2.6-2.6a3 3 0 00-4.2-4.2l-1 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M10.5 7.5a3 3 0 00-4.2 0l-2.6 2.6a3 3 0 004.2 4.2l1-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num">18</div>
+          <div class="guide-section-title">Links, History &amp; Offline</div>
+        </div>
+      </div>
+      <div class="guide-kv">
+        <span class="guide-kv-key">Shareable link</span>
+        <span class="guide-kv-val">The address bar always holds the key, the scale, the chord mode and the view (and the full-screen Tonnetz). Copy it to share exactly what you see, or bookmark it; reloading the page keeps you where you were.</span>
+        <span class="guide-kv-key">Saved here</span>
+        <span class="guide-kv-val">Your compositions, the History list, the Steps toggle, the reading status of the Jazz Resources and the tuner settings stay in this browser, on this device. To move compositions, use Share / Import or Export all / Restore.</span>
+        <span class="guide-kv-key">Reset preferences</span>
+        <span class="guide-kv-val">At the bottom of the page: clears the History and the Steps toggle. Compositions are kept.</span>
+        <span class="guide-kv-key">Install &amp; offline</span>
+        <span class="guide-kv-val">The app can be installed from the browser (Add to Home screen on a phone) and opens offline once it has been visited online. Each instrument's sounds are kept for offline use once they have loaded (the piano at start, the others when their diagrams first show); until then, or offline on a first visit, the strings are synthesised.</span>
+        <span class="guide-kv-key">Keyboard</span>
+        <span class="guide-kv-val">Tab reaches every control; Enter or Space activates it. Escape closes any window. ← → step through zoomed diagrams. In Chords › Tonnetz: P, L, R move, Backspace undoes. In the scale filter, Enter opens the first match.</span>
+      </div>
+    </section>
+
+    <!-- PRO TIPS -->
+    <section class="guide-section" id="g-tips">
+      <div class="guide-section-hdr">
+        <div class="guide-section-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 013.5 8.6L12 13H6l-.5-2.4A5 5 0 019 2z" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M6.5 13v1.5a2.5 2.5 0 005 0V13" stroke="currentColor" stroke-width="1.4"/></svg>
+        </div>
+        <div>
+          <div class="guide-section-num">19</div>
+          <div class="guide-section-title">Pro Tips</div>
+        </div>
+      </div>
+      <div class="guide-tip"><span class="guide-tip-icon">🔁</span><span class="guide-tip-text"><strong>Modal interchange:</strong> stay in C Major but click a Dorian or Mixolydian scale chip from Scale Relationships - add their chords to your composition with the + button to borrow modal colour.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">🎯</span><span class="guide-tip-text"><strong>Finding pivot chords:</strong> open the Pivot Chord Finder on your target key, or use Compare mode to put both keys side by side - the SHARED chords are your pivot candidates for a smooth modulation.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">🎷</span><span class="guide-tip-text"><strong>Jazz voicing workflow:</strong> switch to 7ths mode → use the Drop 2 view to find voicings → add the chords to a composition → play it back with the Guitar sound.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">🔺</span><span class="guide-tip-text"><strong>Smooth voice-leading:</strong> in Chords › Tonnetz, every P, L or R move keeps two notes and moves one by a step. Walk a few moves from the tonic, then Send to Composer to hear the path as a progression.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">🌐</span><span class="guide-tip-text"><strong>Circle of Fifths navigation:</strong> neighbouring segments share the most notes - gold and purple neighbours make the smoothest moves.</span></div>
+      <div class="guide-tip"><span class="guide-tip-icon">⚡</span><span class="guide-tip-text"><strong>Quick progressions:</strong> click a Cadence Suggester row chord by chord to assemble a full cadence in the active composition, then hit Play to audition it.</span></div>
     </section>
 
     <section class="guide-section" id="g-sources">
@@ -13958,7 +14137,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2h8l3 3v11a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M12 2v4h3M6 8h6M6 11h6M6 14h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         </div>
         <div>
-          <div class="guide-section-num">15</div>
+          <div class="guide-section-num">20</div>
           <div class="guide-section-title">Sources &amp; Further Reading</div>
         </div>
       </div>
