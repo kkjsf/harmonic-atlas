@@ -23,9 +23,11 @@ self.addEventListener('install', e => {
   // Cache assets one at a time. addAll() is atomic: a single 404 or redirect
   // rejects the whole batch and leaves nothing precached, which is how a dev
   // server that redirects /index.html could silently kill the offline shell.
+  // cache: 'reload' skips the browser's HTTP cache, which would otherwise hand
+  // the new version a stale copy (an old icon) to serve cache-first.
   e.waitUntil(caches.open(CACHE).then(c =>
     Promise.all(ASSETS.map(u =>
-      c.add(u).catch(err => console.warn('[sw] precache skipped', u, err && err.message))
+      c.add(new Request(u, { cache: 'reload' })).catch(err => console.warn('[sw] precache skipped', u, err && err.message))
     ))
   ));
   self.skipWaiting();
