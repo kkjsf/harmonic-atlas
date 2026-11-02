@@ -164,18 +164,19 @@ alien tone, no wrong-way stretch, nothing clipped off the diagram, none out of r
 
 ### Tuner (tuning-fork button, header)
 
-A microphone tuner for guitar, mandolin, 5-string banjo, or any note (Chromatic).
+A microphone tuner for guitar, mandolin, 5-string banjo, ukulele, or any note (Chromatic).
 
 - **Presets**: guitar Standard, Drop D, Half step down, DADGAD, Open G, Open D; mandolin
   Standard, Cross A (AEAE), Cross G (GDGD); banjo Open G, Double C, G modal (Sawmill),
-  Standard C, Open D.
+  Standard C, Open D; ukulele Standard (gCEA, re-entrant: the 4th string is G4, above the C),
+  Low G, D tuning (aDF♯B), Baritone (DGBE).
 - **Any string, any pitch**: ▲ ▼ move a string by a semitone (up to 7 from its preset), e.g. the
   banjo drone from G to A♭. A tuning that matches a preset takes its name; otherwise it is
   *Custom* with a *Reset* back to the preset. Saved in the browser.
 - **Reading**: a needle over ±50 cents (green within 3), the gap in cents or semitones + cents,
   which way to turn the peg, the frequency heard and aimed at in Hz, and a ✓ on each string held
   in tune. *Auto* aims at the closest string; tapping a string locks it. A4 from 430 to 450 Hz.
-- **Reference** plays the target pitch on the app's voices; **Demo** runs a simulated string
+- **Reference** plays the target pitch on the app's voices (the guitar for the ukulele); **Demo** runs a simulated string
   through the detector without a mic.
 - **Under the hood**: `getUserMedia` with the call-audio filters off, YIN pitch detection with an
   octave check, ~30 readings a second. Needs HTTPS or localhost; the mic stops when the window

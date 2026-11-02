@@ -906,6 +906,7 @@
     #tuner-modal { max-width: none; min-height: 100%; border-radius: 0; border: 0; }
   }
   @media (max-width: 480px) {
+    .tn-seg button { letter-spacing:0; }
     .tn-note { font-size:56px; }
     .tn-strings { gap:4px; }
     .tn-str .tn-main { font-size:18px; }
@@ -2866,8 +2867,8 @@
 // sw.js derives its cache name from the ?v= below, and the Technical Details
 // row is written from it, so a deploy is one edit here.
 // ══════════════════════════════════════════════
-window.APP_VERSION = 'v91';
-window.APP_DEPLOYED = '2026-11-02 10:38';
+window.APP_VERSION = 'v92';
+window.APP_DEPLOYED = '2026-11-02 10:52';
 
 // ══════════════════════════════════════════════
 // ENHARMONIC SPELLING ENGINE
@@ -9808,6 +9809,7 @@ function attachSoundBars(root) {
 //
 // Strings are MIDI numbers in the order the hand meets them: low to high, and on
 // the banjo the short 5th-string drone first, as its tuning is written (gDGBD).
+// The ukulele's 4th string comes first too: an octave up in re-entrant tunings (gCEA).
 // ══════════════════════════════════════════════
 const TUNER_NAMES = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 const TUNER_INSTR = {
@@ -9820,6 +9822,8 @@ const TUNER_INSTR = {
   banjo: { nums: [5, 4, 3, 2, 1], presets: [
     ['Open G', [67, 50, 55, 59, 62]], ['Double C', [67, 48, 55, 60, 62]], ['G modal (Sawmill)', [67, 50, 55, 60, 62]],
     ['Standard C', [67, 48, 55, 59, 62]], ['Open D', [66, 50, 54, 57, 62]] ] },
+  ukulele: { nums: [4, 3, 2, 1], presets: [
+    ['Standard', [67, 60, 64, 69]], ['Low G', [55, 60, 64, 69]], ['D tuning', [69, 62, 66, 71]], ['Baritone', [50, 55, 59, 64]] ] },
   chromatic: { nums: [], presets: [] }
 };
 const TUNER_MAX_SHIFT = 7;   // semitones a string may move away from its preset
@@ -9889,8 +9893,11 @@ function tunerYin(x, sr, minF, maxF) {
 // The reference pitch, on the app's own voices: guitar samples (or the plucked
 // guitar until they load), mandolin and banjo samples, the piano for chromatic.
 // The guitar sampler is pitched for A = 440, so another A4 plucks the guitar in
-// software; the mandolin and banjo recordings shift to any A4.
+// software; the mandolin and banjo recordings shift to any A4. The app has no
+// ukulele recordings, so the ukulele's reference is the guitar.
+const tunerVoice = instr => instr === 'ukulele' ? 'guitar' : instr;
 function tunerReference(instr, midi, a4) {
+  instr = tunerVoice(instr);
   if (typeof Tone === 'undefined') return;
   Tone.start().then(() => voiceReady(instr, 5000)).then(() => {
     const ctx = Tone.getContext().rawContext, at440 = midi + 12 * Math.log2(a4 / 440);
@@ -12717,7 +12724,7 @@ const PHONE_MQ = matchMedia('(max-width: 700px)');
 const M_KEYS = ['C','D♭','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 const M_TOOLS = [
   ['comp-btn',     'Composer',                 'Build a progression, improvise over it'],
-  ['tuner-btn',    'Tuner',                    'Guitar, mandolin, banjo, chromatic'],
+  ['tuner-btn',    'Tuner',                    'Guitar, mandolin, banjo, ukulele, chromatic'],
   ['m-compare',    'Compare scales',           'Two scales side by side'],
   ['lick-lib-btn', 'Jazz resources',           'Licks, lessons and references'],
   ['guide-btn',    'User guide',               'Every tab explained'],
@@ -13218,9 +13225,9 @@ document.getElementById('all-degrees').addEventListener('click', e => {
     <div class="tech-section">
       <div class="tech-section-title">Tuner <span style="color:var(--muted);font-weight:400">- tuning-fork button</span></div>
       <div class="tech-row"><span class="tech-key">Microphone</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">getUserMedia</code> with echo cancellation, noise suppression and auto gain off (call-audio filters that thin out a low string's fundamental), a 45 Hz high-pass, and its own AudioContext, created on Start and suspended on Stop, so the tuner works even when Tone.js did not load. Needs HTTPS or localhost. The mic stops when the window closes or the tab goes to the background; the screen stays awake while listening.</span></div>
-      <div class="tech-row"><span class="tech-key">Detection</span><span class="tech-val">YIN (de Cheveigné &amp; Kawahara 2002) on a 4096-sample window, ~30 times a second: the first dip under 0.15 of the normalised difference function, a parabola through it, then an octave check (a weak fundamental under a loud 2nd harmonic also dips at half the period). Search bounded by the tuning (lowest string × 0.66). Median of 5 readings, needle eased. Tested: within 1 cent from 65 Hz to 1.3 kHz, and 333/333 plucked guitar, mandolin and banjo notes read within 2 cents through a phone-like high-pass.</span></div>
-      <div class="tech-row"><span class="tech-key">Tunings</span><span class="tech-val">Guitar: Standard, Drop D, Half step down, DADGAD, Open G, Open D. Mandolin: Standard, Cross A (AEAE), Cross G (GDGD). Banjo: Open G, Double C, G modal (Sawmill), Standard C, Open D. Each string moves by semitones (up to 7 from its preset); a tuning that matches a preset takes its name. Auto targets the closest string, a tapped string stays the target. In tune = within 3 cents; a string held in tune for 0.4 s gets a ✓. A4 430-450 Hz. Saved in this browser.</span></div>
-      <div class="tech-row"><span class="tech-key">Reference</span><span class="tech-val">The target pitch on the app's own voices: guitar samples (plucked guitar until they load), mandolin and banjo samples, the piano in Chromatic. The guitar samples play at A = 440 only, so another A4 plucks the guitar in software; the mandolin and banjo recordings shift to any A4.</span></div>
+      <div class="tech-row"><span class="tech-key">Detection</span><span class="tech-val">YIN (de Cheveigné &amp; Kawahara 2002) on a 4096-sample window, ~30 times a second: the first dip under 0.15 of the normalised difference function, a parabola through it, then an octave check (a weak fundamental under a loud 2nd harmonic also dips at half the period). Search bounded by the tuning (lowest string × 0.66). Median of 5 readings, needle eased. Tested: within 1 cent from 65 Hz to 1.3 kHz, and 333/333 plucked guitar, mandolin and banjo notes read within 2 cents through a phone-like high-pass, and the ukulele's re-entrant g, C, A and baritone D within 3.</span></div>
+      <div class="tech-row"><span class="tech-key">Tunings</span><span class="tech-val">Guitar: Standard, Drop D, Half step down, DADGAD, Open G, Open D. Mandolin: Standard, Cross A (AEAE), Cross G (GDGD). Banjo: Open G, Double C, G modal (Sawmill), Standard C, Open D. Ukulele: Standard (gCEA, the 4th string an octave up, written lowercase), Low G, D tuning (aDF♯B), Baritone (DGBE). Each string moves by semitones (up to 7 from its preset); a tuning that matches a preset takes its name. Auto targets the closest string, a tapped string stays the target. In tune = within 3 cents; a string held in tune for 0.4 s gets a ✓. A4 430-450 Hz. Saved in this browser.</span></div>
+      <div class="tech-row"><span class="tech-key">Reference</span><span class="tech-val">The target pitch on the app's own voices: guitar samples (plucked guitar until they load), mandolin and banjo samples, the guitar for the ukulele (the app has no ukulele recordings), the piano in Chromatic. The guitar samples play at A = 440 only, so another A4 plucks the guitar in software; the mandolin and banjo recordings shift to any A4.</span></div>
     </div>
 
     <div class="tech-section">
@@ -13272,7 +13279,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
 
     <div class="tech-section">
       <div class="tech-section-title">Tests</div>
-      <div class="tech-row"><span class="tech-key">Engine tests</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">node tests/engine.test.js</code>, no dependencies: loads the first script of this page in a Node VM with a stand-in DOM and checks the engine <em>by name</em> - spelling, chord names, guitar / mandolin / banjo shapes (C = x32010, G big chop = 7-5-2-3), piano fingerings and voicings, the notes each diagram plays and the tuning of the synthesised strings, the tuner (presets, detection, plucked strings through a simulated phone mic), the Tonnetz, and the links. 112 checks, run before every deploy. Named checks, because the v74 grips passed every invariant test while the two most important chop shapes were missing.</span></div>
+      <div class="tech-row"><span class="tech-key">Engine tests</span><span class="tech-val"><code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px">node tests/engine.test.js</code>, no dependencies: loads the first script of this page in a Node VM with a stand-in DOM and checks the engine <em>by name</em> - spelling, chord names, guitar / mandolin / banjo shapes (C = x32010, G big chop = 7-5-2-3), piano fingerings and voicings, the notes each diagram plays and the tuning of the synthesised strings, the tuner (presets, detection, plucked strings through a simulated phone mic), the Tonnetz, and the links. 115 checks, run before every deploy. Named checks, because the v74 grips passed every invariant test while the two most important chop shapes were missing.</span></div>
     </div>
 
     <div class="tech-section">
@@ -14052,15 +14059,15 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <p class="guide-p">The <strong>tuning-fork</strong> button (top-right) opens a tuner that listens through the microphone. Pick the instrument, press <strong>Start</strong>, allow the mic, and play a string: the needle shows how far you are, in cents, and the line under the note says which way to turn the peg.</p>
       <div class="guide-kv">
         <span class="guide-kv-key">Instruments</span>
-        <span class="guide-kv-val">Guitar, Mandolin, 5-string Banjo, or Chromatic (any note, the closest semitone is the target).</span>
+        <span class="guide-kv-val">Guitar, Mandolin, 5-string Banjo, Ukulele, or Chromatic (any note, the closest semitone is the target).</span>
         <span class="guide-kv-key">Tunings</span>
-        <span class="guide-kv-val">Presets per instrument (Drop D, DADGAD, Open G, Double C, Sawmill...). ▲ ▼ move any string by a semitone, for instance the banjo drone from G to A♭: changed strings turn violet, and <em>Reset</em> goes back to the preset. A tuning that matches a preset takes its name.</span>
+        <span class="guide-kv-val">Presets per instrument (Drop D, DADGAD, Open G, Double C, Sawmill, ukulele gCEA, Low G, D tuning, Baritone...). On a ukulele in standard tuning the 4th string is the high <em>g</em> (G4, above the C): Auto aims at it, not at a G an octave down. ▲ ▼ move any string by a semitone, for instance the banjo drone from G to A♭: changed strings turn violet, and <em>Reset</em> goes back to the preset. A tuning that matches a preset takes its name.</span>
         <span class="guide-kv-key">Auto / one string</span>
         <span class="guide-kv-val"><em>Auto</em> aims at the closest string. Tap a string to aim at it alone, which helps when you start a semitone or more away (the gap then reads in semitones and cents). A ✓ marks each string held in tune.</span>
         <span class="guide-kv-key">Hz</span>
         <span class="guide-kv-val">The frequency heard and the frequency aimed at, under the note. A4 can be set from 430 to 450 Hz.</span>
         <span class="guide-kv-key">Reference</span>
-        <span class="guide-kv-val">Plays the target pitch, to tune by ear.</span>
+        <span class="guide-kv-val">Plays the target pitch, to tune by ear (on the guitar for the ukulele).</span>
         <span class="guide-kv-key">Demo</span>
         <span class="guide-kv-val">A simulated string that starts flat and walks into tune, to see how it reads without a mic.</span>
       </div>
@@ -14219,6 +14226,7 @@ document.getElementById('all-degrees').addEventListener('click', e => {
       <button type="button" data-instr="guitar">Guitar</button>
       <button type="button" data-instr="mandolin">Mandolin</button>
       <button type="button" data-instr="banjo">Banjo</button>
+      <button type="button" data-instr="ukulele">Ukulele</button>
       <button type="button" data-instr="chromatic">Chromatic</button>
     </div>
     <div class="tn-row">
@@ -17477,13 +17485,14 @@ window.addEventListener('resize', () => {
 (function() {
   const STORE = 'ha-tuner-v1', TUNED_FRAMES = 12;
   const st = { instr: 'guitar', a4: 440, tunings: {}, base: {}, device: '' };
-  ['guitar', 'mandolin', 'banjo'].forEach(k => { st.tunings[k] = TUNER_INSTR[k].presets[0][1].slice(); st.base[k] = 0; });
+  const STRINGED = Object.keys(TUNER_INSTR).filter(k => TUNER_INSTR[k].presets.length);
+  STRINGED.forEach(k => { st.tunings[k] = TUNER_INSTR[k].presets[0][1].slice(); st.base[k] = 0; });
   try {
     const saved = JSON.parse(localStorage.getItem(STORE)) || {};
     if (TUNER_INSTR[saved.instr]) st.instr = saved.instr;
     if (saved.a4 >= 430 && saved.a4 <= 450) st.a4 = saved.a4;
     if (typeof saved.device === 'string') st.device = saved.device;
-    ['guitar', 'mandolin', 'banjo'].forEach(k => {
+    STRINGED.forEach(k => {
       const t = saved.tunings && saved.tunings[k], b = saved.base && saved.base[k];
       if (Number.isInteger(b) && TUNER_INSTR[k].presets[b]) st.base[k] = b;
       const base = TUNER_INSTR[k].presets[st.base[k]][1];
@@ -17542,7 +17551,7 @@ window.addEventListener('resize', () => {
     $('tn-reset').textContent = 'Reset to ' + presets[st.base[st.instr]][0];
     $('tn-tname').innerHTML = s.map((m, i) => {
       let n = tunerLabel(m).n;
-      if (st.instr === 'banjo' && i === 0) n = n.toLowerCase();
+      if (i === 0 && (st.instr === 'banjo' || st.instr === 'ukulele' && m > s[1])) n = n.toLowerCase();
       return m !== base[i] ? `<span class="m">${n}</span>` : n;
     }).join(' ');
     $('tn-strings').innerHTML = s.map((m, i) => `
@@ -17561,7 +17570,7 @@ window.addEventListener('resize', () => {
   $('tn-seg').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     st.instr = b.dataset.instr; locked = null; active = null; tuned.clear(); resetTrack(); save(); render();
-    warmVoice(st.instr);
+    warmVoice(tunerVoice(st.instr));
   });
   $('tn-preset').addEventListener('change', e => {
     if (e.target.value === 'custom') return;
@@ -17746,7 +17755,7 @@ window.addEventListener('resize', () => {
     overlay.classList.add('open');
     lockScroll();
     render();
-    warmVoice(st.instr);   // the reference button then plays the recording from its first press
+    warmVoice(tunerVoice(st.instr));   // the reference button then plays the recording from its first press
     setTimeout(() => $('tn-start').focus(), 50);
   }
   function closeTuner() {

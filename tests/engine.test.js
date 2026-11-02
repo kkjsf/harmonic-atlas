@@ -266,6 +266,22 @@ check('tuner: a G played on an A-flat drone reads a semitone and a bit low', () 
 check('tuner: Auto picks the closest string, a lock keeps its own', () => {
   eq(run(`[tunerTarget([40,45,50,55,59,64], 44.7, null).idx, tunerTarget([67,50,55,59,62], 67, 0).target, tunerTarget([], 60.4, null).target].join()`), '1,67,60');
 });
+check('tuner ukulele: gCEA with the g above the C, Low G, D tuning, Baritone', () => {
+  const name = p => run(`TUNER_INSTR.ukulele.presets.find(p => p[0] === ${JSON.stringify(p)})[1].map(m => tunerLabel(m).n + tunerLabel(m).o).join(' ')`);
+  eq(['Standard', 'Low G', 'D tuning', 'Baritone'].map(name).join(' | '), 'G4 C4 E4 A4 | G3 C4 E4 A4 | A4 D4 F♯4 B4 | D3 G3 B3 E4');
+  eq(run(`[TUNER_INSTR.ukulele.nums.join(''), tunerHz(67, 440).toFixed(1), tunerPresetIndex('ukulele', [55,60,64,69])].join()`), '4321,392.0,1');
+});
+check('tuner ukulele: Auto tells the high g from the A, the reference plays on the guitar', () => {
+  eq(run(`[tunerTarget([67,60,64,69], 67.9, null).idx, tunerTarget([67,60,64,69], 68.1, null).idx, tunerTarget([67,60,64,69], 61.2, null).idx, tunerVoice('ukulele'), tunerVoice('banjo')].join()`), '0,3,1,guitar,banjo');
+});
+check('tuner reads ukulele strings through a phone-like mic (re-entrant g, C, A, baritone D)', () => {
+  eq(run(`(() => { const sr = 48000, ctx = { sampleRate: sr, createBuffer: (c, n) => { const d = new Float32Array(n); return { getChannelData: () => d }; } };
+    const hp = x => { const a = 1 / (1 + 2 * Math.PI * 250 / sr); let px = 0, py = 0; return x.map(v => { py = a * (py + v - px); px = v; return py; }); };
+    return [[67, 60], [60, 60], [69, 60], [50, 50]].map(([m, low]) => {
+      const x = hp(hp(pluckBuffer(ctx, 'guitar', m).getChannelData(0).slice(2400 - 1000, 2400 + 4096))).slice(1000);
+      const r = tunerYin(x, sr, tunerHz(low, 440) * 0.66, Math.min(1500, tunerHz(69, 440) * 1.6));
+      return r && Math.abs(1200 * Math.log2(r.f / tunerHz(m, 440))) < 3; }).join(); })()`), 'true,true,true,true');
+});
 check('tuner YIN within 1 cent from 65 Hz to 1.3 kHz, no octave error on a loud 2nd harmonic', () => {
   eq(run(`(() => { const sr = 48000, bad = [];
     for (const f of [65.41, 82.41, 110, 196, 293.66, 415.3, 659.26, 1318.5]) for (const h2 of [0.5, 5]) {
