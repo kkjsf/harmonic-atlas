@@ -120,6 +120,14 @@ the attack, retuned to A = 440 (the takes were up to 30 cents off), levelled, fa
 Philharmonia licence allows any use in a work but not redistributing the samples as they are, which
 is why the app ships these processed derivatives. The `tools/` folder is not part of the app.
 
+The guitar, mandolin and banjo icons (view tabs and phone bottom bar) are
+[Acoustic Guitars](https://thenounproject.com/icon/acoustic-guitars-644061/),
+[Mandolin](https://thenounproject.com/icon/mandolin-644070/) and
+[Banjo](https://thenounproject.com/icon/banjo-644064/) by
+[nopixel](https://thenounproject.com/creator/nopixel/) from the Noun Project (CC BY 3.0),
+recoloured with `currentColor` and turned 40°. They live once, as three `<symbol>`s at the top of
+`<body>`, and each tab draws them with `<use>`.
+
 ### Closed-grip engine (mandolin Chop · banjo Moveable)
 
 Both tabs run one search. A chop only speaks because the whole grip lifts off at once, so an
